@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using Dalamud.Game.Text.SeStringHandling;
+using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.Text;
@@ -15,10 +14,26 @@ using ImGuiNET;
 namespace HaselDebug.Tabs;
 
 #pragma warning disable SeStringRenderer
-public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui, ExcelService ExcelService) : DebugTab
+public unsafe class RaptureTextModuleTab(ExcelService ExcelService) : DebugTab
 {
+    private readonly List<TextEntry> entries = [
+        new TextEntry(ExcelService, TextEntryType.String, "Test1 "),
+        new TextEntry(ExcelService, TextEntryType.Macro, "<color(0xFF9000)>"),
+        new TextEntry(ExcelService, TextEntryType.String, "Test2 "),
+        new TextEntry(ExcelService, TextEntryType.Macro, "<color(0)>"),
+        new TextEntry(ExcelService, TextEntryType.String, "Test3 "),
+        new TextEntry(ExcelService, TextEntryType.Macro, "<color(stackcolor)>"),
+        new TextEntry(ExcelService, TextEntryType.String, "Test 4 "),
+        new TextEntry(ExcelService, TextEntryType.Macro, "<color(stackcolor)>"),
+        new TextEntry(ExcelService, TextEntryType.String, "Test 5"),
+    ];
+
+    public override bool DrawInChild => false;
     public override unsafe void Draw()
     {
+        using var hostchild = ImRaii.Child("RaptureTextModuleTabChild", new Vector2(-1), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
+        if (!hostchild) return;
+
         using var tabs = ImRaii.TabBar("RaptureTextModuleTab_TabBar");
         if (!tabs) return;
 
@@ -201,6 +216,33 @@ public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui,
 
         var raptureTextModule = RaptureTextModule.Instance();
 
+        if (ImGui.Button("Add entry"))
+        {
+            entries.Add(new(ExcelService));
+        }
+
+        ImGui.SameLine();
+
+        if (ImGui.Button("PrintString"))
+        {
+            var temp = Utf8String.CreateEmpty();
+            foreach (var entry in entries)
+                temp->Append(entry.Run());
+            RaptureLogModule.Instance()->PrintString(temp->StringPtr);
+            temp->Dtor(true);
+        }
+
+        ImGui.TextUnformatted(raptureTextModule->MacroEncoder.EncoderError.ToString()); // TODO: EncoderError doesn't clear
+
+        using var table = ImRaii.Table("StringMakerTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        if (!table) return;
+
+        ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 80);
+        ImGui.TableSetupScrollFreeze(3, 1);
+        ImGui.TableHeadersRow();
+
         var ArrowUpButtonSize = ImGuiUtils.GetIconButtonSize(FontAwesomeIcon.ArrowUp);
         var ArrowDownButtonSize = ImGuiUtils.GetIconButtonSize(FontAwesomeIcon.ArrowDown);
         var TrashButtonSize = ImGuiUtils.GetIconButtonSize(FontAwesomeIcon.Trash);
@@ -213,11 +255,29 @@ public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui,
         for (var i = 0; i < entries.Count; i++)
         {
             var key = $"##Entry{i}";
-            using var child = ImRaii.Child(key + "_Child", new(-1, 120), true);
             var entry = entries[i];
-            entry.Draw(i);
 
-            ImGui.Separator();
+            ImGui.TableNextRow();
+
+            ImGui.TableNextColumn(); // Type
+            ImGui.SetNextItemWidth(-1);
+            ImGui.Combo($"##Type{i}", ref entry.Type, ["String", "Macro", "Fixed"], 3);
+
+            ImGui.TableNextColumn(); // Text
+            ImGui.TextUnformatted("Input:");
+            ImGui.SameLine();
+            ImGui.InputText($"##{i}_Message", ref entry.Message, 255);
+
+            entry.Run();
+            using var output = new Utf8String();
+            var ptr = &output;
+            raptureTextModule->TextModule.FormatString(entry.GeneratedString->StringPtr, null, ptr);
+
+            ImGui.TextUnformatted("Output:");
+            ImGui.SameLine();
+            DebugUtils.DrawUtf8String((nint)ptr, new NodeOptions() { AddressPath = new AddressPath((nint)ptr) });
+
+            ImGui.TableNextColumn(); // Actions
 
             if (i > 0)
             {
@@ -231,7 +291,7 @@ public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui,
                 ImGui.Dummy(ArrowUpButtonSize);
             }
 
-            ImGui.SameLine();
+            ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
 
             if (i < entries.Count - 1)
             {
@@ -245,7 +305,7 @@ public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui,
                 ImGui.Dummy(ArrowDownButtonSize);
             }
 
-            ImGui.SameLine();
+            ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
 
             if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || ImGui.IsKeyDown(ImGuiKey.RightShift))
             {
@@ -263,6 +323,8 @@ public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui,
                     disabled: true);
             }
         }
+
+        table.Dispose();
 
         if (entryToMoveUp != -1)
         {
@@ -282,83 +344,6 @@ public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui,
         {
             entries.RemoveAt(entryToRemove);
         }
-
-        if (ImGui.Button("Add entry"))
-        {
-            entries.Add(new(ExcelService));
-        }
-
-        ImGui.SameLine();
-        if (ImGui.Button("PrintString"))
-        {
-            using var temp = new Utf8String();
-            var tmpptr = &temp;
-            tmpptr->BufSize = 0;
-            foreach (var entry in entries)
-            {
-                var output = entry.Run();
-                temp.Append(output);
-            }
-            RaptureLogModule.Instance()->PrintString(temp.StringPtr);
-        }
-
-        ImGui.SameLine();
-        if (ImGui.Button("PrintMessage"))
-        {
-            var temp = Utf8String.CreateEmpty();
-            foreach (var entry in entries)
-            {
-                var output = entry.Run();
-                temp->Append(output);
-            }
-            using var sender = new Utf8String("HaselDebug");
-            PluginLog.Debug($"new message id: {RaptureLogModule.Instance()->PrintMessage(16, &sender, temp, (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds(), false)} -> {temp->ToString()}");
-            temp->Dtor(true);
-        }
-        ImGui.SameLine();
-        if (ImGui.Button("Print via Dalamud"))
-        {
-            using var temp = new Utf8String();
-            var tmpptr = &temp;
-            tmpptr->BufSize = 0;
-            foreach (var entry in entries)
-            {
-                var output = entry.Run();
-                temp.Append(output);
-            }
-            using var sender = new Utf8String("HaselDebug");
-            ChatGui.Print(new Dalamud.Game.Text.XivChatEntry()
-            {
-                Type = Dalamud.Game.Text.XivChatType.Party,
-                Message = SeString.Parse(temp.AsSpan()),
-                Name = SeString.Parse(sender.AsSpan()),
-                Timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                Silent = false
-            });
-        }
-        ImGui.SameLine();
-        if (ImGui.Button("Print via Dalamud (Silent)"))
-        {
-            using var temp = new Utf8String();
-            var tmpptr = &temp;
-            tmpptr->BufSize = 0;
-            foreach (var entry in entries)
-            {
-                var output = entry.Run();
-                temp.Append(output);
-            }
-            using var sender = new Utf8String("HaselDebug");
-            ChatGui.Print(new Dalamud.Game.Text.XivChatEntry()
-            {
-                Type = Dalamud.Game.Text.XivChatType.Party,
-                Message = SeString.Parse(temp.AsSpan()),
-                Name = SeString.Parse(sender.AsSpan()),
-                Timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                Silent = true
-            });
-        }
-
-        ImGui.TextUnformatted(raptureTextModule->TextModule.MacroEncoder.EncoderError.ToString());
     }
 
     private enum TextEntryType
@@ -370,90 +355,73 @@ public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui,
 
     private class TextEntry : IDisposable
     {
-        private readonly Utf8String* _str;
         private readonly ExcelService ExcelService;
 
-        //private string _message = "<sheet(ENpcResident,1046073,0)>";
-        //private string _message = "<denoun(ENpcResident,1,1046099,2,3)>";
-        private string _message = "<denoun(ENpcResident,1,1046099,2,1)>"; // "<denoun(Item,1,36664,1,1)>"; // <fixed(200,4,39246,1,0,0,Phoenix Riser Suit)>
-        private int _type = 2;
+        public readonly Utf8String* GeneratedString;
+        public string Message = string.Empty;
+        public int Type = 0;
 
         public TextEntry(ExcelService excelService)
         {
             ExcelService = excelService;
-            _str = Utf8String.FromString("<denoun(ENpcResident,1,1046099,2,1)>");
+            GeneratedString = Utf8String.CreateEmpty();
         }
 
         public TextEntry(ExcelService excelService, TextEntryType type, string text)
         {
             ExcelService = excelService;
 
-            _type = (int)type;
-            _str = Utf8String.CreateEmpty();
-            _message = text;
+            Type = (int)type;
+            GeneratedString = Utf8String.CreateEmpty();
+            Message = text;
         }
 
         public Utf8String* Run()
         {
-            _str->Clear();
+            GeneratedString->Clear();
 
-            switch (_type)
+            switch (Type)
             {
                 case 0:
-                    _str->ConcatCStr(_message);
+                    GeneratedString->ConcatCStr(Message);
                     break;
                 case 1:
-                    AppendMacro(_message);
+                    AppendMacro(Message);
                     break;
                 case 2:
-                    //AppendFixed(_message);
+                    AppendFixed(Message);
                     break;
             }
 
-            return _str;
+            return GeneratedString;
         }
 
         private void AppendMacro(string macro)
         {
-            using var output = new Utf8String();
-            RaptureTextModule.Instance()->MacroEncoder.EncodeString(&output, macro);
-            _str->Append(&output);
+            var output = Utf8String.CreateEmpty();
+            RaptureTextModule.Instance()->MacroEncoder.EncodeString(output, macro);
+            GeneratedString->Append(output);
+            output->Dtor(true);
+        }
+
+        private void AppendFixed(string fixedString)
+        {
+            var input = Utf8String.FromString(fixedString);
+            var output = Utf8String.CreateEmpty();
+
+            RaptureTextModule.Instance()->TextModule.ProcessMacroCode(output, input->StringPtr);
+            var out1 = PronounModule.Instance()->ProcessString(output, true);
+            var out2 = PronounModule.Instance()->ProcessString(out1, false);
+
+            GeneratedString->Append(out2);
+
+            output->Dtor(true);
+            input->Dtor(true);
         }
 
         public void Dispose()
         {
-            _str->Dtor(true);
-        }
-
-        public void Draw(int index)
-        {
-            ImGui.RadioButton($"IsString##{index}_isString", ref _type, 0);
-            ImGui.SameLine();
-            ImGui.RadioButton($"IsMacro##{index}_isMacro", ref _type, 1);
-            ImGui.SameLine();
-            ImGui.RadioButton($"IsFixed##{index}_isFixed", ref _type, 2);
-
-            ImGui.InputText($"Message##{index}_Message", ref _message, 255);
-
-            Run();
-
-            using var output = new Utf8String();
-            var ptr = &output;
-            RaptureTextModule.Instance()->TextModule.FormatString(_str->StringPtr, null, ptr);
-            DebugUtils.DrawUtf8String((nint)ptr, new NodeOptions() { AddressPath = new AddressPath((nint)ptr) });
+            GeneratedString->Dtor(true);
         }
     }
-
-    private readonly List<TextEntry> entries = [
-        new TextEntry(ExcelService, TextEntryType.String, "Test1 "),
-        new TextEntry(ExcelService, TextEntryType.Macro, "<color(0xFF9000)>"),
-        new TextEntry(ExcelService, TextEntryType.String, "Test2 "),
-        new TextEntry(ExcelService, TextEntryType.Macro, "<color(0)>"),
-        new TextEntry(ExcelService, TextEntryType.String, "Test3 "),
-        new TextEntry(ExcelService, TextEntryType.Macro, "<color(stackcolor)>"),
-        new TextEntry(ExcelService, TextEntryType.String, "Test 4 "),
-        new TextEntry(ExcelService, TextEntryType.Macro, "<color(stackcolor)>"),
-        new TextEntry(ExcelService, TextEntryType.String, "Test 5"),
-    ];
-
 }
