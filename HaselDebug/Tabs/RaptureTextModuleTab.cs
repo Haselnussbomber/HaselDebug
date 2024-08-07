@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
@@ -7,7 +6,6 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.Text;
-using FFXIVClientStructs.STD;
 using HaselCommon.Services;
 using HaselCommon.Utils;
 using HaselDebug.Abstracts;
@@ -19,101 +17,6 @@ namespace HaselDebug.Tabs;
 #pragma warning disable SeStringRenderer
 public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui, ExcelService ExcelService) : DebugTab
 {
-    private enum TextEntryType
-    {
-        String,
-        Macro,
-        Fixed
-    }
-
-    private class TextEntry : IDisposable
-    {
-        private readonly Utf8String* _str;
-        private readonly ExcelService ExcelService;
-
-        //private string _message = "<sheet(ENpcResident,1046073,0)>";
-        //private string _message = "<denoun(ENpcResident,1,1046099,2,3)>";
-        private string _message = "<denoun(ENpcResident,1,1046099,2,1)>"; // "<denoun(Item,1,36664,1,1)>"; // <fixed(200,4,39246,1,0,0,Phoenix Riser Suit)>
-        private int _type = 2;
-
-        public TextEntry(ExcelService excelService)
-        {
-            ExcelService = excelService;
-            _str = Utf8String.FromString("<denoun(ENpcResident,1,1046099,2,1)>");
-        }
-
-        public TextEntry(ExcelService excelService, TextEntryType type, string text)
-        {
-            ExcelService = excelService;
-
-            _type = (int)type;
-            _str = Utf8String.CreateEmpty();
-            _message = text;
-        }
-
-        public Utf8String* Run()
-        {
-            _str->Clear();
-
-            switch (_type)
-            {
-                case 0:
-                    _str->ConcatCStr(_message);
-                    break;
-                case 1:
-                    AppendMacro(_message);
-                    break;
-                case 2:
-                    //AppendFixed(_message);
-                    break;
-            }
-
-            return _str;
-        }
-
-        private void AppendMacro(string macro)
-        {
-            using var output = new Utf8String();
-            RaptureTextModule.Instance()->MacroEncoder.EncodeString(&output, macro);
-            _str->Append(&output);
-        }
-
-        public void Dispose()
-        {
-            _str->Dtor(true);
-        }
-
-        public void Draw(int index)
-        {
-            ImGui.RadioButton($"IsString##{index}_isString", ref _type, 0);
-            ImGui.SameLine();
-            ImGui.RadioButton($"IsMacro##{index}_isMacro", ref _type, 1);
-            ImGui.SameLine();
-            ImGui.RadioButton($"IsFixed##{index}_isFixed", ref _type, 2);
-
-            ImGui.InputText($"Message##{index}_Message", ref _message, 255);
-
-            Run();
-
-            using var output = new Utf8String();
-            var ptr = &output;
-            RaptureTextModule.Instance()->TextModule.FormatString(_str->StringPtr, null, ptr);
-            DebugUtils.DrawUtf8String((nint)ptr, new NodeOptions() { AddressPath = new AddressPath((nint)ptr) });
-        }
-    }
-
-    private readonly List<TextEntry> entries = [
-        new TextEntry(ExcelService, TextEntryType.String, "Test1 "),
-        new TextEntry(ExcelService, TextEntryType.Macro, "<color(0xFF9000)>"),
-        new TextEntry(ExcelService, TextEntryType.String, "Test2 "),
-        new TextEntry(ExcelService, TextEntryType.Macro, "<color(0)>"),
-        new TextEntry(ExcelService, TextEntryType.String, "Test3 "),
-        new TextEntry(ExcelService, TextEntryType.Macro, "<color(stackcolor)>"),
-        new TextEntry(ExcelService, TextEntryType.String, "Test 4 "),
-        new TextEntry(ExcelService, TextEntryType.Macro, "<color(stackcolor)>"),
-        new TextEntry(ExcelService, TextEntryType.String, "Test 5"),
-    ];
-
     public override unsafe void Draw()
     {
         using var tabs = ImRaii.TabBar("RaptureTextModuleTab_TabBar");
@@ -163,12 +66,14 @@ public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui,
                     ImGui.SameLine();
                     DebugUtils.DrawCopyableText(item.IntValue.ToString());
                     break;
+
                 case TextParameterType.ReferencedUtf8String:
                     if (item.ReferencedUtf8StringValue != null)
-                        DebugUtils.DrawSeString(item.ReferencedUtf8StringValue->Utf8String.StringPtr, new NodeOptions { Indent = false });
+                        DebugUtils.DrawSeString(item.ReferencedUtf8StringValue->Utf8String.StringPtr, new NodeOptions { AddressPath = new AddressPath([(nint)i, (nint)item.ReferencedUtf8StringValue]), Indent = false });
                     else
                         ImGui.TextUnformatted("null");
                     break;
+
                 case TextParameterType.String:
                     DebugUtils.DrawSeString(item.StringValue, new NodeOptions { Indent = false });
                     break;
@@ -245,38 +150,45 @@ public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui,
         using var tab = ImRaii.TabItem("Definitions");
         if (!tab) return;
 
-        using var table = ImRaii.Table("DefinitionsTable", 12, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("DefinitionsTable", 13, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Code", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Code", ImGuiTableColumnFlags.WidthFixed, 200);
         ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
-        ImGui.TableSetupColumn("ParamCount", ImGuiTableColumnFlags.WidthFixed, 50);
-        ImGui.TableSetupColumn("RequiredParamCount", ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("TotalParamCount", ImGuiTableColumnFlags.WidthFixed, 60);
+        ImGui.TableSetupColumn("ParamCount", ImGuiTableColumnFlags.WidthFixed, 60);
+        ImGui.TableSetupColumn("IsTerminated", ImGuiTableColumnFlags.WidthFixed, 60);
         for (var i = 0; i < 7; i++)
             ImGui.TableSetupColumn($"{i}", ImGuiTableColumnFlags.WidthFixed, 20);
 
-        ImGui.TableSetupScrollFreeze(12, 1);
+        ImGui.TableSetupScrollFreeze(13, 1);
         ImGui.TableHeadersRow();
 
         var raptureTextModule = RaptureTextModule.Instance();
 
-        var map = *(StdMap<Utf8String, MacroCodeDescription>*)Unsafe.AsPointer(ref raptureTextModule->TextModule.MacroEncoder.MacroCodeMap);
-        foreach (var item in map)
+        foreach (var item in raptureTextModule->TextModule.MacroEncoder.MacroCodeMap)
         {
             ImGui.TableNextRow();
-            ImGui.TableNextColumn();
+            ImGui.TableNextColumn(); // Code
             ImGui.TextUnformatted(item.Item1.ToString());
-            ImGui.TableNextColumn();
+
+            ImGui.TableNextColumn(); // Id
             ImGui.TextUnformatted($"0x{item.Item2.Id:X}");
-            ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{item.Item2.ParamCount}");
-            ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{item.Item2.RequiredParamCount}");
+
+            ImGui.TableNextColumn(); // TotalParamCount
+            ImGui.TextUnformatted(item.Item2.TotalParamCount.ToString());
+
+            ImGui.TableNextColumn(); // ParamCount
+            ImGui.TextUnformatted(item.Item2.ParamCount.ToString());
+
+            ImGui.TableNextColumn(); // IsTerminated
+            ImGui.TextUnformatted(item.Item2.IsTerminated.ToString());
+
             ImGui.TableNextColumn();
             for (var i = 0; i < 7; i++)
             {
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted($"{(char)item.Item2.ParamTypes[i]}");
+                ImGui.TextUnformatted(((char)item.Item2.ParamTypes[i]).ToString());
             }
         }
 
@@ -449,14 +361,99 @@ public unsafe class RaptureTextModuleTab(IPluginLog PluginLog, IChatGui ChatGui,
         ImGui.TextUnformatted(raptureTextModule->TextModule.MacroEncoder.EncoderError.ToString());
     }
 
-    [StructLayout(LayoutKind.Explicit, Size = 0x68)]
-    public struct MacroCodeDescription
+    private enum TextEntryType
     {
-        [FieldOffset(0x00)] public byte Id;
-        [FieldOffset(0x01)] public fixed byte ParamTypes[7]; // 'n', 's', 'x', 'S', 'N', '*', '.'
-
-        [FieldOffset(0x44)] public int ParamCount;
-        [FieldOffset(0x48)] public int RequiredParamCount;
-        [FieldOffset(0x4C)] public bool RequiresParameter;
+        String,
+        Macro,
+        Fixed
     }
+
+    private class TextEntry : IDisposable
+    {
+        private readonly Utf8String* _str;
+        private readonly ExcelService ExcelService;
+
+        //private string _message = "<sheet(ENpcResident,1046073,0)>";
+        //private string _message = "<denoun(ENpcResident,1,1046099,2,3)>";
+        private string _message = "<denoun(ENpcResident,1,1046099,2,1)>"; // "<denoun(Item,1,36664,1,1)>"; // <fixed(200,4,39246,1,0,0,Phoenix Riser Suit)>
+        private int _type = 2;
+
+        public TextEntry(ExcelService excelService)
+        {
+            ExcelService = excelService;
+            _str = Utf8String.FromString("<denoun(ENpcResident,1,1046099,2,1)>");
+        }
+
+        public TextEntry(ExcelService excelService, TextEntryType type, string text)
+        {
+            ExcelService = excelService;
+
+            _type = (int)type;
+            _str = Utf8String.CreateEmpty();
+            _message = text;
+        }
+
+        public Utf8String* Run()
+        {
+            _str->Clear();
+
+            switch (_type)
+            {
+                case 0:
+                    _str->ConcatCStr(_message);
+                    break;
+                case 1:
+                    AppendMacro(_message);
+                    break;
+                case 2:
+                    //AppendFixed(_message);
+                    break;
+            }
+
+            return _str;
+        }
+
+        private void AppendMacro(string macro)
+        {
+            using var output = new Utf8String();
+            RaptureTextModule.Instance()->MacroEncoder.EncodeString(&output, macro);
+            _str->Append(&output);
+        }
+
+        public void Dispose()
+        {
+            _str->Dtor(true);
+        }
+
+        public void Draw(int index)
+        {
+            ImGui.RadioButton($"IsString##{index}_isString", ref _type, 0);
+            ImGui.SameLine();
+            ImGui.RadioButton($"IsMacro##{index}_isMacro", ref _type, 1);
+            ImGui.SameLine();
+            ImGui.RadioButton($"IsFixed##{index}_isFixed", ref _type, 2);
+
+            ImGui.InputText($"Message##{index}_Message", ref _message, 255);
+
+            Run();
+
+            using var output = new Utf8String();
+            var ptr = &output;
+            RaptureTextModule.Instance()->TextModule.FormatString(_str->StringPtr, null, ptr);
+            DebugUtils.DrawUtf8String((nint)ptr, new NodeOptions() { AddressPath = new AddressPath((nint)ptr) });
+        }
+    }
+
+    private readonly List<TextEntry> entries = [
+        new TextEntry(ExcelService, TextEntryType.String, "Test1 "),
+        new TextEntry(ExcelService, TextEntryType.Macro, "<color(0xFF9000)>"),
+        new TextEntry(ExcelService, TextEntryType.String, "Test2 "),
+        new TextEntry(ExcelService, TextEntryType.Macro, "<color(0)>"),
+        new TextEntry(ExcelService, TextEntryType.String, "Test3 "),
+        new TextEntry(ExcelService, TextEntryType.Macro, "<color(stackcolor)>"),
+        new TextEntry(ExcelService, TextEntryType.String, "Test 4 "),
+        new TextEntry(ExcelService, TextEntryType.Macro, "<color(stackcolor)>"),
+        new TextEntry(ExcelService, TextEntryType.String, "Test 5"),
+    ];
+
 }
