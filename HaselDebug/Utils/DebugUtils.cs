@@ -11,6 +11,8 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Memory;
 using Dalamud.Plugin.Services;
+using Dalamud.Utility;
+using ExdSheets;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
@@ -28,6 +30,8 @@ namespace HaselDebug.Utils;
 #pragma warning disable SeStringRenderer
 public static unsafe class DebugUtils
 {
+    private static MethodInfo? GetSheetGeneric;
+
     public static HaselColor ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1f);
     public static HaselColor ColorType { get; } = new(0.2f, 0.9f, 0.9f, 1);
     public static HaselColor ColorName { get; } = new(0.2f, 0.9f, 0.4f, 1);
@@ -191,7 +195,7 @@ public static unsafe class DebugUtils
             DrawCopyableText($"[0x{offset:X}]", $"{address + offset:X}", textColor: Colors.Grey3);
             ImGui.SameLine();
 
-            var indexedAddressPath = nodeOptions.AddressPath!.Value.With(i);
+            var indexedAddressPath = nodeOptions.AddressPath.With(i);
 
             var fieldAddress = address + offset;
             var fieldType = fieldInfo.FieldType;
@@ -278,7 +282,7 @@ public static unsafe class DebugUtils
                 ImGui.SameLine();
                 ImGui.TextColored(ColorName, fieldInfo.Name);
                 ImGui.SameLine();
-                DrawAtkValues((AtkValue*)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, new NodeOptions() { AddressPath = nodeOptions.AddressPath.Value.With(fieldAddress) });
+                DrawAtkValues((AtkValue*)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(fieldAddress) });
                 continue;
             }
 
@@ -591,10 +595,10 @@ public static unsafe class DebugUtils
             DrawAddress(_current);
 
             ImGui.TableNextColumn(); // Key
-            DrawPointerType(keyAddress, keyType, new NodeOptions() { AddressPath = nodeOptions.AddressPath!.Value.With(keyAddress) });
+            DrawPointerType(keyAddress, keyType, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(keyAddress) });
 
             ImGui.TableNextColumn(); // Value
-            DrawPointerType(valueAddress, valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath.Value.With(valueAddress) });
+            DrawPointerType(valueAddress, valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(valueAddress) });
         }
     }
 
@@ -649,7 +653,7 @@ public static unsafe class DebugUtils
             ImGui.TextUnformatted(i.ToString());
 
             ImGui.TableNextColumn(); // Value
-            DrawPointerType(valueAddress, type, new NodeOptions() { AddressPath = nodeOptions.AddressPath!.Value.With(valueAddress) });
+            DrawPointerType(valueAddress, type, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(valueAddress) });
         }
     }
 
@@ -705,7 +709,7 @@ public static unsafe class DebugUtils
         for (var i = 0u; i < length; i++)
         {
             var entryAddress = (nint)(address + i * fieldSize);
-            var entryAddressPath = nodeOptions.AddressPath!.Value.With(entryAddress);
+            var entryAddressPath = nodeOptions.AddressPath.With(entryAddress);
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Index
@@ -756,7 +760,7 @@ public static unsafe class DebugUtils
 
             ImGui.TableNextColumn(); // Value
             if (value.Type is ValueType.String or ValueType.String8 or ValueType.ManagedString)
-                DrawSeString(value.String, new NodeOptions { AddressPath = nodeOptions.AddressPath!.Value.With(i), Indent = false });
+                DrawSeString(value.String, new NodeOptions { AddressPath = nodeOptions.AddressPath.With(i), Indent = false });
             else
                 ImGui.TextUnformatted(value.GetValueAsString());
         }
@@ -1767,5 +1771,173 @@ public static unsafe class DebugUtils
 
         if (sameLine)
             ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+    }
+
+    public static void DrawExdSheet(ExdSheets.Module module, Type rowType, uint rowId, uint depth, NodeOptions nodeOptions)
+    {
+        if (depth > 5)
+        {
+            ImGui.TextUnformatted("max depth reached");
+            return;
+        }
+
+        nodeOptions.EnsureAddressInPath((rowType.Name.GetHashCode(), (nint)rowId).GetHashCode());
+
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+        using var node = ImRaii.TreeNode($"{rowType.Name}#{rowId}###{nodeOptions.AddressPath}", ImGuiTreeNodeFlags.SpanAvailWidth);
+        if (!node) return;
+        titleColor.Dispose();
+
+        GetSheetGeneric ??= module.GetType().GetMethod("GetSheetGeneric", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var sheet = GetSheetGeneric.Invoke(module, [rowType, nodeOptions.Language.ToLumina()]);
+        if (sheet == null)
+        {
+            ImGui.TextUnformatted("sheet is null");
+            return;
+        }
+
+        var getRow = sheet.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).FirstOrDefault(info => info.Name == "TryGetRow" && info.GetParameters().Length == 1);
+        if (getRow == null)
+        {
+            ImGui.TextUnformatted("Could not find TryGetRow");
+            return;
+        }
+
+        var row = getRow?.Invoke(sheet, [rowId]);
+        if (row == null)
+        {
+            ImGui.TextUnformatted($"Row {rowId} is null");
+            return;
+        }
+
+        foreach (var propInfo in rowType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+        {
+            if (propInfo.Name == "RowId") continue;
+
+            DrawCopyableText(propInfo.PropertyType.ReadableTypeName(), propInfo.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
+            ImGui.SameLine();
+            ImGui.TextColored(ColorName, propInfo.Name);
+            ImGui.SameLine();
+
+            var value = propInfo.GetValue(row);
+            if (value == null)
+            {
+                ImGui.TextUnformatted("null");
+                continue;
+            }
+
+            if (propInfo.PropertyType == typeof(ReadOnlySeString))
+            {
+                DrawSeString(((ReadOnlySeString)value).AsSpan(), new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(propInfo.Name.GetHashCode()) });
+                continue;
+            }
+
+            if (propInfo.PropertyType == typeof(LazyRow))
+            {
+                var columnRowId = (uint)propInfo.PropertyType.GetProperty("RowId")?.GetValue(value)!;
+                ImGui.TextUnformatted(columnRowId.ToString());
+                continue;
+            }
+
+            if (propInfo.PropertyType.IsGenericType && propInfo.PropertyType.GetGenericTypeDefinition() == typeof(LazyRow<>))
+            {
+                var isValid = (bool)propInfo.PropertyType.GetProperty("IsValid")?.GetValue(value)!;
+                if (!isValid)
+                {
+                    ImGui.TextUnformatted("null");
+                    continue;
+                }
+
+                var columnRowType = propInfo.PropertyType.GenericTypeArguments[0];
+                var columnRowId = (uint)propInfo.PropertyType.GetProperty("RowId")?.GetValue(value)!;
+                DrawExdSheet(module, columnRowType, columnRowId, depth + 1, new NodeOptions() {
+                    Language = nodeOptions.Language,
+                    AddressPath = nodeOptions.AddressPath.With((columnRowType.Name.GetHashCode(), (nint)columnRowId).GetHashCode())
+                });
+                continue;
+            }
+
+            if (propInfo.PropertyType.IsGenericType && propInfo.PropertyType.GetGenericTypeDefinition() == typeof(LazyCollection<>))
+            {
+                var count = (int)propInfo.PropertyType.GetProperty("Count")?.GetValue(value)!;
+                if (count == 0)
+                {
+                    ImGui.TextUnformatted("No values");
+                    return;
+                }
+
+                var collectionType = propInfo.PropertyType.GenericTypeArguments[0];
+                using var colTitleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+                using var colNode = ImRaii.TreeNode($"{count} Value{(count != 1 ? "s" : "")}##LazyCollectionNode{nodeOptions.AddressPath.With(collectionType.Name.GetHashCode())}", ImGuiTreeNodeFlags.SpanAvailWidth);
+                if (!colNode) return;
+                colTitleColor?.Dispose();
+
+                using var table = ImRaii.Table($"LazyCollectionTable{nodeOptions.AddressPath.With(collectionType.Name.GetHashCode())}", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+                if (!table)
+                    return;
+
+                ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
+                ImGui.TableSetupColumn("Value");
+                ImGui.TableSetupScrollFreeze(2, 1);
+                ImGui.TableHeadersRow();
+
+                using var indent = ImRaii.PushIndent(1, nodeOptions.Indent);
+                for (var i = 0; i < count; i++)
+                {
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn(); // Index
+                    ImGui.TextUnformatted(i.ToString());
+
+                    ImGui.TableNextColumn(); // Value
+
+                    var colValue = propInfo.PropertyType.GetMethod("get_Item")?.Invoke(value, [i]);
+                    if (colValue == null)
+                    {
+                        ImGui.TextUnformatted("null");
+                        continue;
+                    }
+
+                    if (collectionType == typeof(ReadOnlySeString))
+                    {
+                        DrawSeString(((ReadOnlySeString)colValue).AsSpan(), new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(collectionType.Name.GetHashCode()) });
+                        continue;
+                    }
+
+                    if (collectionType == typeof(LazyRow))
+                    {
+                        var columnRowId = (uint)collectionType.GetProperty("RowId")?.GetValue(colValue)!;
+                        ImGui.TextUnformatted(columnRowId.ToString());
+                        continue;
+                    }
+
+                    if (collectionType.IsGenericType && collectionType.GetGenericTypeDefinition() == typeof(LazyRow<>))
+                    {
+                        var isValid = (bool)collectionType.GetProperty("IsValid")?.GetValue(colValue)!;
+                        if (!isValid)
+                        {
+                            ImGui.TextUnformatted("null");
+                            continue;
+                        }
+
+                        var columnRowType = collectionType.GenericTypeArguments[0];
+                        var columnRowId = (uint)collectionType.GetProperty("RowId")?.GetValue(colValue)!;
+
+                        DrawExdSheet(module, columnRowType, columnRowId, depth + 1, new NodeOptions()
+                        {
+                            Language = nodeOptions.Language,
+                            AddressPath = nodeOptions.AddressPath.With((i, columnRowType.Name.GetHashCode(), (nint)columnRowId).GetHashCode())
+                        });
+                    }
+                    else
+                    {
+                        ImGui.TextUnformatted("Unsupported type");
+                    }
+                }
+
+                continue;
+            }
+
+            ImGui.TextUnformatted(value.ToString());
+        }
     }
 }

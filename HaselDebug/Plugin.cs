@@ -2,6 +2,7 @@ using System.IO;
 using Dalamud.Game;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using Dalamud.Utility;
 using HaselCommon.Commands;
 using HaselCommon.Extensions;
 using HaselCommon.Logger;
@@ -25,7 +26,8 @@ public class Plugin : IDalamudPlugin
         IFramework framework,
         IPluginLog pluginLog,
         ISigScanner sigScanner,
-        IDataManager dataManager)
+        IDataManager dataManager,
+        IClientState clientState)
     {
         PluginInterface = pluginInterface;
 
@@ -40,6 +42,8 @@ public class Plugin : IDalamudPlugin
                 builder.SetMinimumLevel(LogLevel.Trace);
                 builder.AddProvider(new DalamudLoggerProvider(pluginLog));
             })
+
+            .AddSingleton(new ExdSheets.Module(dataManager.GameData, clientState.ClientLanguage.ToLumina()))
 
             // HaselDebug
             .AddSingleton(PluginConfig.Load(pluginInterface, pluginLog))

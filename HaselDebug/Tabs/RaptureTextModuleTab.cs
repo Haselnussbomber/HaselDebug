@@ -206,7 +206,6 @@ public unsafe class RaptureTextModuleTab(ExcelService ExcelService) : DebugTab
                 ImGui.TextUnformatted(((char)item.Item2.ParamTypes[i]).ToString());
             }
         }
-
     }
 
     private void DrawStringMaker()

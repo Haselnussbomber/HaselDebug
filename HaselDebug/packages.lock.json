@@ -8,6 +8,15 @@
         "resolved": "2.1.13",
         "contentHash": "rMN1omGe8536f4xLMvx9NwfvpAc9YFFfeXJ1t4P4PE6Gu8WCIoFliR1sh07hM+bfODmesk/dvMbji7vNI+B/pQ=="
       },
+      "ExdSheets": {
+        "type": "Direct",
+        "requested": "[2.1.0, )",
+        "resolved": "2.1.0",
+        "contentHash": "SfvLFyL8LYsW4AzPLFVfFwtKPl9xegGraIe9oFar3IlWW8Z4kf5dkM+1CiSr/J+PQt4xt2QZc/ydZ4ibs3RosA==",
+        "dependencies": {
+          "Lumina": "4.1.1"
+        }
+      },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Direct",
         "requested": "[8.0.1, )",
@@ -28,6 +37,14 @@
         "resolved": "2021.2.0",
         "contentHash": "kKSyoVfndMriKHLfYGmr0uzQuI4jcc3TKGyww7buJFCYeHb/X0kodYBPL7n9454q7v6ASiRmDgpPGaDGerg/Hg=="
       },
+      "Lumina": {
+        "type": "Transitive",
+        "resolved": "4.1.1",
+        "contentHash": "Hd+iTtdaPACTpViXaJ/+sQ3ZQ8MEpApCSD+mxTXnUTYDSZOAipuC4LsZqhAkLMeQHSK/R/jiXEXaXS7e0mTXyA==",
+        "dependencies": {
+          "Microsoft.Extensions.ObjectPool": "9.0.0-preview.1.24081.5"
+        }
+      },
       "Microsoft.Extensions.DependencyInjection": {
         "type": "Transitive",
         "resolved": "8.0.0",
@@ -45,6 +62,11 @@
           "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
           "Microsoft.Extensions.Options": "8.0.0"
         }
+      },
+      "Microsoft.Extensions.ObjectPool": {
+        "type": "Transitive",
+        "resolved": "9.0.0-preview.1.24081.5",
+        "contentHash": "aAR7YW+pUUdvHk3vj7GtAi71dWGDIuY9270lsmQ6lKw23zzY+r8pLP3cGNbJdlnA9VWl+S+gnIVkBCqj2ROlEg=="
       },
       "Microsoft.Extensions.Options": {
         "type": "Transitive",

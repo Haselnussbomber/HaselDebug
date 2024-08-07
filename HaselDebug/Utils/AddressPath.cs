@@ -2,10 +2,14 @@ using System.Linq;
 
 namespace HaselDebug.Utils;
 
-public record struct AddressPath
+public record AddressPath
 {
     public nint[] Path { get; private set; }
-    public int Count => Path.Length;
+
+    public AddressPath()
+    {
+        Path = [];
+    }
 
     public AddressPath(nint value)
     {
@@ -19,6 +23,9 @@ public record struct AddressPath
 
     public AddressPath With(nint value)
         => new([.. Path, value]);
+
+    public AddressPath With(nint[] values)
+        => new([.. Path, .. values]);
 
     public override string ToString() => string.Join("_", Path.Select(address => address.ToString("X")));
 }
