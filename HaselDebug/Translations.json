@@ -1,0 +1,13 @@
+{
+  "HaselDebug.CommandHandlerHelpMessage": {
+    "en": "Show/hide the HaselDebug window",
+    "de": "Zeige/verstecke das HaselDebug-Fenster"
+  },
+
+  "template": {
+    "en": "",
+    "de": "",
+    "fr": "",
+    "ja": ""
+  }
+}
