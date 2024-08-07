@@ -135,7 +135,7 @@ public unsafe class RaptureHotbarModuleTab(ExcelService ExcelService, TextServic
         var idx = macroId >= 256 ? macroId - 256 : macroId;
 
         var macro = RaptureMacroModule.Instance()->GetMacro(set, idx);
-        return macro == null || !macro->IsEmpty() ? string.Empty : macro->Name.ToString();
+        return macro == null || !macro->IsNotEmpty() ? string.Empty : macro->Name.ToString();
     }
 
     private string GetRecipeName(RaptureHotbarModule.HotbarSlot* slot)
