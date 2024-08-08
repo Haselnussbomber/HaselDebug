@@ -17,6 +17,7 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
 using HaselCommon.Extensions;
+using HaselCommon.Services;
 using HaselCommon.Utils;
 using HaselDebug.Extensions;
 using ImGuiNET;
@@ -1727,27 +1728,29 @@ public static unsafe class DebugUtils
         => ToBitsString(byteIn, 32);
     */
 
-    public static void DrawIcon(ITextureProvider textureProvider, uint iconId, bool isHq = false, bool sameLine = true)
+    public static void DrawIcon(ITextureProvider textureProvider, uint iconId, bool isHq = false, bool sameLine = true, DrawInfo drawInfo = default)
     {
+        drawInfo.DrawSize ??= new Vector2(ImGui.GetTextLineHeight());
+
         if (iconId == 0)
         {
-            ImGui.Dummy(new Vector2(ImGui.GetTextLineHeight()));
+            ImGui.Dummy(drawInfo.DrawSize.Value);
             if (sameLine)
-                ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+                ImGui.SameLine();
             return;
         }
 
-        if (!ImGuiUtils.IsInViewport(new Vector2(ImGui.GetTextLineHeight())))
+        if (!ImGuiUtils.IsInViewport(drawInfo.DrawSize.Value))
         {
-            ImGui.Dummy(new Vector2(ImGui.GetTextLineHeight()));
+            ImGui.Dummy(drawInfo.DrawSize.Value);
             if (sameLine)
-                ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+                ImGui.SameLine();
             return;
         }
 
         if (textureProvider.TryGetFromGameIcon(iconId, out var tex) && tex.TryGetWrap(out var texture, out _))
         {
-            ImGui.Image(texture.ImGuiHandle, new(ImGui.GetTextLineHeight()));
+            ImGui.Image(texture.ImGuiHandle, drawInfo.DrawSize.Value);
 
             if (ImGui.IsItemHovered())
             {
@@ -1766,11 +1769,11 @@ public static unsafe class DebugUtils
         }
         else
         {
-            ImGui.Dummy(new Vector2(ImGui.GetTextLineHeight()));
+            ImGui.Dummy(drawInfo.DrawSize.Value);
         }
 
         if (sameLine)
-            ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+            ImGui.SameLine();
     }
 
     public static void DrawExdSheet(ExdSheets.Module module, Type rowType, uint rowId, uint depth, NodeOptions nodeOptions)

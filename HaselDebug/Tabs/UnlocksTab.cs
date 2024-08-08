@@ -15,17 +15,32 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
     private readonly TextService TextService;
     private readonly ITextureProvider TextureProvider;
     private readonly MapService MapService;
+    private readonly IDataManager DataManager;
+    private readonly TranslationManager TranslationManager;
+    private readonly ItemService ItemService;
+    private readonly TextureService TextureService;
+    private readonly ImGuiService ImGuiService;
 
     public UnlocksTab(
         ExcelService excelService,
         TextService textService,
         ITextureProvider textureProvider,
-        MapService mapService)
+        MapService mapService,
+        IDataManager dataManager,
+        TranslationManager translationManager,
+        ItemService itemService,
+        TextureService textureService,
+        ImGuiService imGuiService)
     {
         ExcelService = excelService;
         TextService = textService;
         TextureProvider = textureProvider;
         MapService = mapService;
+        DataManager = dataManager;
+        TranslationManager = translationManager;
+        ItemService = itemService;
+        TextureService = textureService;
+        ImGuiService = imGuiService;
 
         TextService.LanguageChanged += OnLanguageChanged;
 
@@ -47,6 +62,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
     {
         UpdateUnlockLinks();
         UpdateCutscenes();
+        UpdateStoreItems();
     }
 
     public override void Draw()
@@ -60,6 +76,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         DrawUnlockLinks();
         DrawAdventure();
         DrawRecipes();
+        DrawStoreItems();
         DrawTitles();
         DrawEmotes();
         DrawCutscenes();

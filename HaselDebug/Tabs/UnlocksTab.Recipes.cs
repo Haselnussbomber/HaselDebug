@@ -41,10 +41,11 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
             return;
 
         ImGui.TableNextRow();
-        ImGui.TableNextColumn();
+
+        ImGui.TableNextColumn(); // Id
         ImGui.TextUnformatted(row.RowId.ToString());
 
-        ImGui.TableNextColumn();
+        ImGui.TableNextColumn(); // Completed
         if (row.RowId < 30000)
         {
             var isComplete = QuestManager.IsRecipeComplete(row.RowId);
@@ -52,9 +53,8 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
                 ImGui.TextUnformatted(isComplete.ToString());
         }
 
-        ImGui.TableNextColumn();
-        DebugUtils.DrawIcon(TextureProvider, row.ItemResult.Value?.Icon ?? 0u);
-        if (ImGui.Selectable(TextService.GetItemName(row.ItemResult.Row)))
+        ImGui.TableNextColumn(); // Name
+        if (ImGuiService.DrawSelectableItem(row.ItemResult.Value!, $"Recipe{row.RowId}"))
             AgentRecipeNote.Instance()->OpenRecipeByRecipeId(row.RowId);
     }
 }

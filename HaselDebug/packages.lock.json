@@ -17,6 +17,16 @@
           "Lumina": "4.1.1"
         }
       },
+      "LuminaSupplemental.Excel": {
+        "type": "Direct",
+        "requested": "[2.0.6, )",
+        "resolved": "2.0.6",
+        "contentHash": "m63nJkYtauxdnN3XZLBYPgEPVZ85YpgPQdrRFENNZJuOZcDNZ2PuZ8+CXhcagmKPPy378OOeJvAdl5WdagKvUw==",
+        "dependencies": {
+          "CSVFile": "3.1.0",
+          "CsvHelper": "30.0.1"
+        }
+      },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Direct",
         "requested": "[8.0.1, )",
@@ -31,6 +41,16 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.1"
         }
+      },
+      "CSVFile": {
+        "type": "Transitive",
+        "resolved": "3.1.0",
+        "contentHash": "yz/FptkwDL0bxhaxoyrFPI5SyxUUfuZtbH1E2yLiHHFZFFrSXNnWJHfXSt5Anvy1gWpHCLpC520Bxy6G/Opp1g=="
+      },
+      "CsvHelper": {
+        "type": "Transitive",
+        "resolved": "30.0.1",
+        "contentHash": "rcZtgbWR+As4G3Vpgx0AMNmShGuQLFjkHAPIIflzrfkJCx8/AOd4m96ZRmiU1Wi39qS5UVjV0P8qdgqOo5Cwyg=="
       },
       "JetBrains.Annotations": {
         "type": "Transitive",

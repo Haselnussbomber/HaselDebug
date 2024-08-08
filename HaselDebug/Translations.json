@@ -4,6 +4,31 @@
     "de": "Zeige/verstecke das HaselDebug-Fenster"
   },
 
+  "UnlocksTab.CabinetNotLoaded": {
+    "en": "Armoire not loaded",
+    "de": "Kostbarkeitenkabinett nicht geladen"
+  },
+  "UnlocksTab.PrismBoxNotLoaded": {
+    "en": "Glamour Dresser not loaded",
+    "de": "Projektionskommode nicht geladen"
+  },
+  "UnlocksTab.StoredInCabinet": {
+    "en": "Stored in Armoire",
+    "de": "Im Kostbarkeitenkabinett gelagert"
+  },
+  "UnlocksTab.NotStoredInCabinet": {
+    "en": "Not stored in Armoire",
+    "de": "Nicht im Kostbarkeitenkabinett gelagert"
+  },
+  "UnlocksTab.StoredInPrismBox": {
+    "en": "Stored in Glamour Dresser",
+    "de": "In der Projektionskommode gelagert"
+  },
+  "UnlocksTab.NotStoredInPrismBox": {
+    "en": "Not stored in Glamour Dresser",
+    "de": "Nicht in der Projektionskommode gelagert"
+  },
+
   "template": {
     "en": "",
     "de": "",
