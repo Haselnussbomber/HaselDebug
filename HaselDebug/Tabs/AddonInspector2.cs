@@ -102,7 +102,6 @@ public unsafe class AddonInspector2Tab(TextureService TextureService) : DebugTab
             focusedList.Add(unitBase);
         }
 
-
         allUnitsList.Sort((a, b) => SortColumnIndex switch
         {
             0 when SortDirection == ImGuiSortDirection.Ascending => a.Value->Id - b.Value->Id,

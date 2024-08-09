@@ -55,15 +55,32 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         }
 
         // i really need to make a sortable, searchable table soon
-        using var table = ImRaii.Table("StoreItemsTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("StoreItemsTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable);
         if (!table) return;
 
         ImGui.TableSetupColumn("Item Id", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Item Category", ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupColumn("Item Category", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.DefaultSort, 200);
         ImGui.TableSetupColumn("Item");
-        ImGui.TableSetupColumn("Collected", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Collected", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort, 100);
         ImGui.TableSetupScrollFreeze(3, 1);
         ImGui.TableHeadersRow();
+
+        var sortSpecs = ImGui.TableGetSortSpecs();
+        if (sortSpecs.SpecsDirty)
+        {
+            StoreItemsList.Sort((a, b) => sortSpecs.Specs.ColumnIndex switch
+            {
+                0 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Ascending => (int)(a.ItemId - b.ItemId),
+                0 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending => (int)(b.ItemId - a.ItemId),
+                1 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Ascending => (a.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty).CompareTo(b.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty),
+                1 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending => (b.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty).CompareTo(a.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty),
+                2 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Ascending => TextService.GetItemName(a.Item.Row).CompareTo(TextService.GetItemName(b.Item.Row)),
+                2 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending => TextService.GetItemName(b.Item.Row).CompareTo(TextService.GetItemName(a.Item.Row)),
+                _ => 0,
+            });
+
+            sortSpecs.SpecsDirty = false;
+        }
 
         var count = StoreItemsList.Count;
         var tribe = PlayerState.Instance()->Tribe;
