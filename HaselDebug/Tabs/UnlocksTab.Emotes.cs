@@ -44,7 +44,10 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
             {
                 using (ImRaii.Disabled(!canUse))
                 {
-                    if (ImGui.Selectable(name))
+                    var clicked = ImGui.Selectable(name);
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if (clicked)
                     {
                         AgentEmote.Instance()->ExecuteEmote((ushort)row.RowId, addToHistory: false);
                     }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Numerics;
@@ -36,6 +37,11 @@ public static unsafe class DebugUtils
     public static HaselColor ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1f);
     public static HaselColor ColorType { get; } = new(0.2f, 0.9f, 0.9f, 1);
     public static HaselColor ColorName { get; } = new(0.2f, 0.9f, 0.4f, 1);
+
+    private static readonly Dictionary<Type, string[]> KnownStringPointers = new() {
+        { typeof(FFXIVClientStructs.FFXIV.Client.UI.Agent.MapMarkerBase), ["Subtext"] },
+        { typeof(FFXIVClientStructs.FFXIV.Common.Component.Excel.ExcelSheet), ["SheetName"] }
+    };
 
     public static void DrawPointerType(void* obj, Type? type, NodeOptions nodeOptions)
         => DrawPointerType((nint)obj, type, nodeOptions);
@@ -218,10 +224,11 @@ public static unsafe class DebugUtils
                 ImGui.SameLine();
             }
 
-            if (fieldInfo.FieldType.IsFunctionPointer || fieldInfo.FieldType.IsUnmanagedFunctionPointer)
+            DrawCopyableText(fieldType.ReadableTypeName(), fieldType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
+            ImGui.SameLine();
+
+            if (fieldType.IsFunctionPointer || fieldType.IsUnmanagedFunctionPointer)
             {
-                DrawCopyableText(fieldInfo.FieldType.ReadableTypeName(), fieldInfo.FieldType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
-                ImGui.SameLine();
                 ImGui.TextColored(ColorName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawAddress(*(nint*)fieldAddress);
@@ -230,13 +237,11 @@ public static unsafe class DebugUtils
 
             if (fieldInfo.IsAssembly
                 && fieldInfo.GetCustomAttribute<FixedSizeArrayAttribute>() is FixedSizeArrayAttribute fixedSizeArrayAttribute
-                && fieldInfo.FieldType.GetCustomAttribute<InlineArrayAttribute>() is InlineArrayAttribute inlineArrayAttribute)
+                && fieldType.GetCustomAttribute<InlineArrayAttribute>() is InlineArrayAttribute inlineArrayAttribute)
             {
-                DrawCopyableText(fieldInfo.FieldType.ReadableTypeName(), fieldInfo.FieldType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
-                ImGui.SameLine();
                 ImGui.TextColored(ColorName, $"{fieldInfo.Name[1..].FirstCharToUpper()}");
                 ImGui.SameLine();
-                DrawFixedSizeArray(fieldAddress, fieldInfo.FieldType, fixedSizeArrayAttribute.IsString, new NodeOptions());
+                DrawFixedSizeArray(fieldAddress, fieldType, fixedSizeArrayAttribute.IsString, new NodeOptions());
                 continue;
             }
 
@@ -250,8 +255,6 @@ public static unsafe class DebugUtils
                     continue;
                 }
 
-                DrawCopyableText(fieldType.ReadableTypeName(), fieldType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
-                ImGui.SameLine();
                 ImGui.TextColored(ColorName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawStdVector(fieldAddress, underlyingType, new NodeOptions() { AddressPath = indexedAddressPath });
@@ -268,8 +271,6 @@ public static unsafe class DebugUtils
                     continue;
                 }
 
-                DrawCopyableText(fieldType.ReadableTypeName(), fieldType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
-                ImGui.SameLine();
                 ImGui.TextColored(ColorName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawStdDeque(fieldAddress, underlyingType, new NodeOptions() { AddressPath = indexedAddressPath });
@@ -279,21 +280,31 @@ public static unsafe class DebugUtils
 
             if (type == typeof(AtkUnitBase) && fieldType == typeof(AtkValue*) && fieldInfo.Name == "AtkValues")
             {
-                DrawCopyableText(fieldType.ReadableTypeName(), fieldType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
-                ImGui.SameLine();
                 ImGui.TextColored(ColorName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawAtkValues((AtkValue*)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(fieldAddress) });
                 continue;
             }
 
+            if (fieldType.IsPointer && KnownStringPointers.TryGetValue(type, out var fieldNames) && fieldNames.Contains(fieldInfo.Name))
+            {
+                ImGui.TextColored(ColorName, fieldInfo.Name);
+                ImGui.SameLine();
+                DrawSeString(*(nint*)fieldAddress, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(fieldAddress) });
+                continue;
+            }
+
             // TODO: vector preview
             // TODO: enum values table
 
-            DrawCopyableText(fieldType.ReadableTypeName(), fieldType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
-            ImGui.SameLine();
             ImGui.TextColored(ColorName, fieldInfo.Name);
             ImGui.SameLine();
+
+            if (fieldType == typeof(uint) && fieldInfo.Name == "IconId")
+            {
+                DrawIcon(Service.Get<ITextureProvider>(), *(uint*)fieldAddress);
+            }
+
             DrawPointerType(fieldAddress, fieldType, new NodeOptions() { AddressPath = indexedAddressPath });
         }
     }
@@ -678,7 +689,7 @@ public static unsafe class DebugUtils
             if (fieldType == typeof(char))
                 ImGui.TextUnformatted(new string((char*)address));
             else
-                ImGuiHelpers.SeStringWrapped(MemoryMarshal.CreateReadOnlySpanFromNullTerminated((byte*)address));
+                DrawSeString((byte*)address, nodeOptions);
 
             return;
         }
@@ -863,6 +874,9 @@ public static unsafe class DebugUtils
 
         DrawSeString(str->StringPtr, nodeOptions);
     }
+
+    public static void DrawSeString(nint ptr, NodeOptions nodeOptions)
+        => DrawSeString((byte*)ptr, nodeOptions);
 
     public static void DrawSeString(byte* ptr, NodeOptions nodeOptions)
     {

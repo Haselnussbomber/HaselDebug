@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** Unlocks -> Store Items tab.
+- **Added:** uint fields named IconId will show their icon in front of their id.
+- **Added:** Known byte* strings will now be displayed as string, instead of just a single byte.  
+  This has to be maintained by hand. Currently handled fields are:
+    - MapMarkerBase.Subtext
+    - ExcelSheet.SheetName
+- **Changed:** Extend Arrays are now displayed as MapMarkerBase*.
+- **Changed:** String Arrays strings are now rendered as SeString, so payloads can be inspected.
+- **Changed:** FixedSizeArray strings are now rendered as SeString, so payloads can be inspected.
+- **Changed:** Interactable Selectables in the Unlocks tab now show a hand cursor.
+
 ## [1.1.1] (2024-07-08)
 
 Updated CS for 7.05hf1

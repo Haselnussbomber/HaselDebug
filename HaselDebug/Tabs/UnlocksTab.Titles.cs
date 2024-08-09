@@ -72,7 +72,10 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
             ImGui.TableNextColumn(); // Feminine
             if (uiState->PlayerState.Sex == 1 && isUnlocked)
             {
-                if (ImGui.Selectable($"{row.Feminine.ExtractText()}##Title_Feminine_{row.RowId}", localPlayer->TitleId == row.RowId))
+                var clicked = ImGui.Selectable($"{row.Feminine.ExtractText()}##Title_Feminine_{row.RowId}", localPlayer->TitleId == row.RowId);
+                if (ImGui.IsItemHovered())
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                if (clicked)
                 {
                     var titleIdToSend = (ushort)(localPlayer->TitleId == row.RowId ? 0 : row.RowId);
                     Service.Get<IPluginLog>().Debug($"Sending Title Update {titleIdToSend}");
@@ -92,7 +95,10 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
             ImGui.TableNextColumn(); // Masculine
             if (uiState->PlayerState.Sex == 0 && isUnlocked)
             {
-                if (ImGui.Selectable($"{row.Masculine.ExtractText()}##Title_Masculine_{row.RowId}", localPlayer->TitleId == row.RowId))
+                var clicked = ImGui.Selectable($"{row.Masculine.ExtractText()}##Title_Masculine_{row.RowId}", localPlayer->TitleId == row.RowId);
+                if (ImGui.IsItemHovered())
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                if (clicked)
                 {
                     var titleIdToSend = (ushort)(localPlayer->TitleId == row.RowId ? 0 : row.RowId);
                     Service.Get<IPluginLog>().Debug($"Sending Title Update {titleIdToSend}");

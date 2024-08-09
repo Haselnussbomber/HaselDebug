@@ -1,6 +1,8 @@
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
@@ -398,7 +400,14 @@ public unsafe class AtkArrayDataTab : DebugTab
 
             ImGui.TableNextColumn(); // Pointer
             if (!isNull)
-                DrawCopyableText($"0x{(nint)array->DataArray[i]:X}", "Copy address");
+            {
+                var marker = (MapMarkerBase*)array->DataArray[i];
+                DebugUtils.DrawIcon(Service.Get<ITextureProvider>(), marker->IconId);
+                DebugUtils.DrawPointerType(array->DataArray[i], typeof(MapMarkerBase), new NodeOptions() {
+                    TitleOverride = new ReadOnlySeString(new ReadOnlySeStringSpan(marker->Subtext).Data.ToArray()),
+                    AddressPath = new AddressPath([(nint)array, (nint)array->DataArray[i]])
+                });
+            }
         }
     }
 }

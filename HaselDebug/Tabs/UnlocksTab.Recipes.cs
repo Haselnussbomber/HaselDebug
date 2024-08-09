@@ -54,7 +54,11 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         }
 
         ImGui.TableNextColumn(); // Name
-        if (ImGuiService.DrawSelectableItem(row.ItemResult.Value!, $"Recipe{row.RowId}"))
+
+        var clicked = ImGuiService.DrawSelectableItem(row.ItemResult.Value!, $"Recipe{row.RowId}");
+        if (ImGui.IsItemHovered())
+            ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+        if (clicked)
             AgentRecipeNote.Instance()->OpenRecipeByRecipeId(row.RowId);
     }
 }

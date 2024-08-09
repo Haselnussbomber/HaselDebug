@@ -45,7 +45,10 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
 
             ImGui.TableNextColumn(); // Name
             DebugUtils.DrawIcon(TextureProvider, (uint)row.IconList);
-            if (ImGui.Selectable(row.Name.ExtractText()))
+            var clicked = ImGui.Selectable(row.Name.ExtractText());
+            if (ImGui.IsItemHovered())
+                ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+            if (clicked)
                 MapService.OpenMap(row.Level.Value);
 
             i++;
