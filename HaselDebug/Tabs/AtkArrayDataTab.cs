@@ -4,6 +4,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
+using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Text.ReadOnly;
 
@@ -340,7 +341,7 @@ public unsafe class AtkArrayDataTab : DebugTab
                 }
                 else
                 {
-                    ImGuiHelpers.SeStringWrapped(new ReadOnlySeStringSpan(array->StringArray[i]));
+                    DebugUtils.DrawSeString(array->StringArray[i], new NodeOptions() { AddressPath = new AddressPath([(nint)array, (nint)array->StringArray[i]]) });
                 }
             }
         }
