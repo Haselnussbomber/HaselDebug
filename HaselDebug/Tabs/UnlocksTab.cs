@@ -7,6 +7,8 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
+// TODO: Achievements, Bardings, Mounts, Minions, Fashion Accessories, Facewear, Orchestrion...
+
 public unsafe partial class UnlocksTab : DebugTab, IDisposable
 {
     public override bool DrawInChild => false;

@@ -52,10 +52,10 @@ public unsafe class AgentsTab : DebugTab
             var agentName = Enum.GetName(agentId) ?? string.Empty;
 
             ImGui.TableNextRow();
-            ImGui.TableNextColumn(); // Type
+            ImGui.TableNextColumn(); // Id
             ImGui.TextUnformatted(i.ToString());
 
-            ImGui.TableNextColumn(); // Type
+            ImGui.TableNextColumn(); // Name
             if (ImGui.Selectable(agentName + $"##Agent{i}", SelectedAgentId == agentId, ImGuiSelectableFlags.SpanAllColumns))
             {
                 SelectedAgentId = agentId;

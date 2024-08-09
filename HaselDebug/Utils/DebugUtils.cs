@@ -227,6 +227,7 @@ public static unsafe class DebugUtils
             DrawCopyableText(fieldType.ReadableTypeName(), fieldType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
             ImGui.SameLine();
 
+            // delegate*
             if (fieldType.IsFunctionPointer || fieldType.IsUnmanagedFunctionPointer)
             {
                 ImGui.TextColored(ColorName, fieldInfo.Name);
@@ -235,6 +236,7 @@ public static unsafe class DebugUtils
                 continue;
             }
 
+            // internal FixedSizeArrays
             if (fieldInfo.IsAssembly
                 && fieldInfo.GetCustomAttribute<FixedSizeArrayAttribute>() is FixedSizeArrayAttribute fixedSizeArrayAttribute
                 && fieldType.GetCustomAttribute<InlineArrayAttribute>() is InlineArrayAttribute inlineArrayAttribute)
@@ -245,6 +247,7 @@ public static unsafe class DebugUtils
                 continue;
             }
 
+            // StdVector<>
             if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(StdVector<>))
             {
                 var underlyingType = fieldType.GenericTypeArguments[0];
@@ -261,6 +264,7 @@ public static unsafe class DebugUtils
                 continue;
             }
 
+            // StdDeque<>
             if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(StdDeque<>))
             {
                 var underlyingType = fieldType.GenericTypeArguments[0];
@@ -277,15 +281,16 @@ public static unsafe class DebugUtils
                 continue;
             }
 
-
-            if (type == typeof(AtkUnitBase) && fieldType == typeof(AtkValue*) && fieldInfo.Name == "AtkValues")
+            // AtkUnitBase.AtkValues
+            if ((type == typeof(AtkUnitBase) || type.GetCustomAttribute<InheritsAttribute<AtkUnitBase>>() != null) && fieldType == typeof(AtkValue*) && fieldInfo.Name == "AtkValues")
             {
                 ImGui.TextColored(ColorName, fieldInfo.Name);
                 ImGui.SameLine();
-                DrawAtkValues((AtkValue*)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(fieldAddress) });
+                DrawAtkValues(*(AtkValue**)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(fieldAddress) });
                 continue;
             }
 
+            // byte* that are strings
             if (fieldType.IsPointer && KnownStringPointers.TryGetValue(type, out var fieldNames) && fieldNames.Contains(fieldInfo.Name))
             {
                 ImGui.TextColored(ColorName, fieldInfo.Name);
@@ -771,10 +776,7 @@ public static unsafe class DebugUtils
             ImGui.TextUnformatted(value.Type.ToString());
 
             ImGui.TableNextColumn(); // Value
-            if (value.Type is ValueType.String or ValueType.String8 or ValueType.ManagedString)
-                DrawSeString(value.String, new NodeOptions { AddressPath = nodeOptions.AddressPath.With(i), Indent = false });
-            else
-                ImGui.TextUnformatted(value.GetValueAsString());
+            DrawAtkValue((nint)(&value), nodeOptions);
         }
     }
 
@@ -786,21 +788,21 @@ public static unsafe class DebugUtils
         switch (value->Type)
         {
             case ValueType.Int:
-                DrawCopyableText($"{value->Int}");
+                DrawNumeric((nint)(&value->Int), typeof(int), nodeOptions);
                 break;
             case ValueType.Bool:
                 DrawCopyableText($"{value->Byte == 0x01}");
                 break;
             case ValueType.UInt:
-                DrawCopyableText($"{value->UInt}");
+                DrawNumeric((nint)(&value->UInt), typeof(uint), nodeOptions);
                 break;
             case ValueType.Float:
-                DrawCopyableText($"{value->Float}");
+                DrawNumeric((nint)(&value->Float), typeof(uint), nodeOptions);
                 break;
             case ValueType.String:
             case ValueType.String8:
             case ValueType.ManagedString:
-                DrawCopyableText($"{MemoryHelper.ReadStringNullTerminated((nint)value->String)}");
+                DrawSeString((nint)value->String, nodeOptions);
                 break;
             case ValueType.Vector:
             case ValueType.ManagedVector:
@@ -847,19 +849,32 @@ public static unsafe class DebugUtils
 
     public static void DrawTexture(nint address, NodeOptions nodeOptions)
     {
+        if (address == 0)
+        {
+            ImGui.TextUnformatted("null");
+            return;
+        }
+
+        nodeOptions.EnsureAddressInPath(address);
+
         var tex = (KernelTexture*)address;
-        ImGui.Image((nint)tex->D3D11ShaderResourceView, new Vector2(tex->Width, tex->Height));
-        DrawCopyableText($"{tex->Width}x{tex->Height}");
-        ImGui.SameLine();
-        DrawCopyableText($"{tex->TextureFormat}");
-        // TODO: context menu to copy/save image
+        using var node = ImRaii.TreeNode($"{tex->Width}x{tex->Height} {tex->TextureFormat}##TextureNode{nodeOptions.AddressPath}", nodeOptions.DefaultOpen ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None);
+        if (!node) return;
+
+        var size = new Vector2(tex->Width, tex->Height);
+        var availSize = ImGui.GetContentRegionAvail();
+
+        var scale = availSize.X / size.X;
+        var scaledSize = new Vector2(size.X * scale, size.Y * scale);
+
+        ImGui.Image((nint)tex->D3D11ShaderResourceView, scaledSize);
     }
 
     public static void DrawUtf8String(nint address, NodeOptions nodeOptions)
     {
         if (address == 0)
         {
-            ImGui.Dummy(Vector2.Zero);
+            ImGui.TextUnformatted("null");
             return;
         }
 
@@ -868,7 +883,7 @@ public static unsafe class DebugUtils
         var str = (Utf8String*)address;
         if (str->StringPtr == null)
         {
-            ImGui.Dummy(Vector2.Zero);
+            ImGui.TextUnformatted("null");
             return;
         }
 
