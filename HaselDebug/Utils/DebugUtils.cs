@@ -797,7 +797,7 @@ public static unsafe class DebugUtils
                 DrawNumeric((nint)(&value->UInt), typeof(uint), nodeOptions);
                 break;
             case ValueType.Float:
-                DrawNumeric((nint)(&value->Float), typeof(uint), nodeOptions);
+                DrawNumeric((nint)(&value->Float), typeof(float), nodeOptions);
                 break;
             case ValueType.String:
             case ValueType.String8:
