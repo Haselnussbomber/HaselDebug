@@ -10,6 +10,10 @@ public unsafe class TerritoryTypeTab(IClientState ClientState, ExdSheets.Module 
 {
     public override void Draw()
     {
-        DebugUtils.DrawExdSheet(ExdModule, typeof(TerritoryType), ClientState.TerritoryType, 0, new NodeOptions() { Language = TranslationManager.ClientLanguage });
+        DebugUtils.DrawExdSheet(ExdModule, typeof(TerritoryType), ClientState.TerritoryType, 0, new NodeOptions()
+        {
+            DefaultOpen = true,
+            Language = TranslationManager.ClientLanguage
+        });
     }
 }

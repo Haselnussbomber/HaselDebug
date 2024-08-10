@@ -1807,7 +1807,7 @@ public static unsafe class DebugUtils
 
     public static void DrawExdSheet(ExdSheets.Module module, Type rowType, uint rowId, uint depth, NodeOptions nodeOptions)
     {
-        if (depth > 5)
+        if (depth > 10)
         {
             ImGui.TextUnformatted("max depth reached");
             return;
