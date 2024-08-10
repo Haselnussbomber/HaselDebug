@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.1] (2024-07-11)
+
+- **Added:** Support for StdList
+
 ## [1.2.0] (2024-07-10)
 
 - **Added:** Early version of the Addon Inspector 2 tab.
@@ -30,7 +34,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.1.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.2.1...main
+[1.2.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.0.0...v1.1.0
