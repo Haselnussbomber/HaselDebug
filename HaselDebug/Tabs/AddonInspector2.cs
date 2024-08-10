@@ -26,6 +26,8 @@ public unsafe class AddonInspector2Tab(TextureService TextureService) : DebugTab
     private ImmutableSortedDictionary<string, Type>? AddonTypes;
     private string AddonNameSearchTerm = string.Empty;
     private bool ShowPicker;
+    private int NodePickerSelectionIndex;
+    private Vector2 LastMousePos;
 
     public override bool DrawInChild => false;
 
@@ -63,7 +65,10 @@ public unsafe class AddonInspector2Tab(TextureService TextureService) : DebugTab
 
         ImGui.SameLine();
         if (ImGuiUtils.IconButton("NodeSelectorToggleButton", FontAwesomeIcon.ObjectUngroup, "Pick Addon/Node", active: ShowPicker))
+        {
             ShowPicker = !ShowPicker;
+            NodePickerSelectionIndex = 0;
+        }
 
         using var table = ImRaii.Table("AddonsTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable, new Vector2(-1));
         if (!table) return;
@@ -85,7 +90,7 @@ public unsafe class AddonInspector2Tab(TextureService TextureService) : DebugTab
                 continue;
 
             if (hasSearchTerm && !unitBase->NameString.Contains(AddonNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
-                    continue;
+                continue;
 
             allUnitsList.Add(unitBase);
         }
@@ -207,38 +212,137 @@ public unsafe class AddonInspector2Tab(TextureService TextureService) : DebugTab
     {
         if (!ShowPicker)
             return;
-        /*
-        ImGui.SetNextWindowPos(_hoveredWindowPos);
-        ImGui.SetNextWindowSize(_hoveredWindowSize);
 
-        using var windowStyles = ImRaii.PushStyle(ImGuiStyleVar.WindowBorderSize, 1.0f);
-        using var windowColors = Colors.Gold.Push(ImGuiCol.Border)
-                                            .Push(ImGuiCol.WindowBg, new Vector4(0.847f, 0.733f, 0.49f, 0.33f));
+        var raptureAtkUnitManager = RaptureAtkUnitManager.Instance();
+        var allUnitsList = new List<Pointer<AtkUnitBase>>();
 
-        if (ImGui.Begin("NodePicker", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize))
+        for (var i = 0; i < raptureAtkUnitManager->AllLoadedUnitsList.Count; i++)
         {
-            var drawList = ImGui.GetForegroundDrawList();
-            var textPos = _hoveredWindowPos + new Vector2(0, -ImGui.GetTextLineHeight());
-            drawList.AddText(textPos + Vector2.One, Colors.Black, _hoveredWindowName);
-            drawList.AddText(textPos, Colors.Gold, _hoveredWindowName);
+            var unitBase = raptureAtkUnitManager->AllLoadedUnitsList.Entries[i].Value;
+            if (unitBase == null || !unitBase->IsFullyLoaded() || !unitBase->IsVisible)
+                continue;
+            allUnitsList.Add(unitBase);
+        }
 
+        allUnitsList.Sort((a, b) => (int)(b.Value->DepthLayer - a.Value->DepthLayer));
+
+        var hoveredDepthLayerAddonNodes = new Dictionary<uint, Dictionary<Pointer<AtkUnitBase>, List<Pointer<AtkResNode>>>>();
+        var nodeCount = 0;
+        var bounds = stackalloc FFXIVClientStructs.FFXIV.Common.Math.Bounds[1];
+
+        foreach (AtkUnitBase* unitBase in allUnitsList)
+        {
+            unitBase->GetWindowBounds(bounds);
+            var pos = new Vector2(bounds->Pos1.X, bounds->Pos1.Y);
+            var size = new Vector2(bounds->Size.X, bounds->Size.Y);
+
+            if (!bounds->ContainsPoint((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y))
+                continue;
+
+            for (var i = 0; i < unitBase->UldManager.NodeListCount; i++) {
+                var node = unitBase->UldManager.NodeList[i];
+                node->GetBounds(bounds);
+
+                if (!bounds->ContainsPoint((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y))
+                    continue;
+
+                if (!hoveredDepthLayerAddonNodes.TryGetValue(unitBase->DepthLayer, out var addonNodes))
+                    hoveredDepthLayerAddonNodes.Add(unitBase->DepthLayer, addonNodes = []);
+
+                if (!addonNodes.TryGetValue(unitBase, out var nodes))
+                    addonNodes.Add(unitBase, [node]);
+                else if (!nodes.Contains(node))
+                    nodes.Add(node);
+
+                nodeCount++;
+            }
+        }
+
+        if (nodeCount == 0)
+        {
+            ShowPicker = false;
+            return;
+        }
+
+        ImGui.SetNextWindowPos(Vector2.Zero);
+        ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
+
+        var mousePos = ImGui.GetMousePos();
+        var mouseMoved = LastMousePos != mousePos;
+        if (mouseMoved)
+            NodePickerSelectionIndex = 0;
+
+        //using var windowColors = ImRaii.PushColor(ImGuiCol.WindowBg, new Vector4(0, 0, 0, 0.33f));
+        if (ImGui.Begin("NodePicker", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBackground))
+        {
             ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
 
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+            var nodeIndex = 0;
+            foreach (var (depthLayer, addons) in hoveredDepthLayerAddonNodes)
             {
-                _showPicker = false;
+                ImGui.TextUnformatted($"Depth Layer {depthLayer}:");
 
-                if (_hoveredWindowName != "" && !Config.LockedWindows.Any(entry => entry.Name == _hoveredWindowName))
+                using var indent = ImRaii.PushIndent();
+                foreach (var (unitBase, nodes) in addons)
                 {
-                    Config.LockedWindows.Add(new()
+                    ImGui.TextUnformatted($"{unitBase.Value->NameString}:");
+
+                    using var indent2 = ImRaii.PushIndent();
+
+                    for (var i = nodes.Count - 1; i >= 0; i--)
                     {
-                        Name = _hoveredWindowName
-                    });
-                    PluginConfig.Save();
+                        var node = nodes[i].Value;
+                        node->GetBounds(bounds);
+
+                        if (NodePickerSelectionIndex == nodeIndex)
+                        {
+                            using (ImRaii.PushFont(UiBuilder.IconFont))
+                                ImGui.TextUnformatted(FontAwesomeIcon.CaretRight.ToIconString());
+                            ImGui.SameLine(0, 0);
+
+                            ImGui.GetForegroundDrawList().AddRectFilled(
+                                new Vector2(bounds->Pos1.X, bounds->Pos1.Y),
+                                new Vector2(bounds->Pos2.X, bounds->Pos2.Y),
+                                HaselColor.From(1, 1, 0, 0.5f));
+
+                            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                            {
+                                SelectedAddonId = unitBase.Value->Id;
+                                SelectedAddonName = unitBase.Value->NameString;
+
+                                NodePickerSelectionIndex = 0;
+                                ShowPicker = false;
+                            }
+                        }
+
+                        if ((int)node->Type < 1000)
+                        {
+                            ImGui.TextUnformatted($"[0x{(nint)node:X}] [{node->NodeId}] {node->Type} Node");
+                        }
+                        else
+                        {
+                            var compNode = (AtkComponentNode*)node;
+                            var componentInfo = compNode->Component->UldManager;
+                            var objectInfo = (AtkUldComponentInfo*)componentInfo.Objects;
+                            if (objectInfo == null) continue;
+                            ImGui.TextUnformatted($"[0x{(nint)node:X}] [{node->NodeId}] {objectInfo->ComponentType} Component Node");
+                        }
+
+                        nodeIndex++;
+                    }
                 }
             }
 
+            NodePickerSelectionIndex -= (int)ImGui.GetIO().MouseWheel;
+            if (NodePickerSelectionIndex < 0)
+                NodePickerSelectionIndex = nodeCount - 1;
+            if (NodePickerSelectionIndex > nodeCount - 1)
+                NodePickerSelectionIndex = 0;
+
+            if (mouseMoved)
+                LastMousePos = mousePos;
+
             ImGui.End();
-        }*/
+        }
     }
 }
