@@ -531,7 +531,13 @@ public static unsafe class DebugUtils
     public static void DrawStdMap(nint address, Type type, NodeOptions nodeOptions)
     {
         nodeOptions.EnsureAddressInPath(address);
+
         var elementCount = *(ulong*)(address + 0x8);
+        if (elementCount == 0)
+        {
+            ImGui.TextUnformatted("No values");
+            return;
+        }
 
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
         using var node = ImRaii.TreeNode($"{elementCount} Value{(elementCount != 1 ? "s" : "")}##Node{nodeOptions.AddressPath}", ImGuiTreeNodeFlags.SpanAvailWidth);
