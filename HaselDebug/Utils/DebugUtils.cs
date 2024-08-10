@@ -134,6 +134,16 @@ public static unsafe class DebugUtils
             DrawStdMap(address, type, nodeOptions);
             return;
         }
+        else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdList<>))
+        {
+            DrawStdList(address, type, nodeOptions);
+            return;
+        }
+        else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdDeque<>))
+        {
+            DrawStdDeque(address, type, nodeOptions);
+            return;
+        }
         else if (type.IsEnum)
         {
             DrawEnum(address, type, nodeOptions);
@@ -279,6 +289,23 @@ public static unsafe class DebugUtils
                 ImGui.TextColored(ColorName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawStdDeque(fieldAddress, underlyingType, new NodeOptions() { AddressPath = indexedAddressPath });
+                continue;
+            }
+
+            // StdList<>
+            if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(StdList<>))
+            {
+                var underlyingType = fieldType.GenericTypeArguments[0];
+                var underlyingTypeSize = underlyingType.SizeOf();
+                if (underlyingTypeSize == 0)
+                {
+                    ImGui.TextColored(Colors.Red, $"Can't get size of {underlyingType.Name}");
+                    continue;
+                }
+
+                ImGui.TextColored(ColorName, fieldInfo.Name);
+                ImGui.SameLine();
+                DrawStdList(fieldAddress, underlyingType, new NodeOptions() { AddressPath = indexedAddressPath });
                 continue;
             }
 
@@ -623,6 +650,63 @@ public static unsafe class DebugUtils
 
             ImGui.TableNextColumn(); // Value
             DrawPointerType(valueAddress, valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(valueAddress) });
+        }
+    }
+
+    public static void DrawStdList(nint address, Type type, NodeOptions nodeOptions)
+    {
+        nodeOptions.EnsureAddressInPath(address);
+
+        if (*(nint*)address == 0)
+        {
+            ImGui.TextUnformatted("Not initialized");
+            return;
+        }
+
+        var elementCount = *(ulong*)(address + 0x8);
+        if (elementCount == 0)
+        {
+            ImGui.TextUnformatted("No values");
+            return;
+        }
+
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+        using var node = ImRaii.TreeNode($"{elementCount} Value{(elementCount != 1 ? "s" : "")}##Node{nodeOptions.AddressPath}", ImGuiTreeNodeFlags.SpanAvailWidth);
+        if (!node)
+            return;
+        titleColor?.Dispose();
+
+        var _head = **(nint**)address;
+        var _current = _head;
+
+        bool MoveNext()
+        {
+            if (_head == 0 || *(nint*)_current == _head)
+                return false;
+            _current = *(nint*)_current;
+            return true;
+        }
+
+        using var indent = ImRaii.PushIndent(1, nodeOptions.Indent);
+        using var table = ImRaii.Table($"StdListTable{nodeOptions.AddressPath}", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+        if (!table)
+            return;
+
+        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Value");
+        ImGui.TableSetupScrollFreeze(2, 1);
+        ImGui.TableHeadersRow();
+
+        var i = 0;
+        while (MoveNext())
+        {
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn(); // Index
+            ImGui.TextUnformatted(i.ToString());
+
+            ImGui.TableNextColumn(); // Value
+            DrawPointerType(_current + 0x10, type, new NodeOptions() { AddressPath = nodeOptions.AddressPath });
+            i++;
         }
     }
 
