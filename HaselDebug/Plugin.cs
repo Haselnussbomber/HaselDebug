@@ -20,7 +20,6 @@ namespace HaselDebug;
 public class Plugin : IDalamudPlugin
 {
     private readonly IDalamudPluginInterface PluginInterface;
-    private PluginWindow? PluginWindow;
 
     public Plugin(
         IDalamudPluginInterface pluginInterface,
@@ -50,7 +49,8 @@ public class Plugin : IDalamudPlugin
             .AddSingleton(PluginConfig.Load(pluginInterface, pluginLog))
             .AddSingleton<DebugRenderer>()
             .AddIServices<IDebugTab>()
-            .AddSingleton<PluginWindow>();
+            .AddSingleton<PluginWindow>()
+            .AddSingleton<ConfigWindow>();
 
         Service.BuildProvider();
 
@@ -71,29 +71,46 @@ public class Plugin : IDalamudPlugin
         // TODO: IHostedService?
         framework.RunOnFrameworkThread(() =>
         {
-            PluginWindow = Service.Get<PluginWindow>();
-            PluginWindow.Open();
+            if (Service.Get<PluginConfig>().AutoOpenPluginWindow)
+                Service.Get<PluginWindow>().Open();
 
             Service.Get<CommandService>().Register(OnCommand);
 
-            PluginInterface.UiBuilder.OpenMainUi += ToggleWindow;
+            PluginInterface.UiBuilder.OpenMainUi += TogglePluginWindow;
+            PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigWindow;
         });
     }
 
     [CommandHandler("/haseldebug", "HaselDebug.CommandHandlerHelpMessage")]
     private void OnCommand(string command, string arguments)
     {
-        ToggleWindow();
+        switch (arguments.Trim().ToLowerInvariant())
+        {
+            case "conf":
+            case "config":
+                ToggleConfigWindow();
+                break;
+
+            default:
+                TogglePluginWindow();
+                break;
+        }
     }
 
-    private static void ToggleWindow()
+    private static void TogglePluginWindow()
     {
         Service.Get<PluginWindow>().Toggle();
     }
 
+    private static void ToggleConfigWindow()
+    {
+        Service.Get<ConfigWindow>().Toggle();
+    }
+
     void IDisposable.Dispose()
     {
-        PluginInterface.UiBuilder.OpenMainUi -= ToggleWindow;
+        PluginInterface.UiBuilder.OpenMainUi -= TogglePluginWindow;
+        PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigWindow;
 
         Service.Dispose();
 

@@ -4,6 +4,24 @@
     "de": "Zeige/verstecke das HaselDebug-Fenster"
   },
 
+  "TitleBarButton.ToggleConfig.Tooltip.OpenConfig": {
+    "en": "Open Configuration",
+    "de": "Konfiguration öffnen"
+  },
+  "TitleBarButton.ToggleConfig.Tooltip.CloseConfig": {
+    "en": "Close Configuration",
+    "de": "Konfiguration schließen"
+  },
+
+  "Config.WindowTitle": {
+    "en": "HaselDebug Configuration",
+    "de": "HaselDebug-Konfiguration"
+  },
+  "Config.AutoOpenPluginWindow.Label": {
+    "en": "Auto-open HaselDebug",
+    "de": "HaselDebug automatisch öffnen"
+  },
+
   "UnlocksTab.CabinetNotLoaded": {
     "en": "Armoire not loaded",
     "de": "Kostbarkeitenkabinett nicht geladen"

@@ -2,7 +2,6 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Extensions;
 using HaselDebug.Abstracts;
-using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 

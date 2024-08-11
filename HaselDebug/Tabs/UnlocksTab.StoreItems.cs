@@ -9,7 +9,6 @@ using HaselCommon.Extensions;
 using HaselCommon.Services;
 using HaselCommon.Utils;
 using HaselDebug.Abstracts;
-using HaselDebug.Utils;
 using ImGuiNET;
 using LuminaSupplemental.Excel.Model;
 using Cabinet = Lumina.Excel.GeneratedSheets.Cabinet;

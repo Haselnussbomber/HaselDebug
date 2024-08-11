@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using HaselCommon.Services;
 using HaselCommon.Windowing;
@@ -18,7 +19,13 @@ public class PluginWindow : SimpleWindow, IDisposable
     private readonly PluginConfig PluginConfig;
     private IDebugTab? SelectedTab;
 
-    public PluginWindow(PluginConfig pluginConfig, WindowManager windowManager, IEnumerable<IDebugTab> tabs) : base(windowManager, "HaselDebug")
+    public PluginWindow(
+        PluginConfig pluginConfig,
+        WindowManager windowManager,
+        IEnumerable<IDebugTab> tabs,
+        TextService textService,
+        ConfigWindow configWindow)
+        : base(windowManager, "HaselDebug")
     {
         PluginConfig = pluginConfig;
 
@@ -32,6 +39,18 @@ public class PluginWindow : SimpleWindow, IDisposable
         SizeCondition = ImGuiCond.FirstUseEver;
         RespectCloseHotkey = false;
         DisableWindowSounds = true;
+
+        TitleBarButtons.Add(new()
+        {
+            Icon = FontAwesomeIcon.Cog,
+            IconOffset = new(0, 1),
+            ShowTooltip = () =>
+            {
+                using var tooltip = ImRaii.Tooltip();
+                textService.Draw($"TitleBarButton.ToggleConfig.Tooltip.{(configWindow.IsOpen ? "Close" : "Open")}Config");
+            },
+            Click = (button) => configWindow.Toggle()
+        });
 
         Tabs = [.. tabs.OrderBy(t => t.GetTitle())];
 

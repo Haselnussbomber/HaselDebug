@@ -73,5 +73,6 @@ public partial class PluginConfig : IPluginConfiguration
 public partial class PluginConfig
 {
     public int Version { get; set; } = CURRENT_CONFIG_VERSION;
-    public string LastSelectedTab { get; set; } = "";
+    public bool AutoOpenPluginWindow = false;
+    public string LastSelectedTab = "";
 }
