@@ -3,6 +3,7 @@ using System.Reflection;
 using FFXIVClientStructs.Attributes;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 
@@ -10,10 +11,13 @@ namespace HaselDebug.Tabs;
 
 public unsafe class InstancesTab : DebugTab
 {
-    private readonly (nint Address, Type Type)[] _instances;
+    private readonly DebugRenderer DebugRenderer;
+    private readonly (nint Address, Type Type)[] Instances;
 
-    public InstancesTab()
+    public InstancesTab(DebugRenderer debugRenderer)
     {
+        DebugRenderer = debugRenderer;
+
         var list = new List<(nint, Type)>();
 
         foreach (var type in typeof(AgentAttribute).Assembly.GetTypes())
@@ -33,17 +37,17 @@ public unsafe class InstancesTab : DebugTab
             list.Add((address, type));
         }
 
-        _instances = [.. list];
+        Instances = [.. list];
     }
 
     public override void Draw()
     {
         var i = 0;
-        foreach (var (ptr, type) in _instances)
+        foreach (var (ptr, type) in Instances)
         {
-            DebugUtils.DrawAddress(ptr);
+            DebugRenderer.DrawAddress(ptr);
             ImGui.SameLine(120);
-            DebugUtils.DrawPointerType(ptr, type, new NodeOptions() { AddressPath = new AddressPath(i++) });
+            DebugRenderer.DrawPointerType(ptr, type, new NodeOptions() { AddressPath = new AddressPath(i++) });
         }
     }
 }

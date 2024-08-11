@@ -3,12 +3,12 @@ using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
-using HaselDebug.Utils;
+using HaselDebug.Services;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class ContentsFinderDutyListTab : DebugTab
+public unsafe class ContentsFinderDutyListTab(DebugRenderer DebugRenderer) : DebugTab
 {
     public override void Draw()
     {
@@ -36,7 +36,7 @@ public unsafe class ContentsFinderDutyListTab : DebugTab
             var item = addon->DutyList->Items[i].Value;
             ImGui.TextUnformatted($"{i}:");
             ImGui.SameLine();
-            DebugUtils.DrawCopyableText($"{(nint)item:X}");
+            DebugRenderer.DrawCopyableText($"{(nint)item:X}");
 
             using (ImRaii.PushIndent())
             {

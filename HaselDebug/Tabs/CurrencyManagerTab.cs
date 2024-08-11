@@ -5,20 +5,21 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class CurrencyManagerTab(ExcelService ExcelService, TextService TextService) : DebugTab
+public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextService TextService) : DebugTab
 {
     public override string GetTitle() => "CurrencyManager";
 
     public override void Draw()
     {
         var currencyManager = CurrencyManager.Instance();
-        DebugUtils.DrawPointerType((nint)currencyManager, typeof(CurrencyManager), new NodeOptions());
+        DebugRenderer.DrawPointerType((nint)currencyManager, typeof(CurrencyManager), new NodeOptions());
 
         ImGui.TextUnformatted(nameof(CurrencyManager.SpecialItemBucket));
         using (var table = ImRaii.Table(nameof(CurrencyManager.SpecialItemBucket) + "Table", 5))
@@ -115,6 +116,6 @@ public unsafe class CurrencyManagerTab(ExcelService ExcelService, TextService Te
         {
             sb.AppendLine($"| {itemId} | {ExcelService.GetSheet<Item>(ClientLanguage.English)!.GetRow(itemId)!.Name.ToDalamudString().ToString()} |<br/>");
         }
-        DebugUtils.DrawCopyableText(sb.ToString());
+        DebugRenderer.DrawCopyableText(sb.ToString());
     }
 }

@@ -3,6 +3,7 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
@@ -13,9 +14,9 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
 {
     public override bool DrawInChild => false;
 
+    private readonly DebugRenderer DebugRenderer;
     private readonly ExcelService ExcelService;
     private readonly TextService TextService;
-    private readonly ITextureProvider TextureProvider;
     private readonly MapService MapService;
     private readonly IDataManager DataManager;
     private readonly TranslationManager TranslationManager;
@@ -24,9 +25,9 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
     private readonly ImGuiService ImGuiService;
 
     public UnlocksTab(
+        DebugRenderer debugRenderer,
         ExcelService excelService,
         TextService textService,
-        ITextureProvider textureProvider,
         MapService mapService,
         IDataManager dataManager,
         TranslationManager translationManager,
@@ -34,9 +35,9 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         TextureService textureService,
         ImGuiService imGuiService)
     {
+        DebugRenderer = debugRenderer;
         ExcelService = excelService;
         TextService = textService;
-        TextureProvider = textureProvider;
         MapService = mapService;
         DataManager = dataManager;
         TranslationManager = translationManager;

@@ -99,10 +99,10 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
 
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn(); // ItemId
-                DebugUtils.DrawCopyableText(row.ItemId.ToString());
+                DebugRenderer.DrawCopyableText(row.ItemId.ToString());
 
                 ImGui.TableNextColumn(); // Item Category
-                DebugUtils.DrawCopyableText(row.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty);
+                DebugRenderer.DrawCopyableText(row.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty);
 
                 ImGui.TableNextColumn(); // Item
                 ImGuiService.DrawSelectableItem(row.Item.Value, $"StoreItemsList{i}");

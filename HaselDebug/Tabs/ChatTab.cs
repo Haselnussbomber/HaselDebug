@@ -3,13 +3,14 @@ using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class ChatTab(ExcelService ExcelService, TextService TextService, SeStringEvaluatorService SeStringEvaluator) : DebugTab
+public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextService TextService, SeStringEvaluatorService SeStringEvaluator) : DebugTab
 {
     public override void Draw()
     {
@@ -78,7 +79,7 @@ public unsafe class ChatTab(ExcelService ExcelService, TextService TextService, 
                     var formatted = SeStringEvaluator.Evaluate(format, new SeStringContext() { LocalParameters = [senderEvaluated, messageEvaluated] }).AsSpan();
 
                     if (!formatted.IsEmpty)
-                        DebugUtils.DrawSeString(formatted, new NodeOptions() { AddressPath = new AddressPath(i), Indent = false });
+                        DebugRenderer.DrawSeString(formatted, new NodeOptions() { AddressPath = new AddressPath(i), Indent = false });
                 }
             }
         }

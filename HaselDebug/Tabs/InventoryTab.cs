@@ -1,11 +1,11 @@
 using System.Numerics;
 using Dalamud.Game.Text;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -14,7 +14,7 @@ using Lumina.Text;
 namespace HaselDebug.Tabs;
 
 #pragma warning disable SeStringRenderer
-public unsafe class InventoryTab(ITextureProvider TextureProvider, TextService TextService, ExcelService ExcelService, ItemService ItemService) : DebugTab
+public unsafe class InventoryTab(DebugRenderer DebugRenderer, TextService TextService, ExcelService ExcelService, ItemService ItemService) : DebugTab
 {
     public override bool DrawInChild => false;
 
@@ -141,8 +141,8 @@ public unsafe class InventoryTab(ITextureProvider TextureProvider, TextService T
                     .PopColorType()
                     .ToReadOnlySeString();
 
-                DebugUtils.DrawIcon(TextureProvider, ItemService.GetIconId(itemId), ItemService.IsHighQuality(itemId));
-                DebugUtils.DrawPointerType((nint)slot, typeof(InventoryItem), new NodeOptions()
+                DebugRenderer.DrawIcon(ItemService.GetIconId(itemId), ItemService.IsHighQuality(itemId));
+                DebugRenderer.DrawPointerType((nint)slot, typeof(InventoryItem), new NodeOptions()
                 {
                     TitleOverride = itemNameSeStr,
                     TextOffsetX = ImGui.GetTextLineHeight()

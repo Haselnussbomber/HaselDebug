@@ -6,7 +6,6 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Services;
 using HaselCommon.Utils;
 using HaselDebug.Abstracts;
-using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 

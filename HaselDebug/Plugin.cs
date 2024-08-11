@@ -9,6 +9,7 @@ using HaselCommon.Logger;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Config;
+using HaselDebug.Services;
 using HaselDebug.Windows;
 using InteropGenerator.Runtime;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,6 +48,7 @@ public class Plugin : IDalamudPlugin
 
             // HaselDebug
             .AddSingleton(PluginConfig.Load(pluginInterface, pluginLog))
+            .AddSingleton<DebugRenderer>()
             .AddIServices<IDebugTab>()
             .AddSingleton<PluginWindow>();
 
@@ -67,7 +69,8 @@ public class Plugin : IDalamudPlugin
         // ---
 
         // TODO: IHostedService?
-        framework.RunOnFrameworkThread(() => {
+        framework.RunOnFrameworkThread(() =>
+        {
             PluginWindow = Service.Get<PluginWindow>();
             PluginWindow.Open();
 

@@ -21,6 +21,7 @@ using HaselCommon.Extensions;
 using HaselCommon.Services;
 using HaselCommon.Utils;
 using HaselDebug.Extensions;
+using HaselDebug.Utils;
 using ImGuiNET;
 using InteropGenerator.Runtime.Attributes;
 using Lumina.Text;
@@ -28,26 +29,26 @@ using Lumina.Text.ReadOnly;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
-namespace HaselDebug.Utils;
+namespace HaselDebug.Services;
 
 #pragma warning disable SeStringRenderer
-public static unsafe class DebugUtils
+public unsafe class DebugRenderer(ITextureProvider TextureProvider)
 {
-    private static MethodInfo? GetSheetGeneric;
+    private MethodInfo? GetSheetGeneric;
 
-    public static HaselColor ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1f);
-    public static HaselColor ColorType { get; } = new(0.2f, 0.9f, 0.9f, 1);
-    public static HaselColor ColorName { get; } = new(0.2f, 0.9f, 0.4f, 1);
+    public HaselColor ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1f);
+    public HaselColor ColorType { get; } = new(0.2f, 0.9f, 0.9f, 1);
+    public HaselColor ColorName { get; } = new(0.2f, 0.9f, 0.4f, 1);
 
-    private static readonly Dictionary<Type, string[]> KnownStringPointers = new() {
+    private readonly Dictionary<Type, string[]> KnownStringPointers = new() {
         { typeof(FFXIVClientStructs.FFXIV.Client.UI.Agent.MapMarkerBase), ["Subtext"] },
         { typeof(FFXIVClientStructs.FFXIV.Common.Component.Excel.ExcelSheet), ["SheetName"] }
     };
 
-    public static void DrawPointerType(void* obj, Type? type, NodeOptions nodeOptions)
+    public void DrawPointerType(void* obj, Type? type, NodeOptions nodeOptions)
         => DrawPointerType((nint)obj, type, nodeOptions);
 
-    public static void DrawPointerType(nint address, Type? type, NodeOptions nodeOptions)
+    public void DrawPointerType(nint address, Type? type, NodeOptions nodeOptions)
     {
         if (type == null)
         {
@@ -163,7 +164,7 @@ public static unsafe class DebugUtils
         ImGui.TextUnformatted("Unsupported Type");
     }
 
-    private static void DrawStruct(nint address, Type type, NodeOptions nodeOptions)
+    private void DrawStruct(nint address, Type type, NodeOptions nodeOptions)
     {
         nodeOptions.EnsureAddressInPath(address);
 
@@ -334,15 +335,13 @@ public static unsafe class DebugUtils
             ImGui.SameLine();
 
             if (fieldType == typeof(uint) && fieldInfo.Name == "IconId")
-            {
-                DrawIcon(Service.Get<ITextureProvider>(), *(uint*)fieldAddress);
-            }
+                DrawIcon(*(uint*)fieldAddress);
 
             DrawPointerType(fieldAddress, fieldType, new NodeOptions() { AddressPath = indexedAddressPath });
         }
     }
 
-    private static void DrawEnum(nint address, Type type, NodeOptions nodeOptions)
+    private void DrawEnum(nint address, Type type, NodeOptions nodeOptions)
     {
         nodeOptions.EnsureAddressInPath(address);
 
@@ -373,7 +372,7 @@ public static unsafe class DebugUtils
         }
     }
 
-    public static void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Vector4? textColor = null)
+    public void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Vector4? textColor = null)
     {
         textCopy ??= text;
         textColor ??= (Vector4)Colors.White;
@@ -396,10 +395,10 @@ public static unsafe class DebugUtils
             ImGui.SetClipboardText(textCopy);
     }
 
-    public static void DrawAddress(void* obj)
+    public void DrawAddress(void* obj)
         => DrawAddress((nint)obj);
 
-    public static void DrawAddress(nint address)
+    public void DrawAddress(nint address)
     {
         if (address == 0)
         {
@@ -420,19 +419,15 @@ public static unsafe class DebugUtils
         }
     }
 
-    public static void DrawHexView(nint address, int length)
+    public void DrawHexView(nint address, int length)
     {
         using var id = ImRaii.PushId($"HexView_{address}");
 
         if (ImGui.Button($"Copy Hex"))
-        {
             ImGui.SetClipboardText(BitConverter.ToString(MemoryHelper.ReadRaw(address, length)).Replace("-", ""));
-        }
         ImGui.SameLine();
         if (ImGui.Button($"Copy Text"))
-        {
             ImGui.SetClipboardText(MemoryHelper.ReadStringNullTerminated(address));
-        }
 
         var numColumns = 16;
 
@@ -493,7 +488,7 @@ public static unsafe class DebugUtils
         }
     }
 
-    public static void DrawStdVector(nint address, Type type, NodeOptions nodeOptions)
+    public void DrawStdVector(nint address, Type type, NodeOptions nodeOptions)
     {
         nodeOptions.EnsureAddressInPath(address);
 
@@ -555,7 +550,7 @@ public static unsafe class DebugUtils
         public StdPair<TKey, TValue> _Myval;
     }
 
-    public static void DrawStdMap(nint address, Type type, NodeOptions nodeOptions)
+    public void DrawStdMap(nint address, Type type, NodeOptions nodeOptions)
     {
         nodeOptions.EnsureAddressInPath(address);
 
@@ -653,7 +648,7 @@ public static unsafe class DebugUtils
         }
     }
 
-    public static void DrawStdList(nint address, Type type, NodeOptions nodeOptions)
+    public void DrawStdList(nint address, Type type, NodeOptions nodeOptions)
     {
         nodeOptions.EnsureAddressInPath(address);
 
@@ -710,7 +705,7 @@ public static unsafe class DebugUtils
         }
     }
 
-    public static void DrawStdDeque(nint address, Type type, NodeOptions nodeOptions)
+    public void DrawStdDeque(nint address, Type type, NodeOptions nodeOptions)
     {
         nodeOptions.EnsureAddressInPath(address);
 
@@ -752,7 +747,7 @@ public static unsafe class DebugUtils
         for (var i = 0ul; i < mySize; i++)
         {
             var actualIndex = myOff + i;
-            var block = (actualIndex / (ulong)blockSize) & (mapSize - 1);
+            var block = actualIndex / (ulong)blockSize & mapSize - 1;
             var offset = actualIndex % (ulong)blockSize;
             var valueAddress = map[block] + (nint)offset * typeSize; // TODO: check this again. this was originally map[block][offset], so doing pointer arithmetic
 
@@ -765,7 +760,7 @@ public static unsafe class DebugUtils
         }
     }
 
-    public static void DrawFixedSizeArray(nint address, Type type, bool isString, NodeOptions nodeOptions)
+    public void DrawFixedSizeArray(nint address, Type type, bool isString, NodeOptions nodeOptions)
     {
         nodeOptions.EnsureAddressInPath(address);
 
@@ -828,7 +823,7 @@ public static unsafe class DebugUtils
         }
     }
 
-    public static void DrawAtkValues(AtkValue* values, ushort valueCount, NodeOptions nodeOptions)
+    public void DrawAtkValues(AtkValue* values, ushort valueCount, NodeOptions nodeOptions)
     {
         if (valueCount == 0)
         {
@@ -871,7 +866,7 @@ public static unsafe class DebugUtils
         }
     }
 
-    public static void DrawAtkValue(nint address, NodeOptions nodeOptions)
+    public void DrawAtkValue(nint address, NodeOptions nodeOptions)
     {
         nodeOptions.EnsureAddressInPath(address);
 
@@ -905,7 +900,7 @@ public static unsafe class DebugUtils
         }
     }
 
-    public static void DrawAtkTexture(nint address, NodeOptions nodeOptions)
+    public void DrawAtkTexture(nint address, NodeOptions nodeOptions)
     {
         nodeOptions.EnsureAddressInPath(address);
 
@@ -918,9 +913,7 @@ public static unsafe class DebugUtils
 
         var title = "AtkTexture";
         if (tex->TextureType == TextureType.Resource)
-        {
             title = tex->Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString();
-        }
 
         var kernelTexture = tex->GetKernelTexture();
         if (kernelTexture == null)
@@ -932,7 +925,7 @@ public static unsafe class DebugUtils
         DrawTexture((nint)kernelTexture, new NodeOptions() { TitleOverride = new SeStringBuilder().Append(title).ToReadOnlySeString() });
     }
 
-    public static void DrawTexture(nint address, NodeOptions nodeOptions)
+    public void DrawTexture(nint address, NodeOptions nodeOptions)
     {
         if (address == 0)
         {
@@ -960,7 +953,7 @@ public static unsafe class DebugUtils
         ImGui.Image((nint)tex->D3D11ShaderResourceView, availSize.X < size.X ? scaledSize : size);
     }
 
-    public static void DrawUtf8String(nint address, NodeOptions nodeOptions)
+    public void DrawUtf8String(nint address, NodeOptions nodeOptions)
     {
         if (address == 0)
         {
@@ -980,10 +973,10 @@ public static unsafe class DebugUtils
         DrawSeString(str->StringPtr, nodeOptions);
     }
 
-    public static void DrawSeString(nint ptr, NodeOptions nodeOptions)
+    public void DrawSeString(nint ptr, NodeOptions nodeOptions)
         => DrawSeString((byte*)ptr, nodeOptions);
 
-    public static void DrawSeString(byte* ptr, NodeOptions nodeOptions)
+    public void DrawSeString(byte* ptr, NodeOptions nodeOptions)
     {
         if (ptr == null)
         {
@@ -994,7 +987,7 @@ public static unsafe class DebugUtils
         DrawSeString(new ReadOnlySeStringSpan(ptr), nodeOptions);
     }
 
-    public static void DrawSeString(ReadOnlySeStringSpan rosss, NodeOptions nodeOptions)
+    public void DrawSeString(ReadOnlySeStringSpan rosss, NodeOptions nodeOptions)
     {
         if (rosss.PayloadCount == 0)
         {
@@ -1013,9 +1006,7 @@ public static unsafe class DebugUtils
             if (contextMenu)
             {
                 if (ImGui.MenuItem("Copy text"))
-                {
                     ImGui.SetClipboardText(rosss.ToString());
-                }
             }
         }
 
@@ -1728,7 +1719,7 @@ public static unsafe class DebugUtils
         }
     }
 
-    public static object? DrawNumeric(nint address, Type type, NodeOptions nodeOptions)
+    public object? DrawNumeric(nint address, Type type, NodeOptions nodeOptions)
     {
         object? value = null;
 
@@ -1823,7 +1814,7 @@ public static unsafe class DebugUtils
     }
 
     /*
-    public static string ToBitsString(ulong value, int bits)
+    public string ToBitsString(ulong value, int bits)
     {
         var bitsString = new StringBuilder();
 
@@ -1837,17 +1828,17 @@ public static unsafe class DebugUtils
         return bitsString.ToString();
     }
 
-    public static string ToBitsString(byte byteIn)
+    public string ToBitsString(byte byteIn)
         => ToBitsString(byteIn, 8);
 
-    public static string ToBitsString(ushort byteIn)
+    public string ToBitsString(ushort byteIn)
         => ToBitsString(byteIn, 16);
 
-    public static string ToBitsString(uint byteIn)
+    public string ToBitsString(uint byteIn)
         => ToBitsString(byteIn, 32);
     */
 
-    public static void DrawIcon(ITextureProvider textureProvider, uint iconId, bool isHq = false, bool sameLine = true, DrawInfo drawInfo = default)
+    public void DrawIcon(uint iconId, bool isHq = false, bool sameLine = true, DrawInfo drawInfo = default)
     {
         drawInfo.DrawSize ??= new Vector2(ImGui.GetTextLineHeight());
 
@@ -1867,7 +1858,7 @@ public static unsafe class DebugUtils
             return;
         }
 
-        if (textureProvider.TryGetFromGameIcon(iconId, out var tex) && tex.TryGetWrap(out var texture, out _))
+        if (TextureProvider.TryGetFromGameIcon(iconId, out var tex) && tex.TryGetWrap(out var texture, out _))
         {
             ImGui.Image(texture.ImGuiHandle, drawInfo.DrawSize.Value);
 
@@ -1882,9 +1873,7 @@ public static unsafe class DebugUtils
             }
 
             if (ImGui.IsItemClicked())
-            {
                 ImGui.SetClipboardText(iconId.ToString());
-            }
         }
         else
         {
@@ -1895,7 +1884,7 @@ public static unsafe class DebugUtils
             ImGui.SameLine();
     }
 
-    public static void DrawExdSheet(ExdSheets.Module module, Type rowType, uint rowId, uint depth, NodeOptions nodeOptions)
+    public void DrawExdSheet(ExdSheets.Module module, Type rowType, uint rowId, uint depth, NodeOptions nodeOptions)
     {
         if (depth > 10)
         {

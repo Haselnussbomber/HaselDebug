@@ -7,6 +7,7 @@ using HaselCommon.Extensions;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -14,13 +15,13 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class RaptureHotbarModuleTab(ExcelService ExcelService, TextService TextService, SeStringEvaluatorService SeStringEvaluatorService, ITextureProvider TextureProvider) : DebugTab
+public unsafe class RaptureHotbarModuleTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextService TextService, SeStringEvaluatorService SeStringEvaluatorService, ITextureProvider TextureProvider) : DebugTab
 {
     public override void Draw()
     {
         var raptureHotbarModule = RaptureHotbarModule.Instance();
 
-        DebugUtils.DrawPointerType(raptureHotbarModule, typeof(RaptureHotbarModule), new NodeOptions());
+        DebugRenderer.DrawPointerType(raptureHotbarModule, typeof(RaptureHotbarModule), new NodeOptions());
 
         ImGui.Spacing();
         ImGui.Separator();
@@ -77,8 +78,8 @@ public unsafe class RaptureHotbarModuleTab(ExcelService ExcelService, TextServic
                 ImGui.TableNextColumn(); // Name
                 if (!slot->IsEmpty)
                 {
-                    DebugUtils.DrawIcon(TextureProvider, slot->IconId);
-                    DebugUtils.DrawPointerType(slot, typeof(RaptureHotbarModule.HotbarSlot), new()
+                    DebugRenderer.DrawIcon(slot->IconId);
+                    DebugRenderer.DrawPointerType(slot, typeof(RaptureHotbarModule.HotbarSlot), new()
                     {
                         TitleOverride = new ReadOnlySeString(Encoding.UTF8.GetBytes(slot->CommandType switch
                         {

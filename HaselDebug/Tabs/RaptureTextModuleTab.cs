@@ -8,13 +8,14 @@ using FFXIVClientStructs.FFXIV.Component.Text;
 using HaselCommon.Services;
 using HaselCommon.Utils;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
 #pragma warning disable SeStringRenderer
-public unsafe class RaptureTextModuleTab(ExcelService ExcelService) : DebugTab
+public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelService ExcelService) : DebugTab
 {
     private readonly List<TextEntry> entries = [
         new TextEntry(ExcelService, TextEntryType.String, "Test1 "),
@@ -71,26 +72,26 @@ public unsafe class RaptureTextModuleTab(ExcelService ExcelService) : DebugTab
             ImGui.TextUnformatted(item.Type.ToString());
 
             ImGui.TableNextColumn(); // ValuePtr
-            DebugUtils.DrawAddress(item.ValuePtr);
+            DebugRenderer.DrawAddress(item.ValuePtr);
 
             ImGui.TableNextColumn(); // Value
             switch (item.Type)
             {
                 case TextParameterType.Integer:
-                    DebugUtils.DrawCopyableText($"0x{item.IntValue:X}");
+                    DebugRenderer.DrawCopyableText($"0x{item.IntValue:X}");
                     ImGui.SameLine();
-                    DebugUtils.DrawCopyableText(item.IntValue.ToString());
+                    DebugRenderer.DrawCopyableText(item.IntValue.ToString());
                     break;
 
                 case TextParameterType.ReferencedUtf8String:
                     if (item.ReferencedUtf8StringValue != null)
-                        DebugUtils.DrawSeString(item.ReferencedUtf8StringValue->Utf8String.StringPtr, new NodeOptions { AddressPath = new AddressPath([(nint)i, (nint)item.ReferencedUtf8StringValue]), Indent = false });
+                        DebugRenderer.DrawSeString(item.ReferencedUtf8StringValue->Utf8String.StringPtr, new NodeOptions { AddressPath = new AddressPath([(nint)i, (nint)item.ReferencedUtf8StringValue]), Indent = false });
                     else
                         ImGui.TextUnformatted("null");
                     break;
 
                 case TextParameterType.String:
-                    DebugUtils.DrawSeString(item.StringValue, new NodeOptions { Indent = false });
+                    DebugRenderer.DrawSeString(item.StringValue, new NodeOptions { Indent = false });
                     break;
             }
 
@@ -274,7 +275,7 @@ public unsafe class RaptureTextModuleTab(ExcelService ExcelService) : DebugTab
 
             ImGui.TextUnformatted("Output:");
             ImGui.SameLine();
-            DebugUtils.DrawUtf8String((nint)ptr, new NodeOptions() { AddressPath = new AddressPath((nint)ptr) });
+            DebugRenderer.DrawUtf8String((nint)ptr, new NodeOptions() { AddressPath = new AddressPath((nint)ptr) });
 
             ImGui.TableNextColumn(); // Actions
 

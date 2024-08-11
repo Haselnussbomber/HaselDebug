@@ -7,19 +7,20 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
-public class AddonInspector(IGameGui GameGui) : DebugTab
+public class AddonInspector(DebugRenderer DebugRenderer, IGameGui GameGui) : DebugTab
 {
     private UiDebug? addonInspector;
 
     public override void Draw()
     {
-        addonInspector ??= new UiDebug(GameGui);
+        addonInspector ??= new UiDebug(DebugRenderer, GameGui);
         addonInspector?.Draw();
     }
 }
@@ -52,17 +53,19 @@ internal unsafe class UiDebug
         "Units 18",
     ];
 
+    private readonly DebugRenderer DebugRenderer;
+    private readonly IGameGui GameGui;
+
     private bool doingSearch;
     private string searchInput = string.Empty;
     private AtkUnitBase* selectedUnitBase = null;
 
-    public IGameGui GameGui { get; }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="UiDebug"/> class.
     /// </summary>
-    public UiDebug(IGameGui gameGui)
+    public UiDebug(DebugRenderer debugRenderer, IGameGui gameGui)
     {
+        DebugRenderer = debugRenderer;
         GameGui = gameGui;
     }
 
@@ -116,7 +119,7 @@ internal unsafe class UiDebug
 
         ImGui.Separator();
 
-        DebugUtils.DrawPointerType(atkUnitBase, typeof(AtkUnitBase), new NodeOptions());
+        DebugRenderer.DrawPointerType(atkUnitBase, typeof(AtkUnitBase), new NodeOptions());
 
         ImGui.Dummy(ImGuiHelpers.ScaledVector2(25));
         ImGui.Separator();

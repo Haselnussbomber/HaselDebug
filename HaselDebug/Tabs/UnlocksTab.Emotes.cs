@@ -39,7 +39,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
             ImGui.TableNextColumn(); // Name
             var name = row.Name.ExtractText();
             var hasName = !string.IsNullOrWhiteSpace(name);
-            DebugUtils.DrawIcon(TextureProvider, row.Icon, sameLine: hasName);
+            DebugRenderer.DrawIcon(row.Icon, sameLine: hasName);
             if (hasName)
             {
                 using (ImRaii.Disabled(!canUse))

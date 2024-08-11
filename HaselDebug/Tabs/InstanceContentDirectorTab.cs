@@ -4,6 +4,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -11,7 +12,7 @@ using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class InstanceContentDirectorTab(ISigScanner SigScanner, ExcelService ExcelService) : DebugTab
+public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISigScanner SigScanner, ExcelService ExcelService) : DebugTab
 {
 
     private static readonly Dictionary<(string, InstanceContentType), nint> InstanceContentTypeVtables = [];
@@ -20,9 +21,9 @@ public unsafe class InstanceContentDirectorTab(ISigScanner SigScanner, ExcelServ
     {
         foreach (var ((name, type), vtableAddr) in InstanceContentTypeVtables)
         {
-            DebugUtils.DrawCopyableText($"{type}: {name} @", $"+0x{vtableAddr - SigScanner.Module.BaseAddress:X} - {name}");
+            DebugRenderer.DrawCopyableText($"{type}: {name} @", $"+0x{vtableAddr - SigScanner.Module.BaseAddress:X} - {name}");
             ImGui.SameLine();
-            DebugUtils.DrawAddress(vtableAddr);
+            DebugRenderer.DrawAddress(vtableAddr);
         }
 
         ImGui.Separator();
@@ -35,7 +36,7 @@ public unsafe class InstanceContentDirectorTab(ISigScanner SigScanner, ExcelServ
             else
                 ImGui.TextUnformatted($"[{directorPtr.Value->EventHandlerInfo->EventId.ContentId}]");
             ImGui.SameLine();
-            DebugUtils.DrawPointerType(directorPtr.Value, typeof(Director), new NodeOptions());
+            DebugRenderer.DrawPointerType(directorPtr.Value, typeof(Director), new NodeOptions());
         }
 
         ImGui.TextUnformatted("ContentDirector:");
@@ -47,7 +48,7 @@ public unsafe class InstanceContentDirectorTab(ISigScanner SigScanner, ExcelServ
         }
         else
         {
-            DebugUtils.DrawPointerType(contentDirector, typeof(ContentDirector), new NodeOptions());
+            DebugRenderer.DrawPointerType(contentDirector, typeof(ContentDirector), new NodeOptions());
         }
 
         ImGui.Separator();
@@ -61,7 +62,7 @@ public unsafe class InstanceContentDirectorTab(ISigScanner SigScanner, ExcelServ
         }
         else
         {
-            DebugUtils.DrawPointerType((nint)craftLeveEventHandler, typeof(EventHandler), new NodeOptions());
+            DebugRenderer.DrawPointerType((nint)craftLeveEventHandler, typeof(EventHandler), new NodeOptions());
         }
 
         ImGui.Separator();
@@ -75,7 +76,7 @@ public unsafe class InstanceContentDirectorTab(ISigScanner SigScanner, ExcelServ
         }
         else
         {
-            DebugUtils.DrawPointerType((nint)publicContentDirector, typeof(PublicContentDirector), new NodeOptions());
+            DebugRenderer.DrawPointerType((nint)publicContentDirector, typeof(PublicContentDirector), new NodeOptions());
         }
 
         ImGui.Separator();
@@ -97,7 +98,7 @@ public unsafe class InstanceContentDirectorTab(ISigScanner SigScanner, ExcelServ
                 InstanceContentTypeVtables.Add(key, *(nint*)instanceContentDirector);
             }
 
-            DebugUtils.DrawPointerType((nint)instanceContentDirector, typeof(InstanceContentDirector), new NodeOptions());
+            DebugRenderer.DrawPointerType((nint)instanceContentDirector, typeof(InstanceContentDirector), new NodeOptions());
         }
     }
 }

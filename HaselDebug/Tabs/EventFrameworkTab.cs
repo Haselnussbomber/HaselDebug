@@ -1,12 +1,12 @@
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.STD;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Text;
@@ -15,7 +15,7 @@ using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class EventFrameworkTab(ITextureProvider TextureProvider, TextService TextService) : DebugTab
+public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService TextService) : DebugTab
 {
     public override string GetTitle() => "EventFramework";
     public override bool DrawInChild => false;
@@ -44,7 +44,7 @@ public unsafe class EventFrameworkTab(ITextureProvider TextureProvider, TextServ
 
         var eventFramework = EventFramework.Instance();
 
-        DebugUtils.DrawPointerType(eventFramework, typeof(EventFramework), new NodeOptions());
+        DebugRenderer.DrawPointerType(eventFramework, typeof(EventFramework), new NodeOptions());
 
         ImGui.Separator();
 
@@ -67,21 +67,21 @@ public unsafe class EventFrameworkTab(ITextureProvider TextureProvider, TextServ
 
         foreach (Director* director in directorList)
         {
-            DebugUtils.DrawAddress(director);
+            DebugRenderer.DrawAddress(director);
             ImGui.SameLine();
 
             ImGui.TextUnformatted(director->EventHandlerInfo->EventId.ContentId.ToString());
             ImGui.SameLine();
 
             if (director->IconId != 0)
-                DebugUtils.DrawIcon(TextureProvider, director->IconId);
+                DebugRenderer.DrawIcon(director->IconId);
 
             var titleBytes = director->Title.AsSpan().ToArray();
             ReadOnlySeString? title = null;
             if (titleBytes.Length != 0)
                 title = new ReadOnlySeString(titleBytes);
 
-            DebugUtils.DrawPointerType(director, typeof(Director), new()
+            DebugRenderer.DrawPointerType(director, typeof(Director), new()
             {
                 TitleOverride = title
             });
@@ -101,7 +101,7 @@ public unsafe class EventFrameworkTab(ITextureProvider TextureProvider, TextServ
             var eventHandler = kv.Item2.Value;
             var type = eventHandler->Info.EventId.ContentId;
 
-            DebugUtils.DrawAddress(eventHandler);
+            DebugRenderer.DrawAddress(eventHandler);
             ImGui.SameLine(110);
 
             ImGui.TextUnformatted(kv.Item1.ToString("X4"));
@@ -125,13 +125,13 @@ public unsafe class EventFrameworkTab(ITextureProvider TextureProvider, TextServ
             else
             {
                 if (eventHandler->IconId != 0)
-                    DebugUtils.DrawIcon(TextureProvider, eventHandler->IconId);
+                    DebugRenderer.DrawIcon(eventHandler->IconId);
             }
 
             if (title == null)
                 title = new SeStringBuilder().Append($"{type} {kv.Item2.Value->Info.EventId.Id}").ToReadOnlySeString();
 
-            DebugUtils.DrawPointerType(eventHandler, typeof(EventHandler), new()
+            DebugRenderer.DrawPointerType(eventHandler, typeof(EventHandler), new()
             {
                 TitleOverride = title
             });
@@ -154,7 +154,7 @@ public unsafe class EventFrameworkTab(ITextureProvider TextureProvider, TextServ
 
         foreach (EventSceneTaskInterface* task in tasks)
         {
-            DebugUtils.DrawAddress(task);
+            DebugRenderer.DrawAddress(task);
             ImGui.SameLine();
             ImGui.TextUnformatted(task->Type.ToString());
         }
@@ -188,7 +188,7 @@ public unsafe class EventFrameworkTab(ITextureProvider TextureProvider, TextServ
             ImGui.TextUnformatted(i.ToString());
 
             ImGui.TableNextColumn(); // Object
-            DebugUtils.DrawPointerType(eventObject.Value, typeof(GameObject), new NodeOptions());
+            DebugRenderer.DrawPointerType(eventObject.Value, typeof(GameObject), new NodeOptions());
             i++;
         }
     }
@@ -224,16 +224,17 @@ public unsafe class EventFrameworkTab(ITextureProvider TextureProvider, TextServ
             ImGui.TextUnformatted(text.Item1.ToString());
 
             ImGui.TableNextColumn(); // Key
-            DebugUtils.DrawUtf8String((nint)(&text.Item2.Key), new NodeOptions());
+            DebugRenderer.DrawUtf8String((nint)(&text.Item2.Key), new NodeOptions());
 
             ImGui.TableNextColumn(); // Value
-            DebugUtils.DrawUtf8String((nint)(&text.Item2.Value), new NodeOptions());
+            DebugRenderer.DrawUtf8String((nint)(&text.Item2.Value), new NodeOptions());
         }
     }
 }
 
 [StructLayout(LayoutKind.Explicit)]
-public struct LuaText {
+public struct LuaText
+{
     [FieldOffset(0)] public Utf8String Key;
     [FieldOffset(0x68)] public Utf8String Value;
 }

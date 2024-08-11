@@ -6,12 +6,13 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class AgentsTab : DebugTab
+public unsafe class AgentsTab(DebugRenderer DebugRenderer) : DebugTab
 {
     private ImmutableSortedDictionary<AgentId, (Pointer<AgentInterface> Address, Type Type)>? Agents;
     private AgentId SelectedAgentId = AgentId.Lobby;
@@ -88,6 +89,6 @@ public unsafe class AgentsTab : DebugTab
         var agent = AgentModule.Instance()->GetAgentByInternalId(agentId);
         var agentType = Agents!.TryGetValue(agentId, out var value) ? value.Type : typeof(AgentInterface);
 
-        DebugUtils.DrawPointerType(agent, agentType, new NodeOptions() { DefaultOpen = true });
+        DebugRenderer.DrawPointerType(agent, agentType, new NodeOptions() { DefaultOpen = true });
     }
 }

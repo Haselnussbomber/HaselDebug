@@ -43,7 +43,7 @@ public unsafe partial class UnlocksTab
 
             ImGui.TableNextColumn(); // Index
             ImGui.TextUnformatted(i.ToString());
-            
+
             ImGui.TableNextColumn(); // Seen
             using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isSeen ? Colors.Green : Colors.Red)))
                 ImGui.TextUnformatted(isSeen.ToString());

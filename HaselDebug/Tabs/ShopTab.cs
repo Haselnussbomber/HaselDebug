@@ -1,11 +1,11 @@
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
-using HaselDebug.Utils;
+using HaselDebug.Services;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class ShopTab : DebugTab
+public unsafe class ShopTab(DebugRenderer DebugRenderer) : DebugTab
 {
     [StructLayout(LayoutKind.Explicit)]
     public struct AddonShop
@@ -28,7 +28,7 @@ public unsafe class ShopTab : DebugTab
             var listItemRenderer = &addon->List->ItemRendererList[i];
             ImGui.TextUnformatted($"{i}:");
             ImGui.SameLine();
-            DebugUtils.DrawCopyableText($"{(nint)listItemRenderer:X}");
+            DebugRenderer.DrawCopyableText($"{(nint)listItemRenderer:X}");
             ImGui.SameLine();
 
             if (addon->List->ItemRendererList[i].IsDisabled)

@@ -44,7 +44,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
                 ImGui.TextUnformatted(isComplete.ToString());
 
             ImGui.TableNextColumn(); // Name
-            DebugUtils.DrawIcon(TextureProvider, (uint)row.IconList);
+            DebugRenderer.DrawIcon((uint)row.IconList);
             var clicked = ImGui.Selectable(row.Name.ExtractText());
             if (ImGui.IsItemHovered())
                 ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);

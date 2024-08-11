@@ -58,7 +58,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
                 ImGui.TextUnformatted($"{sheetName}#{rowId}");
 
                 ImGui.TableNextColumn(); // Name
-                DebugUtils.DrawIcon(TextureProvider, iconId);
+                DebugRenderer.DrawIcon(iconId);
                 ImGui.TextUnformatted(name);
             }
         }

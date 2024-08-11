@@ -1,11 +1,11 @@
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Text.ReadOnly;
@@ -14,7 +14,7 @@ namespace HaselDebug.Tabs;
 
 // same as in Dalamud :)
 #pragma warning disable SeStringRenderer
-public unsafe class AtkArrayDataTab : DebugTab
+public unsafe class AtkArrayDataTab(DebugRenderer DebugRenderer) : DebugTab
 {
     private readonly Type numberType = typeof(NumberArrayType);
     private readonly Type stringType = typeof(StringArrayType);
@@ -343,7 +343,7 @@ public unsafe class AtkArrayDataTab : DebugTab
                 }
                 else
                 {
-                    DebugUtils.DrawSeString(array->StringArray[i], new NodeOptions() { AddressPath = new AddressPath([(nint)array, (nint)array->StringArray[i]]) });
+                    DebugRenderer.DrawSeString(array->StringArray[i], new NodeOptions() { AddressPath = new AddressPath([(nint)array, (nint)array->StringArray[i]]) });
                 }
             }
         }
@@ -402,8 +402,9 @@ public unsafe class AtkArrayDataTab : DebugTab
             if (!isNull)
             {
                 var marker = (MapMarkerBase*)array->DataArray[i];
-                DebugUtils.DrawIcon(Service.Get<ITextureProvider>(), marker->IconId);
-                DebugUtils.DrawPointerType(array->DataArray[i], typeof(MapMarkerBase), new NodeOptions() {
+                DebugRenderer.DrawIcon(marker->IconId);
+                DebugRenderer.DrawPointerType(array->DataArray[i], typeof(MapMarkerBase), new NodeOptions()
+                {
                     TitleOverride = new ReadOnlySeString(new ReadOnlySeStringSpan(marker->Subtext).Data.ToArray()),
                     AddressPath = new AddressPath([(nint)array, (nint)array->DataArray[i]])
                 });

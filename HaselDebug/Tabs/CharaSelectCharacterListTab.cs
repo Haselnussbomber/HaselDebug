@@ -2,12 +2,13 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class CharaSelectCharacterListTab : DebugTab
+public unsafe class CharaSelectCharacterListTab(DebugRenderer DebugRenderer) : DebugTab
 {
     public override void Draw()
     {
@@ -28,7 +29,7 @@ public unsafe class CharaSelectCharacterListTab : DebugTab
                 continue;
 
             ImGui.SameLine();
-            DebugUtils.DrawPointerType(obj, typeof(BattleChara), new NodeOptions());
+            DebugRenderer.DrawPointerType(obj, typeof(BattleChara), new NodeOptions());
         }
     }
 }

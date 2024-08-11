@@ -9,7 +9,7 @@ using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
 using HaselCommon.Utils;
 using HaselDebug.Abstracts;
-using HaselDebug.Utils;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 using Lumina.Text.ReadOnly;
@@ -17,7 +17,7 @@ using ObjectKind = FFXIVClientStructs.FFXIV.Client.Game.Object.ObjectKind;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class ObjectTableTab(SeStringEvaluatorService SeStringEvaluator, IGameGui GameGui, ExcelService ExcelService) : DebugTab
+public unsafe class ObjectTableTab(DebugRenderer DebugRenderer, SeStringEvaluatorService SeStringEvaluator, IGameGui GameGui, ExcelService ExcelService) : DebugTab
 {
     public override bool DrawInChild => false;
     public override void Draw()
@@ -66,13 +66,13 @@ public unsafe class ObjectTableTab(SeStringEvaluatorService SeStringEvaluator, I
             ImGui.TextUnformatted(i.ToString());
 
             ImGui.TableNextColumn(); // Address
-            DebugUtils.DrawAddress(gameObject);
+            DebugRenderer.DrawAddress(gameObject);
 
             ImGui.TableNextColumn(); // ObjectKind
             ImGui.TextUnformatted(objectKind.ToString());
 
             ImGui.TableNextColumn(); // Name
-            DebugUtils.DrawPointerType(
+            DebugRenderer.DrawPointerType(
                 gameObject,
                 objectKind switch
                 {

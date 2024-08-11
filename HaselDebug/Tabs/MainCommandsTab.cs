@@ -1,21 +1,19 @@
 using System.Numerics;
-using System.Xml.Linq;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Extensions;
 using HaselCommon.Services;
 using HaselCommon.Utils;
 using HaselDebug.Abstracts;
-using HaselDebug.Utils;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class MainCommandsTab(ExcelService ExcelService, ITextureProvider TextureProvider, TextureService TextureService) : DebugTab
+public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextureService TextureService) : DebugTab
 {
     public override bool DrawInChild => false;
     public override void Draw()
@@ -41,7 +39,7 @@ public unsafe class MainCommandsTab(ExcelService ExcelService, ITextureProvider 
             ImGui.TextUnformatted(row.RowId.ToString());
 
             ImGui.TableNextColumn(); // Name
-            DebugUtils.DrawIcon(TextureProvider, (uint)row.Icon);
+            DebugRenderer.DrawIcon((uint)row.Icon);
             ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X * 2); // idk why this bugs. don't have that problem in the EmotesTab
 
             // WHAT DID HE DOO????? WOAH
