@@ -3,6 +3,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
+using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
@@ -12,8 +13,11 @@ public unsafe class LocalPlayerTab(DebugRenderer DebugRenderer) : DebugTab
     {
         var localPlayer = Control.GetLocalPlayer();
         if (localPlayer == null)
+        {
+            ImGui.TextUnformatted("LocalPlayer unavailable");
             return;
+        }
 
-        DebugRenderer.DrawPointerType((nint)localPlayer, typeof(BattleChara), new NodeOptions() { DefaultOpen = true });
+        DebugRenderer.DrawPointerType(localPlayer, typeof(BattleChara), new NodeOptions() { DefaultOpen = true });
     }
 }
