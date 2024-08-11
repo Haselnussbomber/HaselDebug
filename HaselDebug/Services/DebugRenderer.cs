@@ -1895,7 +1895,10 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
         nodeOptions.EnsureAddressInPath((rowType.Name.GetHashCode(), (nint)rowId).GetHashCode());
 
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
-        using var node = ImRaii.TreeNode($"{rowType.Name}#{rowId}###{nodeOptions.AddressPath}", ImGuiTreeNodeFlags.SpanAvailWidth);
+        var flags = ImGuiTreeNodeFlags.SpanAvailWidth;
+        if (nodeOptions.DefaultOpen)
+            flags |= ImGuiTreeNodeFlags.DefaultOpen;
+        using var node = ImRaii.TreeNode($"{rowType.Name}#{rowId}###{nodeOptions.AddressPath}", flags);
         if (!node) return;
         titleColor.Dispose();
 
