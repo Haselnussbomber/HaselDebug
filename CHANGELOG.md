@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0] (2024-07-11)
+
+- **Added:** A new configuration window was added.  
+  Accessible via the plugin installer, `/haseldebug config` or the cogwheel in the main window.  
+  Currently it only has a single setting to toggle the automatic opening of the main window when the plugin loads.
+- **Added:** GameObjects in the Object Table how have a context menu to toggle drawing.
+- **Removed:** The Lobby tab was removed as the current CharaSelect character is also listed in the Objects Table.
+
 ## [1.2.1] (2024-07-11)
 
 - **Added:** Support for StdList
@@ -34,7 +42,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.2.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.3.0...main
+[1.3.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.1.0...v1.1.1
