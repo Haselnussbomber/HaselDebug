@@ -168,8 +168,6 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
     {
         nodeOptions.EnsureAddressInPath(address);
 
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
-
         var flags = ImGuiTreeNodeFlags.SpanAvailWidth;
         if (nodeOptions.DefaultOpen)
             flags |= ImGuiTreeNodeFlags.DefaultOpen;
@@ -179,10 +177,14 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
         if (nodeOptions.OnHovered != null && ImGui.IsItemHovered())
             nodeOptions.OnHovered();
 
+        nodeOptions.DrawContextMenu?.Invoke(nodeOptions);
+
         if (nodeOptions.TextOffsetX > 0)
             ImGui.SameLine(nodeOptions.TextOffsetX + ImGui.GetStyle().FramePadding.X * 3f + ImGui.GetFontSize(), 0);
         else
             ImGui.SameLine();
+
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
 
         ImGuiHelpers.SeStringWrapped((nodeOptions.TitleOverride ?? new(Encoding.UTF8.GetBytes(type.FullName ?? "Unknown Type Name"))).AsSpan(), new()
         {
@@ -190,10 +192,10 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
             WrapWidth = 9999
         });
 
+        titleColor?.Dispose();
+
         if (!node)
             return;
-
-        titleColor?.Dispose();
 
         var fields = type
             .GetFields(BindingFlags.Default | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)

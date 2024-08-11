@@ -10,6 +10,7 @@ using HaselCommon.Services.SeStringEvaluation;
 using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 using Lumina.Text.ReadOnly;
@@ -17,7 +18,12 @@ using ObjectKind = FFXIVClientStructs.FFXIV.Client.Game.Object.ObjectKind;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class ObjectTableTab(DebugRenderer DebugRenderer, SeStringEvaluatorService SeStringEvaluator, IGameGui GameGui, ExcelService ExcelService) : DebugTab
+public unsafe class ObjectTableTab(
+    DebugRenderer DebugRenderer,
+    SeStringEvaluatorService SeStringEvaluator,
+    ImGuiContextMenuService ImGuiContextMenuService,
+    IGameGui GameGui,
+    ExcelService ExcelService) : DebugTab
 {
     public override bool DrawInChild => false;
     public override void Draw()
@@ -82,9 +88,9 @@ public unsafe class ObjectTableTab(DebugRenderer DebugRenderer, SeStringEvaluato
                     ObjectKind.HousingEventObject => typeof(HousingObject),
                     _ => typeof(GameObject),
                 },
-                new()
+                new NodeOptions()
                 {
-                    AddressPath = new((nint)gameObject),
+                    AddressPath = new AddressPath((nint)gameObject),
                     TitleOverride = new(Encoding.UTF8.GetBytes(titleOverride)),
                     OnHovered = () =>
                     {
@@ -93,6 +99,24 @@ public unsafe class ObjectTableTab(DebugRenderer DebugRenderer, SeStringEvaluato
                             ImGui.GetForegroundDrawList().AddLine(ImGui.GetMousePos(), screenPos, Colors.Orange);
                             ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Colors.Orange);
                         }
+                    },
+                    DrawContextMenu = (NodeOptions nodeOptions) =>
+                    {
+                        ImGuiContextMenuService.Draw($"{nodeOptions.AddressPath}ContextMenu", builder =>
+                        {
+                            builder.Add(new ImGuiContextMenuEntry()
+                            {
+                                Visible = ((byte)gameObject->TargetableStatus & 1 << 7) != 0,
+                                Label = "Disable Draw",
+                                ClickCallback = () => gameObject->DisableDraw()
+                            });
+                            builder.Add(new ImGuiContextMenuEntry()
+                            {
+                                Visible = ((byte)gameObject->TargetableStatus & 1 << 7) == 0,
+                                Label = "Enable Draw",
+                                ClickCallback = () => gameObject->EnableDraw()
+                            });
+                        });
                     }
                 });
 

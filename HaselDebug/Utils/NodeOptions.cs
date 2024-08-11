@@ -10,6 +10,7 @@ public record NodeOptions
     public bool Indent = true;
     public bool DefaultOpen = false;
     public Action? OnHovered = null;
+    public Action<NodeOptions>? DrawContextMenu;
     public float TextOffsetX = 0;
     public bool RenderSeString = true;
     public ClientLanguage Language = ClientLanguage.English;
