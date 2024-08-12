@@ -36,9 +36,12 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
 {
     private MethodInfo? GetSheetGeneric;
 
-    public HaselColor ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1f);
+    public HaselColor ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1);
     public HaselColor ColorType { get; } = new(0.2f, 0.9f, 0.9f, 1);
-    public HaselColor ColorName { get; } = new(0.2f, 0.9f, 0.4f, 1);
+    public HaselColor ColorFieldName { get; } = new(0.2f, 0.9f, 0.4f, 1);
+    public HaselColor ColorTreeNode { get; } = new(1, 1, 0, 1);
+    public HaselColor ColorObsolete { get; } = new(1, 1, 0, 1);
+    public HaselColor ColorObsoleteError { get; } = new(1, 0, 0, 1);
 
     private readonly Dictionary<Type, string[]> KnownStringPointers = new() {
         { typeof(FFXIVClientStructs.FFXIV.Client.UI.Agent.MapMarkerBase), ["Subtext"] },
@@ -172,7 +175,9 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
         if (nodeOptions.DefaultOpen)
             flags |= ImGuiTreeNodeFlags.DefaultOpen;
 
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"##Node{nodeOptions.AddressPath}", flags);
+        titleColor?.Dispose();
 
         if (nodeOptions.OnHovered != null && ImGui.IsItemHovered())
             nodeOptions.OnHovered();
@@ -184,15 +189,14 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
         else
             ImGui.SameLine();
 
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
-
-        ImGuiHelpers.SeStringWrapped((nodeOptions.TitleOverride ?? new(Encoding.UTF8.GetBytes(type.FullName ?? "Unknown Type Name"))).AsSpan(), new()
+        using (ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode))
         {
-            ForceEdgeColor = true,
-            WrapWidth = 9999
-        });
-
-        titleColor?.Dispose();
+            ImGuiHelpers.SeStringWrapped((nodeOptions.TitleOverride ?? new(Encoding.UTF8.GetBytes(type.FullName ?? "Unknown Type Name"))).AsSpan(), new()
+            {
+                ForceEdgeColor = true,
+                WrapWidth = 9999
+            });
+        }
 
         if (!node)
             return;
@@ -223,7 +227,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
 
             if (fieldInfo.GetCustomAttribute<ObsoleteAttribute>() is ObsoleteAttribute obsoleteAttribute)
             {
-                using (ImRaii.PushColor(ImGuiCol.Text, obsoleteAttribute.IsError ? 0xFF0000FF : 0xFF00FFFF))
+                using (ImRaii.PushColor(ImGuiCol.Text, (uint)(obsoleteAttribute.IsError ? ColorObsoleteError : ColorObsolete)))
                     ImGui.TextUnformatted("[Obsolete]");
 
                 if (!string.IsNullOrEmpty(obsoleteAttribute.Message) && ImGui.IsItemHovered())
@@ -244,7 +248,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
             // delegate*
             if (fieldType.IsFunctionPointer || fieldType.IsUnmanagedFunctionPointer)
             {
-                ImGui.TextColored(ColorName, fieldInfo.Name);
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawAddress(*(nint*)fieldAddress);
                 continue;
@@ -255,7 +259,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
                 && fieldInfo.GetCustomAttribute<FixedSizeArrayAttribute>() is FixedSizeArrayAttribute fixedSizeArrayAttribute
                 && fieldType.GetCustomAttribute<InlineArrayAttribute>() is InlineArrayAttribute inlineArrayAttribute)
             {
-                ImGui.TextColored(ColorName, $"{fieldInfo.Name[1..].FirstCharToUpper()}");
+                ImGui.TextColored(ColorFieldName, $"{fieldInfo.Name[1..].FirstCharToUpper()}");
                 ImGui.SameLine();
                 DrawFixedSizeArray(fieldAddress, fieldType, fixedSizeArrayAttribute.IsString, new NodeOptions());
                 continue;
@@ -272,7 +276,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
                     continue;
                 }
 
-                ImGui.TextColored(ColorName, fieldInfo.Name);
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawStdVector(fieldAddress, underlyingType, new NodeOptions() { AddressPath = indexedAddressPath });
                 continue;
@@ -289,7 +293,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
                     continue;
                 }
 
-                ImGui.TextColored(ColorName, fieldInfo.Name);
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawStdDeque(fieldAddress, underlyingType, new NodeOptions() { AddressPath = indexedAddressPath });
                 continue;
@@ -306,7 +310,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
                     continue;
                 }
 
-                ImGui.TextColored(ColorName, fieldInfo.Name);
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawStdList(fieldAddress, underlyingType, new NodeOptions() { AddressPath = indexedAddressPath });
                 continue;
@@ -315,7 +319,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
             // AtkUnitBase.AtkValues
             if ((type == typeof(AtkUnitBase) || type.GetCustomAttribute<InheritsAttribute<AtkUnitBase>>() != null) && fieldType == typeof(AtkValue*) && fieldInfo.Name == "AtkValues")
             {
-                ImGui.TextColored(ColorName, fieldInfo.Name);
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawAtkValues(*(AtkValue**)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(fieldAddress) });
                 continue;
@@ -324,7 +328,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
             // byte* that are strings
             if (fieldType.IsPointer && KnownStringPointers.TryGetValue(type, out var fieldNames) && fieldNames.Contains(fieldInfo.Name))
             {
-                ImGui.TextColored(ColorName, fieldInfo.Name);
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawSeString(*(nint*)fieldAddress, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(fieldAddress) });
                 continue;
@@ -333,7 +337,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
             // TODO: vector preview
             // TODO: enum values table
 
-            ImGui.TextColored(ColorName, fieldInfo.Name);
+            ImGui.TextColored(ColorFieldName, fieldInfo.Name);
             ImGui.SameLine();
 
             if (fieldType == typeof(uint) && fieldInfo.Name == "IconId")
@@ -510,7 +514,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
             return;
         }
 
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"{elementCount} Value{(elementCount != 1 ? "s" : "")}##Node{nodeOptions.AddressPath}", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!node)
             return;
@@ -563,7 +567,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
             return;
         }
 
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"{elementCount} Value{(elementCount != 1 ? "s" : "")}##Node{nodeOptions.AddressPath}", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!node)
             return;
@@ -667,7 +671,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
             return;
         }
 
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"{elementCount} Value{(elementCount != 1 ? "s" : "")}##Node{nodeOptions.AddressPath}", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!node)
             return;
@@ -718,7 +722,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
             return;
         }
 
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"{mySize} Value{(mySize != 1 ? "s" : "")}##Node{nodeOptions.AddressPath}", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!node)
             return;
@@ -794,7 +798,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
             return;
         }
 
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"{length} Value{(length != 1 ? "s" : "")}##Node{nodeOptions.AddressPath}", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!node) return;
         titleColor?.Dispose();
@@ -835,7 +839,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
 
         nodeOptions.EnsureAddressInPath((nint)values);
 
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"{valueCount} value{(valueCount != 1 ? "s" : "")}##Node{nodeOptions.AddressPath}", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!node)
             return;
@@ -941,7 +945,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
         var title = $"{tex->Width}x{tex->Height}, {(TextureFormat)tex->TextureFormat}";
         if (nodeOptions.TitleOverride != null)
             title = $"{nodeOptions.TitleOverride.Value.ExtractText()} ({title})";
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"{title}##TextureNode{nodeOptions.AddressPath}", nodeOptions.DefaultOpen ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None);
         if (!node) return;
         titleColor?.Dispose();
@@ -999,7 +1003,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
 
         nodeOptions.EnsureAddressInPath(rosss.GetHashCode());
 
-        using var nodeTitleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF, nodeOptions.RenderSeString);
+        using var nodeTitleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode, nodeOptions.RenderSeString);
         using var stringNode = ImRaii.TreeNode($"{(!nodeOptions.RenderSeString ? rosss.ToString() : string.Empty)}##SeStringPayloads{nodeOptions.AddressPath}", ImGuiTreeNodeFlags.SpanAvailWidth);
         nodeTitleColor?.Dispose();
 
@@ -1037,7 +1041,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
         {
             i++;
 
-            using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+            using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
             var preview = payload.Type.ToString();
             if (payload.Type == ReadOnlySePayloadType.Macro)
                 preview += $": {payload.MacroCode}";
@@ -1896,7 +1900,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
 
         nodeOptions.EnsureAddressInPath((rowType.Name.GetHashCode(), (nint)rowId).GetHashCode());
 
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         var flags = ImGuiTreeNodeFlags.SpanAvailWidth;
         if (nodeOptions.DefaultOpen)
             flags |= ImGuiTreeNodeFlags.DefaultOpen;
@@ -1932,7 +1936,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
 
             DrawCopyableText(propInfo.PropertyType.ReadableTypeName(), propInfo.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
             ImGui.SameLine();
-            ImGui.TextColored(ColorName, propInfo.Name);
+            ImGui.TextColored(ColorFieldName, propInfo.Name);
             ImGui.SameLine();
 
             var value = propInfo.GetValue(row);
@@ -1984,7 +1988,7 @@ public unsafe class DebugRenderer(ITextureProvider TextureProvider)
                 }
 
                 var collectionType = propInfo.PropertyType.GenericTypeArguments[0];
-                using var colTitleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
+                using var colTitleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
                 using var colNode = ImRaii.TreeNode($"{count} Value{(count != 1 ? "s" : "")}##LazyCollectionNode{nodeOptions.AddressPath.With(collectionType.Name.GetHashCode())}", ImGuiTreeNodeFlags.SpanAvailWidth);
                 if (!colNode) return;
                 colTitleColor?.Dispose();
