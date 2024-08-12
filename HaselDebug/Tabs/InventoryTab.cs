@@ -142,10 +142,10 @@ public unsafe class InventoryTab(DebugRenderer DebugRenderer, TextService TextSe
                     .ToReadOnlySeString();
 
                 DebugRenderer.DrawIcon(ItemService.GetIconId(itemId), ItemService.IsHighQuality(itemId));
-                DebugRenderer.DrawPointerType((nint)slot, typeof(InventoryItem), new NodeOptions()
+                DebugRenderer.DrawPointerType(slot, typeof(InventoryItem), new NodeOptions()
                 {
-                    TitleOverride = itemNameSeStr,
-                    TextOffsetX = ImGui.GetTextLineHeight()
+                    AddressPath = new AddressPath([(nint)inventoryType, slot->Slot]),
+                    Title = itemNameSeStr
                 });
             }
         }

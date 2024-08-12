@@ -62,7 +62,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         }
         else
         {
-            DebugRenderer.DrawPointerType((nint)craftLeveEventHandler, typeof(EventHandler), new NodeOptions());
+            DebugRenderer.DrawPointerType(craftLeveEventHandler, typeof(EventHandler), new NodeOptions());
         }
 
         ImGui.Separator();
@@ -76,7 +76,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         }
         else
         {
-            DebugRenderer.DrawPointerType((nint)publicContentDirector, typeof(PublicContentDirector), new NodeOptions());
+            DebugRenderer.DrawPointerType(publicContentDirector, typeof(PublicContentDirector), new NodeOptions());
         }
 
         ImGui.Separator();
@@ -98,7 +98,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
                 InstanceContentTypeVtables.Add(key, *(nint*)instanceContentDirector);
             }
 
-            DebugRenderer.DrawPointerType((nint)instanceContentDirector, typeof(InstanceContentDirector), new NodeOptions());
+            DebugRenderer.DrawPointerType(instanceContentDirector, typeof(InstanceContentDirector), new NodeOptions());
         }
     }
 }

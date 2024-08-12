@@ -11,7 +11,7 @@ using ImGuiNET;
 
 namespace HaselDebug.Windows;
 
-public class PluginWindow : SimpleWindow, IDisposable
+public class PluginWindow : SimpleWindow
 {
     private const uint SidebarWidth = 250;
     private readonly IDebugTab[] Tabs;
@@ -57,12 +57,10 @@ public class PluginWindow : SimpleWindow, IDisposable
         SelectedTab = Tabs.FirstOrDefault(tab => tab.GetType().Name == pluginConfig.LastSelectedTab);
     }
 
-    public new void Dispose()
+    public override void Dispose()
     {
-        foreach (var tab in Tabs)
-        {
-            (tab as IDisposable)?.Dispose();
-        }
+        foreach (var tab in Tabs.OfType<IDisposable>())
+            tab.Dispose();
 
         base.Dispose();
     }

@@ -4,6 +4,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselCommon.Extensions;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
@@ -405,7 +406,7 @@ public unsafe class AtkArrayDataTab(DebugRenderer DebugRenderer) : DebugTab
                 DebugRenderer.DrawIcon(marker->IconId);
                 DebugRenderer.DrawPointerType(array->DataArray[i], typeof(MapMarkerBase), new NodeOptions()
                 {
-                    TitleOverride = new ReadOnlySeString(new ReadOnlySeStringSpan(marker->Subtext).Data.ToArray()),
+                    Title = new ReadOnlySeStringSpan(marker->Subtext).ToReadOnlySeString(),
                     AddressPath = new AddressPath([(nint)array, (nint)array->DataArray[i]])
                 });
             }

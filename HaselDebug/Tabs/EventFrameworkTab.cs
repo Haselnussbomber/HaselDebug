@@ -76,14 +76,13 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
             if (director->IconId != 0)
                 DebugRenderer.DrawIcon(director->IconId);
 
-            var titleBytes = director->Title.AsSpan().ToArray();
             ReadOnlySeString? title = null;
-            if (titleBytes.Length != 0)
-                title = new ReadOnlySeString(titleBytes);
+            if (!director->Title.IsEmpty)
+                title = new ReadOnlySeString(director->Title.AsSpan().ToArray());
 
-            DebugRenderer.DrawPointerType(director, typeof(Director), new()
+            DebugRenderer.DrawPointerType(director, typeof(Director), new NodeOptions()
             {
-                TitleOverride = title
+                Title = title
             });
         }
     }
@@ -131,9 +130,9 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
             if (title == null)
                 title = new SeStringBuilder().Append($"{type} {kv.Item2.Value->Info.EventId.Id}").ToReadOnlySeString();
 
-            DebugRenderer.DrawPointerType(eventHandler, typeof(EventHandler), new()
+            DebugRenderer.DrawPointerType(eventHandler, typeof(EventHandler), new NodeOptions()
             {
-                TitleOverride = title
+                Title = title
             });
 
             using var indent = ImRaii.PushIndent();

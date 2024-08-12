@@ -79,9 +79,9 @@ public unsafe class RaptureHotbarModuleTab(DebugRenderer DebugRenderer, ExcelSer
                 if (!slot->IsEmpty)
                 {
                     DebugRenderer.DrawIcon(slot->IconId);
-                    DebugRenderer.DrawPointerType(slot, typeof(RaptureHotbarModule.HotbarSlot), new()
+                    DebugRenderer.DrawPointerType(slot, typeof(RaptureHotbarModule.HotbarSlot), new NodeOptions()
                     {
-                        TitleOverride = new ReadOnlySeString(Encoding.UTF8.GetBytes(slot->CommandType switch
+                        Title = new ReadOnlySeString(Encoding.UTF8.GetBytes(slot->CommandType switch
                         {
                             RaptureHotbarModule.HotbarSlotType.Action => TextService.GetActionName(slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.Item => TextService.GetItemName(slot->CommandId),

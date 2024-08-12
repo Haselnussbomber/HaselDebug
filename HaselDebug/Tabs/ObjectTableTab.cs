@@ -91,7 +91,7 @@ public unsafe class ObjectTableTab(
                 new NodeOptions()
                 {
                     AddressPath = new AddressPath((nint)gameObject),
-                    TitleOverride = new(Encoding.UTF8.GetBytes(titleOverride)),
+                    Title = new(Encoding.UTF8.GetBytes(titleOverride)),
                     OnHovered = () =>
                     {
                         if (GameGui.WorldToScreen(gameObject->Position, out var screenPos))

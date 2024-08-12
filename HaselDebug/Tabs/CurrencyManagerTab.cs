@@ -19,7 +19,7 @@ public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, ExcelService
     public override void Draw()
     {
         var currencyManager = CurrencyManager.Instance();
-        DebugRenderer.DrawPointerType((nint)currencyManager, typeof(CurrencyManager), new NodeOptions());
+        DebugRenderer.DrawPointerType(currencyManager, typeof(CurrencyManager), new NodeOptions());
 
         ImGui.TextUnformatted(nameof(CurrencyManager.SpecialItemBucket));
         using (var table = ImRaii.Table(nameof(CurrencyManager.SpecialItemBucket) + "Table", 5))

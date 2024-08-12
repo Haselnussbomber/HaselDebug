@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace HaselDebug.Utils;
 
 public record AddressPath
@@ -27,5 +25,13 @@ public record AddressPath
     public AddressPath With(nint[] values)
         => new([.. Path, .. values]);
 
-    public override string ToString() => string.Join("_", Path.Select(address => address.ToString("X")));
+    public override string ToString() => GetHashCode().ToString("X");
+
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        foreach (var address in Path)
+            hashCode.Add(address);
+        return hashCode.ToHashCode();
+    }
 }
