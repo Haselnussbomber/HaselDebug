@@ -177,10 +177,13 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.WithAddress(rosss.GetHashCode());
 
-        ImGuiHelpers.SeStringWrapped(rosss, new()
+        if (nodeOptions.RenderSeString)
         {
-            ForceEdgeColor = true,
-        });
+            ImGuiHelpers.SeStringWrapped(rosss, new()
+            {
+                ForceEdgeColor = true,
+            });
+        }
 
         nodeOptions = nodeOptions with
         {
@@ -193,20 +196,25 @@ public unsafe partial class DebugRenderer
         {
             payloadIdx++;
 
-            using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
             var preview = payload.Type.ToString();
             if (payload.Type == ReadOnlySePayloadType.Macro)
                 preview += $": {payload.MacroCode}";
-            using var node = ImRaii.TreeNode($"[{payloadIdx}] {preview}##Payload{payloadIdx}_{payload.GetHashCode()}", nodeOptions.GetTreeNodeFlags());
-            if (!node) continue;
-            titleColor?.Dispose();
+
+            var payloadNodeOptions = nodeOptions
+                .WithAddress(payloadIdx)
+                .WithTitle($"[{payloadIdx}] {preview}");
+
+            using var node = DrawTreeNode(payloadNodeOptions);
 
             using var table = ImRaii.Table($"##Payload{payloadIdx}_{payload.GetHashCode()}Table", 2);
-            ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 100);
+            if (!table) return;
+
+            ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 120);
+            ImGui.TableSetupColumn("Tree", ImGuiTableColumnFlags.WidthStretch);
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted("String");
+            ImGui.TextUnformatted(payload.Type == ReadOnlySePayloadType.Text ? "Text" : "ToString()");
             ImGui.TableNextColumn();
             var text = payload.ToString();
             DrawCopyableText($"\"{text}\"", text);
@@ -220,8 +228,9 @@ public unsafe partial class DebugRenderer
 
                 foreach (var expr in payload)
                 {
-                    DrawExpression(payload.MacroCode, exprIdx++, expr, nodeOptions with
+                    DrawExpression(payload.MacroCode, exprIdx++, expr, payloadNodeOptions with
                     {
+                        Title = null,
                         DefaultOpen = true,
                         AddressPath = nodeOptions.AddressPath.With([payloadIdx, exprIdx]),
                     });
@@ -428,14 +437,7 @@ public unsafe partial class DebugRenderer
         ImGui.TableNextRow();
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted(ExpressionNames.TryGetValue(macroCode, out var names) && idx < names.Length
-            ? names[idx]
-            : macroCode switch
-            {
-                MacroCode.Switch => $"Case {idx - 1}",
-                // MacroCode.Link => ,
-                _ => $"Expr {idx}"
-            });
+        ImGui.TextUnformatted($"[{idx}] " + GetExpressionName(macroCode, idx));
 
         ImGui.TableNextColumn();
 
@@ -499,5 +501,16 @@ public unsafe partial class DebugRenderer
             sb.Append($" {expr.Body[i]:X02}");
         sb.Append(')');
         ImGui.TextUnformatted(sb.ToString());
+    }
+
+    private string GetExpressionName(MacroCode macroCode, int idx)
+    {
+        if (ExpressionNames.TryGetValue(macroCode, out var names) && idx < names.Length)
+            return names[idx];
+
+        if (macroCode == MacroCode.Switch)
+            return $"Case {idx - 1}";
+
+        return string.Empty;
     }
 }

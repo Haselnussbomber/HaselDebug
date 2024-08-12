@@ -1,4 +1,6 @@
 using System.Numerics;
+using Dalamud.Interface.ImGuiSeStringRenderer;
+using Dalamud.Interface.Utility;
 using HaselCommon.Services;
 using HaselCommon.Windowing;
 using HaselDebug.Services;
@@ -8,6 +10,7 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Windows;
 
+#pragma warning disable SeStringRenderer
 public class SeStringInspectorWindow(
     WindowManager windowManager,
     DebugRenderer DebugRenderer,
@@ -32,8 +35,17 @@ public class SeStringInspectorWindow(
 
     public override void Draw()
     {
+        ImGuiHelpers.SeStringWrapped(SeString.AsSpan(), new SeStringDrawParams()
+        {
+            ForceEdgeColor = true,
+        });
+
+        ImGui.Spacing();
+        ImGui.Separator();
+
         DebugRenderer.DrawSeString(SeString.AsSpan(), new NodeOptions()
         {
+            RenderSeString = false,
             DefaultOpen = true
         });
     }
