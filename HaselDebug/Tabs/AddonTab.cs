@@ -38,6 +38,7 @@ public unsafe class AddonTab(DebugRenderer DebugRenderer, ExdSheets.Module ExdMo
                 ImGui.TableNextColumn(); // Text
                 DebugRenderer.DrawSeStringSelectable(row.Text.AsSpan(), new NodeOptions()
                 {
+                    AddressPath = new AddressPath((nint)row.RowId),
                     RenderSeString = false,
                     Title = $"Addon#{row.RowId}"
                 });
