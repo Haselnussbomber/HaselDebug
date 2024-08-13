@@ -123,7 +123,11 @@ public class PluginWindow : SimpleWindow
             }
 
             if (removeTab != null)
+            {
+                SelectedTab = null;
+                PluginConfig.LastSelectedTab = string.Empty;
                 PinnedInstances.Remove(removeTab);
+            }
 
             ImGui.Separator();
         }
