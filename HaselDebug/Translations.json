@@ -22,6 +22,15 @@
     "de": "HaselDebug automatisch öffnen"
   },
 
+  "PinnedInstances.Pin": {
+    "en": "Pin",
+    "de": "Anpinnen"
+  },
+  "PinnedInstances.Unpin": {
+    "en": "Unpin",
+    "de": "Lösen"
+  },
+
   "UnlocksTab.CabinetNotLoaded": {
     "en": "Armoire not loaded",
     "de": "Kostbarkeitenkabinett nicht geladen"

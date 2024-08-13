@@ -5,6 +5,7 @@ using System.Reflection;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
@@ -12,7 +13,11 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class AgentsTab(DebugRenderer DebugRenderer) : DebugTab
+public unsafe class AgentsTab(
+    TextService TextService,
+    DebugRenderer DebugRenderer,
+    ImGuiContextMenuService ImGuiContextMenu,
+    PinnedInstancesService PinnedInstances) : DebugTab
 {
     private ImmutableSortedDictionary<AgentId, (Pointer<AgentInterface> Address, Type Type)>? Agents;
     private AgentId SelectedAgentId = AgentId.Lobby;
@@ -89,6 +94,29 @@ public unsafe class AgentsTab(DebugRenderer DebugRenderer) : DebugTab
         var agent = AgentModule.Instance()->GetAgentByInternalId(agentId);
         var agentType = Agents!.TryGetValue(agentId, out var value) ? value.Type : typeof(AgentInterface);
 
-        DebugRenderer.DrawPointerType(agent, agentType, new NodeOptions() { DefaultOpen = true });
+        DebugRenderer.DrawPointerType(agent, agentType, new NodeOptions() {
+            DefaultOpen = true,
+            DrawContextMenu = (nodeOptions) =>
+            {
+                ImGuiContextMenu.Draw($"ContextMenu{nodeOptions.AddressPath}", builder =>
+                {
+                    var isPinned = PinnedInstances.Contains(agentType);
+
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
+                        Visible = !isPinned,
+                        Label = TextService.Translate("PinnedInstances.Pin"),
+                        ClickCallback = () => PinnedInstances.Add((nint)agent, agentType)
+                    });
+
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
+                        Visible = isPinned,
+                        Label = TextService.Translate("PinnedInstances.Unpin"),
+                        ClickCallback = () => PinnedInstances.Remove(agentType)
+                    });
+                });
+            }
+        });
     }
 }

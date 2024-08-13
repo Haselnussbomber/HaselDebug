@@ -75,4 +75,5 @@ public partial class PluginConfig
     public int Version { get; set; } = CURRENT_CONFIG_VERSION;
     public bool AutoOpenPluginWindow = false;
     public string LastSelectedTab = "";
+    public string[] PinnedInstances = [];
 }

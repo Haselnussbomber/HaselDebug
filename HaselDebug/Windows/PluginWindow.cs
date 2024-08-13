@@ -7,6 +7,8 @@ using HaselCommon.Services;
 using HaselCommon.Windowing;
 using HaselDebug.Abstracts;
 using HaselDebug.Config;
+using HaselDebug.Services;
+using HaselDebug.Tabs;
 using ImGuiNET;
 
 namespace HaselDebug.Windows;
@@ -17,17 +19,23 @@ public class PluginWindow : SimpleWindow
     private readonly IDebugTab[] Tabs;
 
     private readonly PluginConfig PluginConfig;
-    private IDebugTab? SelectedTab;
+    private readonly PinnedInstancesService PinnedInstances;
+    private readonly ImGuiContextMenuService ImGuiContextMenu;
+    private IDrawableTab? SelectedTab;
 
     public PluginWindow(
         PluginConfig pluginConfig,
         WindowManager windowManager,
         IEnumerable<IDebugTab> tabs,
         TextService textService,
-        ConfigWindow configWindow)
+        ConfigWindow configWindow,
+        PinnedInstancesService pinnedInstances,
+        ImGuiContextMenuService imGuiContextMenuService)
         : base(windowManager, "HaselDebug")
     {
         PluginConfig = pluginConfig;
+        PinnedInstances = pinnedInstances;
+        ImGuiContextMenu = imGuiContextMenuService;
 
         Size = new Vector2(1440, 880);
         SizeConstraints = new()
@@ -54,7 +62,7 @@ public class PluginWindow : SimpleWindow
 
         Tabs = [.. tabs.OrderBy(t => t.GetTitle())];
 
-        SelectedTab = Tabs.FirstOrDefault(tab => tab.GetType().Name == pluginConfig.LastSelectedTab);
+        SelectedTab = Tabs.FirstOrDefault(tab => tab.InternalName == pluginConfig.LastSelectedTab);
     }
 
     public override void Dispose()
@@ -75,25 +83,59 @@ public class PluginWindow : SimpleWindow
     private void DrawSidebar()
     {
         var scale = ImGui.GetIO().FontGlobalScale;
-        using var child = ImRaii.Child("##Sidebar", new Vector2(SidebarWidth * scale, -1), true);
+        using var child = ImRaii.Child("Sidebar", new Vector2(SidebarWidth * scale, -1), true);
         if (!child || !child.Success)
             return;
 
-        using var table = ImRaii.Table("##SidebarTable", 1, ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("SidebarTable", 1, ImGuiTableFlags.NoSavedSettings);
         if (!table || !table.Success)
             return;
 
-        ImGui.TableSetupColumn("Debug Tab Name", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Tab Name", ImGuiTableColumnFlags.WidthStretch);
+
+        if (PinnedInstances.Count > 0)
+        {
+            PinnedInstanceTab? removeTab = null;
+
+            foreach (var tab in PinnedInstances)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+
+                var selected = ImGui.Selectable($"{tab.Title}##Selectable_{tab.InternalName}", SelectedTab == tab);
+
+                ImGuiContextMenu.Draw($"{tab.InternalName}ContextMenu", builder =>
+                {
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
+                        Label = "Unpin",
+                        ClickCallback = () => removeTab = tab
+                    });
+                });
+
+                if (selected)
+                {
+                    SelectedTab = SelectedTab != tab ? tab : null;
+                    PluginConfig.LastSelectedTab = SelectedTab != null ? tab.InternalName : string.Empty;
+                    PluginConfig.Save();
+                }
+            }
+
+            if (removeTab != null)
+                PinnedInstances.Remove(removeTab);
+
+            ImGui.Separator();
+        }
 
         foreach (var tab in Tabs)
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
 
-            if (ImGui.Selectable($"{tab.GetTitle()}##Selectable_{tab.GetType().Name}", SelectedTab == tab))
+            if (ImGui.Selectable($"{tab.GetTitle()}##Selectable_{tab.InternalName}", SelectedTab == tab))
             {
                 SelectedTab = SelectedTab != tab ? tab : null;
-                PluginConfig.LastSelectedTab = SelectedTab != null ? tab.GetType().Name : string.Empty;
+                PluginConfig.LastSelectedTab = SelectedTab != null ? tab.InternalName : string.Empty;
                 PluginConfig.Save();
             }
         }
@@ -111,7 +153,7 @@ public class PluginWindow : SimpleWindow
             ? ImRaii.Child("##Tab", new Vector2(-1), true)
             : null;
 
-        using var id = ImRaii.PushId(SelectedTab.GetType().Name);
+        using var id = ImRaii.PushId(SelectedTab.InternalName);
         try
         {
             SelectedTab.Draw();

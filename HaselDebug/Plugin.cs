@@ -48,6 +48,8 @@ public class Plugin : IDalamudPlugin
             // HaselDebug
             .AddSingleton(PluginConfig.Load(pluginInterface, pluginLog))
             .AddSingleton<DebugRenderer>()
+            .AddSingleton<InstancesService>()
+            .AddSingleton<PinnedInstancesService>()
             .AddIServices<IDebugTab>()
             .AddSingleton<PluginWindow>()
             .AddSingleton<ConfigWindow>();

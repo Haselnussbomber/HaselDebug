@@ -1,8 +1,6 @@
 namespace HaselDebug.Abstracts;
 
-public interface IDebugTab : IEquatable<IDebugTab>
+public interface IDebugTab : IDrawableTab
 {
     string GetTitle();
-    void Draw();
-    bool DrawInChild { get; }
 }
