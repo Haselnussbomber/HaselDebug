@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
@@ -75,6 +76,21 @@ public unsafe partial class DebugRenderer
         { MacroCode.Ordinal, ["Value"] },
         { MacroCode.Sound, ["IsJingle", "SoundId"] },
         // { MacroCode.LevelPos, [] },
+    };
+
+    private readonly Dictionary<LinkMacroPayloadType, string[]> LinkExpressionNames = new()
+    {
+        { LinkMacroPayloadType.Character, ["Flags", "WorldId"] },
+        { LinkMacroPayloadType.Item, ["ItemId", "Rarity"] },
+        { LinkMacroPayloadType.MapPosition, ["TerritoryType/MapId", "Raw X", "Raw Y"] },
+        { LinkMacroPayloadType.Quest, ["QuestId"] },
+        { LinkMacroPayloadType.Achievement, ["AchievementId"] },
+        { LinkMacroPayloadType.HowTo, ["HowToId"] },
+        // PartyFinderNotification
+        { LinkMacroPayloadType.Status, ["StatusId"] },
+        { LinkMacroPayloadType.PartyFinder, ["ListingId", string.Empty, "WorldId"] },
+        { LinkMacroPayloadType.AkatsukiNote, ["AkatsukiNoteId"] },
+        { (LinkMacroPayloadType)Payload.EmbeddedInfoType.DalamudLink, ["PluginName", "CommandId"] }
     };
 
     public void DrawUtf8String(nint address, NodeOptions nodeOptions)
@@ -227,10 +243,14 @@ public unsafe partial class DebugRenderer
             if (payload.ExpressionCount > 0)
             {
                 var exprIdx = 0;
+                LinkMacroPayloadType? linkType = null;
+
+                if (payload.MacroCode == MacroCode.Link && payload.TryGetExpression(out var linkExpr1) && linkExpr1.TryGetUInt(out var linkExpr1Val))
+                    linkType = (LinkMacroPayloadType)linkExpr1Val;
 
                 foreach (var expr in payload)
                 {
-                    DrawExpression(payload.MacroCode, exprIdx++, expr, payloadNodeOptions with
+                    DrawExpression(payload.MacroCode, linkType, exprIdx++, expr, payloadNodeOptions with
                     {
                         SeStringTitle = null,
                         DefaultOpen = true,
@@ -238,208 +258,16 @@ public unsafe partial class DebugRenderer
                     });
                 }
             }
-
-            /*
-            switch (payload.MacroCode)
-            {
-                case MacroCode.String:
-                    //DrawExpressionRow("Parameter", parameterPayload.Parameter, localParameters);
-                    break;
-
-                // ---
-
-                case LinkPayload linkPayload:
-
-                    if (linkPayload.Type is IntegerExpression integerType)
-                    {
-                        ImGui.TableNextRow();
-                        ImGui.TableNextColumn();
-                        ImGui.TextUnformatted("Type");
-                        ImGui.TableNextColumn();
-                        ImGui.TextUnformatted($"0x{(byte)integerType.Value:X02}");
-                        ImGui.SameLine();
-                        var linkType = (LinkType)integerType.Value;
-                        ImGui.TextUnformatted($"{linkType}");
-
-                        DrawExpressionRow("Arg2", linkPayload.Arg2, localParameters);
-                        DrawExpressionRow("Arg3", linkPayload.Arg3, localParameters);
-                        DrawExpressionRow("Arg4", linkPayload.Arg4, localParameters);
-                        DrawExpressionRow("Arg5", linkPayload.Arg5, localParameters);
-
-                        switch (linkPayload)
-                        {
-                            case PlayerLinkPayload playerLinkPayload:
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("Flags");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{playerLinkPayload.Flags}");
-
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("WorldId");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{playerLinkPayload.WorldId} ({GetRow<World>(playerLinkPayload.WorldId)?.Name ?? "Unknown"})");
-
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("PlayerName");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{playerLinkPayload.PlayerName}");
-                                break;
-
-                            case ItemLinkPayload itemLinkPayload:
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("ItemId");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{itemLinkPayload.ItemId} ({GetRow<Item>(itemLinkPayload.ItemId)?.Name ?? ""})");
-                                break;
-
-                            case MapPositionLinkPayload mapPositionLinkPayload:
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("TerritoryTypeId");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{mapPositionLinkPayload.TerritoryTypeId} ({GetRow<TerritoryType>(mapPositionLinkPayload.TerritoryTypeId)?.PlaceName.Value?.Name ?? ""})");
-
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("MapId");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{mapPositionLinkPayload.MapId}");
-
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("X");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{mapPositionLinkPayload.X} ({mapPositionLinkPayload.MapPosX:0.0})");
-
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("Y");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{mapPositionLinkPayload.Y} ({mapPositionLinkPayload.MapPosY:0.0})");
-                                break;
-
-                            case QuestLinkPayload questLinkPayload:
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("QuestId");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{questLinkPayload.QuestId} ({GetRow<Quest>(questLinkPayload.QuestId)?.Name ?? ""})");
-                                break;
-
-                            case AchievementLinkPayload achievementLinkPayload:
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("AchievementId");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{achievementLinkPayload.AchievementId} ({GetRow<Achievement>(achievementLinkPayload.AchievementId)?.Name ?? ""})");
-                                break;
-
-                            case HowToLinkPayload howToLinkPayload:
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("HowToId");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{howToLinkPayload.HowToId} ({GetRow<HowTo>(howToLinkPayload.HowToId)?.Name ?? ""})");
-                                break;
-
-                            case StatusLinkPayload statusLinkPayload:
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("StatusId");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{statusLinkPayload.StatusId} ({GetRow<Status>(statusLinkPayload.StatusId)?.Name ?? ""})");
-                                break;
-
-                            case PartyFinderLinkPayload partyFinderLinkPayload:
-                                DrawExpressionRow("ListingId", linkPayload.Arg2, localParameters);
-
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("Flags");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{partyFinderLinkPayload.Flags} ({(byte)partyFinderLinkPayload.Flags:X02})");
-                                break;
-
-                            case AkatsukiNoteLinkPayload akatsukiNoteLinkPayload:
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("AkatsukiNoteId");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{akatsukiNoteLinkPayload.AkatsukiNoteId} ({GetRow<AkatsukiNoteString>((uint)GetRow<AkatsukiNote>(akatsukiNoteLinkPayload.AkatsukiNoteId, 0)!.Unknown5)!.Unknown0 ?? ""})");
-                                break;
-
-                            case DalamudLinkPayload dalamudLinkPayload:
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("PluginName");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{dalamudLinkPayload.PluginName}");
-
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted("CommandId");
-                                ImGui.TableNextColumn();
-                                ImGui.TextUnformatted($"{dalamudLinkPayload.CommandId}");
-                                break;
-
-                            case PartyFinderNotificationLinkPayload:
-                            case LinkTerminatorPayload:
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        DrawExpressionRow("Type", linkPayload.Type, localParameters);
-                        DrawExpressionRow("Arg2", linkPayload.Arg2, localParameters);
-                        DrawExpressionRow("Arg3", linkPayload.Arg3, localParameters);
-                        DrawExpressionRow("Arg4", linkPayload.Arg4, localParameters);
-                        DrawExpressionRow("Arg5", linkPayload.Arg5, localParameters);
-                    }
-                    break;
-
-                case RawPayload:
-                case CharacterPayload:
-                    // ignored
-                    break;
-
-                default:
-                    var props = payload.GetType()
-                        .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                        .Where(propInfo => propInfo.PropertyType.IsAssignableTo(typeof(Expression)));
-
-                    foreach (var propInfo in props)
-                    {
-                        DrawExpressionRow(propInfo.Name, (Expression?)propInfo.GetValue(payload), localParameters);
-                    }
-
-                    // ImGui.TextUnformatted($"Unhandled Payload: {payload.GetType().Name}");
-                    break;
-            }
-
-            var encoded = payload.Encode();
-            ImGui.TableNextRow();
-            ImGui.TableNextColumn();
-            ImGui.TextUnformatted("Data [");
-            ImGui.SameLine(0, 0);
-            ImGui.TextUnformatted(ImGui.IsKeyDown(ImGuiKey.LeftShift) ? $"0x{encoded.Length:X02}" : $"{encoded.Length}");
-            ImGui.SameLine(0, 0);
-            ImGui.TextUnformatted("]");
-            ImGui.TableNextColumn();
-            DrawCopyableText(BitConverter.ToString(encoded).Replace("-", " "));
-            */
         }
     }
 
-    private void DrawExpression(MacroCode macroCode, int idx, ReadOnlySeExpressionSpan expr, NodeOptions nodeOptions)
+    private void DrawExpression(MacroCode macroCode, LinkMacroPayloadType? linkType, int idx, ReadOnlySeExpressionSpan expr, NodeOptions nodeOptions)
     {
         ImGui.TableNextRow();
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted($"[{idx}] " + GetExpressionName(macroCode, idx));
+        var expressionName = GetExpressionName(macroCode, linkType, idx, expr);
+        ImGui.TextUnformatted($"[{idx}] " + (string.IsNullOrEmpty(expressionName) ? $"Expr {idx}" : expressionName));
 
         ImGui.TableNextColumn();
 
@@ -451,7 +279,18 @@ public unsafe partial class DebugRenderer
 
         if (expr.TryGetUInt(out var u32))
         {
-            ImGui.TextUnformatted(u32.ToString());
+            DrawCopyableText(u32.ToString());
+            ImGui.SameLine();
+            DrawCopyableText($"0x{u32:X}");
+
+            if (macroCode == MacroCode.Link && idx == 0 && Enum.GetName((LinkMacroPayloadType)u32) != null)
+            {
+                ImGui.SameLine();
+                ImGui.TextUnformatted(((LinkMacroPayloadType)u32).ToString());
+            }
+
+            // TODO: clickable link to open row in new window :O
+
             return;
         }
 
@@ -505,13 +344,19 @@ public unsafe partial class DebugRenderer
         ImGui.TextUnformatted(sb.ToString());
     }
 
-    private string GetExpressionName(MacroCode macroCode, int idx)
+    private string GetExpressionName(MacroCode macroCode, LinkMacroPayloadType? linkType, int idx, ReadOnlySeExpressionSpan expr)
     {
         if (ExpressionNames.TryGetValue(macroCode, out var names) && idx < names.Length)
             return names[idx];
 
         if (macroCode == MacroCode.Switch)
             return $"Case {idx - 1}";
+
+        if (macroCode == MacroCode.Link && idx == 4)
+            return "Copy String";
+
+        if (macroCode == MacroCode.Link && linkType != null && LinkExpressionNames.TryGetValue((LinkMacroPayloadType)linkType, out var linkNames) && idx - 1 < linkNames.Length)
+            return linkNames[idx - 1];
 
         return string.Empty;
     }
