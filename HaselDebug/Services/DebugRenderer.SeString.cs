@@ -206,6 +206,10 @@ public unsafe partial class DebugRenderer
 
             using var node = DrawTreeNode(payloadNodeOptions);
 
+            // consume option
+            if (payloadNodeOptions.DrawSeStringTreeNode)
+                payloadNodeOptions.DrawSeStringTreeNode = false;
+
             using var table = ImRaii.Table($"##Payload{payloadIdx}_{payload.GetHashCode()}Table", 2);
             if (!table) return;
 

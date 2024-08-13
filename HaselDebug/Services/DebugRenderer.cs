@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Dalamud.Game;
 using Dalamud.Interface.Textures;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.System.String;
@@ -165,21 +166,27 @@ public unsafe partial class DebugRenderer(
     private ImRaii.IEndObject DrawTreeNode(NodeOptions nodeOptions)
     {
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
-        var node = ImRaii.TreeNode((nodeOptions.Title?.ToString() ?? string.Empty) + nodeOptions.GetKey("Node"), nodeOptions.GetTreeNodeFlags());
+        var previewText = string.Empty;
+
+        if (!nodeOptions.DrawSeStringTreeNode && nodeOptions.Title != null)
+            previewText = nodeOptions.Title?.ToString();
+
+        var node = ImRaii.TreeNode(previewText + nodeOptions.GetKey("Node"), nodeOptions.GetTreeNodeFlags());
         titleColor?.Dispose();
 
-        /*
-        ImGui.SameLine();
-         
-        using (ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode))
+        if (nodeOptions.DrawSeStringTreeNode && nodeOptions.Title != null)
         {
-            ImGuiHelpers.SeStringWrapped(nodeOptions.Title.AsSpan(), new()
+            ImGui.SameLine();
+
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode))
             {
-                ForceEdgeColor = true,
-                WrapWidth = 9999
-            });
+                ImGuiHelpers.SeStringWrapped(nodeOptions.Title.Value.AsSpan(), new()
+                {
+                    ForceEdgeColor = true,
+                    WrapWidth = 9999
+                });
+            }
         }
-        */
 
         if (nodeOptions.OnHovered != null && ImGui.IsItemHovered())
             nodeOptions.OnHovered();
@@ -195,6 +202,10 @@ public unsafe partial class DebugRenderer(
 
         using var node = DrawTreeNode(nodeOptions.WithTitleIfNull(type.FullName ?? "Unknown Type Name"));
         if (!node) return;
+
+        // consume option
+        if (nodeOptions.DefaultOpen)
+            nodeOptions.DefaultOpen = false;
 
         var fields = type
             .GetFields(BindingFlags.Default | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
@@ -213,7 +224,7 @@ public unsafe partial class DebugRenderer(
             DrawCopyableText($"[0x{offset:X}]", $"{address + offset:X}", textColor: Colors.Grey3);
             ImGui.SameLine();
 
-            var indexedAddressPath = nodeOptions.AddressPath.With(i);
+            var fieldNodeOptions = nodeOptions.WithAddress(i);
 
             var fieldAddress = address + offset;
             var fieldType = fieldInfo.FieldType;
@@ -256,7 +267,7 @@ public unsafe partial class DebugRenderer(
             {
                 ImGui.TextColored(ColorFieldName, $"{fieldInfo.Name[1..].FirstCharToUpper()}");
                 ImGui.SameLine();
-                DrawFixedSizeArray(fieldAddress, fieldType, fixedSizeArrayAttribute.IsString, new());
+                DrawFixedSizeArray(fieldAddress, fieldType, fixedSizeArrayAttribute.IsString, fieldNodeOptions);
                 continue;
             }
 
@@ -273,7 +284,7 @@ public unsafe partial class DebugRenderer(
 
                 ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
-                DrawStdVector(fieldAddress, underlyingType, new NodeOptions() { AddressPath = indexedAddressPath });
+                DrawStdVector(fieldAddress, underlyingType, fieldNodeOptions);
                 continue;
             }
 
@@ -290,7 +301,7 @@ public unsafe partial class DebugRenderer(
 
                 ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
-                DrawStdDeque(fieldAddress, underlyingType, new NodeOptions() { AddressPath = indexedAddressPath });
+                DrawStdDeque(fieldAddress, underlyingType, fieldNodeOptions);
                 continue;
             }
 
@@ -307,7 +318,7 @@ public unsafe partial class DebugRenderer(
 
                 ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
-                DrawStdList(fieldAddress, underlyingType, new NodeOptions() { AddressPath = indexedAddressPath });
+                DrawStdList(fieldAddress, underlyingType, fieldNodeOptions);
                 continue;
             }
 
@@ -316,7 +327,7 @@ public unsafe partial class DebugRenderer(
             {
                 ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
-                DrawAtkValues(*(AtkValue**)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(fieldAddress) });
+                DrawAtkValues(*(AtkValue**)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, fieldNodeOptions);
                 continue;
             }
 
@@ -325,7 +336,7 @@ public unsafe partial class DebugRenderer(
             {
                 ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
-                DrawSeString(*(byte**)fieldAddress, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(fieldAddress) });
+                DrawSeString(*(byte**)fieldAddress, fieldNodeOptions);
                 continue;
             }
 
@@ -338,7 +349,7 @@ public unsafe partial class DebugRenderer(
             if (fieldType == typeof(uint) && fieldInfo.Name == "IconId")
                 DrawIcon(*(uint*)fieldAddress);
 
-            DrawPointerType(fieldAddress, fieldType, new NodeOptions() { AddressPath = indexedAddressPath });
+            DrawPointerType(fieldAddress, fieldType, fieldNodeOptions);
         }
     }
 
