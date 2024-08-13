@@ -2,10 +2,12 @@ using System.Numerics;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
 using HaselCommon.Services;
+using HaselCommon.Services.SeStringEvaluation;
 using HaselCommon.Windowing;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
+using Lumina.Text.Payloads;
 using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Windows;
@@ -14,6 +16,7 @@ namespace HaselDebug.Windows;
 public class SeStringInspectorWindow(
     WindowManager windowManager,
     DebugRenderer DebugRenderer,
+    SeStringEvaluatorService SeStringEvaluator,
     ReadOnlySeString SeString,
     string windowName = "SeString") : SimpleWindow(windowManager, windowName)
 {
@@ -35,7 +38,7 @@ public class SeStringInspectorWindow(
 
     public override void Draw()
     {
-        ImGuiHelpers.SeStringWrapped(SeString.AsSpan(), new SeStringDrawParams()
+        ImGuiHelpers.SeStringWrapped(SeStringEvaluator.Evaluate(SeString.AsSpan()), new SeStringDrawParams()
         {
             ForceEdgeColor = true,
         });

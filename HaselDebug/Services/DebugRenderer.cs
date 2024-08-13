@@ -26,7 +26,8 @@ namespace HaselDebug.Services;
 public unsafe partial class DebugRenderer(
     WindowManager WindowManager,
     ITextureProvider TextureProvider,
-    ImGuiContextMenuService ImGuiContextMenuService)
+    ImGuiContextMenuService ImGuiContextMenuService,
+    SeStringEvaluatorService SeStringEvaluator)
 {
     private MethodInfo? GetSheetGeneric;
 
