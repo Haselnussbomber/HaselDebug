@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Extensions;
+using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
@@ -13,9 +14,9 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
-// same as in Dalamud :)
+// almost the same as in Dalamud :)
 #pragma warning disable SeStringRenderer
-public unsafe class AtkArrayDataTab(DebugRenderer DebugRenderer) : DebugTab
+public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer DebugRenderer) : DebugTab
 {
     private readonly Type numberType = typeof(NumberArrayType);
     private readonly Type stringType = typeof(StringArrayType);
@@ -258,7 +259,7 @@ public unsafe class AtkArrayDataTab(DebugRenderer DebugRenderer) : DebugTab
             if (sidebarchild)
             {
                 ImGui.SetNextItemWidth(-1);
-                ImGui.InputTextWithHint("##TextSearch", "Search...", ref searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+                ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
 
                 DrawArrayList(
                     stringType,

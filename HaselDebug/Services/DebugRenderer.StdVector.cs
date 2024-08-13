@@ -30,6 +30,8 @@ public unsafe partial class DebugRenderer
         using var node = DrawTreeNode(nodeOptions.WithTitle($"{elementCount} value{(elementCount != 1 ? "s" : "")}"));
         if (!node) return;
 
+        nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
+
         using var indent = ImRaii.PushIndent(1, nodeOptions.Indent);
         using var table = ImRaii.Table(nodeOptions.GetKey("StdVectorTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
         if (!table) return;

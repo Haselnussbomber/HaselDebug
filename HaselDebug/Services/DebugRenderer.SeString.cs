@@ -188,11 +188,7 @@ public unsafe partial class DebugRenderer
             });
         }
 
-        nodeOptions = nodeOptions with
-        {
-            DrawSeStringTreeNode = false,
-            DefaultOpen = true
-        };
+        nodeOptions = nodeOptions.ConsumeTreeNodeOptions() with { DefaultOpen = true };
 
         var payloadIdx = -1;
         foreach (var payload in rosss)
@@ -209,9 +205,7 @@ public unsafe partial class DebugRenderer
 
             using var payloadNode = DrawTreeNode(payloadNodeOptions);
 
-            // consume option
-            if (payloadNodeOptions.DrawSeStringTreeNode)
-                payloadNodeOptions.DrawSeStringTreeNode = false;
+            nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
             using var table = ImRaii.Table($"##Payload{payloadIdx}_{payload.GetHashCode()}Table", 2);
             if (!table) return;

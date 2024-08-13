@@ -1,6 +1,6 @@
-using System.ComponentModel;
-using System.Linq;
+using System.Numerics;
 using System.Reflection;
+using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.Attributes;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
@@ -17,16 +17,26 @@ public class InstancesTab(
     PinnedInstancesService PinnedInstances,
     ImGuiContextMenuService ImGuiContextMenu) : DebugTab
 {
+    private string SearchTerm = string.Empty;
+
     public override void Draw()
     {
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref SearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTerm = !string.IsNullOrWhiteSpace(SearchTerm);
+
+        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false,  ImGuiWindowFlags.NoSavedSettings);
+
         var i = 0;
         foreach (var (ptr, type) in InstancesService.Instances)
         {
             if (type.GetCustomAttribute<AgentAttribute>() != null) continue;
+            if (hasSearchTerm && !type.FullName!.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)) continue;
 
             DebugRenderer.DrawAddress(ptr);
             ImGui.SameLine(120);
-            DebugRenderer.DrawPointerType(ptr, type, new NodeOptions() {
+            DebugRenderer.DrawPointerType(ptr, type, new NodeOptions()
+            {
                 AddressPath = new AddressPath(i++),
                 DrawContextMenu = (nodeOptions) =>
                 {

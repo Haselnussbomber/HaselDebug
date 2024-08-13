@@ -55,6 +55,8 @@ public unsafe partial class DebugRenderer
         using var node = DrawTreeNode(nodeOptions.WithTitle($"{elementCount} value{(elementCount != 1 ? "s" : "")}"));
         if (!node) return;
 
+        nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
+
         using var table = ImRaii.Table(nodeOptions.GetKey("AtkValuesTable"), 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
         if (!table) return;
 

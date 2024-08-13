@@ -45,5 +45,8 @@ public record struct NodeOptions
     public NodeOptions WithTitleIfNull(ReadOnlySeString title)
         => Title == null ? this with { Title = title } : this;
 
+    public NodeOptions ConsumeTreeNodeOptions()
+        => this with { Title = null, DefaultOpen = false, DrawContextMenu = null, OnHovered = null, DrawSeStringTreeNode = false };
+
     public string GetKey(string prefix) => $"###{prefix}{AddressPath}";
 }

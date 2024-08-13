@@ -21,6 +21,8 @@ public unsafe partial class DebugRenderer
         using var node = DrawTreeNode(nodeOptions.WithTitle($"{elementCount} value{(elementCount != 1 ? "s" : "")}"));
         if (!node) return;
 
+        nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
+
         var typeSize = type.SizeOf();
         var blockSize =
             typeSize <= 1 ? 16 :

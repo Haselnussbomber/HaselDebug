@@ -203,9 +203,7 @@ public unsafe partial class DebugRenderer(
         using var node = DrawTreeNode(nodeOptions.WithTitleIfNull(type.FullName ?? "Unknown Type Name"));
         if (!node) return;
 
-        // consume option
-        if (nodeOptions.DefaultOpen)
-            nodeOptions.DefaultOpen = false;
+        nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
         var fields = type
             .GetFields(BindingFlags.Default | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)

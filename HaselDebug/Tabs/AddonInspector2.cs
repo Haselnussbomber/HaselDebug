@@ -17,7 +17,7 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class AddonInspector2Tab(DebugRenderer DebugRenderer, TextureService TextureService) : DebugTab
+public unsafe class AddonInspector2Tab(TextService TextService, DebugRenderer DebugRenderer, TextureService TextureService) : DebugTab
 {
     private ushort SelectedAddonId = 0;
     private string SelectedAddonName = string.Empty;
@@ -60,7 +60,7 @@ public unsafe class AddonInspector2Tab(DebugRenderer DebugRenderer, TextureServi
         if (!sidebarchild) return;
 
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - ImGuiUtils.GetIconButtonSize(FontAwesomeIcon.ObjectUngroup).X - ImGui.GetStyle().ItemSpacing.X);
-        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", "Search...", ref AddonNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref AddonNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         var hasSearchTerm = !string.IsNullOrWhiteSpace(AddonNameSearchTerm);
         var hasSearchTermAutoSelected = false;
 

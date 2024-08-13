@@ -98,6 +98,8 @@ public unsafe class AgentsTab(
             DefaultOpen = true,
             DrawContextMenu = (nodeOptions) =>
             {
+                if (agentType.Name == "AgentInterface") return;
+
                 ImGuiContextMenu.Draw($"ContextMenu{nodeOptions.AddressPath}", builder =>
                 {
                     var isPinned = PinnedInstances.Contains(agentType);

@@ -22,6 +22,11 @@
     "de": "HaselDebug automatisch öffnen"
   },
 
+  "SearchBar.Hint": {
+    "en": "Search...",
+    "de": "Suchen..."
+  },
+
   "PinnedInstances.Pin": {
     "en": "Pin",
     "de": "Anpinnen"

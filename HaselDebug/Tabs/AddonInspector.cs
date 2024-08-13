@@ -6,6 +6,7 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
@@ -14,13 +15,14 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
-public class AddonInspector(DebugRenderer DebugRenderer, IGameGui GameGui) : DebugTab
+// almost the same as in Dalamud :/
+public class AddonInspector(TextService TextService, DebugRenderer DebugRenderer, IGameGui GameGui) : DebugTab
 {
     private UiDebug? addonInspector;
 
     public override void Draw()
     {
-        addonInspector ??= new UiDebug(DebugRenderer, GameGui);
+        addonInspector ??= new UiDebug(TextService, DebugRenderer, GameGui);
         addonInspector?.Draw();
     }
 }
@@ -53,6 +55,7 @@ internal unsafe class UiDebug
         "Units 18",
     ];
 
+    private readonly TextService TextService;
     private readonly DebugRenderer DebugRenderer;
     private readonly IGameGui GameGui;
 
@@ -63,8 +66,9 @@ internal unsafe class UiDebug
     /// <summary>
     /// Initializes a new instance of the <see cref="UiDebug"/> class.
     /// </summary>
-    public UiDebug(DebugRenderer debugRenderer, IGameGui gameGui)
+    public UiDebug(TextService textService, DebugRenderer debugRenderer, IGameGui gameGui)
     {
+        TextService = textService;
         DebugRenderer = debugRenderer;
         GameGui = gameGui;
     }
@@ -77,7 +81,7 @@ internal unsafe class UiDebug
         using (var child = ImRaii.Child("uiDebug_unitBaseSelect", new Vector2(250, -1), true))
         {
             ImGui.SetNextItemWidth(-1);
-            ImGui.InputTextWithHint("###atkUnitBaseSearch", "Search", ref searchInput, 0x20, ImGuiInputTextFlags.AutoSelectAll);
+            ImGui.InputTextWithHint("###atkUnitBaseSearch", TextService.Translate("SearchBar.Hint"), ref searchInput, 0x20, ImGuiInputTextFlags.AutoSelectAll);
 
             DrawUnitBaseList();
         }
