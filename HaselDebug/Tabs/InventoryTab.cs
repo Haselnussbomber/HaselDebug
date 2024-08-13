@@ -145,7 +145,7 @@ public unsafe class InventoryTab(DebugRenderer DebugRenderer, TextService TextSe
                 DebugRenderer.DrawPointerType(slot, typeof(InventoryItem), new NodeOptions()
                 {
                     AddressPath = new AddressPath([(nint)inventoryType, slot->Slot]),
-                    Title = itemNameSeStr
+                    SeStringTitle = itemNameSeStr
                 });
             }
         }

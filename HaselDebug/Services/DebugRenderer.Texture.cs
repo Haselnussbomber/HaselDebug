@@ -29,7 +29,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        DrawTexture((nint)kernelTexture, nodeOptions.WithAddress(address).WithTitle(title));
+        DrawTexture((nint)kernelTexture, nodeOptions.WithAddress(address).WithSeStringTitle(title));
     }
 
     public void DrawTexture(nint address, NodeOptions nodeOptions)
@@ -44,8 +44,8 @@ public unsafe partial class DebugRenderer
 
         var tex = (KernelTexture*)address;
         var title = $"{tex->Width}x{tex->Height}, {(TextureFormat)tex->TextureFormat}";
-        if (nodeOptions.Title != null)
-            title = $"{nodeOptions.Title.Value.ExtractText()} ({title})";
+        if (nodeOptions.SeStringTitle != null)
+            title = $"{nodeOptions.SeStringTitle.Value.ExtractText()} ({title})";
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"{title}##TextureNode{nodeOptions.AddressPath}", nodeOptions.GetTreeNodeFlags());
         if (!node) return;

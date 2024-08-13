@@ -1,6 +1,5 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using HaselCommon.Extensions;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
 using HaselDebug.Abstracts;
@@ -85,7 +84,7 @@ public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelServi
                         {
                             AddressPath = new AddressPath(i),
                             Indent = false,
-                            Title = $"Chat Line {i}".ToReadOnlySeString()
+                            Title = $"Chat Line {i}"
                         });
                     }
                 }

@@ -52,7 +52,7 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.WithAddress((nint)values);
 
-        using var node = DrawTreeNode(nodeOptions.WithTitle($"{elementCount} value{(elementCount != 1 ? "s" : "")}"));
+        using var node = DrawTreeNode(nodeOptions.WithSeStringTitle($"{elementCount} value{(elementCount != 1 ? "s" : "")}"));
         if (!node) return;
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();

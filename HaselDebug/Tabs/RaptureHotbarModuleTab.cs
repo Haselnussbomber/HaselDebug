@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Text;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
@@ -11,7 +10,6 @@ using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
-using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
@@ -81,7 +79,7 @@ public unsafe class RaptureHotbarModuleTab(DebugRenderer DebugRenderer, ExcelSer
                     DebugRenderer.DrawIcon(slot->IconId);
                     DebugRenderer.DrawPointerType(slot, typeof(RaptureHotbarModule.HotbarSlot), new NodeOptions()
                     {
-                        Title = new ReadOnlySeString(Encoding.UTF8.GetBytes(slot->CommandType switch
+                        Title = slot->CommandType switch
                         {
                             RaptureHotbarModule.HotbarSlotType.Action => TextService.GetActionName(slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.Item => TextService.GetItemName(slot->CommandId),
@@ -111,7 +109,7 @@ public unsafe class RaptureHotbarModuleTab(DebugRenderer DebugRenderer, ExcelSer
                             // LostFindsItem
                             RaptureHotbarModule.HotbarSlotType.Glasses => TextService.GetGlassesName(slot->CommandId),
                             _ => string.Empty
-                        }))
+                        }
                     });
                 }
 

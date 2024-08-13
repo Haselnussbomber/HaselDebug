@@ -94,7 +94,8 @@ public unsafe class AgentsTab(
         var agent = AgentModule.Instance()->GetAgentByInternalId(agentId);
         var agentType = Agents!.TryGetValue(agentId, out var value) ? value.Type : typeof(AgentInterface);
 
-        DebugRenderer.DrawPointerType(agent, agentType, new NodeOptions() {
+        DebugRenderer.DrawPointerType(agent, agentType, new NodeOptions()
+        {
             DefaultOpen = true,
             DrawContextMenu = (nodeOptions) =>
             {

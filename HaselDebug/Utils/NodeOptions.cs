@@ -10,7 +10,8 @@ public record struct NodeOptions
     public NodeOptions() { }
 
     public AddressPath AddressPath { get; set; } = new();
-    public ReadOnlySeString? Title { get; set; } = null;
+    public string? Title { get; set; } = null;
+    public ReadOnlySeString? SeStringTitle { get; set; } = null;
     public bool Indent { get; set; } = true;
     public bool DefaultOpen { get; set; } = false;
     public Action? OnHovered { get; set; } = null;
@@ -33,20 +34,28 @@ public record struct NodeOptions
     public NodeOptions WithAddress(nint[] addresses)
         => this with { AddressPath = AddressPath.With(addresses) };
 
-    public NodeOptions WithTitle(string title)
-        => this with { Title = title.ToReadOnlySeString() };
+    public NodeOptions WithSeStringTitle(string title)
+        => this with { SeStringTitle = title.ToReadOnlySeString() };
 
-    public NodeOptions WithTitle(ReadOnlySeString title)
-        => this with { Title = title };
+    public NodeOptions WithSeStringTitle(ReadOnlySeString title)
+        => this with { SeStringTitle = title };
 
-    public NodeOptions WithTitleIfNull(string title)
-        => Title == null ? this with { Title = title.ToReadOnlySeString() } : this;
+    public NodeOptions WithSeStringTitleIfNull(string title)
+        => SeStringTitle == null && Title == null ? this with { SeStringTitle = title.ToReadOnlySeString() } : this;
 
-    public NodeOptions WithTitleIfNull(ReadOnlySeString title)
-        => Title == null ? this with { Title = title } : this;
+    public NodeOptions WithSeStringTitleIfNull(ReadOnlySeString title)
+        => SeStringTitle == null && Title == null ? this with { SeStringTitle = title } : this;
 
     public NodeOptions ConsumeTreeNodeOptions()
-        => this with { Title = null, DefaultOpen = false, DrawContextMenu = null, OnHovered = null, DrawSeStringTreeNode = false };
+        => this with
+        {
+            SeStringTitle = null,
+            Title = null,
+            DefaultOpen = false,
+            DrawContextMenu = null,
+            OnHovered = null,
+            DrawSeStringTreeNode = false
+        };
 
     public string GetKey(string prefix) => $"###{prefix}{AddressPath}";
 }

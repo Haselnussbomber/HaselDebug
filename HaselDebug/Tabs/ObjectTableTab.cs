@@ -1,4 +1,3 @@
-using System.Text;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
@@ -47,24 +46,24 @@ public unsafe class ObjectTableTab(
             var objectKind = gameObject->GetObjectKind();
             var objectName = new ReadOnlySeStringSpan(gameObject->GetName()).ExtractText();
 
-            var titleOverride = objectName;
+            var title = objectName;
             if (objectKind == ObjectKind.EventNpc)
             {
                 var resident = ExcelService.GetRow<ENpcResident>(gameObject->BaseId);
                 if (resident != null && resident.Title.RawData.Length > 0)
                 {
-                    var title = SeStringEvaluator.EvaluateFromAddon(37, new SeStringContext() { LocalParameters = [resident.Title] }).ExtractText();
-                    if (!string.IsNullOrWhiteSpace(title))
+                    var evaluated = SeStringEvaluator.EvaluateFromAddon(37, new SeStringContext() { LocalParameters = [resident.Title] }).ExtractText();
+                    if (!string.IsNullOrWhiteSpace(evaluated))
                     {
-                        if (!string.IsNullOrEmpty(titleOverride))
-                            titleOverride += " ";
-                        titleOverride += title;
+                        if (!string.IsNullOrEmpty(evaluated))
+                            title += " ";
+                        title += evaluated;
                     }
                 }
             }
 
-            if (string.IsNullOrEmpty(titleOverride))
-                titleOverride = "Unnamed Object";
+            if (string.IsNullOrEmpty(title))
+                title = "Unnamed Object";
 
             ImGui.TableNextRow();
 
@@ -91,7 +90,7 @@ public unsafe class ObjectTableTab(
                 new NodeOptions()
                 {
                     AddressPath = new AddressPath((nint)gameObject),
-                    Title = new(Encoding.UTF8.GetBytes(titleOverride)),
+                    Title = title,
                     OnHovered = () =>
                     {
                         if (GameGui.WorldToScreen(gameObject->Position, out var screenPos))

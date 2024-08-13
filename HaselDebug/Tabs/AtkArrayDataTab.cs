@@ -407,7 +407,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
                 DebugRenderer.DrawIcon(marker->IconId);
                 DebugRenderer.DrawPointerType(array->DataArray[i], typeof(MapMarkerBase), new NodeOptions()
                 {
-                    Title = new ReadOnlySeStringSpan(marker->Subtext).ToReadOnlySeString(),
+                    SeStringTitle = new ReadOnlySeStringSpan(marker->Subtext).ToReadOnlySeString(),
                     AddressPath = new AddressPath([(nint)array, (nint)array->DataArray[i]])
                 });
             }

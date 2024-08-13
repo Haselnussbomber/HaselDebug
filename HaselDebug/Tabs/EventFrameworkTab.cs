@@ -9,7 +9,6 @@ using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
-using Lumina.Text;
 using Lumina.Text.ReadOnly;
 using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
 
@@ -82,7 +81,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
 
             DebugRenderer.DrawPointerType(director, typeof(Director), new NodeOptions()
             {
-                Title = title
+                SeStringTitle = title
             });
         }
     }
@@ -106,7 +105,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
             ImGui.TextUnformatted(kv.Item1.ToString("X4"));
             ImGui.SameLine(155);
 
-            ReadOnlySeString? title = null;
+            string? title = null;
 
             if (type == EventHandlerType.Quest)
             {
@@ -119,7 +118,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
                 DebugUtils.DrawIcon(TextureProvider, iconId);
                 */
 
-                title = new SeStringBuilder().Append($"{type} {questId} ({TextService.GetQuestName(questId)})").ToReadOnlySeString();
+                title = $"{type} {questId} ({TextService.GetQuestName(questId)})";
             }
             else
             {
@@ -128,7 +127,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
             }
 
             if (title == null)
-                title = new SeStringBuilder().Append($"{type} {kv.Item2.Value->Info.EventId.Id}").ToReadOnlySeString();
+                title = $"{type} {kv.Item2.Value->Info.EventId.Id}";
 
             DebugRenderer.DrawPointerType(eventHandler, typeof(EventHandler), new NodeOptions()
             {

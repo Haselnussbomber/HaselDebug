@@ -25,7 +25,7 @@ public class InstancesTab(
         ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref SearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         var hasSearchTerm = !string.IsNullOrWhiteSpace(SearchTerm);
 
-        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false,  ImGuiWindowFlags.NoSavedSettings);
+        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
         var i = 0;
         foreach (var (ptr, type) in InstancesService.Instances)

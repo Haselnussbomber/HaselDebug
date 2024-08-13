@@ -1,7 +1,6 @@
 using System.Linq;
 using Dalamud.Interface.Utility.Raii;
 using ExdSheets.Sheets;
-using HaselCommon.Extensions;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
@@ -40,7 +39,7 @@ public unsafe class AddonTab(DebugRenderer DebugRenderer, ExdSheets.Module ExdMo
                 DebugRenderer.DrawSeStringSelectable(row.Text.AsSpan(), new NodeOptions()
                 {
                     RenderSeString = false,
-                    Title = $"Addon#{row.RowId}".ToReadOnlySeString()
+                    Title = $"Addon#{row.RowId}"
                 });
             }
         }

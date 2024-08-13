@@ -14,7 +14,8 @@ public class PinnedInstanceTab(DebugRenderer DebugRenderer, nint address, Type t
 
     public void Draw()
     {
-        DebugRenderer.DrawPointerType(Address, Type, new NodeOptions() {
+        DebugRenderer.DrawPointerType(Address, Type, new NodeOptions()
+        {
             AddressPath = new AddressPath(Address),
             DefaultOpen = true,
         });

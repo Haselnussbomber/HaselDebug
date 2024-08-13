@@ -168,19 +168,21 @@ public unsafe partial class DebugRenderer(
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         var previewText = string.Empty;
 
-        if (!nodeOptions.DrawSeStringTreeNode && nodeOptions.Title != null)
-            previewText = nodeOptions.Title?.ToString();
+        if (!nodeOptions.DrawSeStringTreeNode && nodeOptions.SeStringTitle != null)
+            previewText = nodeOptions.SeStringTitle?.ToString();
+        else if (nodeOptions.Title != null)
+            previewText = nodeOptions.Title;
 
         var node = ImRaii.TreeNode(previewText + nodeOptions.GetKey("Node"), nodeOptions.GetTreeNodeFlags());
         titleColor?.Dispose();
 
-        if (nodeOptions.DrawSeStringTreeNode && nodeOptions.Title != null)
+        if (nodeOptions.DrawSeStringTreeNode && nodeOptions.SeStringTitle != null)
         {
             ImGui.SameLine();
 
             using (ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode))
             {
-                ImGuiHelpers.SeStringWrapped(nodeOptions.Title.Value.AsSpan(), new()
+                ImGuiHelpers.SeStringWrapped(nodeOptions.SeStringTitle.Value.AsSpan(), new()
                 {
                     ForceEdgeColor = true,
                     WrapWidth = 9999
@@ -200,7 +202,7 @@ public unsafe partial class DebugRenderer(
     {
         nodeOptions = nodeOptions.WithAddress(address);
 
-        using var node = DrawTreeNode(nodeOptions.WithTitleIfNull(type.FullName ?? "Unknown Type Name"));
+        using var node = DrawTreeNode(nodeOptions.WithSeStringTitleIfNull(type.FullName ?? "Unknown Type Name"));
         if (!node) return;
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
@@ -246,8 +248,6 @@ public unsafe partial class DebugRenderer(
 
             DrawCopyableText(fieldType.ReadableTypeName(), fieldType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
             ImGui.SameLine();
-
-            // TODO: is this all even necessary
 
             // delegate*
             if (fieldType.IsFunctionPointer || fieldType.IsUnmanagedFunctionPointer)
@@ -335,6 +335,25 @@ public unsafe partial class DebugRenderer(
                 ImGui.TextColored(ColorFieldName, fieldInfo.Name);
                 ImGui.SameLine();
                 DrawSeString(*(byte**)fieldAddress, fieldNodeOptions);
+                continue;
+            }
+
+            // Vector3
+            if (fieldType == typeof(System.Numerics.Vector3))
+            {
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                ImGui.SameLine();
+                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(System.Numerics.Vector3*)fieldAddress).ToString() });
+                continue;
+            }
+            if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector3))
+            {
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                ImGui.SameLine();
+                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with
+                {
+                    Title = (*(FFXIVClientStructs.FFXIV.Common.Math.Vector3*)fieldAddress).ToString()
+                });
                 continue;
             }
 

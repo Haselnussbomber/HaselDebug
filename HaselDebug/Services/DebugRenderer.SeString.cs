@@ -162,7 +162,7 @@ public unsafe partial class DebugRenderer
         {
             var str = new ReadOnlySeString(rosss.Data.ToArray());
             WindowManager.CreateOrOpen(
-                (nodeOptions.Title ?? str).ToString(),
+                nodeOptions.Title ?? (nodeOptions.SeStringTitle ?? str).ToString(),
                 (wm, windowName) => new SeStringInspectorWindow(wm, this, SeStringEvaluator, str, windowName));
         }
     }
@@ -177,7 +177,7 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.WithAddress(rosss.GetHashCode());
 
-        using var node = asTreeNode ? DrawTreeNode(nodeOptions.WithTitle(rosss.ToReadOnlySeString())) : null;
+        using var node = asTreeNode ? DrawTreeNode(nodeOptions.WithSeStringTitle(rosss.ToReadOnlySeString())) : null;
         if (asTreeNode && !node!) return;
 
         if (!asTreeNode && nodeOptions.RenderSeString)
@@ -201,7 +201,7 @@ public unsafe partial class DebugRenderer
 
             var payloadNodeOptions = nodeOptions
                 .WithAddress(payloadIdx)
-                .WithTitle($"[{payloadIdx}] {preview}");
+                .WithSeStringTitle($"[{payloadIdx}] {preview}");
 
             using var payloadNode = DrawTreeNode(payloadNodeOptions);
             if (!payloadNode) continue;
@@ -232,7 +232,7 @@ public unsafe partial class DebugRenderer
                 {
                     DrawExpression(payload.MacroCode, exprIdx++, expr, payloadNodeOptions with
                     {
-                        Title = null,
+                        SeStringTitle = null,
                         DefaultOpen = true,
                         AddressPath = nodeOptions.AddressPath.With([payloadIdx, exprIdx]),
                     });
