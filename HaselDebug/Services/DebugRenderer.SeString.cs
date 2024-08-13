@@ -124,7 +124,7 @@ public unsafe partial class DebugRenderer
         if (nodeOptions.RenderSeString)
         {
             clicked = ImGui.Selectable(nodeOptions.GetKey("SeStringSelectable"));
-
+            ImGui.SameLine(0, 0);
             ImGuiHelpers.SeStringWrapped(rosss, new()
             {
                 GetEntity = (scoped in SeStringDrawState state, int byteOffset) =>
