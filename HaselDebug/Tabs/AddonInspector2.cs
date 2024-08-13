@@ -206,7 +206,10 @@ public unsafe class AddonInspector2Tab(DebugRenderer DebugRenderer, TextureServi
             type = typeof(AtkUnitBase);
 
         var unitBase = RaptureAtkUnitManager.Instance()->GetAddonById(SelectedAddonId);
-        DebugRenderer.DrawPointerType(unitBase, type, new NodeOptions());
+        DebugRenderer.DrawPointerType(unitBase, type, new NodeOptions()
+        {
+            DefaultOpen = true,
+        });
     }
 
     private void DrawNodePicker()

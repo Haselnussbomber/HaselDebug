@@ -79,7 +79,7 @@ public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelServi
                     var formatted = SeStringEvaluator.Evaluate(format, new SeStringContext() { LocalParameters = [senderEvaluated, messageEvaluated] }).AsSpan();
 
                     if (!formatted.IsEmpty)
-                        DebugRenderer.DrawSeString(formatted, new NodeOptions() { AddressPath = new AddressPath(i), Indent = false });
+                        DebugRenderer.DrawSeString(formatted, true, new NodeOptions() { AddressPath = new AddressPath(i), Indent = false });
                 }
             }
         }

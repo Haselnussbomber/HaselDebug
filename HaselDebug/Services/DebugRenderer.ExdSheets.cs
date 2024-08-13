@@ -98,7 +98,7 @@ public unsafe partial class DebugRenderer
 
         if (propInfo.PropertyType == typeof(ReadOnlySeString))
         {
-            DrawSeString(((ReadOnlySeString)value).AsSpan(), new NodeOptions()
+            DrawSeString(((ReadOnlySeString)value).AsSpan(), true, new NodeOptions()
             {
                 RenderSeString = nodeOptions.RenderSeString,
                 AddressPath = nodeOptions.AddressPath.With(propInfo.Name.GetHashCode())
@@ -175,7 +175,7 @@ public unsafe partial class DebugRenderer
 
                 if (collectionType == typeof(ReadOnlySeString))
                 {
-                    DrawSeString(((ReadOnlySeString)colValue).AsSpan(), new NodeOptions()
+                    DrawSeString(((ReadOnlySeString)colValue).AsSpan(), true, new NodeOptions()
                     {
                         RenderSeString = nodeOptions.RenderSeString,
                         AddressPath = nodeOptions.AddressPath.With(collectionType.Name.GetHashCode())

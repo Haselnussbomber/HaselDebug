@@ -167,7 +167,7 @@ public unsafe partial class DebugRenderer
         }
     }
 
-    public void DrawSeString(ReadOnlySeStringSpan rosss, NodeOptions nodeOptions)
+    public void DrawSeString(ReadOnlySeStringSpan rosss, bool asTreeNode, NodeOptions nodeOptions)
     {
         if (rosss.PayloadCount == 0)
         {
@@ -177,7 +177,10 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.WithAddress(rosss.GetHashCode());
 
-        if (nodeOptions.RenderSeString)
+        using var node = asTreeNode ? DrawTreeNode(nodeOptions.WithTitle(rosss.ToReadOnlySeString())) : null;
+        if (asTreeNode && !node!) return;
+
+        if (!asTreeNode && nodeOptions.RenderSeString)
         {
             ImGuiHelpers.SeStringWrapped(rosss, new()
             {
@@ -204,7 +207,7 @@ public unsafe partial class DebugRenderer
                 .WithAddress(payloadIdx)
                 .WithTitle($"[{payloadIdx}] {preview}");
 
-            using var node = DrawTreeNode(payloadNodeOptions);
+            using var payloadNode = DrawTreeNode(payloadNodeOptions);
 
             // consume option
             if (payloadNodeOptions.DrawSeStringTreeNode)
@@ -459,7 +462,7 @@ public unsafe partial class DebugRenderer
 
         if (expr.TryGetString(out var s))
         {
-            DrawSeString(s, nodeOptions with { DefaultOpen = true });
+            DrawSeString(s, false, nodeOptions with { DefaultOpen = true });
             // ImGui.TextUnformatted($"\"{s.ToString().Replace("\\", "\\\\").Replace("\"", "\\\"")}\"");
             return;
         }
