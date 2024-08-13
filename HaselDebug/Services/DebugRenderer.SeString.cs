@@ -204,8 +204,9 @@ public unsafe partial class DebugRenderer
                 .WithTitle($"[{payloadIdx}] {preview}");
 
             using var payloadNode = DrawTreeNode(payloadNodeOptions);
+            if (!payloadNode) continue;
 
-            nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
+            nodeOptions = nodeOptions.ConsumeTreeNodeOptions() with { DefaultOpen = true, Indent = true };
 
             using var table = ImRaii.Table($"##Payload{payloadIdx}_{payload.GetHashCode()}Table", 2);
             if (!table) return;
