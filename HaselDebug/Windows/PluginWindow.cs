@@ -62,7 +62,8 @@ public class PluginWindow : SimpleWindow
 
         Tabs = [.. tabs.OrderBy(t => t.GetTitle())];
 
-        SelectedTab = Tabs.FirstOrDefault(tab => tab.InternalName == pluginConfig.LastSelectedTab);
+        SelectedTab = PinnedInstances.FirstOrDefault(tab => tab.InternalName == pluginConfig.LastSelectedTab)
+            ?? (IDrawableTab?)Tabs.FirstOrDefault(tab => tab.InternalName == pluginConfig.LastSelectedTab);
     }
 
     public override void Dispose()
