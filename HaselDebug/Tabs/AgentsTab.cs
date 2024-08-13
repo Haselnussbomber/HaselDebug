@@ -2,10 +2,12 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Services;
+using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
@@ -21,6 +23,7 @@ public unsafe class AgentsTab(
 {
     private ImmutableSortedDictionary<AgentId, (Pointer<AgentInterface> Address, Type Type)>? Agents;
     private AgentId SelectedAgentId = AgentId.Lobby;
+    private string AgentNameSearchTerm = string.Empty;
 
     public override bool DrawInChild => false;
     public override void Draw()
@@ -40,6 +43,14 @@ public unsafe class AgentsTab(
 
     private void DrawAgentsList()
     {
+        using var sidebarchild = ImRaii.Child("AgentsListChild", new Vector2(300, -1), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
+        if (!sidebarchild) return;
+
+        ImGui.SetNextItemWidth(-1);
+        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref AgentNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTerm = !string.IsNullOrWhiteSpace(AgentNameSearchTerm);
+        var hasSearchTermAutoSelected = false;
+
         using var table = ImRaii.Table("AgentsTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY, new Vector2(300, -1));
         if (!table) return;
 
@@ -56,6 +67,15 @@ public unsafe class AgentsTab(
             var agent = agentModule->Agents[i];
             var agentId = (AgentId)i;
             var agentName = Enum.GetName(agentId) ?? string.Empty;
+
+            if (hasSearchTerm && !agentName.Contains(AgentNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
+                continue;
+
+            if (hasSearchTerm && !hasSearchTermAutoSelected)
+            {
+                SelectedAgentId = agentId;
+                hasSearchTermAutoSelected = true;
+            }
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Id

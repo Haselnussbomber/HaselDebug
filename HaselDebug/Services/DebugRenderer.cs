@@ -338,6 +338,25 @@ public unsafe partial class DebugRenderer(
                 continue;
             }
 
+            // Vector2
+            if (fieldType == typeof(System.Numerics.Vector2))
+            {
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                ImGui.SameLine();
+                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(System.Numerics.Vector2*)fieldAddress).ToString() });
+                continue;
+            }
+            if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector2))
+            {
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                ImGui.SameLine();
+                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with
+                {
+                    Title = (*(FFXIVClientStructs.FFXIV.Common.Math.Vector2*)fieldAddress).ToString()
+                });
+                continue;
+            }
+
             // Vector3
             if (fieldType == typeof(System.Numerics.Vector3))
             {
@@ -353,6 +372,25 @@ public unsafe partial class DebugRenderer(
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with
                 {
                     Title = (*(FFXIVClientStructs.FFXIV.Common.Math.Vector3*)fieldAddress).ToString()
+                });
+                continue;
+            }
+
+            // Vector4
+            if (fieldType == typeof(System.Numerics.Vector4))
+            {
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                ImGui.SameLine();
+                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(System.Numerics.Vector4*)fieldAddress).ToString() });
+                continue;
+            }
+            if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector4))
+            {
+                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                ImGui.SameLine();
+                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with
+                {
+                    Title = (*(FFXIVClientStructs.FFXIV.Common.Math.Vector4*)fieldAddress).ToString()
                 });
                 continue;
             }
