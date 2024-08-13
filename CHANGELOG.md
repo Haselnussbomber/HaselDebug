@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.4.0] (2024-07-14)
+
+- **Added:** Instances and Agents are now pinnable.  
+  Right-clicking the TreeNode of an Instance or Agent gives an option to pin it to the sidebar. Agents must implement their own struct (AgentInterface is not pinnable).
+- **Added:** TreeNodes for Vector2, Vector3 and Vector4 fields now show the coordinates instead of type name.
+- **Added:** An Addon tab to search through texts from the Addon sheet (currently just playing around with it).
+- **Added:** A new SeString Inspector window (used in the Addon and Chat tab for now).
+- **Added:** SeString expressions now have a name, if known.
+- **Added:** Agents are now searchable (just the agents name).
+- **Added:** Instances are now searchable (just the type name).
+
 ## [1.3.0] (2024-07-11)
 
 - **Added:** A new configuration window was added.  
@@ -42,7 +53,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.3.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.0...main
+[1.4.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.1.1...v1.2.0
