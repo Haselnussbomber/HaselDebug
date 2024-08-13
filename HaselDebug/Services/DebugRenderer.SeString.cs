@@ -78,6 +78,8 @@ public unsafe partial class DebugRenderer
         // { MacroCode.LevelPos, [] },
     };
 
+    private const LinkMacroPayloadType DalamudLinkType = (LinkMacroPayloadType)Payload.EmbeddedInfoType.DalamudLink - 1;
+
     private readonly Dictionary<LinkMacroPayloadType, string[]> LinkExpressionNames = new()
     {
         { LinkMacroPayloadType.Character, ["Flags", "WorldId"] },
@@ -90,7 +92,7 @@ public unsafe partial class DebugRenderer
         { LinkMacroPayloadType.Status, ["StatusId"] },
         { LinkMacroPayloadType.PartyFinder, ["ListingId", string.Empty, "WorldId"] },
         { LinkMacroPayloadType.AkatsukiNote, ["AkatsukiNoteId"] },
-        { (LinkMacroPayloadType)Payload.EmbeddedInfoType.DalamudLink, ["PluginName", "CommandId"] }
+        { DalamudLinkType, ["CommandId", "Extra1", "Extra2", "ExtraString"] }
     };
 
     public void DrawUtf8String(nint address, NodeOptions nodeOptions)
@@ -283,11 +285,16 @@ public unsafe partial class DebugRenderer
             ImGui.SameLine();
             DrawCopyableText($"0x{u32:X}");
 
-            if (macroCode == MacroCode.Link && idx == 0 && Enum.GetName((LinkMacroPayloadType)u32) != null)
+            if (macroCode == MacroCode.Link && idx == 0)
             {
-                ImGui.SameLine();
-                ImGui.TextUnformatted(((LinkMacroPayloadType)u32).ToString());
+                var name = linkType == DalamudLinkType ? "Dalamud" : Enum.GetName((LinkMacroPayloadType)u32);
+                if (!string.IsNullOrEmpty(name))
+                {
+                    ImGui.SameLine();
+                    ImGui.TextUnformatted(name);
+                }
             }
+
 
             // TODO: clickable link to open row in new window :O
 
@@ -352,11 +359,11 @@ public unsafe partial class DebugRenderer
         if (macroCode == MacroCode.Switch)
             return $"Case {idx - 1}";
 
-        if (macroCode == MacroCode.Link && idx == 4)
-            return "Copy String";
-
         if (macroCode == MacroCode.Link && linkType != null && LinkExpressionNames.TryGetValue((LinkMacroPayloadType)linkType, out var linkNames) && idx - 1 < linkNames.Length)
             return linkNames[idx - 1];
+
+        if (macroCode == MacroCode.Link && idx == 4)
+            return "Copy String";
 
         return string.Empty;
     }
