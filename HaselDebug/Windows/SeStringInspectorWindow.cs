@@ -30,6 +30,9 @@ public class SeStringInspectorWindow(
         };
 
         SizeCondition = ImGuiCond.Appearing;
+
+        Flags |= ImGuiWindowFlags.NoSavedSettings;
+
         RespectCloseHotkey = true;
         DisableWindowSounds = true;
     }

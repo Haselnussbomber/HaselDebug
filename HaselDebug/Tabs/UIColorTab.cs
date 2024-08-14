@@ -15,8 +15,9 @@ public unsafe class UIColorTab(ExcelService ExcelService, TextService TextServic
 
     public override void Draw()
     {
-        using var table = ImRaii.Table("UIColorTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("UIColorTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
+
         ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 30);
         ImGui.TableSetupColumn(TextService.GetAddonText(4232)); // Dark
         ImGui.TableSetupColumn(TextService.GetAddonText(4233)); // Light

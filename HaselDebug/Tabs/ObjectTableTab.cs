@@ -27,7 +27,7 @@ public unsafe class ObjectTableTab(
     public override bool DrawInChild => false;
     public override void Draw()
     {
-        using var table = ImRaii.Table("ObjectTable", 5, ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable);
+        using var table = ImRaii.Table("ObjectTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 30);

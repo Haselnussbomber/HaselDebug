@@ -168,7 +168,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
         if (!treenode)
             return;
 
-        using var table = ImRaii.Table($"EventObjectsTable_{(nint)eventHandler:X}", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+        using var table = ImRaii.Table($"EventObjectsTable_{(nint)eventHandler:X}", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
         if (!table)
             return;
 
@@ -204,7 +204,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
         if (!treenode)
             return;
 
-        using var table = ImRaii.Table($"CustomTalkTextsTable_{(nint)eventHandler:X}", 3, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(-1, 500));
+        using var table = ImRaii.Table($"CustomTalkTextsTable_{(nint)eventHandler:X}", 3, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new Vector2(-1, 500));
         if (!table)
             return;
 

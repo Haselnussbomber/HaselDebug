@@ -14,7 +14,7 @@ public class AetherytesTab(IAetheryteList AetheryteList, TextService TextService
     public override bool DrawInChild => false;
     public override void Draw()
     {
-        using var table = ImRaii.Table("##AetheryteListTable", 8, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("AetheryteListTable", 8, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("ID", ImGuiTableColumnFlags.WidthFixed, 50);

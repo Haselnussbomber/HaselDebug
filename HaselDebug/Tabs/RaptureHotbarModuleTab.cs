@@ -48,7 +48,7 @@ public unsafe class RaptureHotbarModuleTab(DebugRenderer DebugRenderer, ExcelSer
                 continue;
             titleColor?.Dispose();
 
-            using var table = ImRaii.Table("RaptureHotbarModuleTable", 5, ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+            using var table = ImRaii.Table("RaptureHotbarModuleTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
             if (!table) return;
 
             ImGui.TableSetupColumn("Slot", ImGuiTableColumnFlags.WidthFixed, 60);

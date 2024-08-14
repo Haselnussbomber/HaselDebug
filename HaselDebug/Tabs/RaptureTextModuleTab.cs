@@ -48,7 +48,7 @@ public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelServi
         using var tab = ImRaii.TabItem("GlobalParameters");
         if (!tab) return;
 
-        using var table = ImRaii.Table("GlobalParametersTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("GlobalParametersTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 40);
@@ -166,7 +166,7 @@ public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelServi
         using var tab = ImRaii.TabItem("Definitions");
         if (!tab) return;
 
-        using var table = ImRaii.Table("DefinitionsTable", 13, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("DefinitionsTable", 13, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Code", ImGuiTableColumnFlags.WidthFixed, 200);
@@ -234,7 +234,7 @@ public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelServi
 
         ImGui.TextUnformatted(raptureTextModule->MacroEncoder.EncoderError.ToString()); // TODO: EncoderError doesn't clear
 
-        using var table = ImRaii.Table("StringMakerTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("StringMakerTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed, 100);

@@ -40,7 +40,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
             return;
         }
 
-        using var table = ImRaii.Table("TitlesTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("TitlesTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);

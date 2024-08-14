@@ -13,7 +13,7 @@ public unsafe class AgentMapEventMarkersTab(ITextureProvider TextureProvider) : 
     {
         var agent = AgentMap.Instance();
 
-        using var table = ImRaii.Table("AgentMapEventMarkersTable", 6, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("AgentMapEventMarkersTable", 6, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 100);

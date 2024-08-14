@@ -33,7 +33,7 @@ public unsafe partial class DebugRenderer
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
         using var indent = ImRaii.PushIndent(1, nodeOptions.Indent);
-        using var table = ImRaii.Table(nodeOptions.GetKey("StdVectorTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+        using var table = ImRaii.Table(nodeOptions.GetKey("StdVectorTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);

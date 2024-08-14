@@ -14,7 +14,7 @@ public unsafe class SatisfactionSupplyTab(ExcelService ExcelService, TextService
     {
         var satisfactionSupply = SatisfactionSupplyManager.Instance();
 
-        using var table = ImRaii.Table("SatisfactionSupply", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("SatisfactionSupply", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);

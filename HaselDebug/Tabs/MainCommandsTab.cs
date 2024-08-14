@@ -20,7 +20,7 @@ public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService Ex
     {
         var agentHud = AgentHUD.Instance();
 
-        using var table = ImRaii.Table("MainCommandsTable", 2, ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("MainCommandsTable", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table.Success) return;
 
         ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 40);

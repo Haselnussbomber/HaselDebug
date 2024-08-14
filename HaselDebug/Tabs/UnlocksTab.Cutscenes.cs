@@ -18,7 +18,7 @@ public unsafe partial class UnlocksTab
         using var tab = ImRaii.TabItem("Cutscenes");
         if (!tab) return;
 
-        using var table = ImRaii.Table("CutsceneTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("CutsceneTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);

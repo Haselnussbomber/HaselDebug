@@ -31,7 +31,7 @@ public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelServi
 
         ImGui.TextUnformatted($"{count} Message");
 
-        using var table = ImRaii.Table("ChatTabTable", 5, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("ChatTabTable", 5, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table)
             return;
 

@@ -48,7 +48,7 @@ public unsafe class InventoryTab(DebugRenderer DebugRenderer, TextService TextSe
 
     private void DrawInventoryTypeList()
     {
-        using var table = ImRaii.Table("InventoryTypeTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY, new Vector2(300, -1));
+        using var table = ImRaii.Table("InventoryTypeTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new Vector2(300, -1));
         if (!table) return;
 
         ImGui.TableSetupColumn("Type");
@@ -98,7 +98,7 @@ public unsafe class InventoryTab(DebugRenderer DebugRenderer, TextService TextSe
         var container = InventoryManager.Instance()->GetInventoryContainer(inventoryType);
         using var disabled = ImRaii.Disabled(container->Loaded == 0);
 
-        using var itemTable = ImRaii.Table("InventoryItemTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY);
+        using var itemTable = ImRaii.Table("InventoryItemTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!itemTable) return;
         ImGui.TableSetupColumn("Slot", ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupColumn("ItemId", ImGuiTableColumnFlags.WidthFixed, 70);

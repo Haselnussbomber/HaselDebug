@@ -50,7 +50,7 @@ public unsafe class AddonTab : DebugTab
 
         using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
-        using var table = ImRaii.Table("AddonTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("AddonTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);

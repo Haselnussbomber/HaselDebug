@@ -48,7 +48,7 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
-        using var table = ImRaii.Table(nodeOptions.GetKey("FixedSizeArrayTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+        using var table = ImRaii.Table(nodeOptions.GetKey("FixedSizeArrayTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);

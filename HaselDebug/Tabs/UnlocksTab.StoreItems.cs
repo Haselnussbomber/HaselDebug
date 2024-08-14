@@ -54,7 +54,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         }
 
         // i really need to make a sortable, searchable table soon
-        using var table = ImRaii.Table("StoreItemsTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable);
+        using var table = ImRaii.Table("StoreItemsTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Item Id", ImGuiTableColumnFlags.WidthFixed, 40);

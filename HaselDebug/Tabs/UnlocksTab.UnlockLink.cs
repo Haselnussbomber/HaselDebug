@@ -20,7 +20,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         using var tab = ImRaii.TabItem("Unlock Links");
         if (!tab) return;
 
-        using var table = ImRaii.Table("UnlockLinksTable", 3, ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("UnlockLinksTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 40);

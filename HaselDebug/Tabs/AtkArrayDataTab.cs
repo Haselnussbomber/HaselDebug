@@ -67,7 +67,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
 
     private void DrawArrayList(Type? arrayType, int arrayCount, short* arrayKeys, AtkArrayData** arrays, ref int selectedIndex)
     {
-        using var table = ImRaii.Table("ArkArrayTable", 3, ImGuiTableFlags.ScrollY | ImGuiTableFlags.Borders, new Vector2(300, -1));
+        using var table = ImRaii.Table("ArkArrayTable", 3, ImGuiTableFlags.ScrollY | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings, new Vector2(300, -1));
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 30);
@@ -206,7 +206,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
         var array = atkArrayDataHolder.NumberArrays[selectedNumberArray];
         DrawArrayHeader(numberType, "Number", selectedNumberArray, (AtkArrayData*)array);
 
-        using var table = ImRaii.Table("NumberArrayDataTable", 7, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders);
+        using var table = ImRaii.Table("NumberArrayDataTable", 7, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
@@ -286,7 +286,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
         ImGui.SameLine();
         ImGui.Checkbox("Show macro string##RenderStringsCheckbox", ref showMacroString);
 
-        using var table = ImRaii.Table("StringArrayDataTable", 4, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders);
+        using var table = ImRaii.Table("StringArrayDataTable", 4, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
@@ -376,7 +376,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
         DrawArrayHeader(null, "Extend", selectedExtendArray, (AtkArrayData*)array);
         ImGui.Checkbox("Hide unset entries##HideUnsetExtendArrayEntriesCheckbox", ref hideUnsetExtendArrayEntries);
 
-        using var table = ImRaii.Table("ExtendArrayDataTable", 3, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders);
+        using var table = ImRaii.Table("ExtendArrayDataTable", 3, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);

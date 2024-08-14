@@ -16,7 +16,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         using var tab = ImRaii.TabItem("Sightseeing Log");
         if (!tab) return;
 
-        using var table = ImRaii.Table("AdventureTabTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("AdventureTabTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);

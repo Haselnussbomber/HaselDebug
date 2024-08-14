@@ -16,7 +16,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
 
         var agentEmote = AgentEmote.Instance();
 
-        using var table = ImRaii.Table("EmotesTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("EmotesTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);

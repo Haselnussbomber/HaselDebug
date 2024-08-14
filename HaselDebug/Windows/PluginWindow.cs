@@ -84,7 +84,7 @@ public class PluginWindow : SimpleWindow
     private void DrawSidebar()
     {
         var scale = ImGui.GetIO().FontGlobalScale;
-        using var child = ImRaii.Child("Sidebar", new Vector2(SidebarWidth * scale, -1), true);
+        using var child = ImRaii.Child("Sidebar", new Vector2(SidebarWidth * scale, -1), true, ImGuiWindowFlags.NoSavedSettings);
         if (!child || !child.Success)
             return;
 

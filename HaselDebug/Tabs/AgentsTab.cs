@@ -51,7 +51,7 @@ public unsafe class AgentsTab(
         var hasSearchTerm = !string.IsNullOrWhiteSpace(AgentNameSearchTerm);
         var hasSearchTermAutoSelected = false;
 
-        using var table = ImRaii.Table("AgentsTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY, new Vector2(300, -1));
+        using var table = ImRaii.Table("AgentsTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new Vector2(300, -1));
         if (!table) return;
 
         ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 40);

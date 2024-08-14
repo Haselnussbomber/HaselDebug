@@ -143,14 +143,15 @@ public unsafe partial class DebugRenderer
             }
 
             var collectionType = propInfo.PropertyType.GenericTypeArguments[0];
+            var propNodeOptions = nodeOptions.WithAddress(collectionType.Name.GetHashCode());
+
             using var colTitleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
-            using var colNode = ImRaii.TreeNode($"{count} Value{(count != 1 ? "s" : "")}##LazyCollectionNode{nodeOptions.AddressPath.With(collectionType.Name.GetHashCode())}", nodeOptions.GetTreeNodeFlags());
+            using var colNode = ImRaii.TreeNode($"{count} Value{(count != 1 ? "s" : "")}{propNodeOptions.GetKey("LazyCollectionNode")}", nodeOptions.GetTreeNodeFlags());
             if (!colNode) return;
             colTitleColor?.Dispose();
 
-            using var table = ImRaii.Table($"LazyCollectionTable{nodeOptions.AddressPath.With(collectionType.Name.GetHashCode())}", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
-            if (!table)
-                return;
+            using var table = ImRaii.Table(propNodeOptions.GetKey("LazyCollectionTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
+            if (!table) return;
 
             ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
             ImGui.TableSetupColumn("Value");

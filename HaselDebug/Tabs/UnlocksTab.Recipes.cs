@@ -20,7 +20,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         using var tab = ImRaii.TabItem("Recipes");
         if (!tab) return;
 
-        using var table = ImRaii.Table("RecipesTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("RecipesTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         Recipes ??= ExcelService.GetSheet<Recipe>().Where(row => row.ItemResult.Row != 0).ToArray();
