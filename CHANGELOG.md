@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1] (2024-07-16)
+
+- **Changed:** Field names are now copyable.
+- **Changed:** TreeNodes are now disabled when the struct doesn't have any fields.
+- **Changed:** TreeNodes, tables and SeString Inspector windows no longer save ImGui settings (they kinda spammed the config).
+- **Other:** TextDecoder was updated to use Luminas SeStringBuilder instead of Utf8Strings. I noticed some names include payloads, which I want to preserve. The TextDecoder tab though extracts the text now, so no payloads are visible there.
+
 ## [1.4.0] (2024-07-14)
 
 - **Added:** Instances and Agents are now pinnable.  
@@ -53,7 +60,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.1...main
+[1.4.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.2.0...v1.2.1
