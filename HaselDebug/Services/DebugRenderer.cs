@@ -202,23 +202,26 @@ public unsafe partial class DebugRenderer(
     {
         nodeOptions = nodeOptions.WithAddress(address);
 
-        using var node = DrawTreeNode(nodeOptions.WithSeStringTitleIfNull(type.FullName ?? "Unknown Type Name"));
-        if (!node) return;
-
-        nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
-
         var fields = type
             .GetFields(BindingFlags.Default | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
             .Where(fieldInfo => !fieldInfo.IsLiteral) // no constants
-            .Where(fieldInfo => !fieldInfo.IsStatic)
+            .Where(fieldInfo => !fieldInfo.IsStatic);
+
+        using var disabled = ImRaii.Disabled(fields.Count() == 0);
+        using var node = DrawTreeNode(nodeOptions.WithSeStringTitleIfNull(type.FullName ?? "Unknown Type Name"));
+        if (!node) return;
+
+        var processedFields = fields
             .OrderBy(fieldInfo => fieldInfo.GetFieldOffset())
             .Select(fieldInfo => (
                 Info: fieldInfo,
                 Offset: fieldInfo.GetFieldOffset(),
                 Size: fieldInfo.IsFixed() ? fieldInfo.GetFixedType().SizeOf() * fieldInfo.GetFixedSize() : fieldInfo.FieldType.SizeOf()));
 
+        nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
+
         var i = 0;
-        foreach (var (fieldInfo, offset, size) in fields)
+        foreach (var (fieldInfo, offset, size) in processedFields)
         {
             i++;
             DrawCopyableText($"[0x{offset:X}]", $"{address + offset:X}", textColor: Colors.Grey3);
