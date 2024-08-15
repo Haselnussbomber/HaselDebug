@@ -255,7 +255,7 @@ public unsafe partial class DebugRenderer(
             // delegate*
             if (fieldType.IsFunctionPointer || fieldType.IsUnmanagedFunctionPointer)
             {
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawAddress(*(nint*)fieldAddress);
                 continue;
@@ -266,7 +266,7 @@ public unsafe partial class DebugRenderer(
                 && fieldInfo.GetCustomAttribute<FixedSizeArrayAttribute>() is FixedSizeArrayAttribute fixedSizeArrayAttribute
                 && fieldType.GetCustomAttribute<InlineArrayAttribute>() is InlineArrayAttribute inlineArrayAttribute)
             {
-                ImGui.TextColored(ColorFieldName, $"{fieldInfo.Name[1..].FirstCharToUpper()}");
+                DrawCopyableText(fieldInfo.Name[1..].FirstCharToUpper(), textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawFixedSizeArray(fieldAddress, fieldType, fixedSizeArrayAttribute.IsString, fieldNodeOptions);
                 continue;
@@ -283,7 +283,7 @@ public unsafe partial class DebugRenderer(
                     continue;
                 }
 
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawStdVector(fieldAddress, underlyingType, fieldNodeOptions);
                 continue;
@@ -300,7 +300,7 @@ public unsafe partial class DebugRenderer(
                     continue;
                 }
 
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawStdDeque(fieldAddress, underlyingType, fieldNodeOptions);
                 continue;
@@ -317,7 +317,7 @@ public unsafe partial class DebugRenderer(
                     continue;
                 }
 
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawStdList(fieldAddress, underlyingType, fieldNodeOptions);
                 continue;
@@ -326,7 +326,7 @@ public unsafe partial class DebugRenderer(
             // AtkUnitBase.AtkValues
             if ((type == typeof(AtkUnitBase) || type.GetCustomAttribute<InheritsAttribute<AtkUnitBase>>() != null) && fieldType == typeof(AtkValue*) && fieldInfo.Name == "AtkValues")
             {
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawAtkValues(*(AtkValue**)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, fieldNodeOptions);
                 continue;
@@ -335,7 +335,7 @@ public unsafe partial class DebugRenderer(
             // byte* that are strings
             if (fieldType.IsPointer && KnownStringPointers.TryGetValue(type, out var fieldNames) && fieldNames.Contains(fieldInfo.Name))
             {
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawSeString(*(byte**)fieldAddress, fieldNodeOptions);
                 continue;
@@ -344,14 +344,14 @@ public unsafe partial class DebugRenderer(
             // Vector2
             if (fieldType == typeof(System.Numerics.Vector2))
             {
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(System.Numerics.Vector2*)fieldAddress).ToString() });
                 continue;
             }
             if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector2))
             {
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with
                 {
@@ -363,14 +363,14 @@ public unsafe partial class DebugRenderer(
             // Vector3
             if (fieldType == typeof(System.Numerics.Vector3))
             {
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(System.Numerics.Vector3*)fieldAddress).ToString() });
                 continue;
             }
             if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector3))
             {
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with
                 {
@@ -382,14 +382,14 @@ public unsafe partial class DebugRenderer(
             // Vector4
             if (fieldType == typeof(System.Numerics.Vector4))
             {
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(System.Numerics.Vector4*)fieldAddress).ToString() });
                 continue;
             }
             if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector4))
             {
-                ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with
                 {
@@ -398,10 +398,9 @@ public unsafe partial class DebugRenderer(
                 continue;
             }
 
-            // TODO: vector preview
             // TODO: enum values table
 
-            ImGui.TextColored(ColorFieldName, fieldInfo.Name);
+            DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
             ImGui.SameLine();
 
             if (fieldType == typeof(uint) && fieldInfo.Name == "IconId")
