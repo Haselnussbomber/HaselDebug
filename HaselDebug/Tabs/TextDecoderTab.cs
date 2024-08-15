@@ -3,13 +3,13 @@ using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using HaselCommon.Extensions;
-using HaselCommon.Utils;
+using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class TextDecoderTab : DebugTab
+public class TextDecoderTab : DebugTab
 {
     private readonly string[] SheetNames = [
         "BeastTribe",
@@ -118,7 +118,7 @@ public unsafe class TextDecoderTab : DebugTab
             for (var @case = 1; @case < 6; @case++)
             {
                 ImGui.TableNextColumn();
-                var text = TextDecoder.ProcessNoun(language, sheetName, person, RowId, Amount, @case);
+                var text = TextDecoder.ProcessNoun(language, sheetName, person, RowId, Amount, @case).ExtractText();
 
                 if (EnableTitleCase)
                     text = CultureInfo.TextInfo.ToTitleCase(text);
