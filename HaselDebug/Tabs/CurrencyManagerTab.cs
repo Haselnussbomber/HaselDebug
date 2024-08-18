@@ -14,7 +14,7 @@ namespace HaselDebug.Tabs;
 
 public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextService TextService) : DebugTab
 {
-    public override string GetTitle() => "CurrencyManager";
+    public override string Title => "CurrencyManager";
 
     public override void Draw()
     {

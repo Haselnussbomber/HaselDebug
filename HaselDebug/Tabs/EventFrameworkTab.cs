@@ -16,7 +16,7 @@ namespace HaselDebug.Tabs;
 
 public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService TextService) : DebugTab
 {
-    public override string GetTitle() => "EventFramework";
+    public override string Title => "EventFramework";
     public override bool DrawInChild => false;
 
     public override void Draw()

@@ -5,7 +5,7 @@ namespace HaselDebug.Abstracts;
 public abstract partial class DebugTab : IDebugTab
 {
     private string? _title = null;
-    public virtual string GetTitle() => _title ??= NameRegex().Replace(TabRegex().Replace(GetType().Name, ""), "$1 $2");
+    public virtual string Title => _title ??= NameRegex().Replace(TabRegex().Replace(GetType().Name, ""), "$1 $2");
     public virtual bool DrawInChild => true;
     public virtual string InternalName => GetType().Name;
 
@@ -19,6 +19,6 @@ public abstract partial class DebugTab : IDebugTab
 
     public bool Equals(IDebugTab? other)
     {
-        return other?.GetTitle() == _title;
+        return other?.Title == _title;
     }
 }

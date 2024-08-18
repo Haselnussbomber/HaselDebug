@@ -1,6 +1,3 @@
 namespace HaselDebug.Abstracts;
 
-public interface IDebugTab : IDrawableTab
-{
-    string GetTitle();
-}
+public interface IDebugTab : IDrawableTab;

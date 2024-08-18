@@ -52,12 +52,8 @@ public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelServi
                 if (i >= count)
                     return;
 
-                if (i >= 0 && raptureLogModule->GetLogMessageDetail(i + start, out var sender, out var message, out var logInfo, out var time))
+                if (i >= 0 && raptureLogModule->GetLogMessageDetail(i + start, out var sender, out var message, out var logKind, out var casterKind, out var targetKind, out var time))
                 {
-                    var logKind = logInfo & 0x7F;
-                    var caster = ((logInfo >> 11) & 0xF) - 1;
-                    var target = ((logInfo >> 7) & 0xF) - 1;
-
                     ImGui.TableNextRow();
 
                     ImGui.TableNextColumn(); // Timestamp
@@ -67,10 +63,10 @@ public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelServi
                     ImGui.TextUnformatted(logKind.ToString());
 
                     ImGui.TableNextColumn(); // Caster
-                    ImGui.TextUnformatted(GetLabel(caster));
+                    ImGui.TextUnformatted(GetLabel(casterKind));
 
                     ImGui.TableNextColumn(); // Target
-                    ImGui.TextUnformatted(GetLabel(target));
+                    ImGui.TextUnformatted(GetLabel(targetKind));
 
                     ImGui.TableNextColumn(); // Formatted Message
                     var senderEvaluated = SeStringEvaluator.Evaluate(sender);

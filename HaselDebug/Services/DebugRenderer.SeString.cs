@@ -170,7 +170,7 @@ public unsafe partial class DebugRenderer
             {
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Label = "Copy text",
+                    Label = TextService.Translate("ContextMenu.CopyText"),
                     ClickCallback = () => ImGui.SetClipboardText(text)
                 });
             });

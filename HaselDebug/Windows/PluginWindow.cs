@@ -19,6 +19,7 @@ public class PluginWindow : SimpleWindow
     private readonly IDebugTab[] Tabs;
 
     private readonly PluginConfig PluginConfig;
+    private readonly TextService TextService;
     private readonly PinnedInstancesService PinnedInstances;
     private readonly ImGuiContextMenuService ImGuiContextMenu;
     private IDrawableTab? SelectedTab;
@@ -34,6 +35,7 @@ public class PluginWindow : SimpleWindow
         : base(windowManager, "HaselDebug")
     {
         PluginConfig = pluginConfig;
+        TextService = textService;
         PinnedInstances = pinnedInstances;
         ImGuiContextMenu = imGuiContextMenuService;
 
@@ -44,7 +46,7 @@ public class PluginWindow : SimpleWindow
             MaximumSize = new Vector2(4096, 2160)
         };
 
-        SizeCondition = ImGuiCond.FirstUseEver;
+        SizeCondition = ImGuiCond.Always;
         RespectCloseHotkey = false;
         DisableWindowSounds = true;
 
@@ -60,7 +62,7 @@ public class PluginWindow : SimpleWindow
             Click = (button) => configWindow.Toggle()
         });
 
-        Tabs = [.. tabs.OrderBy(t => t.GetTitle())];
+        Tabs = [.. tabs.OrderBy(t => t.Title)];
 
         SelectedTab = PinnedInstances.FirstOrDefault(tab => tab.InternalName == pluginConfig.LastSelectedTab)
             ?? (IDrawableTab?)Tabs.FirstOrDefault(tab => tab.InternalName == pluginConfig.LastSelectedTab);
@@ -109,7 +111,13 @@ public class PluginWindow : SimpleWindow
                 {
                     builder.Add(new ImGuiContextMenuEntry()
                     {
-                        Label = "Unpin",
+                        Label = TextService.Translate("ContextMenu.TabPopout"),
+                        ClickCallback = () => WindowManager.CreateOrOpen(tab.InternalName, (wm, _) => new TabPopoutWindow(wm, tab))
+                    });
+
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
+                        Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
                         ClickCallback = () => removeTab = tab
                     });
                 });
@@ -137,12 +145,21 @@ public class PluginWindow : SimpleWindow
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
 
-            if (ImGui.Selectable($"{tab.GetTitle()}##Selectable_{tab.InternalName}", SelectedTab == tab))
+            if (ImGui.Selectable($"{tab.Title}##Selectable_{tab.InternalName}", SelectedTab == tab))
             {
                 SelectedTab = SelectedTab != tab ? tab : null;
                 PluginConfig.LastSelectedTab = SelectedTab != null ? tab.InternalName : string.Empty;
                 PluginConfig.Save();
             }
+
+            ImGuiContextMenu.Draw($"{tab.InternalName}ContextMenu", builder =>
+            {
+                builder.Add(new ImGuiContextMenuEntry()
+                {
+                    Label = TextService.Translate("ContextMenu.TabPopout"),
+                    ClickCallback = () => WindowManager.CreateOrOpen(tab.InternalName, (wm, _) => new TabPopoutWindow(wm, tab))
+                });
+            });
         }
     }
 

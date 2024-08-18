@@ -11,6 +11,7 @@ using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
+using HaselDebug.Windows;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
@@ -19,7 +20,8 @@ public unsafe class AgentsTab(
     TextService TextService,
     DebugRenderer DebugRenderer,
     ImGuiContextMenuService ImGuiContextMenu,
-    PinnedInstancesService PinnedInstances) : DebugTab
+    PinnedInstancesService PinnedInstances,
+    WindowManager WindowManager) : DebugTab
 {
     private ImmutableSortedDictionary<AgentId, (Pointer<AgentInterface> Address, Type Type)>? Agents;
     private AgentId SelectedAgentId = AgentId.Lobby;
@@ -127,15 +129,21 @@ public unsafe class AgentsTab(
 
                     builder.Add(new ImGuiContextMenuEntry()
                     {
+                        Label = TextService.Translate("ContextMenu.TabPopout"),
+                        ClickCallback = () => WindowManager.CreateOrOpen(agentType.FullName!, (wm, _) => new TabPopoutWindow(wm, new PinnedInstanceTab(DebugRenderer, (nint)agent, agentType)))
+                    });
+
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
                         Visible = !isPinned,
-                        Label = TextService.Translate("PinnedInstances.Pin"),
+                        Label = TextService.Translate("ContextMenu.PinnedInstances.Pin"),
                         ClickCallback = () => PinnedInstances.Add((nint)agent, agentType)
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()
                     {
                         Visible = isPinned,
-                        Label = TextService.Translate("PinnedInstances.Unpin"),
+                        Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
                         ClickCallback = () => PinnedInstances.Remove(agentType)
                     });
                 });

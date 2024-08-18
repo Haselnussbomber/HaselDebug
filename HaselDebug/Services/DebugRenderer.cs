@@ -28,7 +28,8 @@ public unsafe partial class DebugRenderer(
     WindowManager WindowManager,
     ITextureProvider TextureProvider,
     ImGuiContextMenuService ImGuiContextMenuService,
-    SeStringEvaluatorService SeStringEvaluator)
+    SeStringEvaluatorService SeStringEvaluator,
+    TextService TextService)
 {
     private MethodInfo? GetSheetGeneric;
 

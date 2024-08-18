@@ -10,7 +10,7 @@ namespace HaselDebug.Tabs;
 
 public unsafe class UIColorTab(ExcelService ExcelService, TextService TextService) : DebugTab
 {
-    public override string GetTitle() => "UIColor";
+    public override string Title => "UIColor";
     public override bool DrawInChild => false;
 
     public override void Draw()

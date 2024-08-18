@@ -6,6 +6,7 @@ using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
+using HaselDebug.Windows;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
@@ -13,6 +14,7 @@ namespace HaselDebug.Tabs;
 public class InstancesTab(
     TextService TextService,
     DebugRenderer DebugRenderer,
+    WindowManager WindowManager,
     InstancesService InstancesService,
     PinnedInstancesService PinnedInstances,
     ImGuiContextMenuService ImGuiContextMenu) : DebugTab
@@ -46,15 +48,21 @@ public class InstancesTab(
 
                         builder.Add(new ImGuiContextMenuEntry()
                         {
+                            Label = TextService.Translate("ContextMenu.TabPopout"),
+                            ClickCallback = () => WindowManager.CreateOrOpen(type.FullName!, (wm, _) => new TabPopoutWindow(wm, new PinnedInstanceTab(DebugRenderer, ptr, type)))
+                        });
+
+                        builder.Add(new ImGuiContextMenuEntry()
+                        {
                             Visible = !isPinned,
-                            Label = TextService.Translate("PinnedInstances.Pin"),
+                            Label = TextService.Translate("ContextMenu.PinnedInstances.Pin"),
                             ClickCallback = () => PinnedInstances.Add(ptr, type)
                         });
 
                         builder.Add(new ImGuiContextMenuEntry()
                         {
                             Visible = isPinned,
-                            Label = TextService.Translate("PinnedInstances.Unpin"),
+                            Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
                             ClickCallback = () => PinnedInstances.Remove(type)
                         });
                     });

@@ -27,13 +27,27 @@
     "de": "Suchen..."
   },
 
-  "PinnedInstances.Pin": {
-    "en": "Pin",
-    "de": "Anpinnen"
+  "ContextMenu.CopyText": {
+    "en": "Copy text",
+    "de": "Text kopieren"
   },
-  "PinnedInstances.Unpin": {
-    "en": "Unpin",
-    "de": "Lösen"
+  "ContextMenu.PinnedInstances.Pin": {
+    "en": "Pin instance",
+    "de": "Instanz anpinnen"
+  },
+  "ContextMenu.PinnedInstances.Unpin": {
+    "en": "Unpin instance",
+    "de": "Instanz lösen"
+  },
+  "ContextMenu.TabPopout": {
+    "en": "Open in new window",
+    "de": "In neuem Fenster öffnen"
+  },
+  "ContextMenu.GameObject.DisableDraw": {
+    "en": "Disable draw"
+  },
+  "ContextMenu.GameObject.EnableDraw": {
+    "en": "Enable draw"
   },
 
   "UnlocksTab.CabinetNotLoaded": {

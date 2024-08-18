@@ -22,6 +22,7 @@ public unsafe class ObjectTableTab(
     SeStringEvaluatorService SeStringEvaluator,
     ImGuiContextMenuService ImGuiContextMenuService,
     IGameGui GameGui,
+    TextService TextService,
     ExcelService ExcelService) : DebugTab
 {
     public override bool DrawInChild => false;
@@ -106,13 +107,13 @@ public unsafe class ObjectTableTab(
                             builder.Add(new ImGuiContextMenuEntry()
                             {
                                 Visible = ((byte)gameObject->TargetableStatus & 1 << 7) != 0,
-                                Label = "Disable Draw",
+                                Label = TextService.Translate("ContextMenu.GameObject.DisableDraw"),
                                 ClickCallback = () => gameObject->DisableDraw()
                             });
                             builder.Add(new ImGuiContextMenuEntry()
                             {
                                 Visible = ((byte)gameObject->TargetableStatus & 1 << 7) == 0,
-                                Label = "Enable Draw",
+                                Label = TextService.Translate("ContextMenu.GameObject.EnableDraw"),
                                 ClickCallback = () => gameObject->EnableDraw()
                             });
                         });
