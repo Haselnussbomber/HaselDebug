@@ -46,7 +46,7 @@ public class PluginWindow : SimpleWindow
             MaximumSize = new Vector2(4096, 2160)
         };
 
-        SizeCondition = ImGuiCond.Always;
+        SizeCondition = ImGuiCond.FirstUseEver;
         RespectCloseHotkey = false;
         DisableWindowSounds = true;
 
