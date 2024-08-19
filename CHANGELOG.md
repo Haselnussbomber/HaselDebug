@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.4.2] (2024-07-19)
+
+- **Added:** It's now possible to pop-out tabs (including pinned ones) with a right click -> Open in new window.
+- **Updated:** ClientStructs now at [36a3e4c](https://github.com/aers/FFXIVClientStructs/tree/36a3e4c)
+
 ## [1.4.1] (2024-07-16)
 
 - **Changed:** Field names are now copyable.
@@ -61,6 +66,7 @@ Updated CS for 7.05hf1
 First release! 🥳
 
 [unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.1...main
+[1.4.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.2.1...v1.3.0
