@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** Holding shift while closing a SeString Inspector window will close all SeString Inspector windows.
+- **Fixed:** The context menu to popout a tab was visible even when the window was already open.
+
 ## [1.4.3] (2024-07-19)
 
 - **Changed:** Merged Addon Inspector and Addon Inspector 2 tabs.
