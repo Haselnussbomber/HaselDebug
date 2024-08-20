@@ -58,24 +58,6 @@ public unsafe class AddonTab : DebugTab
         ImGui.TableSetupScrollFreeze(2, 1);
         ImGui.TableHeadersRow();
 
-        /*
-        var sheet = ExdModule.GetSheet<Addon>();
-
-        var imGuiListClipperPtr = new ImGuiListClipperPtr(ImGuiNative.ImGuiListClipper_ImGuiListClipper());
-        imGuiListClipperPtr.Begin(sheet.Count, ImGui.GetTextLineHeightWithSpacing());
-
-        while (imGuiListClipperPtr.Step())
-        {
-            foreach (var row in sheet.Skip(imGuiListClipperPtr.DisplayStart).Take(imGuiListClipperPtr.DisplayEnd - imGuiListClipperPtr.DisplayStart))
-            {
-                DrawRow(row);
-            }
-        }
-
-        imGuiListClipperPtr.End();
-        imGuiListClipperPtr.Destroy();
-        */
-
         ImGuiClip.ClippedDraw(FilteredRows ?? Rows, DrawRow, ImGui.GetTextLineHeightWithSpacing());
     }
 

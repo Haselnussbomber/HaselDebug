@@ -300,7 +300,8 @@ public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer Deb
     {
         //var isVisible = node->NodeFlags.HasFlag(NodeFlags.Visible);
 
-        using var treeNode = DebugRenderer.DrawTreeNode(nodeOptions with {
+        using var treeNode = DebugRenderer.DrawTreeNode(nodeOptions with
+        {
             Title = $"{treePrefix}{node->Type} Node (ptr = {(nint)node:X})",
             TitleColor = Colors.Green
             // TODO: OnHovered = () => DrawOutline(node)
