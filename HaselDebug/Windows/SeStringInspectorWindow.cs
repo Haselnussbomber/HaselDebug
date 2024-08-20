@@ -37,6 +37,14 @@ public class SeStringInspectorWindow(
         DisableWindowSounds = true;
     }
 
+    public override void OnClose()
+    {
+        base.OnClose();
+
+        if (ImGui.IsKeyDown(ImGuiKey.LeftShift))
+            WindowManager.Close<SeStringInspectorWindow>();
+    }
+
     public override void Draw()
     {
         ImGuiHelpers.SeStringWrapped(SeStringEvaluator.Evaluate(SeString.AsSpan()), new SeStringDrawParams()
