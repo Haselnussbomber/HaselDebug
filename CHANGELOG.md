@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.4.3] (2024-07-19)
+
+- **Changed:** Merged Addon Inspector and Addon Inspector 2 tabs.
+- **Fixed:** The `/haseldebug` command didn't auto-register.
+
 ## [1.4.2] (2024-07-19)
 
 - **Added:** It's now possible to pop-out tabs (including pinned ones) with a right click -> Open in new window.
@@ -66,6 +71,7 @@ Updated CS for 7.05hf1
 First release! 🥳
 
 [unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.1...main
+[1.4.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.3.0...v1.4.0
