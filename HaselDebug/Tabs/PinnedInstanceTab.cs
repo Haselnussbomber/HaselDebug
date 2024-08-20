@@ -6,9 +6,9 @@ namespace HaselDebug.Tabs;
 
 public class PinnedInstanceTab(DebugRenderer DebugRenderer, nint address, Type type) : IDrawableTab
 {
-    public nint Address { get; } = address;
-    public Type Type { get; init; } = type;
-    public string Title { get; init; } = type.Name;
+    public nint Address => address;
+    public Type Type => type;
+    public string Title => type.Name;
     public string InternalName => Type.FullName!;
     public bool DrawInChild => true;
 
