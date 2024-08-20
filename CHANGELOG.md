@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.5.0] (2024-07-20)
 
 - **Added:** A LogMessage tab to search through texts from the LogMessage sheet (until a full Excel tab is implemented).
 - **Added:** A language selector to the right of the search bar in the Addon and LogMessage tabs.
@@ -77,7 +77,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.5.0...main
+[1.5.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.3...v1.5.0
 [1.4.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.0...v1.4.1
