@@ -1,5 +1,6 @@
 using Dalamud.Game;
 using HaselCommon.Extensions;
+using HaselCommon.Utils;
 using ImGuiNET;
 using Lumina.Text.ReadOnly;
 
@@ -11,6 +12,7 @@ public record struct NodeOptions
 
     public AddressPath AddressPath { get; set; } = new();
     public string? Title { get; set; } = null;
+    public HaselColor? TitleColor { get; set; } = null;
     public ReadOnlySeString? SeStringTitle { get; set; } = null;
     public bool Indent { get; set; } = true;
     public bool DefaultOpen { get; set; } = false;
@@ -51,6 +53,7 @@ public record struct NodeOptions
         {
             SeStringTitle = null,
             Title = null,
+            TitleColor = null,
             DefaultOpen = false,
             DrawContextMenu = null,
             OnHovered = null,

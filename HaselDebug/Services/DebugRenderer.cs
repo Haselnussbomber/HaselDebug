@@ -164,9 +164,9 @@ public unsafe partial class DebugRenderer(
         ImGui.TextUnformatted("Unsupported Type");
     }
 
-    private ImRaii.IEndObject DrawTreeNode(NodeOptions nodeOptions)
+    public ImRaii.IEndObject DrawTreeNode(NodeOptions nodeOptions)
     {
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)(nodeOptions.TitleColor ?? ColorTreeNode));
         var previewText = string.Empty;
 
         if (!nodeOptions.DrawSeStringTreeNode && nodeOptions.SeStringTitle != null)
@@ -181,7 +181,7 @@ public unsafe partial class DebugRenderer(
         {
             ImGui.SameLine();
 
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode))
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(nodeOptions.TitleColor ?? ColorTreeNode)))
             {
                 ImGuiHelpers.SeStringWrapped(nodeOptions.SeStringTitle.Value.AsSpan(), new()
                 {

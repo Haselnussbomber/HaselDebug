@@ -1,12 +1,18 @@
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Numerics;
+using System.Reflection;
+using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
-using Dalamud.Utility;
+using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Services;
+using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
@@ -15,133 +21,246 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
-// almost the same as in Dalamud :/
-public class AddonInspector(TextService TextService, DebugRenderer DebugRenderer, IGameGui GameGui) : DebugTab
+#pragma warning disable SeStringRenderer
+public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer DebugRenderer) : DebugTab
 {
-    private UiDebug? addonInspector;
+    private ushort SelectedAddonId = 0;
+    private string SelectedAddonName = string.Empty;
+    private bool SortDirty = true;
+    private short SortColumnIndex = 1;
+    private ImGuiSortDirection SortDirection = ImGuiSortDirection.Ascending;
+    private ImmutableSortedDictionary<string, Type>? AddonTypes;
+    private string AddonNameSearchTerm = string.Empty;
+    private bool ShowPicker;
+    private int NodePickerSelectionIndex;
+    private Vector2 LastMousePos;
+
+    public override bool DrawInChild => false;
 
     public override void Draw()
     {
-        addonInspector ??= new UiDebug(TextService, DebugRenderer, GameGui);
-        addonInspector?.Draw();
-    }
-}
+        AddonTypes ??= typeof(Addon).Assembly.GetTypes()
+            .Where(type => type.GetCustomAttribute<Addon>() != null)
+            .SelectMany(type => type.GetCustomAttribute<Addon>()!.AddonIdentifiers, (type, addonName) => (type, addonName))
+            .ToImmutableSortedDictionary(
+                tuple => tuple.addonName,
+                tuple => tuple.type);
 
-#pragma warning disable SeStringRenderer
-internal unsafe class UiDebug
-{
-    private const int UnitListCount = 18;
+        using var hostchild = ImRaii.Child("AddonInspectorTabChild", new Vector2(-1), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
+        if (!hostchild) return;
 
-    private readonly bool[] selectedInList = new bool[UnitListCount];
-    private readonly string[] listNames =
-    [
-        "Depth Layer 1",
-        "Depth Layer 2",
-        "Depth Layer 3",
-        "Depth Layer 4",
-        "Depth Layer 5",
-        "Depth Layer 6",
-        "Depth Layer 7",
-        "Depth Layer 8",
-        "Depth Layer 9",
-        "Depth Layer 10",
-        "Depth Layer 11",
-        "Depth Layer 12",
-        "Depth Layer 13",
-        "Loaded Units",
-        "Focused Units",
-        "Units 16",
-        "Units 17",
-        "Units 18",
-    ];
-
-    private readonly TextService TextService;
-    private readonly DebugRenderer DebugRenderer;
-    private readonly IGameGui GameGui;
-
-    private bool doingSearch;
-    private string searchInput = string.Empty;
-    private AtkUnitBase* selectedUnitBase = null;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UiDebug"/> class.
-    /// </summary>
-    public UiDebug(TextService textService, DebugRenderer debugRenderer, IGameGui gameGui)
-    {
-        TextService = textService;
-        DebugRenderer = debugRenderer;
-        GameGui = gameGui;
+        DrawAddonList();
+        ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+        DrawAddon();
+        DrawNodePicker();
     }
 
-    /// <summary>
-    /// Renders this window.
-    /// </summary>
-    public void Draw()
+    private void DrawAddonList()
     {
-        using (var child = ImRaii.Child("uiDebug_unitBaseSelect", new Vector2(250, -1), true))
+        using var sidebarchild = ImRaii.Child("AddonListChild", new Vector2(300, -1), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
+        if (!sidebarchild) return;
+
+        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - ImGuiUtils.GetIconButtonSize(FontAwesomeIcon.ObjectUngroup).X - ImGui.GetStyle().ItemSpacing.X);
+        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref AddonNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTerm = !string.IsNullOrWhiteSpace(AddonNameSearchTerm);
+        var hasSearchTermAutoSelected = false;
+
+        ImGui.SameLine();
+        if (ImGuiUtils.IconButton("NodeSelectorToggleButton", FontAwesomeIcon.ObjectUngroup, "Pick Addon/Node", active: ShowPicker))
         {
-            ImGui.SetNextItemWidth(-1);
-            ImGui.InputTextWithHint("###atkUnitBaseSearch", TextService.Translate("SearchBar.Hint"), ref searchInput, 0x20, ImGuiInputTextFlags.AutoSelectAll);
-
-            DrawUnitBaseList();
+            ShowPicker = !ShowPicker;
+            NodePickerSelectionIndex = 0;
         }
 
-        if (selectedUnitBase != null)
+        using var table = ImRaii.Table("AddonsTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable | ImGuiTableFlags.NoSavedSettings, new Vector2(-1));
+        if (!table) return;
+
+        ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Name");
+        ImGui.TableSetupScrollFreeze(2, 1);
+        ImGui.TableHeadersRow();
+
+        var raptureAtkUnitManager = RaptureAtkUnitManager.Instance();
+
+        var allUnitsList = new List<Pointer<AtkUnitBase>>();
+        var focusedList = new List<Pointer<AtkUnitBase>>();
+
+        for (var i = 0; i < raptureAtkUnitManager->AllLoadedUnitsList.Count; i++)
         {
-            ImGui.SameLine();
-            using (var child = ImRaii.Child("uiDebug_selectedUnitBase", new Vector2(-1), true))
-                DrawUnitBase(selectedUnitBase);
+            var unitBase = raptureAtkUnitManager->AllLoadedUnitsList.Entries[i].Value;
+            if (unitBase == null)
+                continue;
+
+            if (hasSearchTerm && !unitBase->NameString.Contains(AddonNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
+                continue;
+
+            allUnitsList.Add(unitBase);
         }
+
+        for (var i = 0; i < raptureAtkUnitManager->FocusedUnitsList.Count; i++)
+        {
+            var unitBase = raptureAtkUnitManager->FocusedUnitsList.Entries[i].Value;
+            if (unitBase == null)
+                continue;
+
+            if (hasSearchTerm && !unitBase->NameString.Contains(AddonNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
+                continue;
+
+            focusedList.Add(unitBase);
+        }
+
+        allUnitsList.Sort((a, b) => SortColumnIndex switch
+        {
+            0 when SortDirection == ImGuiSortDirection.Ascending => a.Value->Id - b.Value->Id,
+            0 when SortDirection == ImGuiSortDirection.Descending => b.Value->Id - a.Value->Id,
+            1 when SortDirection == ImGuiSortDirection.Ascending => a.Value->NameString.CompareTo(b.Value->NameString),
+            1 when SortDirection == ImGuiSortDirection.Descending => b.Value->NameString.CompareTo(a.Value->NameString),
+            _ => 0,
+        });
+
+        var bounds = stackalloc FFXIVClientStructs.FFXIV.Common.Math.Bounds[1];
+
+        foreach (AtkUnitBase* unitBase in allUnitsList)
+        {
+            var addonId = unitBase->Id;
+            var addonName = unitBase->NameString;
+
+            if (hasSearchTermChanged && !hasSearchTermAutoSelected)
+            {
+                SelectedAddonId = addonId;
+                SelectedAddonName = addonName;
+                hasSearchTermAutoSelected = true;
+            }
+
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn(); // Id
+            ImGui.TextUnformatted(addonId.ToString());
+
+            ImGui.TableNextColumn(); // Name
+            using (ImRaii.PushColor(ImGuiCol.Text, ImGui.GetColorU32(ImGuiCol.TextDisabled), !unitBase->IsVisible))
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)Colors.Gold, focusedList.Contains(unitBase)))
+            {
+                if (ImGui.Selectable(addonName + $"##Addon_{addonId}_{addonName}", addonId == SelectedAddonId && SelectedAddonName == addonName, ImGuiSelectableFlags.SpanAllColumns))
+                {
+                    SelectedAddonId = addonId;
+                    SelectedAddonName = addonName;
+                }
+            }
+
+            if (ImGui.IsItemHovered() && ImGui.IsKeyDown(ImGuiKey.LeftShift))
+            {
+                unitBase->GetWindowBounds(bounds);
+                var pos = new Vector2(bounds->Pos1.X, bounds->Pos1.Y);
+                var size = new Vector2(bounds->Size.X, bounds->Size.Y);
+
+                ImGui.SetNextWindowPos(pos);
+                ImGui.SetNextWindowSize(size);
+
+                using var windowStyles = ImRaii.PushStyle(ImGuiStyleVar.WindowBorderSize, 1.0f);
+                using var windowColors = Colors.Gold.Push(ImGuiCol.Border)
+                                                    .Push(ImGuiCol.WindowBg, new Vector4(0.847f, 0.733f, 0.49f, 0.33f));
+
+                if (ImGui.Begin("AddonHighligher", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoInputs))
+                {
+                    var drawList = ImGui.GetForegroundDrawList();
+                    var textPos = pos + new Vector2(0, -ImGui.GetTextLineHeight());
+                    drawList.AddText(textPos + Vector2.One, Colors.Black, addonName);
+                    drawList.AddText(textPos, Colors.Gold, addonName);
+                    ImGui.End();
+                }
+            }
+
+            using var contextMenu = ImRaii.ContextPopupItem($"##Addon_{addonId}_{addonName}_Context");
+            if (contextMenu)
+            {
+                if (!string.IsNullOrEmpty(addonName) && ImGui.MenuItem("Copy name"))
+                {
+                    ImGui.SetClipboardText(addonName);
+                }
+
+                if (ImGui.MenuItem("Copy address"))
+                {
+                    ImGui.SetClipboardText($"0x{(nint)unitBase:X}");
+                }
+            }
+        }
+
+        var sortSpecs = ImGui.TableGetSortSpecs();
+        SortDirty |= sortSpecs.SpecsDirty;
+
+        if (!SortDirty)
+            return;
+
+        SortColumnIndex = sortSpecs.Specs.ColumnIndex;
+        SortDirection = sortSpecs.Specs.SortDirection;
+        sortSpecs.SpecsDirty = SortDirty = false;
     }
 
-    private void DrawUnitBase(AtkUnitBase* atkUnitBase)
+    private void DrawAddon()
     {
-        var isVisible = atkUnitBase->IsVisible;
-        var addonName = atkUnitBase->NameString;
-        var agent = GameGui.FindAgentInterface(atkUnitBase); //Service<GameGui>.Get().FindAgentInterface(atkUnitBase);
+        if (string.IsNullOrEmpty(SelectedAddonName))
+            return;
 
-        ImGui.TextUnformatted(addonName);
+        using var hostchild = ImRaii.Child("AddonChild", new Vector2(-1), true, ImGuiWindowFlags.NoSavedSettings);
+
+        if (!AddonTypes!.TryGetValue(SelectedAddonName, out var type))
+            type = typeof(AtkUnitBase);
+
+        var unitBase = RaptureAtkUnitManager.Instance()->GetAddonById(SelectedAddonId);
+        if (unitBase == null)
+        {
+            ImGui.TextUnformatted($"Could not find addon with id {SelectedAddonId}");
+            return;
+        }
+
+        var nodeOptions = new NodeOptions() { AddressPath = new AddressPath((nint)unitBase) };
+
+        var isVisible = unitBase->IsVisible;
+        var addonName = unitBase->NameString;
+        //var agent = 0; // GameGui.FindAgentInterface(atkUnitBase); //Service<GameGui>.Get().FindAgentInterface(atkUnitBase);
+
+        DebugRenderer.DrawCopyableText(addonName);
         ImGui.SameLine();
         using (ImRaii.PushColor(ImGuiCol.Text, isVisible ? 0xFF00FF00 : 0xFF0000FF))
-            ImGui.Text(isVisible ? "Visible" : "Not Visible");
+            ImGui.TextUnformatted(isVisible ? "Visible" : "Not Visible");
 
         ImGui.SameLine(0, 0);
         ImGui.SetCursorPosX(ImGui.GetWindowContentRegionMax().X - ImGui.GetWindowContentRegionMin().X - ImGui.CalcTextSize("V").X);
         if (ImGui.Button("V"))
         {
-            atkUnitBase->IsVisible = !atkUnitBase->IsVisible;
+            unitBase->IsVisible = !unitBase->IsVisible;
         }
 
         ImGui.Separator();
-        ImGuiHelpers.ClickToCopyText($"Address: {(nint)atkUnitBase:X}", $"{(nint)atkUnitBase:X}");
-        ImGuiHelpers.ClickToCopyText($"Agent: {agent:X}", $"{agent:X}");
+        ImGuiHelpers.ClickToCopyText($"Address: {(nint)unitBase:X}", $"{(nint)unitBase:X}");
+        //ImGuiHelpers.ClickToCopyText($"Agent: {agent:X}", $"{agent:X}");
         ImGui.Separator();
 
-        ImGui.TextUnformatted($"Position: [ {atkUnitBase->X} , {atkUnitBase->Y} ]");
-        ImGui.TextUnformatted($"Scale: {atkUnitBase->Scale * 100}%%");
-        ImGui.TextUnformatted($"Widget Count {atkUnitBase->UldManager.ObjectCount}");
+        ImGui.TextUnformatted($"Position: [ {unitBase->X} , {unitBase->Y} ]");
+        ImGui.TextUnformatted($"Scale: {unitBase->Scale * 100}%");
+        ImGui.TextUnformatted($"Widget Count {unitBase->UldManager.ObjectCount}");
 
         ImGui.Separator();
 
-        DebugRenderer.DrawPointerType(atkUnitBase, typeof(AtkUnitBase), new NodeOptions());
+        DebugRenderer.DrawPointerType(unitBase, type, nodeOptions);
 
         ImGui.Dummy(ImGuiHelpers.ScaledVector2(25));
         ImGui.Separator();
-        if (atkUnitBase->RootNode != null)
-            PrintNode(atkUnitBase->RootNode);
+        if (unitBase->RootNode != null)
+            PrintNode(unitBase->RootNode, true, string.Empty, nodeOptions with { DefaultOpen = true });
 
-        if (atkUnitBase->UldManager.NodeListCount > 0)
+        if (unitBase->UldManager.NodeListCount > 0)
         {
             ImGui.Dummy(ImGuiHelpers.ScaledVector2(25));
             ImGui.Separator();
             ImGui.PushStyleColor(ImGuiCol.Text, 0xFFFFAAAA);
-            if (ImGui.TreeNode($"Node List##{(ulong)atkUnitBase:X}"))
+            if (ImGui.TreeNodeEx($"Node List##{(ulong)unitBase:X}", ImGuiTreeNodeFlags.SpanAvailWidth))
             {
                 ImGui.PopStyleColor();
 
-                for (var j = 0; j < atkUnitBase->UldManager.NodeListCount; j++)
+                for (var j = 0; j < unitBase->UldManager.NodeListCount; j++)
                 {
-                    PrintNode(atkUnitBase->UldManager.NodeList[j], false, $"[{j}] ");
+                    PrintNode(unitBase->UldManager.NodeList[j], false, $"[{j}] ", nodeOptions);
                 }
 
                 ImGui.TreePop();
@@ -153,191 +272,177 @@ internal unsafe class UiDebug
         }
     }
 
-    private void PrintNode(AtkResNode* node, bool printSiblings = true, string treePrefix = "")
+    private void PrintNode(AtkResNode* node, bool printSiblings, string treePrefix, NodeOptions nodeOptions)
     {
         if (node == null)
             return;
 
+        nodeOptions = nodeOptions.WithAddress((nint)node);
+
         if ((int)node->Type < 1000)
-            PrintSimpleNode(node, treePrefix);
+            PrintSimpleNode(node, treePrefix, nodeOptions);
         else
-            PrintComponentNode(node, treePrefix);
+            PrintComponentNode(node, treePrefix, nodeOptions);
 
         if (printSiblings)
         {
             var prevNode = node;
             while ((prevNode = prevNode->PrevSiblingNode) != null)
-                PrintNode(prevNode, false, "prev ");
+                PrintNode(prevNode, false, "prev ", nodeOptions);
 
             var nextNode = node;
             while ((nextNode = nextNode->NextSiblingNode) != null)
-                PrintNode(nextNode, false, "next ");
+                PrintNode(nextNode, false, "next ", nodeOptions);
         }
     }
 
-    private void PrintSimpleNode(AtkResNode* node, string treePrefix)
+    private void PrintSimpleNode(AtkResNode* node, string treePrefix, NodeOptions nodeOptions)
     {
-        var popped = false;
-        var isVisible = node->NodeFlags.HasFlag(NodeFlags.Visible);
+        //var isVisible = node->NodeFlags.HasFlag(NodeFlags.Visible);
 
-        if (isVisible)
-            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 255, 0, 255));
+        using var treeNode = DebugRenderer.DrawTreeNode(nodeOptions with {
+            Title = $"{treePrefix}{node->Type} Node (ptr = {(nint)node:X})",
+            TitleColor = Colors.Green
+            // TODO: OnHovered = () => DrawOutline(node)
+        });
 
-        if (ImGui.TreeNode($"{treePrefix}{node->Type} Node (ptr = {(long)node:X})###{(long)node}"))
+        nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
+
+        if (!treeNode) return;
+
+        ImGui.TextUnformatted("Node: ");
+        ImGui.SameLine();
+        DebugRenderer.DrawAddress(node);
+        ImGui.SameLine();
+        var nodeType = node->Type switch
         {
-            if (ImGui.IsItemHovered())
-                DrawOutline(node);
+            NodeType.Text => typeof(AtkTextNode),
+            NodeType.Image => typeof(AtkImageNode),
+            NodeType.Collision => typeof(AtkCollisionNode),
+            NodeType.NineGrid => typeof(AtkNineGridNode),
+            NodeType.ClippingMask => typeof(AtkClippingMaskNode),
+            NodeType.Counter => typeof(AtkCounterNode),
+            _ => typeof(AtkResNode)
+        };
+        DebugRenderer.DrawPointerType((nint)node, nodeType, nodeOptions);
 
-            if (isVisible)
-            {
-                ImGui.PopStyleColor();
-                popped = true;
-            }
+        PrintResNode(node);
 
-            ImGui.TextUnformatted("Node: ");
-            ImGui.SameLine();
-            ImGuiHelpers.ClickToCopyText($"{(ulong)node:X}");
-            ImGui.SameLine();
-            switch (node->Type)
-            {
-                case NodeType.Text: Util.ShowStruct(*(AtkTextNode*)node, (ulong)node); break;
-                case NodeType.Image: Util.ShowStruct(*(AtkImageNode*)node, (ulong)node); break;
-                case NodeType.Collision: Util.ShowStruct(*(AtkCollisionNode*)node, (ulong)node); break;
-                case NodeType.NineGrid: Util.ShowStruct(*(AtkNineGridNode*)node, (ulong)node); break;
-                case NodeType.ClippingMask: Util.ShowStruct(*(AtkClippingMaskNode*)node, (ulong)node); break;
-                case NodeType.Counter: Util.ShowStruct(*(AtkCounterNode*)node, (ulong)node); break;
-                default: Util.ShowStruct(*node, (ulong)node); break;
-            }
+        if (node->ChildNode != null)
+            PrintNode(node->ChildNode, true, string.Empty, nodeOptions);
 
-            PrintResNode(node);
+        switch (node->Type)
+        {
+            case NodeType.Text:
+                var textNode = (AtkTextNode*)node;
+                ImGui.TextUnformatted("text: ");
+                ImGui.SameLine();
+                DebugRenderer.DrawUtf8String((nint)(&textNode->NodeText), nodeOptions);
 
-            if (node->ChildNode != null)
-                PrintNode(node->ChildNode);
+                ImGui.InputText($"Replace Text##{(ulong)textNode:X}", new IntPtr(textNode->NodeText.StringPtr), (uint)textNode->NodeText.BufSize);
 
-            switch (node->Type)
-            {
-                case NodeType.Text:
-                    var textNode = (AtkTextNode*)node;
-                    ImGui.TextUnformatted("text: ");
-                    ImGui.SameLine();
-                    ImGuiHelpers.SeStringWrapped(textNode->NodeText.AsSpan()); // Service<SeStringRenderer>.Get().Draw(textNode->NodeText);
+                ImGui.SameLine();
+                if (ImGui.Button($"Encode##{(ulong)textNode:X}"))
+                {
+                    using var tmp = new Utf8String();
+                    RaptureTextModule.Instance()->MacroEncoder.EncodeString(&tmp, textNode->NodeText.StringPtr);
+                    textNode->NodeText.Copy(&tmp);
+                }
 
-                    ImGui.InputText($"Replace Text##{(ulong)textNode:X}", new IntPtr(textNode->NodeText.StringPtr), (uint)textNode->NodeText.BufSize);
+                ImGui.SameLine();
+                if (ImGui.Button($"Decode##{(ulong)textNode:X}"))
+                    textNode->NodeText.SetString(new ReadOnlySeStringSpan(textNode->NodeText.StringPtr).ToString());
 
-                    ImGui.SameLine();
-                    if (ImGui.Button($"Encode##{(ulong)textNode:X}"))
-                    {
-                        using var tmp = new Utf8String();
-                        RaptureTextModule.Instance()->MacroEncoder.EncodeString(&tmp, textNode->NodeText.StringPtr);
-                        textNode->NodeText.Copy(&tmp);
-                    }
+                ImGui.TextUnformatted($"AlignmentType: {(AlignmentType)textNode->AlignmentFontType}  FontSize: {textNode->FontSize}");
+                int b = textNode->AlignmentFontType;
+                if (ImGui.InputInt($"###setAlignment{(ulong)textNode:X}", ref b, 1))
+                {
+                    while (b > byte.MaxValue) b -= byte.MaxValue;
+                    while (b < byte.MinValue) b += byte.MaxValue;
+                    textNode->AlignmentFontType = (byte)b;
+                    textNode->AtkResNode.DrawFlags |= 0x1;
+                }
 
-                    ImGui.SameLine();
-                    if (ImGui.Button($"Decode##{(ulong)textNode:X}"))
-                        textNode->NodeText.SetString(new ReadOnlySeStringSpan(textNode->NodeText.StringPtr).ToString());
+                ImGui.TextUnformatted($"Color: #{textNode->TextColor.R:X2}{textNode->TextColor.G:X2}{textNode->TextColor.B:X2}{textNode->TextColor.A:X2}");
+                ImGui.SameLine();
+                ImGui.TextUnformatted($"EdgeColor: #{textNode->EdgeColor.R:X2}{textNode->EdgeColor.G:X2}{textNode->EdgeColor.B:X2}{textNode->EdgeColor.A:X2}");
+                ImGui.SameLine();
+                ImGui.TextUnformatted($"BGColor: #{textNode->BackgroundColor.R:X2}{textNode->BackgroundColor.G:X2}{textNode->BackgroundColor.B:X2}{textNode->BackgroundColor.A:X2}");
 
-                    ImGui.TextUnformatted($"AlignmentType: {(AlignmentType)textNode->AlignmentFontType}  FontSize: {textNode->FontSize}");
-                    int b = textNode->AlignmentFontType;
-                    if (ImGui.InputInt($"###setAlignment{(ulong)textNode:X}", ref b, 1))
-                    {
-                        while (b > byte.MaxValue) b -= byte.MaxValue;
-                        while (b < byte.MinValue) b += byte.MaxValue;
-                        textNode->AlignmentFontType = (byte)b;
-                        textNode->AtkResNode.DrawFlags |= 0x1;
-                    }
+                ImGui.TextUnformatted($"TextFlags: {textNode->TextFlags}");
+                ImGui.SameLine();
+                ImGui.TextUnformatted($"TextFlags2: {textNode->TextFlags2}");
 
-                    ImGui.TextUnformatted($"Color: #{textNode->TextColor.R:X2}{textNode->TextColor.G:X2}{textNode->TextColor.B:X2}{textNode->TextColor.A:X2}");
-                    ImGui.SameLine();
-                    ImGui.TextUnformatted($"EdgeColor: #{textNode->EdgeColor.R:X2}{textNode->EdgeColor.G:X2}{textNode->EdgeColor.B:X2}{textNode->EdgeColor.A:X2}");
-                    ImGui.SameLine();
-                    ImGui.TextUnformatted($"BGColor: #{textNode->BackgroundColor.R:X2}{textNode->BackgroundColor.G:X2}{textNode->BackgroundColor.B:X2}{textNode->BackgroundColor.A:X2}");
-
-                    ImGui.TextUnformatted($"TextFlags: {textNode->TextFlags}");
-                    ImGui.SameLine();
-                    ImGui.TextUnformatted($"TextFlags2: {textNode->TextFlags2}");
-
-                    break;
-                case NodeType.Counter:
-                    var counterNode = (AtkCounterNode*)node;
-                    ImGui.TextUnformatted("text: ");
-                    ImGui.SameLine();
-                    ImGuiHelpers.SeStringWrapped(counterNode->NodeText.AsSpan()); // Service<SeStringRenderer>.Get().Draw(counterNode->NodeText);
-                    break;
-                case NodeType.Image:
-                    var imageNode = (AtkImageNode*)node;
-                    PrintTextureInfo(imageNode->PartsList, imageNode->PartId);
-                    break;
-                case NodeType.NineGrid:
-                    var ngNode = (AtkNineGridNode*)node;
-                    PrintTextureInfo(ngNode->PartsList, ngNode->PartId);
-                    break;
-                case NodeType.ClippingMask:
-                    var cmNode = (AtkClippingMaskNode*)node;
-                    PrintTextureInfo(cmNode->PartsList, cmNode->PartId);
-                    break;
-            }
-
-            ImGui.TreePop();
+                break;
+            case NodeType.Counter:
+                var counterNode = (AtkCounterNode*)node;
+                ImGui.TextUnformatted("text: ");
+                ImGui.SameLine();
+                ImGuiHelpers.SeStringWrapped(counterNode->NodeText.AsSpan()); // Service<SeStringRenderer>.Get().Draw(counterNode->NodeText);
+                break;
+            case NodeType.Image:
+                var imageNode = (AtkImageNode*)node;
+                PrintTextureInfo(imageNode->PartsList, imageNode->PartId);
+                break;
+            case NodeType.NineGrid:
+                var ngNode = (AtkNineGridNode*)node;
+                PrintTextureInfo(ngNode->PartsList, ngNode->PartId);
+                break;
+            case NodeType.ClippingMask:
+                var cmNode = (AtkClippingMaskNode*)node;
+                PrintTextureInfo(cmNode->PartsList, cmNode->PartId);
+                break;
         }
-        else if (ImGui.IsItemHovered())
+    }
+
+    private static void PrintTextureInfo(AtkUldPartsList* partsList, uint partId)
+    {
+        if (partsList == null)
         {
-            DrawOutline(node);
+            ImGui.TextUnformatted("No texture loaded");
+            return;
         }
 
-        if (isVisible && !popped)
-            ImGui.PopStyleColor();
-
-        static void PrintTextureInfo(AtkUldPartsList* partsList, uint partId)
+        if (partId > partsList->PartCount)
         {
-            if (partsList != null)
-            {
-                if (partId > partsList->PartCount)
-                {
-                    ImGui.TextUnformatted("part id > part count?");
-                }
-                else
-                {
-                    var textureInfo = partsList->Parts[partId].UldAsset;
-                    var texType = textureInfo->AtkTexture.TextureType;
-                    ImGui.TextUnformatted(
-                        $"texture type: {texType} part_id={partId} part_id_count={partsList->PartCount}");
-                    if (texType == TextureType.Resource)
-                    {
-                        ImGui.TextUnformatted(
-                            $"texture path: {textureInfo->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName}");
-                        var kernelTexture = textureInfo->AtkTexture.Resource->KernelTextureObject;
+            ImGui.TextUnformatted("part id > part count?");
+            return;
+        }
 
-                        if (ImGui.TreeNode($"Texture##{(ulong)kernelTexture->D3D11ShaderResourceView:X}"))
-                        {
-                            ImGui.Image(
-                                new IntPtr(kernelTexture->D3D11ShaderResourceView),
-                                new Vector2(kernelTexture->Width, kernelTexture->Height));
-                            ImGui.TreePop();
-                        }
-                    }
-                    else if (texType == TextureType.KernelTexture)
-                    {
-                        if (ImGui.TreeNode(
-                                $"Texture##{(ulong)textureInfo->AtkTexture.KernelTexture->D3D11ShaderResourceView:X}"))
-                        {
-                            ImGui.Image(
-                                new IntPtr(textureInfo->AtkTexture.KernelTexture->D3D11ShaderResourceView),
-                                new Vector2(
-                                    textureInfo->AtkTexture.KernelTexture->Width,
-                                    textureInfo->AtkTexture.KernelTexture->Height));
-                            ImGui.TreePop();
-                        }
-                    }
-                }
-            }
-            else
+        var textureInfo = partsList->Parts[partId].UldAsset;
+        var texType = textureInfo->AtkTexture.TextureType;
+        ImGui.TextUnformatted(
+            $"texture type: {texType} part_id={partId} part_id_count={partsList->PartCount}");
+        if (texType == TextureType.Resource)
+        {
+            ImGui.TextUnformatted(
+                $"texture path: {textureInfo->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName}");
+            var kernelTexture = textureInfo->AtkTexture.Resource->KernelTextureObject;
+
+            if (ImGui.TreeNode($"Texture##{(ulong)kernelTexture->D3D11ShaderResourceView:X}"))
             {
-                ImGui.TextUnformatted("no texture loaded");
+                ImGui.Image(
+                    new IntPtr(kernelTexture->D3D11ShaderResourceView),
+                    new Vector2(kernelTexture->Width, kernelTexture->Height));
+                ImGui.TreePop();
+            }
+        }
+        else if (texType == TextureType.KernelTexture)
+        {
+            if (ImGui.TreeNode(
+                    $"Texture##{(ulong)textureInfo->AtkTexture.KernelTexture->D3D11ShaderResourceView:X}"))
+            {
+                ImGui.Image(
+                    new IntPtr(textureInfo->AtkTexture.KernelTexture->D3D11ShaderResourceView),
+                    new Vector2(
+                        textureInfo->AtkTexture.KernelTexture->Width,
+                        textureInfo->AtkTexture.KernelTexture->Height));
+                ImGui.TreePop();
             }
         }
     }
 
-    private void PrintComponentNode(AtkResNode* node, string treePrefix)
+    private void PrintComponentNode(AtkResNode* node, string treePrefix, NodeOptions nodeOptions)
     {
         var compNode = (AtkComponentNode*)node;
 
@@ -357,10 +462,10 @@ internal unsafe class UiDebug
         if (isVisible)
             ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 255, 0, 255));
 
-        if (ImGui.TreeNode($"{treePrefix}{objectInfo->ComponentType} Component Node (ptr = {(long)node:X}, component ptr = {(long)compNode->Component:X}) child count = {childCount}  ###{(long)node}"))
+        if (ImGui.TreeNodeEx($"{treePrefix}{objectInfo->ComponentType} Component Node (ptr = {(nint)node:X}, component ptr = {(nint)compNode->Component:X}) child count = {childCount}###{nodeOptions.GetKey("ComponentNode")}", ImGuiTreeNodeFlags.SpanAvailWidth))
         {
-            if (ImGui.IsItemHovered())
-                DrawOutline(node);
+            // if (ImGui.IsItemHovered())
+            //     DrawOutline(node);
 
             if (isVisible)
             {
@@ -370,29 +475,30 @@ internal unsafe class UiDebug
 
             ImGui.TextUnformatted("Node: ");
             ImGui.SameLine();
-            ImGuiHelpers.ClickToCopyText($"{(ulong)node:X}");
+            DebugRenderer.DrawAddress(node);
             ImGui.SameLine();
-            Util.ShowStruct(*compNode, (ulong)compNode);
+            DebugRenderer.DrawPointerType((nint)compNode, typeof(AtkComponentNode), nodeOptions.WithAddress(1));
+
             ImGui.TextUnformatted("Component: ");
             ImGui.SameLine();
-            ImGuiHelpers.ClickToCopyText($"{(ulong)compNode->Component:X}");
+            DebugRenderer.DrawAddress(compNode->Component);
             ImGui.SameLine();
-
-            switch (objectInfo->ComponentType)
+            var componentType = objectInfo->ComponentType switch
             {
-                case ComponentType.Button: Util.ShowStruct(*(AtkComponentButton*)compNode->Component, (ulong)compNode->Component); break;
-                case ComponentType.Slider: Util.ShowStruct(*(AtkComponentSlider*)compNode->Component, (ulong)compNode->Component); break;
-                case ComponentType.Window: Util.ShowStruct(*(AtkComponentWindow*)compNode->Component, (ulong)compNode->Component); break;
-                case ComponentType.CheckBox: Util.ShowStruct(*(AtkComponentCheckBox*)compNode->Component, (ulong)compNode->Component); break;
-                case ComponentType.GaugeBar: Util.ShowStruct(*(AtkComponentGaugeBar*)compNode->Component, (ulong)compNode->Component); break;
-                case ComponentType.RadioButton: Util.ShowStruct(*(AtkComponentRadioButton*)compNode->Component, (ulong)compNode->Component); break;
-                case ComponentType.TextInput: Util.ShowStruct(*(AtkComponentTextInput*)compNode->Component, (ulong)compNode->Component); break;
-                case ComponentType.Icon: Util.ShowStruct(*(AtkComponentIcon*)compNode->Component, (ulong)compNode->Component); break;
-                default: Util.ShowStruct(*compNode->Component, (ulong)compNode->Component); break;
-            }
+                ComponentType.Button => typeof(AtkComponentButton),
+                ComponentType.Slider => typeof(AtkComponentSlider),
+                ComponentType.Window => typeof(AtkComponentWindow),
+                ComponentType.CheckBox => typeof(AtkComponentCheckBox),
+                ComponentType.GaugeBar => typeof(AtkComponentGaugeBar),
+                ComponentType.RadioButton => typeof(AtkComponentRadioButton),
+                ComponentType.TextInput => typeof(AtkComponentTextInput),
+                ComponentType.Icon => typeof(AtkComponentIcon),
+                _ => typeof(AtkComponentBase)
+            };
+            DebugRenderer.DrawPointerType((nint)compNode->Component, componentType, nodeOptions.WithAddress(2));
 
             PrintResNode(node);
-            PrintNode(componentInfo.RootNode);
+            PrintNode(componentInfo.RootNode, true, string.Empty, nodeOptions);
 
             switch (objectInfo->ComponentType)
             {
@@ -435,7 +541,7 @@ internal unsafe class UiDebug
 
                 for (var i = 0; i < compNode->Component->UldManager.NodeListCount; i++)
                 {
-                    PrintNode(compNode->Component->UldManager.NodeList[i], false, $"[{i}] ");
+                    PrintNode(compNode->Component->UldManager.NodeList[i], false, $"[{i}] ", nodeOptions);
                 }
 
                 ImGui.TreePop();
@@ -447,10 +553,10 @@ internal unsafe class UiDebug
 
             ImGui.TreePop();
         }
-        else if (ImGui.IsItemHovered())
-        {
-            DrawOutline(node);
-        }
+        //else if (ImGui.IsItemHovered())
+        //{
+        //    DrawOutline(node);
+        //}
 
         if (isVisible && !popped)
             ImGui.PopStyleColor();
@@ -483,180 +589,142 @@ internal unsafe class UiDebug
             $"MultiplyRGB: {node->MultiplyRed} {node->MultiplyGreen} {node->MultiplyBlue}");
     }
 
-    private bool DrawUnitListHeader(int index, ushort count, ulong ptr, bool highlight)
+
+    private void DrawNodePicker()
     {
-        ImGui.PushStyleColor(ImGuiCol.Text, highlight ? 0xFFAAAA00 : 0xFFFFFFFF);
-        if (!string.IsNullOrEmpty(searchInput) && !doingSearch)
+        if (!ShowPicker)
+            return;
+
+        var raptureAtkUnitManager = RaptureAtkUnitManager.Instance();
+        var allUnitsList = new List<Pointer<AtkUnitBase>>();
+
+        for (var i = 0; i < raptureAtkUnitManager->AllLoadedUnitsList.Count; i++)
         {
-            ImGui.SetNextItemOpen(true, ImGuiCond.Always);
+            var unitBase = raptureAtkUnitManager->AllLoadedUnitsList.Entries[i].Value;
+            if (unitBase == null || !unitBase->IsFullyLoaded() || !unitBase->IsVisible)
+                continue;
+            allUnitsList.Add(unitBase);
         }
-        else if (doingSearch && string.IsNullOrEmpty(searchInput))
+
+        allUnitsList.Sort((a, b) => (int)(b.Value->DepthLayer - a.Value->DepthLayer));
+
+        var hoveredDepthLayerAddonNodes = new Dictionary<uint, Dictionary<Pointer<AtkUnitBase>, List<Pointer<AtkResNode>>>>();
+        var nodeCount = 0;
+        var bounds = stackalloc FFXIVClientStructs.FFXIV.Common.Math.Bounds[1];
+
+        foreach (AtkUnitBase* unitBase in allUnitsList)
         {
-            ImGui.SetNextItemOpen(false, ImGuiCond.Always);
-        }
+            unitBase->GetWindowBounds(bounds);
+            var pos = new Vector2(bounds->Pos1.X, bounds->Pos1.Y);
+            var size = new Vector2(bounds->Size.X, bounds->Size.Y);
 
-        var treeNode = ImGui.TreeNode($"{listNames[index]}##unitList_{index}");
-        ImGui.PopStyleColor();
+            if (!bounds->ContainsPoint((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y))
+                continue;
 
-        ImGui.SameLine();
-        ImGui.TextDisabled($"C:{count}  {ptr:X}");
-        return treeNode;
-    }
-
-    private void DrawUnitBaseList()
-    {
-        var foundSelected = false;
-        var noResults = true;
-        var stage = AtkStage.Instance();
-
-        var unitManagers = &stage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerOneList;
-
-        var searchStr = searchInput;
-        var searching = !string.IsNullOrEmpty(searchStr);
-
-        for (var i = 0; i < UnitListCount; i++)
-        {
-            var headerDrawn = false;
-
-            var highlight = selectedUnitBase != null && selectedInList[i];
-            selectedInList[i] = false;
-            var unitManager = &unitManagers[i];
-
-            var headerOpen = true;
-
-            if (!searching)
+            for (var i = 0; i < unitBase->UldManager.NodeListCount; i++)
             {
-                headerOpen = DrawUnitListHeader(i, unitManager->Count, (ulong)unitManager, highlight);
-                headerDrawn = true;
-                noResults = false;
+                var node = unitBase->UldManager.NodeList[i];
+                node->GetBounds(bounds);
+
+                if (!bounds->ContainsPoint((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y))
+                    continue;
+
+                if (!hoveredDepthLayerAddonNodes.TryGetValue(unitBase->DepthLayer, out var addonNodes))
+                    hoveredDepthLayerAddonNodes.Add(unitBase->DepthLayer, addonNodes = []);
+
+                if (!addonNodes.TryGetValue(unitBase, out var nodes))
+                    addonNodes.Add(unitBase, [node]);
+                else if (!nodes.Contains(node))
+                    nodes.Add(node);
+
+                nodeCount++;
             }
+        }
 
-            for (var j = 0; j < unitManager->Count && headerOpen; j++)
+        if (nodeCount == 0)
+        {
+            ShowPicker = false;
+            return;
+        }
+
+        ImGui.SetNextWindowPos(Vector2.Zero);
+        ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
+
+        var mousePos = ImGui.GetMousePos();
+        var mouseMoved = LastMousePos != mousePos;
+        if (mouseMoved)
+            NodePickerSelectionIndex = 0;
+
+        if (!ImGui.Begin("NodePicker", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBackground))
+            return;
+
+        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+
+        var nodeIndex = 0;
+        foreach (var (depthLayer, addons) in hoveredDepthLayerAddonNodes)
+        {
+            ImGui.TextUnformatted($"Depth Layer {depthLayer}:");
+
+            using var indent = ImRaii.PushIndent();
+            foreach (var (unitBase, nodes) in addons)
             {
-                AtkUnitBase* unitBase = unitManager->Entries[j];
-                if (selectedUnitBase != null && unitBase == selectedUnitBase)
-                {
-                    selectedInList[i] = true;
-                    foundSelected = true;
-                }
+                ImGui.TextUnformatted($"{unitBase.Value->NameString}:");
 
-                var name = unitBase->NameString;
-                if (searching)
-                {
-                    if (name == null || !name.ToLowerInvariant().Contains(searchStr.ToLowerInvariant())) continue;
-                }
+                using var indent2 = ImRaii.PushIndent();
 
-                noResults = false;
-                if (!headerDrawn)
+                for (var i = nodes.Count - 1; i >= 0; i--)
                 {
-                    headerOpen = DrawUnitListHeader(i, unitManager->Count, (ulong)unitManager, highlight);
-                    headerDrawn = true;
-                }
+                    var node = nodes[i].Value;
+                    node->GetBounds(bounds);
 
-                if (headerOpen)
-                {
-                    var visible = unitBase->IsVisible;
-                    ImGui.PushStyleColor(ImGuiCol.Text, visible ? 0xFF00FF00 : 0xFF999999);
-
-                    if (ImGui.Selectable($"{name}##list{i}-{(ulong)unitBase:X}_{j}", selectedUnitBase == unitBase))
+                    if (NodePickerSelectionIndex == nodeIndex)
                     {
-                        selectedUnitBase = unitBase;
-                        foundSelected = true;
-                        selectedInList[i] = true;
+                        using (ImRaii.PushFont(UiBuilder.IconFont))
+                            ImGui.TextUnformatted(FontAwesomeIcon.CaretRight.ToIconString());
+                        ImGui.SameLine(0, 0);
+
+                        ImGui.GetForegroundDrawList().AddRectFilled(
+                            new Vector2(bounds->Pos1.X, bounds->Pos1.Y),
+                            new Vector2(bounds->Pos2.X, bounds->Pos2.Y),
+                            HaselColor.From(1, 1, 0, 0.5f));
+
+                        if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                        {
+                            SelectedAddonId = unitBase.Value->Id;
+                            SelectedAddonName = unitBase.Value->NameString;
+
+                            NodePickerSelectionIndex = 0;
+                            ShowPicker = false;
+                        }
                     }
 
-                    ImGui.PopStyleColor();
-                }
-            }
+                    if ((int)node->Type < 1000)
+                    {
+                        ImGui.TextUnformatted($"[0x{(nint)node:X}] [{node->NodeId}] {node->Type} Node");
+                    }
+                    else
+                    {
+                        var compNode = (AtkComponentNode*)node;
+                        var componentInfo = compNode->Component->UldManager;
+                        var objectInfo = (AtkUldComponentInfo*)componentInfo.Objects;
+                        if (objectInfo == null) continue;
+                        ImGui.TextUnformatted($"[0x{(nint)node:X}] [{node->NodeId}] {objectInfo->ComponentType} Component Node");
+                    }
 
-            if (headerDrawn && headerOpen)
-            {
-                ImGui.TreePop();
-            }
-
-            if (selectedInList[i] == false && selectedUnitBase != null)
-            {
-                for (var j = 0; j < unitManager->Count; j++)
-                {
-                    AtkUnitBase* unitBase = unitManager->Entries[j];
-                    if (selectedUnitBase == null || unitBase != selectedUnitBase) continue;
-                    selectedInList[i] = true;
-                    foundSelected = true;
+                    nodeIndex++;
                 }
             }
         }
 
-        if (noResults)
-        {
-            ImGui.TextDisabled("No Results");
-        }
+        NodePickerSelectionIndex -= (int)ImGui.GetIO().MouseWheel;
+        if (NodePickerSelectionIndex < 0)
+            NodePickerSelectionIndex = nodeCount - 1;
+        if (NodePickerSelectionIndex > nodeCount - 1)
+            NodePickerSelectionIndex = 0;
 
-        if (!foundSelected)
-        {
-            selectedUnitBase = null;
-        }
+        if (mouseMoved)
+            LastMousePos = mousePos;
 
-        if (doingSearch && string.IsNullOrEmpty(searchInput))
-        {
-            doingSearch = false;
-        }
-        else if (!doingSearch && !string.IsNullOrEmpty(searchInput))
-        {
-            doingSearch = true;
-        }
-    }
-
-    private Vector2 GetNodePosition(AtkResNode* node)
-    {
-        var pos = new Vector2(node->X, node->Y);
-        pos -= new Vector2(node->OriginX * (node->ScaleX - 1), node->OriginY * (node->ScaleY - 1));
-        var par = node->ParentNode;
-        while (par != null)
-        {
-            pos *= new Vector2(par->ScaleX, par->ScaleY);
-            pos += new Vector2(par->X, par->Y);
-            pos -= new Vector2(par->OriginX * (par->ScaleX - 1), par->OriginY * (par->ScaleY - 1));
-            par = par->ParentNode;
-        }
-
-        return pos;
-    }
-
-    private Vector2 GetNodeScale(AtkResNode* node)
-    {
-        if (node == null) return new Vector2(1, 1);
-        var scale = new Vector2(node->ScaleX, node->ScaleY);
-        while (node->ParentNode != null)
-        {
-            node = node->ParentNode;
-            scale *= new Vector2(node->ScaleX, node->ScaleY);
-        }
-
-        return scale;
-    }
-
-    private bool GetNodeVisible(AtkResNode* node)
-    {
-        if (node == null) return false;
-        while (node != null)
-        {
-            if (!node->NodeFlags.HasFlag(NodeFlags.Visible)) return false;
-            node = node->ParentNode;
-        }
-
-        return true;
-    }
-
-    private void DrawOutline(AtkResNode* node)
-    {
-        var position = GetNodePosition(node);
-        var scale = GetNodeScale(node);
-        var size = new Vector2(node->Width, node->Height) * scale;
-
-        var nodeVisible = GetNodeVisible(node);
-
-        position += ImGuiHelpers.MainViewport.Pos;
-
-        ImGui.GetForegroundDrawList(ImGuiHelpers.MainViewport).AddRect(position, position + size, nodeVisible ? 0xFF00FF00 : 0xFF0000FF);
+        ImGui.End();
     }
 }
