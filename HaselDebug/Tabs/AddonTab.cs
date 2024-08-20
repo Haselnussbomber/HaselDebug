@@ -3,8 +3,10 @@ using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using Dalamud.Game;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Utility;
 using ExdSheets;
 using ExdSheets.Sheets;
 using HaselCommon.Services;
@@ -17,21 +19,27 @@ namespace HaselDebug.Tabs;
 
 public unsafe class AddonTab : DebugTab
 {
+    private const int LanguageSelectorWidth = 90;
+
     private readonly TextService TextService;
+    private readonly TranslationManager TranslationManager;
     private readonly DebugRenderer DebugRenderer;
     private readonly Module ExdModule;
-    private readonly Addon[] Rows;
+    private Addon[] Rows;
     private Addon[]? FilteredRows;
     private CancellationTokenSource? FilterCTS;
     private string SearchTerm = string.Empty;
+    private ClientLanguage SelectedLanguage;
 
-    public AddonTab(TextService textService, DebugRenderer debugRenderer, Module exdModule)
+    public AddonTab(TextService textService, TranslationManager translationManager, DebugRenderer debugRenderer, Module exdModule)
     {
         TextService = textService;
+        TranslationManager = translationManager;
         DebugRenderer = debugRenderer;
         ExdModule = exdModule;
 
-        Rows = ExdModule.GetSheet<Addon>().ToArray();
+        SelectedLanguage = TranslationManager.ClientLanguage;
+        Rows = ExdModule.GetSheet<Addon>(SelectedLanguage.ToLumina()).ToArray();
     }
 
     public override bool DrawInChild => false;
@@ -39,9 +47,27 @@ public unsafe class AddonTab : DebugTab
     {
         using var hostChild = ImRaii.Child("Host", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
-        ImGui.SetNextItemWidth(-1);
-        var searchTermChanged = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref SearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
-        if (searchTermChanged)
+        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - LanguageSelectorWidth * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X);
+        var listDirty = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref SearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(LanguageSelectorWidth * ImGuiHelpers.GlobalScale);
+        using (var dropdown = ImRaii.Combo("##Language", SelectedLanguage.ToString() ?? "Language..."))
+        {
+            if (dropdown)
+            {
+                var values = Enum.GetValues<ClientLanguage>().OrderBy((ClientLanguage lang) => lang.ToString());
+                foreach (var value in values)
+                {
+                    if (ImGui.Selectable(Enum.GetName(value), value == SelectedLanguage))
+                    {
+                        SelectedLanguage = value;
+                        Rows = ExdModule.GetSheet<Addon>(SelectedLanguage.ToLumina()).ToArray();
+                        listDirty |= true;
+                    }
+                }
+            }
+        }
+        if (listDirty)
         {
             FilterCTS?.Cancel();
             FilterCTS = new();
