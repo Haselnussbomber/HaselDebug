@@ -76,7 +76,7 @@ public class Plugin : IDalamudPlugin
             if (Service.Get<PluginConfig>().AutoOpenPluginWindow)
                 Service.Get<PluginWindow>().Open();
 
-            Service.Get<CommandService>().Register(OnCommand);
+            Service.Get<CommandService>().Register(OnCommand, true);
 
             PluginInterface.UiBuilder.OpenMainUi += TogglePluginWindow;
             PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigWindow;
