@@ -1,13 +1,16 @@
 using System.Numerics;
 using HaselCommon.Services;
 using HaselCommon.Windowing;
-using HaselDebug.Abstracts;
+using HaselDebug.Services;
+using HaselDebug.Utils;
 using ImGuiNET;
 
 namespace HaselDebug.Windows;
 
-public class TabPopoutWindow(WindowManager wm, IDrawableTab tab) : SimpleWindow(wm, tab.Title)
+public class PointerTypeWindow(WindowManager WindowManager, DebugRenderer DebugRenderer, nint Address, Type Type) : SimpleWindow(WindowManager, Type.Name)
 {
+    private NodeOptions? NodeOptions;
+
     public override void OnOpen()
     {
         base.OnOpen();
@@ -23,6 +26,10 @@ public class TabPopoutWindow(WindowManager wm, IDrawableTab tab) : SimpleWindow(
 
     public override void Draw()
     {
-        tab.Draw();
+        DebugRenderer.DrawPointerType(Address, Type, NodeOptions ??= new NodeOptions()
+        {
+            AddressPath = new AddressPath(Address),
+            DefaultOpen = true,
+        });
     }
 }

@@ -51,7 +51,7 @@ public class InstancesTab(
                         {
                             Visible = !WindowManager.Contains(windowName),
                             Label = TextService.Translate("ContextMenu.TabPopout"),
-                            ClickCallback = () => WindowManager.Open(TabPopoutWindow.Create(WindowManager, DebugRenderer, ptr, type))
+                            ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, ptr, type))
                         });
 
                         builder.Add(new ImGuiContextMenuEntry()
