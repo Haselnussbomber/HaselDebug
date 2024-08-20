@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- **Added:** A LogMessage tab to search through texts from the LogMessage sheet (until a full Excel tab is implemented).
+- **Added:** A language selector to the right of the search bar in the Addon and LogMessage tabs.
 - **Added:** Holding shift while closing a SeString Inspector window will close all SeString Inspector windows.
 - **Fixed:** The context menu to popout a tab was visible even when the window was already open.
 
