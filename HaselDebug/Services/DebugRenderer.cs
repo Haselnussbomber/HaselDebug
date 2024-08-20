@@ -177,6 +177,11 @@ public unsafe partial class DebugRenderer(
         var node = ImRaii.TreeNode(previewText + nodeOptions.GetKey("Node"), nodeOptions.GetTreeNodeFlags());
         titleColor?.Dispose();
 
+        if (nodeOptions.OnHovered != null && ImGui.IsItemHovered())
+            nodeOptions.OnHovered();
+
+        nodeOptions.DrawContextMenu?.Invoke(nodeOptions);
+
         if (nodeOptions.DrawSeStringTreeNode && nodeOptions.SeStringTitle != null)
         {
             ImGui.SameLine();
@@ -190,11 +195,6 @@ public unsafe partial class DebugRenderer(
                 });
             }
         }
-
-        if (nodeOptions.OnHovered != null && ImGui.IsItemHovered())
-            nodeOptions.OnHovered();
-
-        nodeOptions.DrawContextMenu?.Invoke(nodeOptions);
 
         return node;
     }

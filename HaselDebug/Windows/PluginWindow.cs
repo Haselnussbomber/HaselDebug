@@ -111,8 +111,9 @@ public class PluginWindow : SimpleWindow
                 {
                     builder.Add(new ImGuiContextMenuEntry()
                     {
+                        Visible = !WindowManager.Contains(tab.Title),
                         Label = TextService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => WindowManager.CreateOrOpen(tab.InternalName, (wm, _) => new TabPopoutWindow(wm, tab))
+                        ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, tab))
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()
@@ -156,8 +157,9 @@ public class PluginWindow : SimpleWindow
             {
                 builder.Add(new ImGuiContextMenuEntry()
                 {
+                    Visible = !WindowManager.Contains(tab.Title),
                     Label = TextService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => WindowManager.CreateOrOpen(tab.InternalName, (wm, _) => new TabPopoutWindow(wm, tab))
+                    ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, tab))
                 });
             });
         }

@@ -179,9 +179,8 @@ public unsafe partial class DebugRenderer
         if (clicked)
         {
             var str = new ReadOnlySeString(rosss.Data.ToArray());
-            WindowManager.CreateOrOpen(
-                nodeOptions.Title ?? (nodeOptions.SeStringTitle ?? str).ToString(),
-                (wm, windowName) => new SeStringInspectorWindow(wm, this, SeStringEvaluator, str, windowName));
+            var windowTitle = nodeOptions.Title ?? (nodeOptions.SeStringTitle ?? str).ToString();
+            WindowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(WindowManager, this, SeStringEvaluator, str, windowTitle));
         }
     }
 

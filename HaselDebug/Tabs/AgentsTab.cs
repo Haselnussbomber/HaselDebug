@@ -129,8 +129,9 @@ public unsafe class AgentsTab(
 
                     builder.Add(new ImGuiContextMenuEntry()
                     {
+                        Visible = !WindowManager.Contains(agentType.Name),
                         Label = TextService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => WindowManager.CreateOrOpen(agentType.FullName!, (wm, _) => new TabPopoutWindow(wm, new PinnedInstanceTab(DebugRenderer, (nint)agent, agentType)))
+                        ClickCallback = () => WindowManager.Open(TabPopoutWindow.Create(WindowManager, DebugRenderer, (nint)agent, agentType))
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()

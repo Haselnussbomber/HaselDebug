@@ -45,11 +45,13 @@ public class InstancesTab(
                     ImGuiContextMenu.Draw($"ContextMenu{nodeOptions.AddressPath}", builder =>
                     {
                         var isPinned = PinnedInstances.Contains(type);
+                        var windowName = type.Name;
 
                         builder.Add(new ImGuiContextMenuEntry()
                         {
+                            Visible = !WindowManager.Contains(windowName),
                             Label = TextService.Translate("ContextMenu.TabPopout"),
-                            ClickCallback = () => WindowManager.CreateOrOpen(type.FullName!, (wm, _) => new TabPopoutWindow(wm, new PinnedInstanceTab(DebugRenderer, ptr, type)))
+                            ClickCallback = () => WindowManager.Open(TabPopoutWindow.Create(WindowManager, DebugRenderer, ptr, type))
                         });
 
                         builder.Add(new ImGuiContextMenuEntry()
