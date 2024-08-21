@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Dalamud.Game;
-using Dalamud.Interface;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
 using HaselCommon.Services;
@@ -11,6 +11,7 @@ using HaselCommon.Windowing;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
+using Lumina.Text.Expressions;
 using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Windows;
@@ -24,7 +25,7 @@ public class SeStringInspectorWindow(
     ClientLanguage Language,
     string windowName = "SeString") : SimpleWindow(windowManager, windowName)
 {
-    private readonly List<SeStringParameter> LocalParameters = [];
+    private Dictionary<uint, SeStringParameter>? LocalParameters = null;
 
     public override void OnOpen()
     {
@@ -67,9 +68,11 @@ public class SeStringInspectorWindow(
         using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { Title = "Preview", TitleColor = Colors.Green, DefaultOpen = true });
         if (!node) return;
 
+        LocalParameters ??= GetLocalParameters(SeString.AsSpan(), []);
+
         var evaluated = SeStringEvaluator.Evaluate(SeString.AsSpan(), new()
         {
-            LocalParameters = LocalParameters.ToArray(),
+            LocalParameters = [.. LocalParameters.Values],
             Language = Language
         });
 
@@ -83,52 +86,29 @@ public class SeStringInspectorWindow(
 
     private void DrawParameters()
     {
+        if (LocalParameters == null) return;
+
         using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { Title = "Parameters", TitleColor = Colors.Green, DefaultOpen = true });
         if (!node) return;
 
-        // TODO: nice table
-
-        var elementToDelete = -1;
-
-        for (var i = 0; i < LocalParameters.Count; i++)
+        foreach (var (index, param) in LocalParameters.OrderBy(x => x.Key))
         {
-            if (LocalParameters[i].IsString)
+            if (param.IsString)
             {
-                var str = LocalParameters[i].StringValue.ExtractText();
-                if (ImGui.InputText($"lstr({i + 1})", ref str, 255))
+                var str = param.StringValue.ExtractText();
+                if (ImGui.InputText($"lstr({index})", ref str, 255))
                 {
-                    LocalParameters[i] = new(str);
+                    LocalParameters[index] = new(str);
                 }
             }
             else
             {
-                var num = (int)LocalParameters[i].UIntValue;
-                if (ImGui.InputInt($"lnum({i + 1})", ref num))
+                var num = (int)param.UIntValue;
+                if (ImGui.InputInt($"lnum({index})", ref num))
                 {
-                    LocalParameters[i] = new((uint)num);
+                    LocalParameters[index] = new((uint)num);
                 }
             }
-
-            ImGui.SameLine();
-            if (ImGuiUtils.IconButton($"DeleteLocalParam{i}", FontAwesomeIcon.Trash, "Delete"))
-            {
-                elementToDelete = i;
-            }
-        }
-
-        if (elementToDelete != -1)
-        {
-            LocalParameters.RemoveAt(elementToDelete);
-        }
-
-        if (ImGui.Button("Add UInt"))
-        {
-            LocalParameters.Add(new(0));
-        }
-        ImGui.SameLine();
-        if (ImGui.Button("Add String"))
-        {
-            LocalParameters.Add(new(""));
         }
     }
 
@@ -142,5 +122,58 @@ public class SeStringInspectorWindow(
             RenderSeString = false,
             DefaultOpen = true
         });
+    }
+
+    private static Dictionary<uint, SeStringParameter> GetLocalParameters(ReadOnlySeStringSpan rosss, Dictionary<uint, SeStringParameter>? parameters)
+    {
+        parameters ??= [];
+
+        foreach (var payload in rosss)
+        {
+            foreach (var expression in payload)
+            {
+                if (expression.TryGetString(out var exprString))
+                {
+                    GetLocalParameters(exprString, parameters);
+                    continue;
+                }
+
+                if (!expression.TryGetParameterExpression(out var expressionType, out var operand))
+                    continue;
+
+                if (!operand.TryGetUInt(out var index))
+                    continue;
+
+                if (parameters.ContainsKey(index))
+                    continue;
+
+                if (expressionType == (int)ExpressionType.LocalNumber)
+                {
+                    parameters[index] = new SeStringParameter(0);
+                }
+                else if (expressionType == (int)ExpressionType.LocalString)
+                {
+                    parameters[index] = new SeStringParameter("");
+                }
+            }
+        }
+
+        if (parameters.Count > 0)
+        {
+            var last = parameters.OrderBy(x => x.Key).Last();
+
+            if (parameters.Count != last.Key)
+            {
+                // fill missing local parameter slots, so we can go off the array index in SeStringContext
+
+                for (var i = 1u; i <= last.Key; i++)
+                {
+                    if (!parameters.ContainsKey(i))
+                        parameters[i] = new SeStringParameter(2);
+                }
+            }
+        }
+
+        return parameters;
     }
 }
