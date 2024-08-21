@@ -123,7 +123,7 @@ public unsafe class LogMessageTab : DebugTab
         {
             AddressPath = new AddressPath((nint)row.RowId),
             RenderSeString = false,
-            Title = $"LogMessage#{row.RowId}",
+            Title = $"LogMessage#{row.RowId} ({SelectedLanguage})",
             Language = SelectedLanguage
         });
     }
