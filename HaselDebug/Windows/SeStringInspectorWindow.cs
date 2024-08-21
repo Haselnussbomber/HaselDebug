@@ -25,7 +25,7 @@ public class SeStringInspectorWindow(
     ClientLanguage Language,
     string windowName = "SeString") : SimpleWindow(windowManager, windowName)
 {
-    private Dictionary<uint, SeStringParameter>? LocalParameters = null;
+    private SeStringParameter[]? LocalParameters = null;
 
     public override void OnOpen()
     {
@@ -56,23 +56,28 @@ public class SeStringInspectorWindow(
 
     public override void Draw()
     {
+        LocalParameters ??= GetLocalParameters(SeString.AsSpan(), []);
+
         DrawPreview();
-        ImGui.Spacing();
-        DrawParameters();
+
+        if (LocalParameters.Length != 0)
+        {
+            ImGui.Spacing();
+            DrawParameters();
+        }
+
         ImGui.Spacing();
         DrawPayloads();
     }
 
     private void DrawPreview()
     {
-        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { Title = "Preview", TitleColor = Colors.Green, DefaultOpen = true });
+        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(1), Title = "Preview", TitleColor = Colors.Green, DefaultOpen = true });
         if (!node) return;
-
-        LocalParameters ??= GetLocalParameters(SeString.AsSpan(), []);
 
         var evaluated = SeStringEvaluator.Evaluate(SeString.AsSpan(), new()
         {
-            LocalParameters = [.. LocalParameters.Values],
+            LocalParameters = LocalParameters ?? [],
             Language = Language
         });
 
@@ -86,27 +91,25 @@ public class SeStringInspectorWindow(
 
     private void DrawParameters()
     {
-        if (LocalParameters == null) return;
-
-        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { Title = "Parameters", TitleColor = Colors.Green, DefaultOpen = true });
+        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(2), Title = "Parameters", TitleColor = Colors.Green, DefaultOpen = true });
         if (!node) return;
 
-        foreach (var (index, param) in LocalParameters.OrderBy(x => x.Key))
+        for (var i = 0; i < LocalParameters!.Length; i++)
         {
-            if (param.IsString)
+            if (LocalParameters[i].IsString)
             {
-                var str = param.StringValue.ExtractText();
-                if (ImGui.InputText($"lstr({index})", ref str, 255))
+                var str = LocalParameters[i].StringValue.ExtractText();
+                if (ImGui.InputText($"lstr({i + 1})", ref str, 255))
                 {
-                    LocalParameters[index] = new(str);
+                    LocalParameters[i] = new(str);
                 }
             }
             else
             {
-                var num = (int)param.UIntValue;
-                if (ImGui.InputInt($"lnum({index})", ref num))
+                var num = (int)LocalParameters[i].UIntValue;
+                if (ImGui.InputInt($"lnum({i + 1})", ref num))
                 {
-                    LocalParameters[index] = new((uint)num);
+                    LocalParameters[i] = new((uint)num);
                 }
             }
         }
@@ -114,7 +117,7 @@ public class SeStringInspectorWindow(
 
     private void DrawPayloads()
     {
-        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { Title = "Payloads", TitleColor = Colors.Green, DefaultOpen = true });
+        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(3), Title = "Payloads", TitleColor = Colors.Green, DefaultOpen = true });
         if (!node) return;
 
         DebugRenderer.DrawSeString(SeString.AsSpan(), false, new NodeOptions()
@@ -124,7 +127,7 @@ public class SeStringInspectorWindow(
         });
     }
 
-    private static Dictionary<uint, SeStringParameter> GetLocalParameters(ReadOnlySeStringSpan rosss, Dictionary<uint, SeStringParameter>? parameters)
+    private static SeStringParameter[] GetLocalParameters(ReadOnlySeStringSpan rosss, Dictionary<uint, SeStringParameter>? parameters)
     {
         parameters ??= [];
 
@@ -169,11 +172,11 @@ public class SeStringInspectorWindow(
                 for (var i = 1u; i <= last.Key; i++)
                 {
                     if (!parameters.ContainsKey(i))
-                        parameters[i] = new SeStringParameter(2);
+                        parameters[i] = new SeStringParameter(0);
                 }
             }
         }
 
-        return parameters;
+        return parameters.OrderBy(x => x.Key).Select(x => x.Value).ToArray();
     }
 }
