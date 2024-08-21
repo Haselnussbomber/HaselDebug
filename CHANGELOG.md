@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.6.0] (2024-07-21)
+
+- **Added:** The SeString Inspector window now has inputs for local parameters.  
+  These are automatically detected from what's in the string. If you find a string with incorrectly detected parameters please open an issue.
+- **Added:** The SeString evaluator now evaluates Digit, Head, HeadAll, JaNoun, EnNoun, DeNoun and FrNoun payloads.
+- **Fixed:** Strings from the Addon/LogMessage could not be opened in different languages.
+- **Fixed:** Evaluating gstr parameters would produce garbage.
+- **Fixed:** Evaluating Kilo payloads with a value of 0 would result in an empty string.
+- **Fixed:** Evaluating Sheet payloads with a numeric column would produce a string. It now produces a Num payload as a workaround for not being able to write integer expressions directly.
+
 ## [1.5.0] (2024-07-20)
 
 - **Added:** A LogMessage tab to search through texts from the LogMessage sheet (until a full Excel tab is implemented).
@@ -77,7 +87,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.5.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.0...main
+[1.6.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.3...v1.5.0
 [1.4.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.1...v1.4.2
