@@ -123,7 +123,8 @@ public unsafe class AddonTab : DebugTab
         {
             AddressPath = new AddressPath((nint)row.RowId),
             RenderSeString = false,
-            Title = $"Addon#{row.RowId}"
+            Title = $"Addon#{row.RowId} ({SelectedLanguage})",
+            Language = SelectedLanguage
         });
     }
 }

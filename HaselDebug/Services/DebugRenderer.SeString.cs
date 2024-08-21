@@ -180,7 +180,7 @@ public unsafe partial class DebugRenderer
         {
             var str = new ReadOnlySeString(rosss.Data.ToArray());
             var windowTitle = nodeOptions.Title ?? (nodeOptions.SeStringTitle ?? str).ToString();
-            WindowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(WindowManager, this, SeStringEvaluator, str, windowTitle));
+            WindowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(WindowManager, this, SeStringEvaluator, str, nodeOptions.Language, windowTitle));
         }
     }
 
