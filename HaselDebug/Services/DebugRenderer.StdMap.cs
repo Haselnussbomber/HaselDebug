@@ -78,7 +78,7 @@ public unsafe partial class DebugRenderer
         }
 
         using var indent = ImRaii.PushIndent(1, nodeOptions.Indent);
-        using var table = ImRaii.Table(nodeOptions.GetKey("StdMapTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table(nodeOptions.GetKey("StdMapTable"), 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthFixed, 120);
