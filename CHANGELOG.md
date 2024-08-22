@@ -2,12 +2,12 @@
 
 ## [1.6.2] (2024-07-22)
 
-- **Fixed:** Evaluating Sheet payloads using a column of type SeString were not evaluated with the ColumnParam expression as lnum(1).
+- **Fixed:** Sheet payloads using a column of type SeString were not evaluated with the ColumnParam expression as lnum(1).
 - **Fixed:** Added missing sheets Aetheryte and BNpcName to the Text Decoder tab.
 
 ## [1.6.1] (2024-07-22)
 
-- **Fixed:** Some local parameters did not automatically detected, for example the condition in If payloads.
+- **Fixed:** Some local parameters were not automatically detected, for example the condition in If payloads.
 
 ## [1.6.0] (2024-07-21)
 
