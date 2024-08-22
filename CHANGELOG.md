@@ -1,14 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+- **Fixed:** Some local parameters did not automatically detected, for example the condition in If payloads.
+
 ## [1.6.0] (2024-07-21)
 
 - **Added:** The SeString Inspector window now has inputs for local parameters.  
   These are automatically detected from what's in the string. If you find a string with incorrectly detected parameters please open an issue.
 - **Added:** The SeString evaluator now evaluates Digit, Head, HeadAll, JaNoun, EnNoun, DeNoun and FrNoun payloads.
-- **Fixed:** Strings from the Addon/LogMessage could not be opened in different languages.
+- **Fixed:** Strings from the Addon/LogMessage tabs could not be opened in different languages.
 - **Fixed:** Evaluating gstr parameters would produce garbage.
 - **Fixed:** Evaluating Kilo payloads with a value of 0 would result in an empty string.
-- **Fixed:** Evaluating Sheet payloads with a numeric column would produce a string. It now produces a Num payload as a workaround for not being able to write integer expressions directly.
+- **Fixed:** Evaluating Sheet payloads with a numeric column would produce a string. It now produces a Num payload as a workaround for not being able to write an integer expression directly.
 
 ## [1.5.0] (2024-07-20)
 

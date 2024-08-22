@@ -131,35 +131,54 @@ public class SeStringInspectorWindow(
     {
         parameters ??= [];
 
-        foreach (var payload in rosss)
+        void ProcessString(ReadOnlySeStringSpan rosss)
         {
-            foreach (var expression in payload)
+            foreach (var payload in rosss)
             {
-                if (expression.TryGetString(out var exprString))
+                foreach (var expression in payload)
                 {
-                    GetLocalParameters(exprString, parameters);
-                    continue;
+                    ProcessExpression(expression);
                 }
+            }
+        }
 
-                if (!expression.TryGetParameterExpression(out var expressionType, out var operand))
-                    continue;
+        void ProcessExpression(ReadOnlySeExpressionSpan expression)
+        {
+            if (expression.TryGetString(out var exprString))
+            {
+                ProcessString(exprString);
+                return;
+            }
 
+            if (expression.TryGetBinaryExpression(out var expressionType, out var operand1, out var operand2))
+            {
+                ProcessExpression(operand1);
+                ProcessExpression(operand2);
+                return;
+            }
+
+            if (expression.TryGetParameterExpression(out expressionType, out var operand))
+            {
                 if (!operand.TryGetUInt(out var index))
-                    continue;
+                    return;
 
                 if (parameters.ContainsKey(index))
-                    continue;
+                    return;
 
                 if (expressionType == (int)ExpressionType.LocalNumber)
                 {
                     parameters[index] = new SeStringParameter(0);
+                    return;
                 }
                 else if (expressionType == (int)ExpressionType.LocalString)
                 {
                     parameters[index] = new SeStringParameter("");
+                    return;
                 }
             }
         }
+
+        ProcessString(rosss);
 
         if (parameters.Count > 0)
         {
