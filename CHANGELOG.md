@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.6.1] (2024-07-22)
 
 - **Fixed:** Some local parameters did not automatically detected, for example the condition in If payloads.
 
@@ -91,7 +91,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.1...main
+[1.6.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.3...v1.5.0
 [1.4.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.4.2...v1.4.3
