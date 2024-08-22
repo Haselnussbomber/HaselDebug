@@ -12,6 +12,8 @@ namespace HaselDebug.Tabs;
 public class TextDecoderTab : DebugTab
 {
     private readonly string[] SheetNames = [
+        "Aetheryte",
+        "BNpcName",
         "BeastTribe",
         "DeepDungeonEquipment",
         "DeepDungeonItem",
