@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.6.3] (2024-07-22)
+
+- **Fixed:** StdMap table column count was incorrect.
+
 ## [1.6.2] (2024-07-22)
 
 - **Fixed:** Sheet payloads using a column of type SeString were not evaluated with the ColumnParam expression as lnum(1).
@@ -96,7 +100,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.3...main
+[1.6.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.5.0...v1.6.0
