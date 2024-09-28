@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** EventFramework Task History (not very useful, but still better than nothing).
+
 ## [1.6.3] (2024-07-22)
 
 - **Fixed:** StdMap table column count was incorrect.

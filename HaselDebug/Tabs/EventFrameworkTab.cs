@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
@@ -140,6 +141,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
         }
     }
 
+    private readonly List<(nint, EventSceneTaskType)> TaskTypeHistory = [];
     private void DrawTasksTab()
     {
         var tasks = EventFramework.Instance()->EventSceneModule.TaskManager.Tasks;
@@ -155,6 +157,32 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
             DebugRenderer.DrawAddress(task);
             ImGui.SameLine();
             ImGui.TextUnformatted(task->Type.ToString());
+            
+            var exists = false;
+            foreach (var (ptr, type) in TaskTypeHistory)
+            {
+                if (ptr == (nint)task)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists)
+                TaskTypeHistory.Add(((nint)task, task->Type));
+        }
+
+        ImGui.Separator();
+
+        ImGui.TextUnformatted("History:");
+
+        foreach (var (_, type) in TaskTypeHistory)
+        {
+            ImGui.TextUnformatted(type.ToString());
+        }
+
+        if (ImGui.Button("Reset History"))
+        {
+            TaskTypeHistory.Clear();
         }
     }
 
