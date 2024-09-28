@@ -1,6 +1,6 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.STD;
-using HaselDebug.Extensions;
+using HaselCommon.Extensions;
 using HaselDebug.Utils;
 using ImGuiNET;
 

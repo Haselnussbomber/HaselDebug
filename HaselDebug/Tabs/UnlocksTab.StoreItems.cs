@@ -22,7 +22,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
 
     public void UpdateStoreItems()
     {
-        StoreItemsList = CsvLoader.LoadResource<StoreItem>(CsvLoader.StoreItemResourceName, out _, DataManager.GameData, TranslationManager.ClientLanguage.ToLumina())
+        StoreItemsList = CsvLoader.LoadResource<StoreItem>(CsvLoader.StoreItemResourceName, out _, DataManager.GameData, TextService.ClientLanguage.ToLumina())
             .Where(row => row.RowId != 0 && row.Item.Row is not (0 or 5827) && row.Item.Value != null)
             .GroupBy(row => row.FittingShopItemSetId)
             .SelectMany(group => group)

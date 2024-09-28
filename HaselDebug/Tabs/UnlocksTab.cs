@@ -19,7 +19,6 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
     private readonly TextService TextService;
     private readonly MapService MapService;
     private readonly IDataManager DataManager;
-    private readonly TranslationManager TranslationManager;
     private readonly ItemService ItemService;
     private readonly TextureService TextureService;
     private readonly ImGuiService ImGuiService;
@@ -30,7 +29,6 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         TextService textService,
         MapService mapService,
         IDataManager dataManager,
-        TranslationManager translationManager,
         ItemService itemService,
         TextureService textureService,
         ImGuiService imGuiService)
@@ -40,7 +38,6 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         TextService = textService;
         MapService = mapService;
         DataManager = dataManager;
-        TranslationManager = translationManager;
         ItemService = itemService;
         TextureService = textureService;
         ImGuiService = imGuiService;

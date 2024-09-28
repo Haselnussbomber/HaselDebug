@@ -22,7 +22,6 @@ public unsafe class AddonTab : DebugTab
     private const int LanguageSelectorWidth = 90;
 
     private readonly TextService TextService;
-    private readonly TranslationManager TranslationManager;
     private readonly DebugRenderer DebugRenderer;
     private readonly Module ExdModule;
     private Addon[] Rows;
@@ -31,14 +30,13 @@ public unsafe class AddonTab : DebugTab
     private string SearchTerm = string.Empty;
     private ClientLanguage SelectedLanguage;
 
-    public AddonTab(TextService textService, TranslationManager translationManager, DebugRenderer debugRenderer, Module exdModule)
+    public AddonTab(TextService textService, DebugRenderer debugRenderer, Module exdModule)
     {
         TextService = textService;
-        TranslationManager = translationManager;
         DebugRenderer = debugRenderer;
         ExdModule = exdModule;
 
-        SelectedLanguage = TranslationManager.ClientLanguage;
+        SelectedLanguage = TextService.ClientLanguage;
         Rows = ExdModule.GetSheet<Addon>(SelectedLanguage.ToLumina()).ToArray();
     }
 

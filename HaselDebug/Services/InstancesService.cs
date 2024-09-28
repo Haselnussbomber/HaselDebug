@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using FFXIVClientStructs.Attributes;
-using HaselDebug.Extensions;
+using HaselCommon.Extensions;
 
 namespace HaselDebug.Services;
 

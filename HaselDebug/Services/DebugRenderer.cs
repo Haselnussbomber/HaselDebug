@@ -15,7 +15,6 @@ using FFXIVClientStructs.STD;
 using HaselCommon.Extensions;
 using HaselCommon.Services;
 using HaselCommon.Utils;
-using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using ImGuiNET;
 using InteropGenerator.Runtime.Attributes;

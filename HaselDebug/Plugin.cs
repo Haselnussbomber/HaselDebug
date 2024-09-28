@@ -33,7 +33,7 @@ public class Plugin : IDalamudPlugin
 
         Service
             // Dalamud & HaselCommon
-            .Initialize(pluginInterface)
+            .Initialize(pluginInterface, pluginLog)
 
             // Logging
             .AddLogging(builder =>

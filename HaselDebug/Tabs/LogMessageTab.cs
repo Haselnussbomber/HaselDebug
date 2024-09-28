@@ -22,7 +22,6 @@ public unsafe class LogMessageTab : DebugTab
     private const int LanguageSelectorWidth = 90;
 
     private readonly TextService TextService;
-    private readonly TranslationManager TranslationManager;
     private readonly DebugRenderer DebugRenderer;
     private readonly Module ExdModule;
     private LogMessage[] Rows;
@@ -31,14 +30,13 @@ public unsafe class LogMessageTab : DebugTab
     private string SearchTerm = string.Empty;
     private ClientLanguage SelectedLanguage;
 
-    public LogMessageTab(TextService textService, TranslationManager translationManager, DebugRenderer debugRenderer, Module exdModule)
+    public LogMessageTab(TextService textService, DebugRenderer debugRenderer, Module exdModule)
     {
         TextService = textService;
-        TranslationManager = translationManager;
         DebugRenderer = debugRenderer;
         ExdModule = exdModule;
 
-        SelectedLanguage = TranslationManager.ClientLanguage;
+        SelectedLanguage = TextService.ClientLanguage;
         Rows = ExdModule.GetSheet<LogMessage>(SelectedLanguage.ToLumina()).ToArray();
     }
 
