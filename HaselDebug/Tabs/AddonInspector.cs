@@ -424,7 +424,7 @@ public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer Deb
             {
                 ImGui.Image(
                     new IntPtr(kernelTexture->D3D11ShaderResourceView),
-                    new Vector2(kernelTexture->Width, kernelTexture->Height));
+                    new Vector2(kernelTexture->ActualWidth, kernelTexture->ActualHeight));
                 ImGui.TreePop();
             }
         }
@@ -436,8 +436,8 @@ public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer Deb
                 ImGui.Image(
                     new IntPtr(textureInfo->AtkTexture.KernelTexture->D3D11ShaderResourceView),
                     new Vector2(
-                        textureInfo->AtkTexture.KernelTexture->Width,
-                        textureInfo->AtkTexture.KernelTexture->Height));
+                        textureInfo->AtkTexture.KernelTexture->ActualWidth,
+                        textureInfo->AtkTexture.KernelTexture->ActualHeight));
                 ImGui.TreePop();
             }
         }

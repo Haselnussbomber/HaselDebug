@@ -43,7 +43,7 @@ public unsafe partial class DebugRenderer
         nodeOptions = nodeOptions.WithAddress(address);
 
         var tex = (KernelTexture*)address;
-        var title = $"{tex->Width}x{tex->Height}, {(TextureFormat)tex->TextureFormat}";
+        var title = $"{tex->ActualWidth}x{tex->ActualHeight}, {(TextureFormat)tex->TextureFormat}";
         if (nodeOptions.SeStringTitle != null)
             title = $"{nodeOptions.SeStringTitle.Value.ExtractText()} ({title})";
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
@@ -51,7 +51,7 @@ public unsafe partial class DebugRenderer
         if (!node) return;
         titleColor?.Dispose();
 
-        var size = new Vector2(tex->Width, tex->Height);
+        var size = new Vector2(tex->ActualWidth, tex->ActualHeight);
         var availSize = ImGui.GetContentRegionAvail();
 
         var scale = availSize.X / size.X;

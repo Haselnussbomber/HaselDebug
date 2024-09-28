@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - **Added:** EventFramework Task History (not very useful, but still better than nothing).
+- **Updated:** ClientStructs now at [81fb801](https://github.com/aers/FFXIVClientStructs/tree/81fb801)
 
 ## [1.6.3] (2024-07-22)
 
