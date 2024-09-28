@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.6.4] (2024-09-28)
 
 - **Added:** EventFramework Task History (not very useful, but still better than nothing).
 - **Updated:** ClientStructs now at [81fb801](https://github.com/aers/FFXIVClientStructs/tree/81fb801)
@@ -105,7 +105,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.3...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.4...main
+[1.6.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.0...v1.6.1
