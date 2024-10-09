@@ -4,7 +4,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.Strings;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;

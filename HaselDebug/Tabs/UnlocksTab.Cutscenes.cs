@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.Strings;
+using HaselCommon.Graphics;
 using HaselCommon.Services;
-using HaselCommon.Utils;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 
@@ -45,7 +45,7 @@ public unsafe partial class UnlocksTab
             ImGui.TextUnformatted(i.ToString());
 
             ImGui.TableNextColumn(); // Seen
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isSeen ? Colors.Green : Colors.Red)))
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isSeen ? Color.Green : Color.Red)))
                 ImGui.TextUnformatted(isSeen.ToString());
 
             ImGui.TableNextColumn(); // Path

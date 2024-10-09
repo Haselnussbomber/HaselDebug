@@ -3,7 +3,7 @@ using System.Reflection;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
 using ExdSheets;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.Reflection;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Text.ReadOnly;

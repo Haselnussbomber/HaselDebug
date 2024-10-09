@@ -3,8 +3,8 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using HaselCommon.Graphics;
 using HaselCommon.Services;
-using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -48,13 +48,13 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         if (row.RowId < 30000)
         {
             var isComplete = QuestManager.IsRecipeComplete(row.RowId);
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(QuestManager.IsRecipeComplete(row.RowId) ? Colors.Green : Colors.Red)))
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(QuestManager.IsRecipeComplete(row.RowId) ? Color.Green : Color.Red)))
                 ImGui.TextUnformatted(isComplete.ToString());
         }
 
         ImGui.TableNextColumn(); // Name
 
-        var clicked = ImGuiService.DrawSelectableItem(row.ItemResult.Value!, $"Recipe{row.RowId}");
+        var clicked = DrawSelectableItem(row.ItemResult.Value!, $"Recipe{row.RowId}");
         if (ImGui.IsItemHovered())
             ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
         if (clicked)

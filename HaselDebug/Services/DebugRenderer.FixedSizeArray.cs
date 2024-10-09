@@ -2,8 +2,8 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Dalamud.Interface.Utility.Raii;
-using HaselCommon.Extensions;
-using HaselCommon.Utils;
+using HaselCommon.Extensions.Reflection;
+using HaselCommon.Graphics;
 using HaselDebug.Utils;
 using ImGuiNET;
 
@@ -39,7 +39,7 @@ public unsafe partial class DebugRenderer
         var typeSize = type.SizeOf();
         if (typeSize == 0)
         {
-            ImGui.TextColored(Colors.Red, $"Can't get size of {type.Name}");
+            ImGui.TextColored(Color.Red, $"Can't get size of {type.Name}");
             return;
         }
 

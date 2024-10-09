@@ -4,8 +4,8 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using HaselCommon.Extensions;
-using HaselCommon.Utils;
+using HaselCommon.Extensions.Strings;
+using HaselCommon.Graphics;
 using HaselDebug.Abstracts;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -63,7 +63,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
 
             ImGui.TableNextColumn(); // Unlocked
             var isUnlocked = uiState->TitleList.IsTitleUnlocked((ushort)row.RowId);
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isUnlocked ? Colors.Green : Colors.Red)))
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isUnlocked ? Color.Green : Color.Red)))
                 ImGui.TextUnformatted(isUnlocked.ToString());
 
             ImGui.TableNextColumn(); // IsPrefix

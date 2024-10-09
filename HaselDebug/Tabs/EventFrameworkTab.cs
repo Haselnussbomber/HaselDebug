@@ -157,7 +157,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
             DebugRenderer.DrawAddress(task);
             ImGui.SameLine();
             ImGui.TextUnformatted(task->Type.ToString());
-            
+
             var exists = false;
             foreach (var (ptr, type) in TaskTypeHistory)
             {

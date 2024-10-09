@@ -2,7 +2,7 @@ using System.Text;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Memory;
-using HaselCommon.Utils;
+using HaselCommon.Graphics;
 using HaselDebug.Utils;
 using ImGuiNET;
 
@@ -43,7 +43,7 @@ public unsafe partial class DebugRenderer
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
 
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)Colors.Grey3))
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)Color.Grey3))
                 DrawCopyableText($"{address + line * numColumns:X}", asSelectable: true);
 
             var colpos = pos;

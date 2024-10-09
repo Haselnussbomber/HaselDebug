@@ -4,7 +4,7 @@ using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Dalamud.Utility;
 using HaselCommon.Commands;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.DependencyInjection;
 using HaselCommon.Logger;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;

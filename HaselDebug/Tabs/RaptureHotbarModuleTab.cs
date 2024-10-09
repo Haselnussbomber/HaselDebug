@@ -2,7 +2,7 @@ using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.Strings;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
 using HaselDebug.Abstracts;

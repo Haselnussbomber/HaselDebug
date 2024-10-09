@@ -3,10 +3,11 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.Strings;
+using HaselCommon.Graphics;
+using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
-using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
@@ -96,8 +97,8 @@ public unsafe class ObjectTableTab(
                     {
                         if (GameGui.WorldToScreen(gameObject->Position, out var screenPos))
                         {
-                            ImGui.GetForegroundDrawList().AddLine(ImGui.GetMousePos(), screenPos, Colors.Orange);
-                            ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Colors.Orange);
+                            ImGui.GetForegroundDrawList().AddLine(ImGui.GetMousePos(), screenPos, Color.Orange);
+                            ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Color.Orange);
                         }
                     },
                     DrawContextMenu = (NodeOptions nodeOptions) =>

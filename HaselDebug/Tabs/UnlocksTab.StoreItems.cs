@@ -5,9 +5,9 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.Strings;
+using HaselCommon.Graphics;
 using HaselCommon.Services;
-using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using ImGuiNET;
 using LuminaSupplemental.Excel.Model;
@@ -45,12 +45,12 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
 
         if (!isCabinetLoaded)
         {
-            TextService.DrawWrapped(Colors.Red, "UnlocksTab.CabinetNotLoaded");
+            TextService.DrawWrapped(Color.Red, "UnlocksTab.CabinetNotLoaded");
         }
 
         if (!isPrismBoxLoaded)
         {
-            TextService.DrawWrapped(Colors.Red, "UnlocksTab.PrismBoxNotLoaded");
+            TextService.DrawWrapped(Color.Red, "UnlocksTab.PrismBoxNotLoaded");
         }
 
         // i really need to make a sortable, searchable table soon
@@ -104,7 +104,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
                 DebugRenderer.DrawCopyableText(row.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty);
 
                 ImGui.TableNextColumn(); // Item
-                ImGuiService.DrawSelectableItem(row.Item.Value, $"StoreItemsList{i}");
+                DrawSelectableItem(row.Item.Value, $"StoreItemsList{i}");
 
                 /* i'd love to link the store, but that information is not available
                 if (ImGui.Selectable(TextService.GetItemName(row.ItemId)))
@@ -149,7 +149,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
                 else if (ItemService.IsUnlockable(row.Item.Row))
                 {
                     var isUnlocked = ItemService.IsUnlocked(row.Item.Row);
-                    using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isUnlocked ? Colors.Green : Colors.Red)))
+                    using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isUnlocked ? Color.Green : Color.Red)))
                         ImGui.TextUnformatted(isUnlocked.ToString());
                 }
             }

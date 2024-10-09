@@ -12,9 +12,11 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.Reflection;
+using HaselCommon.Extensions.Strings;
+using HaselCommon.Graphics;
+using HaselCommon.Gui;
 using HaselCommon.Services;
-using HaselCommon.Utils;
 using HaselDebug.Utils;
 using ImGuiNET;
 using InteropGenerator.Runtime.Attributes;
@@ -32,12 +34,12 @@ public unsafe partial class DebugRenderer(
 {
     private MethodInfo? GetSheetGeneric;
 
-    public HaselColor ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1);
-    public HaselColor ColorType { get; } = new(0.2f, 0.9f, 0.9f, 1);
-    public HaselColor ColorFieldName { get; } = new(0.2f, 0.9f, 0.4f, 1);
-    public HaselColor ColorTreeNode { get; } = new(1, 1, 0, 1);
-    public HaselColor ColorObsolete { get; } = new(1, 1, 0, 1);
-    public HaselColor ColorObsoleteError { get; } = new(1, 0, 0, 1);
+    public Color ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1);
+    public Color ColorType { get; } = new(0.2f, 0.9f, 0.9f, 1);
+    public Color ColorFieldName { get; } = new(0.2f, 0.9f, 0.4f, 1);
+    public Color ColorTreeNode { get; } = new(1, 1, 0, 1);
+    public Color ColorObsolete { get; } = new(1, 1, 0, 1);
+    public Color ColorObsoleteError { get; } = new(1, 0, 0, 1);
 
     private readonly Dictionary<Type, string[]> KnownStringPointers = new() {
         { typeof(FFXIVClientStructs.FFXIV.Client.UI.Agent.MapMarkerBase), ["Subtext"] },
@@ -224,7 +226,7 @@ public unsafe partial class DebugRenderer(
         foreach (var (fieldInfo, offset, size) in processedFields)
         {
             i++;
-            DrawCopyableText($"[0x{offset:X}]", $"{address + offset:X}", textColor: Colors.Grey3);
+            DrawCopyableText($"[0x{offset:X}]", $"{address + offset:X}", textColor: Color.Grey3);
             ImGui.SameLine();
 
             var fieldNodeOptions = nodeOptions.WithAddress(i);
@@ -279,7 +281,7 @@ public unsafe partial class DebugRenderer(
                 var underlyingTypeSize = underlyingType.SizeOf();
                 if (underlyingTypeSize == 0)
                 {
-                    ImGui.TextColored(Colors.Red, $"Can't get size of {underlyingType.Name}");
+                    ImGui.TextColored(Color.Red, $"Can't get size of {underlyingType.Name}");
                     continue;
                 }
 
@@ -296,7 +298,7 @@ public unsafe partial class DebugRenderer(
                 var underlyingTypeSize = underlyingType.SizeOf();
                 if (underlyingTypeSize == 0)
                 {
-                    ImGui.TextColored(Colors.Red, $"Can't get size of {underlyingType.Name}");
+                    ImGui.TextColored(Color.Red, $"Can't get size of {underlyingType.Name}");
                     continue;
                 }
 
@@ -313,7 +315,7 @@ public unsafe partial class DebugRenderer(
                 var underlyingTypeSize = underlyingType.SizeOf();
                 if (underlyingTypeSize == 0)
                 {
-                    ImGui.TextColored(Colors.Red, $"Can't get size of {underlyingType.Name}");
+                    ImGui.TextColored(Color.Red, $"Can't get size of {underlyingType.Name}");
                     continue;
                 }
 
@@ -444,7 +446,7 @@ public unsafe partial class DebugRenderer(
     public void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Vector4? textColor = null)
     {
         textCopy ??= text;
-        textColor ??= (Vector4)Colors.White;
+        textColor ??= (Vector4)Color.White;
 
         using (ImRaii.PushColor(ImGuiCol.Text, ImGui.ColorConvertFloat4ToU32((Vector4)textColor)))
         {

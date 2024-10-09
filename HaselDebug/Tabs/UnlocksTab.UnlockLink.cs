@@ -3,8 +3,8 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using HaselCommon.Graphics;
 using HaselCommon.Services;
-using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -39,7 +39,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
 
             ImGui.TableNextColumn(); // Unlocked
             var isUnlocked = UIState.Instance()->IsUnlockLinkUnlocked(id);
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isUnlocked ? Colors.Green : Colors.Red)))
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isUnlocked ? Color.Green : Color.Red)))
                 ImGui.TextUnformatted(isUnlocked.ToString());
 
             ImGui.TableNextColumn(); // Unlocks

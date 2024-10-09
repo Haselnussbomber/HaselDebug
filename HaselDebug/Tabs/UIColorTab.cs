@@ -1,7 +1,7 @@
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
+using HaselCommon.Graphics;
 using HaselCommon.Services;
-using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -34,19 +34,19 @@ public unsafe class UIColorTab(ExcelService ExcelService, TextService TextServic
             ImGui.TextUnformatted(row.RowId.ToString());
 
             ImGui.TableNextColumn();
-            var color = (Vector4)HaselColor.FromABGR(row.UIForeground);
+            var color = (Vector4)Color.FromABGR(row.UIForeground);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_UIForeground", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)HaselColor.FromABGR(row.UIGlow);
+            color = (Vector4)Color.FromABGR(row.UIGlow);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_UIGlow", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)HaselColor.FromABGR(row.Unknown2);
+            color = (Vector4)Color.FromABGR(row.Unknown2);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown2", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)HaselColor.FromABGR(row.Unknown3);
+            color = (Vector4)Color.FromABGR(row.Unknown3);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown3", ref color, ImGuiColorEditFlags.DisplayHex);
         }
     }

@@ -3,9 +3,10 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.Strings;
+using HaselCommon.Graphics;
+using HaselCommon.Gui;
 using HaselCommon.Services;
-using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using ImGuiNET;
@@ -85,7 +86,7 @@ public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService Ex
                 if (!string.IsNullOrEmpty(categoryName))
                 {
                     ImGuiUtils.PushCursorY(-3);
-                    using (ImRaii.PushColor(ImGuiCol.Text, (uint)Colors.Grey))
+                    using (ImRaii.PushColor(ImGuiCol.Text, (uint)Color.Grey))
                         ImGui.TextUnformatted(categoryName);
                 }
                 ImGuiUtils.PushCursorY(1);

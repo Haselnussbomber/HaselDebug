@@ -2,7 +2,7 @@ using System.Globalization;
 using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.Dalamud;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using ImGuiNET;

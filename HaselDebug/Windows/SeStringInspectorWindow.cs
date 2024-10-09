@@ -4,10 +4,10 @@ using System.Numerics;
 using Dalamud.Game;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
+using HaselCommon.Graphics;
+using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
-using HaselCommon.Utils;
-using HaselCommon.Windowing;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
@@ -72,7 +72,7 @@ public class SeStringInspectorWindow(
 
     private void DrawPreview()
     {
-        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(1), Title = "Preview", TitleColor = Colors.Green, DefaultOpen = true });
+        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(1), Title = "Preview", TitleColor = Color.Green, DefaultOpen = true });
         if (!node) return;
 
         var evaluated = SeStringEvaluator.Evaluate(SeString.AsSpan(), new()
@@ -91,7 +91,7 @@ public class SeStringInspectorWindow(
 
     private void DrawParameters()
     {
-        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(2), Title = "Parameters", TitleColor = Colors.Green, DefaultOpen = true });
+        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(2), Title = "Parameters", TitleColor = Color.Green, DefaultOpen = true });
         if (!node) return;
 
         for (var i = 0; i < LocalParameters!.Length; i++)
@@ -117,7 +117,7 @@ public class SeStringInspectorWindow(
 
     private void DrawPayloads()
     {
-        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(3), Title = "Payloads", TitleColor = Colors.Green, DefaultOpen = true });
+        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(3), Title = "Payloads", TitleColor = Color.Green, DefaultOpen = true });
         if (!node) return;
 
         DebugRenderer.DrawSeString(SeString.AsSpan(), false, new NodeOptions()

@@ -1,8 +1,8 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.Strings;
+using HaselCommon.Graphics;
 using HaselCommon.Services;
-using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -39,7 +39,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
 
             ImGui.TableNextColumn(); // Completed
             var isComplete = PlayerState.Instance()->IsAdventureComplete(i);
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isComplete ? Colors.Green : Colors.Red)))
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isComplete ? Color.Green : Color.Red)))
                 ImGui.TextUnformatted(isComplete.ToString());
 
             ImGui.TableNextColumn(); // Name

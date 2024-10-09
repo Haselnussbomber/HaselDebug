@@ -1,5 +1,5 @@
 using Dalamud.Interface.Utility.Raii;
-using HaselCommon.Extensions;
+using HaselCommon.Extensions.Reflection;
 using HaselDebug.Utils;
 using ImGuiNET;
 

@@ -11,8 +11,9 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselCommon.Graphics;
+using HaselCommon.Gui;
 using HaselCommon.Services;
-using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
@@ -138,7 +139,7 @@ public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer Deb
 
             ImGui.TableNextColumn(); // Name
             using (ImRaii.PushColor(ImGuiCol.Text, ImGui.GetColorU32(ImGuiCol.TextDisabled), !unitBase->IsVisible))
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)Colors.Gold, focusedList.Contains(unitBase)))
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)Color.Gold, focusedList.Contains(unitBase)))
             {
                 if (ImGui.Selectable(addonName + $"##Addon_{addonId}_{addonName}", addonId == SelectedAddonId && SelectedAddonName == addonName, ImGuiSelectableFlags.SpanAllColumns))
                 {
@@ -157,15 +158,15 @@ public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer Deb
                 ImGui.SetNextWindowSize(size);
 
                 using var windowStyles = ImRaii.PushStyle(ImGuiStyleVar.WindowBorderSize, 1.0f);
-                using var windowColors = Colors.Gold.Push(ImGuiCol.Border)
+                using var windowColors = Color.Gold.Push(ImGuiCol.Border)
                                                     .Push(ImGuiCol.WindowBg, new Vector4(0.847f, 0.733f, 0.49f, 0.33f));
 
                 if (ImGui.Begin("AddonHighligher", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoInputs))
                 {
                     var drawList = ImGui.GetForegroundDrawList();
                     var textPos = pos + new Vector2(0, -ImGui.GetTextLineHeight());
-                    drawList.AddText(textPos + Vector2.One, Colors.Black, addonName);
-                    drawList.AddText(textPos, Colors.Gold, addonName);
+                    drawList.AddText(textPos + Vector2.One, Color.Black, addonName);
+                    drawList.AddText(textPos, Color.Gold, addonName);
                     ImGui.End();
                 }
             }
@@ -303,7 +304,7 @@ public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer Deb
         using var treeNode = DebugRenderer.DrawTreeNode(nodeOptions with
         {
             Title = $"{treePrefix}{node->Type} Node (ptr = {(nint)node:X})",
-            TitleColor = Colors.Green
+            TitleColor = Color.Green
             // TODO: OnHovered = () => DrawOutline(node)
         });
 
@@ -687,7 +688,7 @@ public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer Deb
                         ImGui.GetForegroundDrawList().AddRectFilled(
                             new Vector2(bounds->Pos1.X, bounds->Pos1.Y),
                             new Vector2(bounds->Pos2.X, bounds->Pos2.Y),
-                            HaselColor.From(1, 1, 0, 0.5f));
+                            Color.From(1, 1, 0, 0.5f));
 
                         if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                         {
