@@ -7,13 +7,14 @@ using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
+using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
 public unsafe partial class UnlocksTab : DebugTab, IDisposable
 {
-    private (uint Id, HashSet<(string, uint, uint, string)> Unlocks)[] UnlockLinks = [];
+    private (uint Id, HashSet<(string, uint, uint, ReadOnlySeString)> Unlocks)[] UnlockLinks = [];
 
     public void DrawUnlockLinks()
     {
@@ -58,14 +59,14 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
 
                 ImGui.TableNextColumn(); // Name
                 DebugRenderer.DrawIcon(iconId);
-                ImGui.TextUnformatted(name);
+                ImGui.TextUnformatted(name.ExtractText());
             }
         }
     }
 
     private void UpdateUnlockLinks()
     {
-        var dict = new Dictionary<uint, HashSet<(string, uint, uint, string)>>();
+        var dict = new Dictionary<uint, HashSet<(string, uint, uint, ReadOnlySeString)>>();
 
         foreach (var row in ExcelService.GetSheet<GeneralAction>())
         {
@@ -78,12 +79,12 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
             }
         }
 
-        foreach (var row in ExcelService.GetSheet<Lumina.Excel.GeneratedSheets.Action>())
+        foreach (var row in ExcelService.GetSheet<Lumina.Excel.Sheets.Action>())
         {
-            if (row.UnlockLink is > 0 and < 65536)
+            if (row.UnlockLink.RowId is > 0 and < 65536)
             {
-                if (!dict.TryGetValue(row.UnlockLink, out var names))
-                    dict.Add(row.UnlockLink, names = []);
+                if (!dict.TryGetValue(row.UnlockLink.RowId, out var names))
+                    dict.Add(row.UnlockLink.RowId, names = []);
 
                 names.Add(("Action", row.RowId, row.Icon, row.Name));
             }

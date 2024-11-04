@@ -8,7 +8,7 @@ using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -114,7 +114,7 @@ public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, ExcelService
         var sb = new StringBuilder();
         foreach (var (itemId, item) in currencyManager->ContentItemBucket)
         {
-            sb.AppendLine($"| {itemId} | {ExcelService.GetSheet<Item>(ClientLanguage.English)!.GetRow(itemId)!.Name.ToDalamudString().ToString()} |<br/>");
+            sb.AppendLine($"| {itemId} | {ExcelService.GetSheet<Item>(ClientLanguage.English).GetRow(itemId).Name.ToDalamudString().ToString()} |<br/>");
         }
         DebugRenderer.DrawCopyableText(sb.ToString());
     }

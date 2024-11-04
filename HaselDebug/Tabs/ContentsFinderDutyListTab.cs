@@ -1,6 +1,7 @@
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
@@ -20,6 +21,28 @@ public unsafe class ContentsFinderDutyListTab(DebugRenderer DebugRenderer) : Deb
                 UIModule.Instance()->ExecuteMainCommand(33);
             }
             return;
+        }
+
+        if (ImGui.Button("12 0"))
+        {
+            var returnValue = stackalloc AtkValue[1];
+            var command = stackalloc AtkValue[2];
+
+            command[0].SetInt(12);
+            command[1].SetInt(0);
+
+            AgentContentsFinder.Instance()->ReceiveEvent(returnValue, command, 2, 0);
+        }
+
+        if (ImGui.Button("12 1"))
+        {
+            var returnValue = stackalloc AtkValue[1];
+            var command = stackalloc AtkValue[2];
+
+            command[0].SetInt(12);
+            command[1].SetInt(1);
+
+            AgentContentsFinder.Instance()->ReceiveEvent(returnValue, command, 2, 0);
         }
 
         ImGui.TextUnformatted($"ItemCount: {addon->DutyList->Items.LongCount}");

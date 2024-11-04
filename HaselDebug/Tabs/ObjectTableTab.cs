@@ -3,7 +3,6 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
@@ -12,7 +11,7 @@ using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
 using ObjectKind = FFXIVClientStructs.FFXIV.Client.Game.Object.ObjectKind;
 
@@ -49,18 +48,14 @@ public unsafe class ObjectTableTab(
             var objectName = new ReadOnlySeStringSpan(gameObject->GetName()).ExtractText();
 
             var title = objectName;
-            if (objectKind == ObjectKind.EventNpc)
+            if (objectKind == ObjectKind.EventNpc && ExcelService.TryGetRow<ENpcResident>(gameObject->BaseId, out var resident) && !resident.Title.IsEmpty)
             {
-                var resident = ExcelService.GetRow<ENpcResident>(gameObject->BaseId);
-                if (resident != null && resident.Title.RawData.Length > 0)
+                var evaluated = SeStringEvaluator.EvaluateFromAddon(37, new SeStringContext() { LocalParameters = [resident.Title] }).ExtractText();
+                if (!string.IsNullOrWhiteSpace(evaluated))
                 {
-                    var evaluated = SeStringEvaluator.EvaluateFromAddon(37, new SeStringContext() { LocalParameters = [resident.Title] }).ExtractText();
-                    if (!string.IsNullOrWhiteSpace(evaluated))
-                    {
-                        if (!string.IsNullOrEmpty(evaluated))
-                            title += " ";
-                        title += evaluated;
-                    }
+                    if (!string.IsNullOrEmpty(evaluated))
+                        title += " ";
+                    title += evaluated;
                 }
             }
 
@@ -130,33 +125,30 @@ public unsafe class ObjectTableTab(
                     case EventHandlerType.Adventure:
                         ImGui.TextUnformatted($"Adventure#{gameObject->EventHandler->Info.EventId.Id}");
 
-                        var adventureName = ExcelService.GetRow<Adventure>(gameObject->EventHandler->Info.EventId.Id)?.Name.ExtractText();
-                        if (!string.IsNullOrWhiteSpace(adventureName))
+                        if (ExcelService.TryGetRow<Adventure>(gameObject->EventHandler->Info.EventId.Id, out var adventure) && !adventure.Name.IsEmpty)
                         {
                             ImGuiUtils.SameLineSpace();
-                            ImGui.TextUnformatted($"({adventureName})");
+                            ImGui.TextUnformatted($"({adventure.Name})");
                         }
                         break;
 
                     case EventHandlerType.Quest:
                         ImGui.TextUnformatted($"Quest#{gameObject->EventHandler->Info.EventId.EntryId + 0x10000u}");
 
-                        var questName = ExcelService.GetRow<Quest>(gameObject->EventHandler->Info.EventId.EntryId + 0x10000u)?.Name.ExtractText();
-                        if (!string.IsNullOrWhiteSpace(questName))
+                        if (ExcelService.TryGetRow<Quest>(gameObject->EventHandler->Info.EventId.EntryId + 0x10000u, out var quest) && !quest.Name.IsEmpty)
                         {
                             ImGuiUtils.SameLineSpace();
-                            ImGui.TextUnformatted($"({questName})");
+                            ImGui.TextUnformatted($"({quest.Name})");
                         }
                         break;
 
                     case EventHandlerType.CustomTalk:
                         ImGui.TextUnformatted($"CustomTalk#{gameObject->EventHandler->Info.EventId.Id}");
 
-                        var customTalkName = ExcelService.GetRow<CustomTalk>(gameObject->EventHandler->Info.EventId.Id)?.Name.ExtractText();
-                        if (!string.IsNullOrWhiteSpace(customTalkName))
+                        if (ExcelService.TryGetRow<CustomTalk>(gameObject->EventHandler->Info.EventId.Id, out var customTalk) && !customTalk.Name.IsEmpty)
                         {
                             ImGuiUtils.SameLineSpace();
-                            ImGui.TextUnformatted($"({customTalkName})");
+                            ImGui.TextUnformatted($"({customTalk.Name})");
                         }
                         break;
 

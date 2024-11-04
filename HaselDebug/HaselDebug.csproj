@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <PackageReference Include="DalamudPackager" Version="2.1.13" />
-    <PackageReference Include="ExdSheets" Version="2.1.0" />
     <PackageReference Include="LuminaSupplemental.Excel" Version="2.0.6" />
     <Reference Include="Dalamud" Private="false" />
     <Reference Include="ImGui.NET" Private="false" />
@@ -73,8 +72,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
 

@@ -7,13 +7,13 @@ using Dalamud.Game;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
-using ExdSheets;
-using ExdSheets.Sheets;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
+using Lumina.Excel;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -23,21 +23,21 @@ public unsafe class LogMessageTab : DebugTab
 
     private readonly TextService TextService;
     private readonly DebugRenderer DebugRenderer;
-    private readonly Module ExdModule;
+    private readonly ExcelModule ExcelModule;
     private LogMessage[] Rows;
     private LogMessage[]? FilteredRows;
     private CancellationTokenSource? FilterCTS;
     private string SearchTerm = string.Empty;
     private ClientLanguage SelectedLanguage;
 
-    public LogMessageTab(TextService textService, DebugRenderer debugRenderer, Module exdModule)
+    public LogMessageTab(TextService textService, DebugRenderer debugRenderer, ExcelModule excelModule)
     {
         TextService = textService;
         DebugRenderer = debugRenderer;
-        ExdModule = exdModule;
+        ExcelModule = excelModule;
 
         SelectedLanguage = TextService.ClientLanguage;
-        Rows = ExdModule.GetSheet<LogMessage>(SelectedLanguage.ToLumina()).ToArray();
+        Rows = ExcelModule.GetSheet<LogMessage>(SelectedLanguage.ToLumina()).ToArray();
     }
 
     public override bool DrawInChild => false;
@@ -59,7 +59,7 @@ public unsafe class LogMessageTab : DebugTab
                     if (ImGui.Selectable(Enum.GetName(value), value == SelectedLanguage))
                     {
                         SelectedLanguage = value;
-                        Rows = ExdModule.GetSheet<LogMessage>(SelectedLanguage.ToLumina()).ToArray();
+                        Rows = ExcelModule.GetSheet<LogMessage>(SelectedLanguage.ToLumina()).ToArray();
                         listDirty |= true;
                     }
                 }

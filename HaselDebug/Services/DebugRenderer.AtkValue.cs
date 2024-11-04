@@ -36,8 +36,14 @@ public unsafe partial class DebugRenderer
             case ValueType.ManagedVector:
                 DrawStdVector((nint)value->Vector, typeof(AtkValue), nodeOptions);
                 break;
-            case ValueType.Texture:
-                DrawTexture((nint)value->Texture, nodeOptions);
+            case ValueType.Pointer:
+                DrawNumeric((nint)(&value->Pointer), typeof(nint), nodeOptions);
+                break;
+            case ValueType.Undefined:
+                ImGui.TextUnformatted("Undefined");
+                break;
+            default:
+                ImGui.TextUnformatted(value->ToString());
                 break;
         }
     }

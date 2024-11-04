@@ -43,7 +43,7 @@ public class Plugin : IDalamudPlugin
                 builder.AddProvider(new DalamudLoggerProvider(pluginLog));
             })
 
-            .AddSingleton(new ExdSheets.Module(dataManager.GameData, clientState.ClientLanguage.ToLumina()))
+            .AddSingleton(dataManager.Excel)
 
             // HaselDebug
             .AddSingleton(PluginConfig.Load(pluginInterface, pluginLog))
@@ -60,7 +60,7 @@ public class Plugin : IDalamudPlugin
 
 #if HAS_LOCAL_CS
         FFXIVClientStructs.Interop.Generated.Addresses.Register();
-        //Addresses.Register();
+        Addresses.Register();
         Resolver.GetInstance.Setup(
             sigScanner.SearchBase,
             dataManager.GameData.Repositories["ffxiv"].Version,
@@ -117,7 +117,7 @@ public class Plugin : IDalamudPlugin
         Service.Dispose();
 
 #if HAS_LOCAL_CS
-        //Addresses.Unregister();
+        Addresses.Unregister();
 #endif
     }
 }

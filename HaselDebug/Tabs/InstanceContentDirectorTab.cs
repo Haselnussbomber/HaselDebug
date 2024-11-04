@@ -7,15 +7,17 @@ using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
+using Lumina.Text.ReadOnly;
 using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
+using InstanceContentType = FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.InstanceContentType;
 
 namespace HaselDebug.Tabs;
 
 public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISigScanner SigScanner, ExcelService ExcelService) : DebugTab
 {
 
-    private static readonly Dictionary<(string, InstanceContentType), nint> InstanceContentTypeVtables = [];
+    private static readonly Dictionary<(ReadOnlySeString, InstanceContentType), nint> InstanceContentTypeVtables = [];
 
     public override void Draw()
     {
@@ -91,8 +93,8 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         else
         {
             var ic = ExcelService.GetSheet<InstanceContent>().GetRow(instanceContentDirector->ContentDirector.Director.ContentId);
-            var cfc = ExcelService.GetSheet<ContentFinderCondition>(ClientLanguage.English).GetRow(ic?.Order ?? 0);
-            var key = (cfc?.Name ?? instanceContentDirector->ContentDirector.Director.UnkString0.ToString(), instanceContentDirector->InstanceContentType);
+            var cfc = ExcelService.GetSheet<ContentFinderCondition>(ClientLanguage.English).GetRow(ic.Order);
+            var key = (!cfc.Name.IsEmpty ? cfc.Name : instanceContentDirector->ContentDirector.Director.UnkString0.ToString(), instanceContentDirector->InstanceContentType);
             if (!InstanceContentTypeVtables.ContainsKey(key))
             {
                 InstanceContentTypeVtables.Add(key, *(nint*)instanceContentDirector);

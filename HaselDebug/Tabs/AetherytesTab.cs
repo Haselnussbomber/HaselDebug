@@ -1,11 +1,10 @@
 using Dalamud.Game.Text;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -31,17 +30,20 @@ public class AetherytesTab(IAetheryteList AetheryteList, TextService TextService
 
         foreach (var aetheryte in AetheryteList)
         {
-            var gameData = aetheryte.AetheryteData.GameData;
-            if (gameData == null || gameData.Invisible || !gameData.IsAetheryte)
+            if (!aetheryte.AetheryteData.IsValid)
+                continue;
+
+            var gameData = aetheryte.AetheryteData.Value;
+            if (gameData.Invisible || !gameData.IsAetheryte || !gameData.Territory.IsValid)
                 continue;
 
             var territory = gameData.Territory.Value;
-            if (territory == null)
+            if (!territory.Map.IsValid)
                 continue;
 
-            var regionName = territory.Map.Value?.PlaceNameRegion.Value?.Name.ToString();
-            var mapName = territory.Map.Value?.PlaceName.Value?.Name.ToString();
-            var aetheryteName = gameData.PlaceName.Value?.Name.ToString();
+            var regionName = territory.Map.Value.PlaceNameRegion.Value.Name.ToString();
+            var mapName = territory.Map.Value.PlaceName.Value.Name.ToString();
+            var aetheryteName = gameData.PlaceName.Value.Name.ToString();
 
             var regionType = GetRegion(territory);
 
@@ -57,7 +59,7 @@ public class AetherytesTab(IAetheryteList AetheryteList, TextService TextService
             ImGui.TextUnformatted(GetRegionName(regionType));
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(territory.ExVersion.Value?.Name.ExtractText() ?? string.Empty);
+            ImGui.TextUnformatted(territory.ExVersion.Value.Name.ExtractText());
 
             ImGui.TableNextColumn();
             ImGui.TextUnformatted(regionName);
@@ -75,15 +77,15 @@ public class AetherytesTab(IAetheryteList AetheryteList, TextService TextService
 
     // "48 83 EC 28 0F B7 4A 08"
     // int GetRegion(Client::UI::Agent::AgentTeleport* thisPtr, Client::Game::UI::TeleportInfo* teleportInfo)
-    private static AetheryteRegion GetRegion(TerritoryType? territoryType)
+    private static AetheryteRegion GetRegion(TerritoryType territoryType)
     {
-        if (territoryType == null)
-            return AetheryteRegion.Others;
+        //if (territoryType == null)
+        //    return AetheryteRegion.Others;
 
-        if (territoryType.TerritoryIntendedUse == 13)
+        if (territoryType.TerritoryIntendedUse.RowId == 13)
             return AetheryteRegion.HousingArea;
 
-        return territoryType.PlaceNameRegion.Row switch
+        return territoryType.PlaceNameRegion.RowId switch
         {
             22u => AetheryteRegion.LaNoscea,
             23u => AetheryteRegion.TheBlackShroud,
@@ -112,9 +114,9 @@ public class AetherytesTab(IAetheryteList AetheryteList, TextService TextService
     {
         return region switch
         {
-            AetheryteRegion.LaNoscea => ExcelService.GetRow<PlaceName>(22)!.Name.ExtractText(), // La Noscea
-            AetheryteRegion.TheBlackShroud => ExcelService.GetRow<PlaceName>(23)!.Name.ExtractText(), // The Black Shroud
-            AetheryteRegion.Thanalan => ExcelService.GetRow<PlaceName>(24)!.Name.ExtractText(), // Thanalan
+            AetheryteRegion.LaNoscea => ExcelService.TryGetRow<PlaceName>(22, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // La Noscea
+            AetheryteRegion.TheBlackShroud => ExcelService.TryGetRow<PlaceName>(23, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // The Black Shroud
+            AetheryteRegion.Thanalan => ExcelService.TryGetRow<PlaceName>(24, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // Thanalan
             AetheryteRegion.Coerthas or AetheryteRegion.Dravania or AetheryteRegion.AbalathiasSpine => TextService.GetAddonText(8486), // Ishgard and Surrounding Areas
             AetheryteRegion.GyrAbania => TextService.GetAddonText(8488), // Gyr Abania
             AetheryteRegion.Hingashi or AetheryteRegion.Othard => TextService.GetAddonText(8489), // Othard

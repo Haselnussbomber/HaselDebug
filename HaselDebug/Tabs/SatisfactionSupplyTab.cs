@@ -3,7 +3,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -36,10 +36,10 @@ public unsafe class SatisfactionSupplyTab(ExcelService ExcelService, TextService
             ImGui.TextUnformatted(row.RowId.ToString());
 
             ImGui.TableNextColumn(); // Name
-            ImGui.TextUnformatted(TextService.GetENpcResidentName(row.Npc.Row));
+            ImGui.TextUnformatted(TextService.GetENpcResidentName(row.Npc.RowId));
 
             ImGui.TableNextColumn(); // Satisfaction
-            ImGui.TextUnformatted($"{satisfactionSupply->Satisfaction[index]}/{row.SatisfactionRequired[satisfactionSupply->SatisfactionRanks[index]]}");
+            ImGui.TextUnformatted($"{satisfactionSupply->Satisfaction[index]}/{row.SatisfactionNpcParams[satisfactionSupply->SatisfactionRanks[index]].SatisfactionRequired}");
 
             ImGui.TableNextColumn(); // Rank
             ImGui.TextUnformatted($"{satisfactionSupply->SatisfactionRanks[index]}");

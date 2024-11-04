@@ -1,41 +1,46 @@
 /*
-using HaselDebug.Interfaces;
-using HaselDebug.Utils;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using FFXIVClientStructs.Interop;
+using HaselDebug.Abstracts;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class AllocFunctionsTab : IDebugWindowTab
+public unsafe class AllocFunctions : IDebugTab
 {
     public string Title => "AllocFunctions";
+    public string InternalName => "AllocFunctions";
+    public bool DrawInChild => true;
 
     public unsafe void Draw()
     {
         var raptureAtkModule = RaptureAtkModule.Instance();
 
-        using var table = ImRaii.Table("AllocFunctions", 9);
+        using var table = ImRaii.Table("AllocFunctions", 3 /*9* /);
         if (!table.Success) return;
 
         ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
         ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthFixed, 150);
-        ImGui.TableSetupColumn("Unk8", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("UnkC", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Dependencies", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("NumDependencies", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Unk1C", ImGuiTableColumnFlags.WidthFixed, 100);
+        //ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthFixed, 150);
+        //ImGui.TableSetupColumn("Unk8", ImGuiTableColumnFlags.WidthFixed, 100);
+        //ImGui.TableSetupColumn("UnkC", ImGuiTableColumnFlags.WidthFixed, 100);
+        //ImGui.TableSetupColumn("Dependencies", ImGuiTableColumnFlags.WidthFixed, 100);
+        //ImGui.TableSetupColumn("NumDependencies", ImGuiTableColumnFlags.WidthFixed, 100);
+        //ImGui.TableSetupColumn("Unk1C", ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupColumn("AlwaysLoaded", ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableHeadersRow();
 
-        for (var i = 0; i < raptureAtkModule->AddonAllocatorsSpan.Length; i++)
-        {
-            var entry = raptureAtkModule->AddonAllocatorsSpan.GetPointer(i);
-            if (entry == null) continue;
+        var addonAllocators = new Span<AddonAllocator>((void*)((nint)raptureAtkModule + 0x87F8), 873);
 
-            var name = raptureAtkModule->AddonNames.Get((ulong)i);
+        for (var i = 0; i < addonAllocators.Length; i++)
+        {
+            var entry = addonAllocators.GetPointer(i);
+            if (entry == null)
+                continue;
+            if (entry->AlwaysLoaded == 0)
+                continue;
+
+            var name = raptureAtkModule->AddonNames[i];
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
@@ -45,28 +50,21 @@ public unsafe class AllocFunctionsTab : IDebugWindowTab
             ImGui.Text($"{name}");
 
             ImGui.TableNextColumn();
-            if ((nint)entry->AllocFunction != 0)
-                Debug.DrawCopyableText($"ffxiv_dx11.exe+{(nint)entry->AllocFunction - Service.SigScanner.Module.BaseAddress:X}");
-
-            ImGui.TableNextColumn();
-            if (entry->Unk8 != 0)
-                ImGui.Text($"{entry->Unk8}");
-            ImGui.TableNextColumn();
-            if (entry->UnkC != 32758)
-                ImGui.Text($"{entry->UnkC}");
-            ImGui.TableNextColumn();
-            if (entry->Dependencies != 0)
-                Debug.DrawCopyableText($"{entry->Dependencies:X}");
-            ImGui.TableNextColumn();
-            if (entry->NumDependencies != 0)
-                ImGui.Text($"{entry->NumDependencies}");
-            ImGui.TableNextColumn();
-            if (entry->Unk1C != 0)
-                ImGui.Text($"{entry->Unk1C}");
-            ImGui.TableNextColumn();
-            if (entry->AlwaysLoaded)
+            if (entry->AlwaysLoaded == 1)
                 ImGui.Text($"{entry->AlwaysLoaded}");
         }
     }
+}
+
+[StructLayout(LayoutKind.Explicit, Size = 0x28)]
+public struct AddonAllocator
+{
+    // [FieldOffset(0x00)] public nint AllocFunction;
+    // [FieldOffset(0x08)] public int ThisOffset;
+    // [FieldOffset(0x0C)] public uint UnkC;
+    // [FieldOffset(0x10)] public nint Dependencies;
+    // [FieldOffset(0x18)] public int NumDependencies;
+    // [FieldOffset(0x1C)] public int Unk1C;
+    [FieldOffset(0x20)] public byte AlwaysLoaded; // bool?
 }
 */

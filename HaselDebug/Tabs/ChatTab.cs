@@ -6,7 +6,7 @@ using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -71,7 +71,7 @@ public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelServi
                     ImGui.TableNextColumn(); // Formatted Message
                     var senderEvaluated = SeStringEvaluator.Evaluate(sender);
                     var messageEvaluated = SeStringEvaluator.Evaluate(message);
-                    var format = ExcelService.GetRow<LogKind>((uint)logKind)?.Format.AsReadOnly() ?? new();
+                    var format = ExcelService.TryGetRow<LogKind>((uint)logKind, out var logKindRow) ? logKindRow.Format : new();
                     var formatted = SeStringEvaluator.Evaluate(format, new SeStringContext() { LocalParameters = [senderEvaluated, messageEvaluated] }).AsSpan();
 
                     if (!formatted.IsEmpty)

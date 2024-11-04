@@ -8,7 +8,7 @@ using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Lumina.Text;
 
 namespace HaselDebug.Tabs;
@@ -169,7 +169,7 @@ public unsafe class InventoryTab(DebugRenderer DebugRenderer, TextService TextSe
 
         foreach (var row in ExcelService.GetSheet<TomestonesItem>()!)
         {
-            ImGui.TextUnformatted($"TomestoneItem #{row.RowId} ({row.Item.Value?.Name ?? ""}): {inventoryManager->GetTomestoneCount(row.Item.Row):N0}");
+            ImGui.TextUnformatted($"TomestoneItem #{row.RowId} ({row.Item.Value.Name}): {inventoryManager->GetTomestoneCount(row.Item.RowId):N0}");
         }
     }
 }

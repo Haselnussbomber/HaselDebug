@@ -1,11 +1,10 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 

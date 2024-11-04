@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Dalamud.Game;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
@@ -32,8 +33,6 @@ public unsafe partial class DebugRenderer(
     SeStringEvaluatorService SeStringEvaluator,
     TextService TextService)
 {
-    private MethodInfo? GetSheetGeneric;
-
     public Color ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1);
     public Color ColorType { get; } = new(0.2f, 0.9f, 0.9f, 1);
     public Color ColorFieldName { get; } = new(0.2f, 0.9f, 0.4f, 1);
@@ -585,7 +584,6 @@ public unsafe partial class DebugRenderer(
         return value;
     }
 
-    /*
     public string ToBitsString(ulong value, int bits)
     {
         var bitsString = new StringBuilder();
@@ -608,7 +606,6 @@ public unsafe partial class DebugRenderer(
 
     public string ToBitsString(uint byteIn)
         => ToBitsString(byteIn, 32);
-    */
 
     public void DrawIcon(uint iconId, bool isHq = false, bool sameLine = true, DrawInfo drawInfo = default)
     {

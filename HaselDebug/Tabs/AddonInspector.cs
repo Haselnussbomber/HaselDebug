@@ -123,6 +123,9 @@ public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer Deb
 
         foreach (AtkUnitBase* unitBase in allUnitsList)
         {
+            // if ((unitBase->Flags198 & 0b1100_0000) != 0 || unitBase->HostId != 0)
+            //     continue;
+
             var addonId = unitBase->Id;
             var addonName = unitBase->NameString;
 

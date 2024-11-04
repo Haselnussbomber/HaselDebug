@@ -1,18 +1,19 @@
 using System.Linq;
 using System.Reflection;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using Dalamud.Utility;
-using ExdSheets;
 using HaselCommon.Extensions.Reflection;
 using HaselDebug.Utils;
 using ImGuiNET;
+using Lumina.Excel;
 using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Services;
 
 public unsafe partial class DebugRenderer
 {
-    public void DrawExdSheet(ExdSheets.Module module, Type rowType, uint rowId, uint depth, NodeOptions nodeOptions)
+    public void DrawExdSheet(ExcelModule module, Type sheetType, uint rowId, uint depth, NodeOptions nodeOptions)
     {
         if (depth > 10)
         {
@@ -20,61 +21,41 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        nodeOptions = nodeOptions.WithAddress((rowType.Name.GetHashCode(), (nint)rowId).GetHashCode());
+        nodeOptions = nodeOptions.WithAddress((sheetType.Name.GetHashCode(), (nint)rowId).GetHashCode());
 
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
-        using var node = ImRaii.TreeNode($"{rowType.Name}#{rowId}###{nodeOptions.AddressPath}", nodeOptions.GetTreeNodeFlags());
+        using var node = ImRaii.TreeNode($"{sheetType.Name}#{rowId}###{nodeOptions.AddressPath}", nodeOptions.GetTreeNodeFlags());
         if (!node) return;
         titleColor.Dispose();
 
-        GetSheetGeneric ??= module.GetType().GetMethod("GetSheetGeneric", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var sheet = GetSheetGeneric.Invoke(module, [rowType, nodeOptions.Language.ToLumina()]);
-        if (sheet == null)
+        foreach (var propInfo in sheetType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
         {
-            ImGui.TextUnformatted("sheet is null");
-            return;
-        }
-
-        var getRow = sheet.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).FirstOrDefault(info => info.Name == "TryGetRow" && info.GetParameters().Length == 1);
-        if (getRow == null)
-        {
-            ImGui.TextUnformatted("Could not find TryGetRow");
-            return;
-        }
-
-        var row = getRow?.Invoke(sheet, [rowId]);
-        if (row == null)
-        {
-            ImGui.TextUnformatted($"Row {rowId} is null");
-            return;
-        }
-
-        foreach (var propInfo in rowType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
-        {
-            if (propInfo.Name == "RowId") continue;
+            if (propInfo.Name == "RowId")
+                continue;
 
             DrawCopyableText(propInfo.PropertyType.ReadableTypeName(), propInfo.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
             ImGui.SameLine();
             ImGui.TextColored(ColorFieldName, propInfo.Name);
             ImGui.SameLine();
-            DrawExdSheetColumnValue(module, rowType, rowId, propInfo.Name, depth, nodeOptions);
+            DrawExdSheetColumnValue(module, sheetType, rowId, propInfo.Name, depth, nodeOptions);
         }
     }
 
-    public void DrawExdSheetColumnValue(ExdSheets.Module module, Type rowType, uint rowId, string propName, uint depth, NodeOptions nodeOptions)
+    public void DrawExdSheetColumnValue(ExcelModule module, Type sheetType, uint rowId, string propName, uint depth, NodeOptions nodeOptions)
     {
-        GetSheetGeneric ??= module.GetType().GetMethod("GetSheetGeneric", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var sheet = GetSheetGeneric.Invoke(module, [rowType, nodeOptions.Language.ToLumina()]);
+        var getSheet = module.GetType().GetMethod("GetSheet", BindingFlags.Instance | BindingFlags.Public)!;
+        var genericGetSheet = getSheet.MakeGenericMethod(sheetType);
+        var sheet = genericGetSheet.Invoke(module, [nodeOptions.Language.ToLumina(), sheetType.GetCustomAttribute<SheetAttribute>()?.Name ?? sheetType.Name]);
         if (sheet == null)
         {
             ImGui.TextUnformatted("sheet is null");
             return;
         }
 
-        var getRow = sheet.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).FirstOrDefault(info => info.Name == "TryGetRow" && info.GetParameters().Length == 1);
+        var getRow = sheet.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).FirstOrDefault(info => info.Name == "GetRowOrDefault" && info.GetParameters().Length == 1);
         if (getRow == null)
         {
-            ImGui.TextUnformatted("Could not find TryGetRow");
+            ImGui.TextUnformatted("Could not find GetRowOrDefault");
             return;
         }
 
@@ -85,7 +66,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        var propInfo = rowType.GetProperty(propName, BindingFlags.Instance | BindingFlags.Public);
+        var propInfo = sheetType.GetProperty(propName, BindingFlags.Instance | BindingFlags.Public);
         if (propInfo == null)
             return;
 
@@ -106,14 +87,14 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (propInfo.PropertyType == typeof(LazyRow))
+        if (propInfo.PropertyType == typeof(RowRef))
         {
             var columnRowId = (uint)propInfo.PropertyType.GetProperty("RowId")?.GetValue(value)!;
             ImGui.TextUnformatted(columnRowId.ToString());
             return;
         }
 
-        if (propInfo.PropertyType.IsGenericType && propInfo.PropertyType.GetGenericTypeDefinition() == typeof(LazyRow<>))
+        if (propInfo.PropertyType.IsGenericType && propInfo.PropertyType.GetGenericTypeDefinition() == typeof(RowRef<>))
         {
             var isValid = (bool)propInfo.PropertyType.GetProperty("IsValid")?.GetValue(value)!;
             if (!isValid)
@@ -133,7 +114,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (propInfo.PropertyType.IsGenericType && propInfo.PropertyType.GetGenericTypeDefinition() == typeof(LazyCollection<>))
+        if (propInfo.PropertyType.IsGenericType && propInfo.PropertyType.GetGenericTypeDefinition() == typeof(Collection<>))
         {
             var count = (int)propInfo.PropertyType.GetProperty("Count")?.GetValue(value)!;
             if (count == 0)
@@ -146,11 +127,11 @@ public unsafe partial class DebugRenderer
             var propNodeOptions = nodeOptions.WithAddress(collectionType.Name.GetHashCode());
 
             using var colTitleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
-            using var colNode = ImRaii.TreeNode($"{count} Value{(count != 1 ? "s" : "")}{propNodeOptions.GetKey("LazyCollectionNode")}", nodeOptions.GetTreeNodeFlags());
+            using var colNode = ImRaii.TreeNode($"{count} Value{(count != 1 ? "s" : "")}{propNodeOptions.GetKey("CollectionNode")}", nodeOptions.GetTreeNodeFlags());
             if (!colNode) return;
             colTitleColor?.Dispose();
 
-            using var table = ImRaii.Table(propNodeOptions.GetKey("LazyCollectionTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
+            using var table = ImRaii.Table(propNodeOptions.GetKey("CollectionTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
             if (!table) return;
 
             ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
@@ -184,14 +165,14 @@ public unsafe partial class DebugRenderer
                     continue;
                 }
 
-                if (collectionType == typeof(LazyRow))
+                if (collectionType == typeof(RowRef))
                 {
                     var columnRowId = (uint)collectionType.GetProperty("RowId")?.GetValue(colValue)!;
                     ImGui.TextUnformatted(columnRowId.ToString());
                     continue;
                 }
 
-                if (collectionType.IsGenericType && collectionType.GetGenericTypeDefinition() == typeof(LazyRow<>))
+                if (collectionType.IsGenericType && collectionType.GetGenericTypeDefinition() == typeof(RowRef<>))
                 {
                     var isValid = (bool)collectionType.GetProperty("IsValid")?.GetValue(colValue)!;
                     if (!isValid)

@@ -8,7 +8,7 @@ using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselDebug.Abstracts;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -82,7 +82,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
                     uiState->TitleController.SendTitleIdUpdate(titleIdToSend);
                     if (titleIdToSend != 0)
                     {
-                        using var title = new Utf8String(row.Feminine.RawData);
+                        using var title = row.Feminine.ToUtf8String();
                         RaptureLogModule.Instance()->ShowLogMessageString(3846u, &title);
                     }
                 }
@@ -105,7 +105,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
                     uiState->TitleController.SendTitleIdUpdate(titleIdToSend);
                     if (titleIdToSend != 0)
                     {
-                        using var title = new Utf8String(row.Masculine.RawData);
+                        using var title = row.Masculine.ToUtf8String();
                         RaptureLogModule.Instance()->ShowLogMessageString(3846u, &title);
                     }
                 }

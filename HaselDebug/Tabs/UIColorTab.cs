@@ -4,7 +4,7 @@ using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -42,12 +42,12 @@ public unsafe class UIColorTab(ExcelService ExcelService, TextService TextServic
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_UIGlow", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)Color.FromABGR(row.Unknown2);
-            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown2", ref color, ImGuiColorEditFlags.DisplayHex);
+            color = (Vector4)Color.FromABGR(row.Unknown0);
+            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown0", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)Color.FromABGR(row.Unknown3);
-            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown3", ref color, ImGuiColorEditFlags.DisplayHex);
+            color = (Vector4)Color.FromABGR(row.Unknown1);
+            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown1", ref color, ImGuiColorEditFlags.DisplayHex);
         }
     }
 }

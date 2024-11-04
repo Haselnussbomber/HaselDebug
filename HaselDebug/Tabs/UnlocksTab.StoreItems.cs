@@ -1,3 +1,6 @@
+/*
+ * LuminaSupplemental not Lumina 5 compatible
+ * 
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +14,7 @@ using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using ImGuiNET;
 using LuminaSupplemental.Excel.Model;
-using Cabinet = Lumina.Excel.GeneratedSheets.Cabinet;
+using Cabinet = Lumina.Excel.Sheets.Cabinet;
 
 namespace HaselDebug.Tabs;
 
@@ -23,7 +26,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
     public void UpdateStoreItems()
     {
         StoreItemsList = CsvLoader.LoadResource<StoreItem>(CsvLoader.StoreItemResourceName, out _, DataManager.GameData, TextService.ClientLanguage.ToLumina())
-            .Where(row => row.RowId != 0 && row.Item.Row is not (0 or 5827) && row.Item.Value != null)
+            .Where(row => row.RowId != 0 && row.Item.RowId is not (0 or 5827) && row.Item.Value != null)
             .GroupBy(row => row.FittingShopItemSetId)
             .SelectMany(group => group)
             .DistinctBy(row => row.Item.Row)
@@ -31,7 +34,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
             .ThenBy(row => TextService.GetItemName(row.Item.Row))
             .ToList();
 
-        CabinetItems = ExcelService.GetSheet<Cabinet>().DistinctBy(row => row.Item.Row).ToFrozenDictionary(row => row.Item.Row, row => row.RowId);
+        CabinetItems = ExcelService.GetSheet<Cabinet>().DistinctBy(row => row.Item.RowId).ToFrozenDictionary(row => row.Item.Row, row => row.RowId);
     }
 
     public void DrawStoreItems()
@@ -111,7 +114,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
                 {
                     Util.OpenLink($"https://store.finalfantasyxiv.com/ffxivstore/product/{row.RowId}");
                 }
-                */
+                * /
 
                 ImGui.TableNextColumn(); // Collected
 
@@ -159,3 +162,4 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         imGuiListClipperPtr.Destroy();
     }
 }
+*/

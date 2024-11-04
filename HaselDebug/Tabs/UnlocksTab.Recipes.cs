@@ -7,7 +7,7 @@ using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -23,7 +23,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         using var table = ImRaii.Table("RecipesTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        Recipes ??= ExcelService.GetSheet<Recipe>().Where(row => row.ItemResult.Row != 0).ToArray();
+        Recipes ??= ExcelService.FindRows<Recipe>(row => row.ItemResult.RowId != 0);
 
         ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupColumn("Completed", ImGuiTableColumnFlags.WidthFixed, 60);
@@ -36,7 +36,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
 
     private void DrawRecipeRow(Recipe row)
     {
-        if (row.ItemResult.Row <= 0)
+        if (row.ItemResult.RowId <= 0)
             return;
 
         ImGui.TableNextRow();

@@ -3,14 +3,13 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -81,8 +80,7 @@ public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService Ex
 
                 ImGui.TextUnformatted(row.Name.ExtractText());
 
-                var category = ExcelService.GetRow<MainCommandCategory>(row.MainCommandCategory.Row);
-                var categoryName = category?.Name.ExtractText() ?? string.Empty;
+                var categoryName = ExcelService.TryGetRow<MainCommandCategory>(row.MainCommandCategory.RowId, out var category) ? category.Name.ExtractText() : string.Empty;
                 if (!string.IsNullOrEmpty(categoryName))
                 {
                     ImGuiUtils.PushCursorY(-3);

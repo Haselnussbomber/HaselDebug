@@ -2,14 +2,13 @@ using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -86,7 +85,7 @@ public unsafe class RaptureHotbarModuleTab(DebugRenderer DebugRenderer, ExcelSer
                             RaptureHotbarModule.HotbarSlotType.EventItem => TextService.GetItemName(slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.Emote => TextService.GetEmoteName(slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.Macro => GetMacroName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.Marker => ExcelService.GetRow<Marker>(slot->CommandId)?.Name.ExtractText() ?? $"Marker#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.Marker => ExcelService.TryGetRow<Marker>(slot->CommandId, out var marker) ? marker.Name.ExtractText() : $"Marker#{slot->CommandId}",
                             RaptureHotbarModule.HotbarSlotType.CraftAction => TextService.GetCraftActionName(slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.GeneralAction => TextService.GetGeneralActionName(slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.BuddyAction => TextService.GetBuddyActionName(slot->CommandId),
@@ -95,16 +94,16 @@ public unsafe class RaptureHotbarModuleTab(DebugRenderer DebugRenderer, ExcelSer
                             RaptureHotbarModule.HotbarSlotType.GearSet => GetGearsetName((int)slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.PetAction => TextService.GetPetActionName(slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.Mount => TextService.GetMountName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.FieldMarker => ExcelService.GetRow<FieldMarker>(slot->CommandId)?.Name.ExtractText() ?? $"FieldMarker#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.FieldMarker => ExcelService.TryGetRow<FieldMarker>(slot->CommandId, out var fieldMarker) ? fieldMarker.Name.ExtractText() : $"FieldMarker#{slot->CommandId}",
                             RaptureHotbarModule.HotbarSlotType.Recipe => GetRecipeName(slot),
-                            RaptureHotbarModule.HotbarSlotType.ChocoboRaceAbility => ExcelService.GetRow<ChocoboRaceAbility>(slot->CommandId)?.Name.ExtractText() ?? $"ChocoboRaceAbility#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.ChocoboRaceItem => ExcelService.GetRow<ChocoboRaceItem>(slot->CommandId)?.Name.ExtractText() ?? $"ChocoboRaceItem#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.ExtraCommand => ExcelService.GetRow<ExtraCommand>(slot->CommandId)?.Name.ExtractText() ?? $"ExtraCommand#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.PvPQuickChat => ExcelService.GetRow<QuickChat>(slot->CommandId)?.NameAction.ExtractText() ?? $"QuickChat#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.PvPCombo => ExcelService.GetRow<ActionComboRoute>(slot->CommandId)?.Name.ExtractText() ?? $"ActionComboRoute#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.BgcArmyAction => ExcelService.GetRow<Lumina.Excel.GeneratedSheets2.BgcArmyAction>(slot->CommandId)?.Unknown0.ExtractText() ?? $"BgcArmyAction#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.PerformanceInstrument => ExcelService.GetRow<Perform>(slot->CommandId)?.Instrument.ExtractText() ?? $"Perform#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.McGuffin => ExcelService.GetRow<McGuffinUIData>(ExcelService.GetRow<McGuffin>(slot->CommandId)?.UIData.Row ?? 0)?.Name.ExtractText() ?? $"McGuffin#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.ChocoboRaceAbility => ExcelService.TryGetRow<ChocoboRaceAbility>(slot->CommandId, out var chocoboRaceAbility) ? chocoboRaceAbility.Name.ExtractText() : $"ChocoboRaceAbility#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.ChocoboRaceItem => ExcelService.TryGetRow<ChocoboRaceItem>(slot->CommandId, out var chocoboRaceItem) ? chocoboRaceItem.Name.ExtractText() : $"ChocoboRaceItem#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.ExtraCommand => ExcelService.TryGetRow<ExtraCommand>(slot->CommandId, out var extraCommand) ? extraCommand.Name.ExtractText() : $"ExtraCommand#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.PvPQuickChat => ExcelService.TryGetRow<QuickChat>(slot->CommandId, out var quickChat) ? quickChat.NameAction.ExtractText() : $"QuickChat#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.PvPCombo => ExcelService.TryGetRow<ActionComboRoute>(slot->CommandId, out var actionComboRoute) ? actionComboRoute.Name.ExtractText() : $"ActionComboRoute#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.BgcArmyAction => ExcelService.TryGetRow<BgcArmyAction>(slot->CommandId, out var bgcArmyAction) ? bgcArmyAction.Unknown0.ExtractText() : $"BgcArmyAction#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.PerformanceInstrument => ExcelService.TryGetRow<Perform>(slot->CommandId, out var perform) ? perform.Instrument.ExtractText() : $"Perform#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.McGuffin => ExcelService.TryGetRow<McGuffinUIData>(ExcelService.TryGetRow<McGuffin>(slot->CommandId, out var mcGuffin) ? mcGuffin.UIData.RowId : 0, out var mcGuffinUIData) ? mcGuffinUIData.Name.ExtractText() : $"McGuffin#{slot->CommandId}",
                             RaptureHotbarModule.HotbarSlotType.Ornament => TextService.GetOrnamentName(slot->CommandId),
                             // LostFindsItem
                             RaptureHotbarModule.HotbarSlotType.Glasses => TextService.GetGlassesName(slot->CommandId),

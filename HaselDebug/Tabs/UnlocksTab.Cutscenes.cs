@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -31,11 +30,11 @@ public unsafe partial class UnlocksTab
         var uiState = UIState.Instance();
         var sheet = ExcelService.GetSheet<Cutscene>()!;
         var sheetWI = ExcelService.GetSheet<CutsceneWorkIndex>()!;
-        for (var i = 0u; i < sheet.RowCount; i++)
+        for (var i = 0u; i < sheet.Count; i++)
         {
             var row = sheet.GetRow(i);
             var rowWI = sheetWI.GetRow(i);
-            if (i == 0 || row == null || rowWI == null || rowWI.WorkIndex == 0) continue;
+            if (i == 0 || rowWI.WorkIndex == 0) continue;
 
             var isSeen = uiState->IsCutsceneSeen(i);
 
@@ -67,28 +66,30 @@ public unsafe partial class UnlocksTab
         {
             foreach (var cutscene in row.Cutscene)
             {
-                if (cutscene.Row == 0) continue;
+                if (cutscene.RowId == 0) continue;
                 var tuple = (typeof(CompleteJournal), row.RowId, row.Name.ExtractText());
 
-                if (Cutscenes.TryGetValue(cutscene.Row, out var cEntry))
+                if (Cutscenes.TryGetValue(cutscene.RowId, out var cEntry))
                     cEntry.Add(tuple);
                 else
-                    Cutscenes.Add(cutscene.Row, new([tuple]));
+                    Cutscenes.Add(cutscene.RowId, new([tuple]));
             }
         }
 
-        foreach (var row in ExcelService.GetSheet<Lumina.Excel.GeneratedSheets.InstanceContent>())
+        foreach (var row in ExcelService.GetSheet<Lumina.Excel.Sheets.InstanceContent>())
         {
-            if (row.Cutscene.Row == 0) continue;
+            if (row.Cutscene.RowId == 0)
+                continue;
 
-            var cfc = ExcelService.FindRow<ContentFinderCondition>(cfcrow => cfcrow!.ContentLinkType == 1 && cfcrow.Content == row.RowId);
+            if (!ExcelService.TryFindRow<ContentFinderCondition>(cfcrow => cfcrow!.ContentLinkType == 1 && cfcrow.Content.RowId == row.RowId, out var cfc))
+                continue;
 
-            var tuple = (typeof(Lumina.Excel.GeneratedSheets.InstanceContent), row.RowId, cfc?.Name.ExtractText() ?? "?");
+            var tuple = (typeof(Lumina.Excel.Sheets.InstanceContent), row.RowId, cfc.Name.ExtractText() ?? "?");
 
-            if (Cutscenes.TryGetValue(row.Cutscene.Row, out var cEntry))
+            if (Cutscenes.TryGetValue(row.Cutscene.RowId, out var cEntry))
                 cEntry.Add(tuple);
             else
-                Cutscenes.Add(row.Cutscene.Row, new([tuple]));
+                Cutscenes.Add(row.Cutscene.RowId, new([tuple]));
         }
 
         // PartyContentCutscene, PublicContentCutscene, Warp

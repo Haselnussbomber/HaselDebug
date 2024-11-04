@@ -7,13 +7,13 @@ using Dalamud.Game;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
-using ExdSheets;
-using ExdSheets.Sheets;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
+using Lumina.Excel;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
@@ -23,21 +23,21 @@ public unsafe class AddonTab : DebugTab
 
     private readonly TextService TextService;
     private readonly DebugRenderer DebugRenderer;
-    private readonly Module ExdModule;
+    private readonly ExcelModule ExcelModule;
     private Addon[] Rows;
     private Addon[]? FilteredRows;
     private CancellationTokenSource? FilterCTS;
     private string SearchTerm = string.Empty;
     private ClientLanguage SelectedLanguage;
 
-    public AddonTab(TextService textService, DebugRenderer debugRenderer, Module exdModule)
+    public AddonTab(TextService textService, DebugRenderer debugRenderer, ExcelModule excelModule)
     {
         TextService = textService;
         DebugRenderer = debugRenderer;
-        ExdModule = exdModule;
+        ExcelModule = excelModule;
 
         SelectedLanguage = TextService.ClientLanguage;
-        Rows = ExdModule.GetSheet<Addon>(SelectedLanguage.ToLumina()).ToArray();
+        Rows = ExcelModule.GetSheet<Addon>(SelectedLanguage.ToLumina()).ToArray();
     }
 
     public override bool DrawInChild => false;
@@ -59,7 +59,7 @@ public unsafe class AddonTab : DebugTab
                     if (ImGui.Selectable(Enum.GetName(value), value == SelectedLanguage))
                     {
                         SelectedLanguage = value;
-                        Rows = ExdModule.GetSheet<Addon>(SelectedLanguage.ToLumina()).ToArray();
+                        Rows = ExcelModule.GetSheet<Addon>(SelectedLanguage.ToLumina()).ToArray();
                         listDirty |= true;
                     }
                 }

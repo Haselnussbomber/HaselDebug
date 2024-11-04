@@ -1,9 +1,8 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Extensions.Strings;
 using HaselDebug.Abstracts;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
