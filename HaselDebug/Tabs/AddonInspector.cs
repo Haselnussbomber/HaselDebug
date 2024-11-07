@@ -40,9 +40,9 @@ public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer Deb
 
     public override void Draw()
     {
-        AddonTypes ??= typeof(Addon).Assembly.GetTypes()
-            .Where(type => type.GetCustomAttribute<Addon>() != null)
-            .SelectMany(type => type.GetCustomAttribute<Addon>()!.AddonIdentifiers, (type, addonName) => (type, addonName))
+        AddonTypes ??= typeof(AddonAttribute).Assembly.GetTypes()
+            .Where(type => type.GetCustomAttribute<AddonAttribute>() != null)
+            .SelectMany(type => type.GetCustomAttribute<AddonAttribute>()!.AddonIdentifiers, (type, addonName) => (type, addonName))
             .ToImmutableSortedDictionary(
                 tuple => tuple.addonName,
                 tuple => tuple.type);
