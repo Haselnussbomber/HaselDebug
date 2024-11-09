@@ -45,7 +45,7 @@ public unsafe class InclusionShopTab(DebugRenderer DebugRenderer) : DebugTab
             ImGui.TextUnformatted("No shop open!");
             return;
         }
-        
+
         DebugRenderer.DrawPointerType(addon->AtkValues, typeof(InclusionShopAtkValues), new NodeOptions());
     }
 }

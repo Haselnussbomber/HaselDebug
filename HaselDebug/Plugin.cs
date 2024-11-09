@@ -2,7 +2,6 @@ using System.IO;
 using Dalamud.Game;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using Dalamud.Utility;
 using HaselCommon.Commands;
 using HaselCommon.Extensions.DependencyInjection;
 using HaselCommon.Logger;

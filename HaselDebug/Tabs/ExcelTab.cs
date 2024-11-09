@@ -10,6 +10,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using Dalamud.Utility;
+using HaselCommon.Extensions.Reflection;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
@@ -21,10 +22,8 @@ using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
 using Microsoft.Extensions.Logging;
-using SheetName = (int Id, string Name);
 using SheetColumn = (string Name, System.Type Type);
-using HaselCommon.Extensions.Reflection;
-using HaselCommon.Math;
+using SheetName = (int Id, string Name);
 
 namespace HaselDebug.Tabs;
 
