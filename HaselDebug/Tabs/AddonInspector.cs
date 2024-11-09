@@ -304,11 +304,12 @@ public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer Deb
     {
         //var isVisible = node->NodeFlags.HasFlag(NodeFlags.Visible);
 
+        DebugRenderer.HighlightNode((nint)(&node), typeof(AtkResNode*), ref nodeOptions);
+
         using var treeNode = DebugRenderer.DrawTreeNode(nodeOptions with
         {
             Title = $"{treePrefix}{node->Type} Node (ptr = {(nint)node:X})",
             TitleColor = Color.Green
-            // TODO: OnHovered = () => DrawOutline(node)
         });
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
@@ -467,11 +468,13 @@ public unsafe class AddonInspectorTab(TextService TextService, DebugRenderer Deb
         if (isVisible)
             ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 255, 0, 255));
 
-        if (ImGui.TreeNodeEx($"{treePrefix}{objectInfo->ComponentType} Component Node (ptr = {(nint)node:X}, component ptr = {(nint)compNode->Component:X}) child count = {childCount}###{nodeOptions.GetKey("ComponentNode")}", ImGuiTreeNodeFlags.SpanAvailWidth))
-        {
-            // if (ImGui.IsItemHovered())
-            //     DrawOutline(node);
+        var nodeOpen = ImGui.TreeNodeEx($"{treePrefix}{objectInfo->ComponentType} Component Node (ptr = {(nint)node:X}, component ptr = {(nint)compNode->Component:X}) child count = {childCount}###{nodeOptions.GetKey("ComponentNode")}", ImGuiTreeNodeFlags.SpanAvailWidth);
 
+        if (ImGui.IsItemHovered())
+            DebugRenderer.HighlightNode(node);
+
+        if (nodeOpen)
+        {
             if (isVisible)
             {
                 ImGui.PopStyleColor();

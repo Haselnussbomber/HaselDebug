@@ -343,11 +343,11 @@ public unsafe partial class DebugRenderer(
             }
 
             // Vector2
-            if (fieldType == typeof(System.Numerics.Vector2))
+            if (fieldType == typeof(Vector2))
             {
                 DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
-                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(System.Numerics.Vector2*)fieldAddress).ToString() });
+                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(Vector2*)fieldAddress).ToString() });
                 continue;
             }
             if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector2))
@@ -362,11 +362,11 @@ public unsafe partial class DebugRenderer(
             }
 
             // Vector3
-            if (fieldType == typeof(System.Numerics.Vector3))
+            if (fieldType == typeof(Vector3))
             {
                 DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
-                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(System.Numerics.Vector3*)fieldAddress).ToString() });
+                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(Vector3*)fieldAddress).ToString() });
                 continue;
             }
             if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector3))
@@ -381,11 +381,11 @@ public unsafe partial class DebugRenderer(
             }
 
             // Vector4
-            if (fieldType == typeof(System.Numerics.Vector4))
+            if (fieldType == typeof(Vector4))
             {
                 DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
                 ImGui.SameLine();
-                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(System.Numerics.Vector4*)fieldAddress).ToString() });
+                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(Vector4*)fieldAddress).ToString() });
                 continue;
             }
             if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector4))
@@ -407,8 +407,67 @@ public unsafe partial class DebugRenderer(
             if (fieldType == typeof(uint) && fieldInfo.Name == "IconId")
                 DrawIcon(*(uint*)fieldAddress);
 
+            if (fieldType.IsPointer && fieldAddress != 0)
+                HighlightNode(fieldAddress, fieldType, ref fieldNodeOptions);
+
             DrawPointerType(fieldAddress, fieldType, fieldNodeOptions);
         }
+    }
+
+    public void HighlightNode(nint fieldAddress, Type fieldType, ref NodeOptions fieldNodeOptions)
+    {
+        if (fieldType == typeof(AtkResNode*) || fieldType == typeof(Pointer<AtkResNode>) ||
+            fieldType == typeof(AtkCollisionNode*) || fieldType == typeof(Pointer<AtkCollisionNode>) ||
+            fieldType == typeof(AtkComponentNode*) || fieldType == typeof(Pointer<AtkComponentNode>) ||
+            fieldType == typeof(AtkCounterNode*) || fieldType == typeof(Pointer<AtkCounterNode>) ||
+            fieldType == typeof(AtkImageNode*) || fieldType == typeof(Pointer<AtkImageNode>) ||
+            fieldType == typeof(AtkNineGridNode*) || fieldType == typeof(Pointer<AtkNineGridNode>) ||
+            fieldType == typeof(AtkTextNode*) || fieldType == typeof(Pointer<AtkTextNode>))
+        {
+            fieldNodeOptions = fieldNodeOptions with
+            {
+                OnHovered = () => HighlightNode(*(AtkResNode**)fieldAddress)
+            };
+        }
+        else if (fieldType == typeof(AtkComponentButton*) || fieldType == typeof(Pointer<AtkComponentButton>) ||
+            fieldType == typeof(AtkComponentRadioButton*) || fieldType == typeof(Pointer<AtkComponentRadioButton>) ||
+            fieldType == typeof(AtkComponentDragDrop*) || fieldType == typeof(Pointer<AtkComponentDragDrop>) ||
+            fieldType == typeof(AtkComponentDropDownList*) || fieldType == typeof(Pointer<AtkComponentDropDownList>) ||
+            fieldType == typeof(AtkComponentGaugeBar*) || fieldType == typeof(Pointer<AtkComponentGaugeBar>) ||
+            fieldType == typeof(AtkComponentGuildLeveCard*) || fieldType == typeof(Pointer<AtkComponentGuildLeveCard>) ||
+            fieldType == typeof(AtkComponentIcon*) || fieldType == typeof(Pointer<AtkComponentIcon>) ||
+            fieldType == typeof(AtkComponentIconText*) || fieldType == typeof(Pointer<AtkComponentIconText>) ||
+            fieldType == typeof(AtkComponentInputBase*) || fieldType == typeof(Pointer<AtkComponentInputBase>) ||
+            fieldType == typeof(AtkComponentJournalCanvas*) || fieldType == typeof(Pointer<AtkComponentJournalCanvas>) ||
+            fieldType == typeof(AtkComponentList*) || fieldType == typeof(Pointer<AtkComponentList>) ||
+            fieldType == typeof(AtkComponentPortrait*) || fieldType == typeof(Pointer<AtkComponentPortrait>) ||
+            fieldType == typeof(AtkComponentScrollBar*) || fieldType == typeof(Pointer<AtkComponentScrollBar>) ||
+            fieldType == typeof(AtkComponentSlider*) || fieldType == typeof(Pointer<AtkComponentSlider>) ||
+            fieldType == typeof(AtkComponentTextNineGrid*) || fieldType == typeof(Pointer<AtkComponentTextNineGrid>) ||
+            fieldType == typeof(AtkComponentWindow*) || fieldType == typeof(Pointer<AtkComponentWindow>))
+        {
+            fieldNodeOptions = fieldNodeOptions with
+            {
+                OnHovered = () =>
+                {
+                    var component = *(AtkComponentBase**)fieldAddress;
+                    if (component == null || component->AtkResNode == null)
+                        return;
+
+                    HighlightNode(component->AtkResNode);
+                }
+            };
+        }
+    }
+
+    public void HighlightNode(AtkResNode* node)
+    {
+        if (node == null)
+            return;
+
+        var pos = new Vector2(node->ScreenX, node->ScreenY);
+        var size = new Vector2(node->Width, node->Height);
+        ImGui.GetForegroundDrawList().AddRect(pos, pos + size, Color.Gold);
     }
 
     private void DrawEnum(nint address, Type type, NodeOptions nodeOptions)
