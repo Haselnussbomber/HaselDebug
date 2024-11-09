@@ -42,7 +42,8 @@ public unsafe partial class DebugRenderer(
 
     private readonly Dictionary<Type, string[]> KnownStringPointers = new() {
         { typeof(FFXIVClientStructs.FFXIV.Client.UI.Agent.MapMarkerBase), ["Subtext"] },
-        { typeof(FFXIVClientStructs.FFXIV.Common.Component.Excel.ExcelSheet), ["SheetName"] }
+        { typeof(FFXIVClientStructs.FFXIV.Common.Component.Excel.ExcelSheet), ["SheetName"] },
+        { typeof(AtkTextNode), ["OriginalTextPointer"] }
     };
 
     public void DrawPointerType(void* obj, Type? type, NodeOptions nodeOptions)

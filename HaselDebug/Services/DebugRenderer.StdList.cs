@@ -1,4 +1,5 @@
 using Dalamud.Interface.Utility.Raii;
+using FFXIVClientStructs.STD.ContainerInterface;
 using HaselDebug.Utils;
 using ImGuiNET;
 
@@ -28,14 +29,18 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
-        var _head = **(nint**)address;
+        var _head = *(nint*)address;
         var _current = _head;
+        var valueType = type.GenericTypeArguments[0];
+        var nodeType = typeof(IStdList<>.Node).MakeGenericType(valueType);
+        var valueOffset = Marshal.OffsetOf(nodeType, "Value");
 
         bool MoveNext()
         {
-            if (_head == 0 || *(nint*)_current == _head)
+            var next = *(nint*)_current; // _current->Next
+            if (_head == 0 || next == _head)
                 return false;
-            _current = *(nint*)_current;
+            _current = next;
             return true;
         }
 
@@ -56,7 +61,7 @@ public unsafe partial class DebugRenderer
             ImGui.TextUnformatted(i.ToString());
 
             ImGui.TableNextColumn(); // Value
-            DrawPointerType(_current + 0x10, type, new NodeOptions() { AddressPath = nodeOptions.AddressPath });
+            DrawPointerType(_current + valueOffset, valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath });
             i++;
         }
     }
