@@ -210,7 +210,7 @@ public class ExcelTab : DebugTab
         }
 
         SelectedSheetName = sheetName;
-        SheetLanguages = ExcelHeaderFile.Languages;
+        SheetLanguages = ExcelHeaderFile.Languages.Except([Language.ChineseSimplified, Language.ChineseTraditional, Language.Korean]).ToArray();
 
         var lang = SheetLanguages.Contains(SelectedLanguage)
             ? SelectedLanguage
@@ -296,6 +296,7 @@ public class ExcelTab : DebugTab
                     if (ImGui.Selectable(Enum.GetName(value), value == SelectedLanguage))
                     {
                         SelectedLanguage = value;
+                        LoadSheet(value);
                         //Rows = dataManager.Excel.GetSheet<Addon>(SelectedLanguage.ToLumina()).ToArray();
                         listDirty |= true;
                     }
