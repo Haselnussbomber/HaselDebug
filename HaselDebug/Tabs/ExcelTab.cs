@@ -11,6 +11,7 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using Dalamud.Utility;
 using HaselCommon.Extensions.Reflection;
+using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
@@ -277,6 +278,13 @@ public class ExcelTab : DebugTab
         ImGui.TextUnformatted("\u2022");
         ImGui.SameLine();
         ImGui.TextUnformatted(string.Concat("Column: ", excelSheetColumns.Length));
+
+        if (excelSheetColumns.Length > 70)
+        {
+            using (Color.Red.Push(ImGuiCol.Text))
+                ImGuiHelpers.SafeTextWrapped("Displaying this sheet would currently crash the game (ImGui column count limitation). Please use other tools for now.");
+            return;
+        }
 
         var supportsLanguages = !SheetLanguages.Contains(Language.None);
 
