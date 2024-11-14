@@ -107,13 +107,13 @@ public unsafe class InventoryTab(DebugRenderer DebugRenderer, TextService TextSe
         ImGui.TableSetupScrollFreeze(3, 1);
         ImGui.TableHeadersRow();
 
-        for (var i = 0; i < container->Size; i++)
+        for (var i = 0; i < container->GetSize(); i++)
         {
             var slot = container->GetInventorySlot(i);
             if (slot == null) continue;
 
             var itemId = slot->GetItemId();
-            var quantity = slot->GetQuantity();
+            var quantity = slot->GetSpiritbondOrQuantity();
 
             using var disableditem = ImRaii.Disabled(itemId == 0);
 
