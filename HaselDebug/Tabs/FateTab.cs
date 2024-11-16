@@ -135,8 +135,8 @@ public class FateTab(IFateTable FateTable, ITextureProvider TextureProvider) : D
                 ImGui.TextUnformatted($"{TimeSpan.FromSeconds(fate.TimeRemaining):mm\\:ss} / {TimeSpan.FromSeconds(fate.Duration):mm\\:ss}");
             }
 
-            ImGui.TableNextColumn(); // HasExpBonus
-            ImGui.TextUnformatted(fate.HasExpBonus.ToString());
+            ImGui.TableNextColumn(); // HasBonus
+            ImGui.TextUnformatted(fate.HasBonus.ToString());
 
             ImGui.TableNextColumn(); // Position
             DrawCopyableText(fate.Position.ToString(), "Click to copy Position");
