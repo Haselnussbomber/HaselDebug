@@ -91,6 +91,8 @@ public unsafe class ConfigModuleTab : DebugTab
         sb.AppendLine("");
         sb.AppendLine($"public enum {configName}ConfigOption {{");
 
+        var usedNames = new HashSet<string>();
+
         var configEntry = configBase.ConfigEntry;
         for (var i = 0; i < configBase.ConfigCount; i++, configEntry++)
         {
@@ -104,8 +106,9 @@ public unsafe class ConfigModuleTab : DebugTab
                 ? MemoryHelper.ReadStringNullTerminated((nint)configEntry->Name)
                 : "";
 
-            if (dict.ContainsValue(name))
-                name = $"{name}_{i}";
+            // Dalamud doesn't support multiple options with the same name
+            if (!usedNames.Add(name))
+                continue;
 
             if (configEntry->Type == 1)
                 continue;
