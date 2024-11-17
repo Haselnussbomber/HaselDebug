@@ -5,6 +5,8 @@ using System.Reflection;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
@@ -66,7 +68,7 @@ public unsafe class AgentsTab(
         {
             var agent = agentModule->Agents[i];
             var agentId = (AgentId)i;
-            var agentName = Enum.GetName(agentId) ?? string.Empty;
+            var (agentName, isAgentNameAddonName) = GetAgentName(agentId);
 
             if (hasSearchTerm && !agentName.Contains(AgentNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
                 continue;
@@ -82,15 +84,19 @@ public unsafe class AgentsTab(
             ImGui.TextUnformatted(i.ToString());
 
             ImGui.TableNextColumn(); // Name
-            if (ImGui.Selectable(agentName + $"##Agent{i}", SelectedAgentId == agentId, ImGuiSelectableFlags.SpanAllColumns))
+
+            using (Color.Yellow.Push(ImGuiCol.Text, isAgentNameAddonName))
             {
-                SelectedAgentId = agentId;
+                if (ImGui.Selectable(agentName + $"##Agent{i}", SelectedAgentId == agentId, ImGuiSelectableFlags.SpanAllColumns))
+                {
+                    SelectedAgentId = agentId;
+                }
             }
             using (var contextMenu = ImRaii.ContextPopupItem($"##AgentContext{agentId}"))
             {
                 if (contextMenu)
                 {
-                    if (!string.IsNullOrEmpty(agentName) && ImGui.MenuItem("Copy AgentId"))
+                    if (!string.IsNullOrEmpty(agentName) && ImGui.MenuItem("Copy Name"))
                     {
                         ImGui.SetClipboardText(agentName);
                     }
@@ -105,6 +111,18 @@ public unsafe class AgentsTab(
             ImGui.TableNextColumn(); // Active
             ImGui.TextUnformatted(agent.Value->IsAgentActive().ToString());
         }
+    }
+
+    private (string, bool) GetAgentName(AgentId agentId)
+    {
+        var name = Enum.GetName(agentId);
+        if (!string.IsNullOrEmpty(name))
+            return (name, false);
+
+        if (TryGetAddon<AtkUnitBase>(agentId, out var addon) && !string.IsNullOrEmpty(addon->NameString))
+            return (addon->NameString, true);
+
+        return (string.Empty, false);
     }
 
     private void DrawAgent(AgentId agentId)
