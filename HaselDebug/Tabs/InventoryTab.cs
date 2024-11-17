@@ -113,7 +113,7 @@ public unsafe class InventoryTab(DebugRenderer DebugRenderer, TextService TextSe
             if (slot == null) continue;
 
             var itemId = slot->GetItemId();
-            var quantity = slot->GetSpiritbondOrQuantity();
+            var quantity = slot->GetQuantity();
 
             using var disableditem = ImRaii.Disabled(itemId == 0);
 
