@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.5] (2024-09-28)
+
+Update for 7.1.
+
+- **Added:** Unknown Agents will show the Addon name in yellow, if they are active.
+- **Added:** Addon Inspector will now highlight the nodes on hover.
+- **Fixed:** StdList rendering was incorrect.
+
 ## [1.6.4] (2024-09-28)
 
 - **Added:** EventFramework Task History (not very useful, but still better than nothing).
@@ -105,7 +113,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.4...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.5...main
+[1.6.5]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.4...v1.6.5
 [1.6.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.1...v1.6.2
