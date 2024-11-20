@@ -50,6 +50,7 @@ jobs:
             echo "branch=${{ github.event.inputs.dalamud_branch }}" >> $GITHUB_OUTPUT
           elif [[ "${{ github.event.ref }}" == "refs/heads/stg" ]] || [[ "${{ github.event.head_commit.message }}" == "[stg]"* ]]; then
             echo "branch=stg" >> $GITHUB_OUTPUT
+          else
             echo "branch=master" >> $GITHUB_OUTPUT
           fi
 
