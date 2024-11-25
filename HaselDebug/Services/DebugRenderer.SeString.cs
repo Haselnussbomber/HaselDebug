@@ -6,7 +6,6 @@ using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
@@ -280,6 +279,12 @@ public unsafe partial class DebugRenderer
 
         if (expr.TryGetUInt(out var u32))
         {
+            if (macroCode is MacroCode.Icon or MacroCode.Icon2 && idx == 0)
+            {
+                TextureService.DrawGfd(u32, ImGui.GetTextLineHeight());
+                ImGui.SameLine();
+            }
+
             DrawCopyableText(u32.ToString());
             ImGui.SameLine();
             DrawCopyableText($"0x{u32:X}");
@@ -293,7 +298,6 @@ public unsafe partial class DebugRenderer
                     ImGui.TextUnformatted(name);
                 }
             }
-
 
             // TODO: clickable link to open row in new window :O
 
