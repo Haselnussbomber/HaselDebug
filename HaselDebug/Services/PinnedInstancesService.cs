@@ -76,6 +76,15 @@ public class PinnedInstancesService : IReadOnlyCollection<PinnedInstanceTab>
         Remove(tab);
     }
 
+    public void Remove(Type type, nint address)
+    {
+        var tab = Tabs.FirstOrDefault(tab => tab.Type == type && tab.Address == address);
+        if (tab == null)
+            return;
+
+        Remove(tab);
+    }
+
     public bool Contains(string fullName) => Tabs.Any(tab => tab.InternalName == fullName);
     public bool Contains(Type type) => Tabs.Any(tab => tab.Type == type);
 
