@@ -190,20 +190,6 @@ public unsafe class AddonInspectorTab(
                         WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, (nint)unitBase, type));
                     }
                 });
-
-                builder.Add(new ImGuiContextMenuEntry()
-                {
-                    Visible = !isPinned,
-                    Label = TextService.Translate("ContextMenu.PinnedInstances.Pin"),
-                    ClickCallback = () => PinnedInstances.Add((nint)unitBase, type)
-                });
-
-                builder.Add(new ImGuiContextMenuEntry()
-                {
-                    Visible = isPinned,
-                    Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
-                    ClickCallback = () => PinnedInstances.Remove(type)
-                });
             });
         }
 
@@ -351,20 +337,6 @@ public unsafe class AddonInspectorTab(
                                 Visible = !WindowManager.Contains(hostType.Name),
                                 Label = TextService.Translate("ContextMenu.TabPopout"),
                                 ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, (nint)host, hostType))
-                            });
-
-                            builder.Add(new ImGuiContextMenuEntry()
-                            {
-                                Visible = !isPinned,
-                                Label = TextService.Translate("ContextMenu.PinnedInstances.Pin"),
-                                ClickCallback = () => pinnedInstances.Add((nint)host, hostType)
-                            });
-
-                            builder.Add(new ImGuiContextMenuEntry()
-                            {
-                                Visible = isPinned,
-                                Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
-                                ClickCallback = () => pinnedInstances.Remove(hostType)
                             });
                         });
                     }
