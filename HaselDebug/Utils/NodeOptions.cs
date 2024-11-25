@@ -1,5 +1,4 @@
 using Dalamud.Game;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using ImGuiNET;
 using Lumina.Text.ReadOnly;

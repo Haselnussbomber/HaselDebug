@@ -4,7 +4,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselDebug.Abstracts;
 using ImGuiNET;

@@ -225,7 +225,7 @@ public unsafe partial class DebugRenderer
 
                 if (attrType.GetGenericTypeDefinition() != typeof(InheritsAttribute<>))
                     continue;
-                
+
                 var parentOffsetProperty = attrType.GetProperty("ParentOffset", BindingFlags.Instance | BindingFlags.Public);
                 if (parentOffsetProperty == null || parentOffsetProperty.GetValue(attr) is null or (not 0))
                     continue;
