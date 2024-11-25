@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+- **Changed:** Addon and LogMessage tabs have been consolidated into a new Excel tab.
+- **Updated:** SeString inspector will now draw the icon of Icon and Icon2 payloads.
+- **Updated:** Small changes to the header in the Addon Inspector. It will now show the agents using this addon, or the host addon.
+- **Removed:** Addons in the Addon Inspector can no longer be pinned to the sidebar.
+- **Updated:** ClientStructs now at [696f714](https://github.com/aers/FFXIVClientStructs/tree/696f714)
+
 ## [1.6.5] (2024-09-28)
 
 Update for 7.1.
@@ -7,6 +15,7 @@ Update for 7.1.
 - **Added:** Unknown Agents will show the Addon name in yellow, if they are active.
 - **Added:** Addon Inspector will now highlight the nodes on hover.
 - **Fixed:** StdList rendering was incorrect.
+- **Updated:** ClientStructs now at [cf5ba30](https://github.com/aers/FFXIVClientStructs/tree/cf5ba30)
 
 ## [1.6.4] (2024-09-28)
 
