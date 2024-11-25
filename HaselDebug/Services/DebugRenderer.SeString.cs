@@ -166,7 +166,7 @@ public unsafe partial class DebugRenderer
             using (ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode, nodeOptions.RenderSeString))
                 clicked = ImGui.Selectable(text + nodeOptions.GetKey("SeStringSelectable"));
 
-            ImGuiContextMenuService.Draw(nodeOptions.GetKey("SeStringSelectableContextMenu"), (builder) =>
+            ImGuiContextMenu.Draw(nodeOptions.GetKey("SeStringSelectableContextMenu"), (builder) =>
             {
                 builder.Add(new ImGuiContextMenuEntry()
                 {
@@ -194,7 +194,7 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.WithAddress(rosss.GetHashCode());
 
-        using var node = asTreeNode ? DrawTreeNode(nodeOptions.WithSeStringTitle(rosss.ToReadOnlySeString())) : null;
+        using var node = asTreeNode ? DrawTreeNode(nodeOptions.WithSeStringTitle(rosss)) : null;
         if (asTreeNode && !node!) return;
 
         if (!asTreeNode && nodeOptions.RenderSeString)

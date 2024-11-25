@@ -2,6 +2,7 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
@@ -81,7 +82,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
                     uiState->TitleController.SendTitleIdUpdate(titleIdToSend);
                     if (titleIdToSend != 0)
                     {
-                        using var title = row.Feminine.ToUtf8String();
+                        using var title = new Utf8String(row.Feminine);
                         RaptureLogModule.Instance()->ShowLogMessageString(3846u, &title);
                     }
                 }
@@ -104,7 +105,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
                     uiState->TitleController.SendTitleIdUpdate(titleIdToSend);
                     if (titleIdToSend != 0)
                     {
-                        using var title = row.Masculine.ToUtf8String();
+                        using var title = new Utf8String(row.Masculine);
                         RaptureLogModule.Instance()->ShowLogMessageString(3846u, &title);
                     }
                 }

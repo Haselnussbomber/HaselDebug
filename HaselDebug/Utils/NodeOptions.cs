@@ -37,13 +37,16 @@ public record struct NodeOptions
         => this with { AddressPath = AddressPath.With(addresses) };
 
     public NodeOptions WithSeStringTitle(string title)
-        => this with { SeStringTitle = title.ToReadOnlySeString() };
+        => this with { SeStringTitle = title };
 
     public NodeOptions WithSeStringTitle(ReadOnlySeString title)
         => this with { SeStringTitle = title };
 
+    public NodeOptions WithSeStringTitle(ReadOnlySeStringSpan title)
+        => this with { SeStringTitle = new(title) };
+
     public NodeOptions WithSeStringTitleIfNull(string title)
-        => SeStringTitle == null && Title == null ? this with { SeStringTitle = title.ToReadOnlySeString() } : this;
+        => SeStringTitle == null && Title == null ? this with { SeStringTitle = title } : this;
 
     public NodeOptions WithSeStringTitleIfNull(ReadOnlySeString title)
         => SeStringTitle == null && Title == null ? this with { SeStringTitle = title } : this;

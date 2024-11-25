@@ -9,6 +9,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Extensions;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
@@ -92,21 +93,40 @@ public unsafe class AgentsTab(
                     SelectedAgentId = agentId;
                 }
             }
-            using (var contextMenu = ImRaii.ContextPopupItem($"##AgentContext{agentId}"))
+            ImGuiContextMenu.Draw($"ContextMenuAgent{i}", builder =>
             {
-                if (contextMenu)
-                {
-                    if (!string.IsNullOrEmpty(agentName) && ImGui.MenuItem("Copy Name"))
-                    {
-                        ImGui.SetClipboardText(agentName);
-                    }
+                if (!DebugRenderer.AgentTypes.TryGetValue(agentId, out var agentType))
+                    agentType = typeof(AgentInterface);
 
-                    if (ImGui.MenuItem("Copy Address"))
-                    {
-                        ImGui.SetClipboardText($"0x{(nint)agent.Value:X}");
-                    }
-                }
-            }
+                var pinnedInstances = Service.Get<PinnedInstancesService>();
+                var isPinned = pinnedInstances.Contains(agentType);
+
+                builder.AddCopyName(TextService, agentId.ToString());
+                builder.AddCopyAddress(TextService, (nint)agent.Value);
+
+                builder.AddSeparator();
+
+                builder.Add(new ImGuiContextMenuEntry()
+                {
+                    Visible = !WindowManager.Contains(agentType.Name),
+                    Label = TextService.Translate("ContextMenu.TabPopout"),
+                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, (nint)agent.Value, agentType))
+                });
+
+                builder.Add(new ImGuiContextMenuEntry()
+                {
+                    Visible = !isPinned,
+                    Label = TextService.Translate("ContextMenu.PinnedInstances.Pin"),
+                    ClickCallback = () => pinnedInstances.Add((nint)agent.Value, agentType)
+                });
+
+                builder.Add(new ImGuiContextMenuEntry()
+                {
+                    Visible = isPinned,
+                    Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
+                    ClickCallback = () => pinnedInstances.Remove(agentType)
+                });
+            });
 
             ImGui.TableNextColumn(); // Active
             ImGui.TextUnformatted(agent.Value->IsAgentActive().ToString());

@@ -31,6 +31,14 @@
     "en": "Copy text",
     "de": "Text kopieren"
   },
+  "ContextMenu.CopyName": {
+    "en": "Copy name",
+    "de": "Name kopieren"
+  },
+  "ContextMenu.CopyAddress": {
+    "en": "Copy address",
+    "de": "Addresse kopieren"
+  },
   "ContextMenu.PinnedInstances.Pin": {
     "en": "Pin instance",
     "de": "Instanz anpinnen"

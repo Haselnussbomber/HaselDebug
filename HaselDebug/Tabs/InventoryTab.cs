@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Extensions;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
@@ -14,7 +15,12 @@ using Lumina.Text;
 namespace HaselDebug.Tabs;
 
 #pragma warning disable SeStringRenderer
-public unsafe class InventoryTab(DebugRenderer DebugRenderer, TextService TextService, ExcelService ExcelService, ItemService ItemService) : DebugTab
+public unsafe class InventoryTab(
+    DebugRenderer DebugRenderer,
+    TextService TextService,
+    ExcelService ExcelService,
+    ItemService ItemService,
+    ImGuiContextMenuService ImGuiContextMenu) : DebugTab
 {
     public override bool DrawInChild => false;
 
@@ -71,22 +77,13 @@ public unsafe class InventoryTab(DebugRenderer DebugRenderer, TextService TextSe
             {
                 selectedInventoryType = inventoryType;
             }
-            using (var contextMenu = ImRaii.ContextPopupItem($"##InventoryContext{inventoryType}"))
+            ImGuiContextMenu.Draw($"##InventoryContext{inventoryType}", builder =>
             {
-                if (contextMenu)
-                {
-                    if (ImGui.MenuItem("Copy Name"))
-                    {
-                        ImGui.SetClipboardText(inventoryType.ToString());
-                    }
+                var container = InventoryManager.Instance()->GetInventoryContainer(inventoryType);
 
-                    if (ImGui.MenuItem("Copy Address"))
-                    {
-                        var container = InventoryManager.Instance()->GetInventoryContainer(inventoryType);
-                        ImGui.SetClipboardText($"0x{(nint)container:X}");
-                    }
-                }
-            }
+                builder.AddCopyName(TextService, inventoryType.ToString());
+                builder.AddCopyAddress(TextService, (nint)container);
+            });
 
             ImGui.TableNextColumn(); // Size
             ImGui.TextUnformatted(listContainer->Size.ToString());

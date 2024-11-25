@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Numerics;
@@ -10,7 +11,9 @@ using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
 using HaselCommon.Extensions.Reflection;
@@ -21,17 +24,14 @@ using HaselCommon.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using InteropGenerator.Runtime.Attributes;
+using Lumina.Data.Parsing.Layer;
+using Lumina.Excel.Sheets;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
 namespace HaselDebug.Services;
 
 #pragma warning disable SeStringRenderer
-public unsafe partial class DebugRenderer(
-    WindowManager WindowManager,
-    ITextureProvider TextureProvider,
-    ImGuiContextMenuService ImGuiContextMenuService,
-    SeStringEvaluatorService SeStringEvaluator,
-    TextService TextService)
+public unsafe partial class DebugRenderer
 {
     public Color ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1);
     public Color ColorType { get; } = new(0.2f, 0.9f, 0.9f, 1);
@@ -45,6 +45,43 @@ public unsafe partial class DebugRenderer(
         { typeof(FFXIVClientStructs.FFXIV.Common.Component.Excel.ExcelSheet), ["SheetName"] },
         { typeof(AtkTextNode), ["OriginalTextPointer"] }
     };
+
+    private readonly WindowManager WindowManager;
+    private readonly ITextureProvider TextureProvider;
+    private readonly ImGuiContextMenuService ImGuiContextMenu;
+    private readonly SeStringEvaluatorService SeStringEvaluator;
+    private readonly TextService TextService;
+
+    public ImmutableSortedDictionary<string, Type> AddonTypes { get; }
+    public ImmutableSortedDictionary<AgentId, Type> AgentTypes { get; }
+
+    public DebugRenderer(
+        WindowManager windowManager,
+        ITextureProvider textureProvider,
+        ImGuiContextMenuService imGuiContextMenuService,
+        SeStringEvaluatorService seStringEvaluator,
+        TextService textService)
+    {
+        WindowManager = windowManager;
+        TextureProvider = textureProvider;
+        ImGuiContextMenu = imGuiContextMenuService;
+        SeStringEvaluator = seStringEvaluator;
+        TextService = textService;
+
+        AddonTypes = typeof(AddonAttribute).Assembly.GetTypes()
+            .Where(type => type.GetCustomAttribute<AddonAttribute>() != null)
+            .SelectMany(type => type.GetCustomAttribute<AddonAttribute>()!.AddonIdentifiers, (type, addonName) => (type, addonName))
+            .ToImmutableSortedDictionary(
+                tuple => tuple.addonName,
+                tuple => tuple.type);
+
+        AgentTypes = typeof(AgentAttribute).Assembly.GetTypes()
+            .Where(type => type.GetCustomAttribute<AgentAttribute>() != null)
+            .Select(type => (type, agentId: type.GetCustomAttribute<AgentAttribute>()!.Id))
+            .ToImmutableSortedDictionary(
+                tuple => tuple.agentId,
+                tuple => tuple.type);
+    }
 
     public void DrawPointerType(void* obj, Type? type, NodeOptions nodeOptions)
         => DrawPointerType((nint)obj, type, nodeOptions);
@@ -163,6 +200,50 @@ public unsafe partial class DebugRenderer(
         }
 
         ImGui.TextUnformatted("Unsupported Type");
+    }
+
+    private bool Inherits<T>(Type pointerType) where T : struct
+    {
+        var targetType = typeof(T);
+        var currentType = pointerType;
+
+        if (currentType == targetType)
+            return true;
+
+        do
+        {
+            var attributes = currentType.GetCustomAttributes();
+            var inheritedTypeFound = false;
+
+            foreach (var attr in attributes)
+            {
+                var attrType = attr.GetType();
+
+                if (!attrType.IsGenericType)
+                    continue;
+
+                if (attrType.GetGenericTypeDefinition() != typeof(InheritsAttribute<>))
+                    continue;
+                
+                var parentOffsetProperty = attrType.GetProperty("ParentOffset", BindingFlags.Instance | BindingFlags.Public);
+                if (parentOffsetProperty == null || parentOffsetProperty.GetValue(attr) is null or (not 0))
+                    continue;
+
+                var attrStructType = attrType.GenericTypeArguments[0]!;
+                if (attrStructType == currentType)
+                    continue;
+
+                currentType = attrStructType;
+                inheritedTypeFound = true;
+                break;
+            }
+
+            if (!inheritedTypeFound)
+                break;
+
+        } while (currentType != targetType);
+
+        return currentType == targetType;
     }
 
     public ImRaii.IEndObject DrawTreeNode(NodeOptions nodeOptions)

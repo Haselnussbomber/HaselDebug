@@ -10,7 +10,7 @@ public unsafe class ShopTab(DebugRenderer DebugRenderer) : DebugTab
     [StructLayout(LayoutKind.Explicit)]
     public struct AddonShop
     {
-        [FieldOffset(0x230)] public AtkComponentList* List;
+        [FieldOffset(0x238)] public AtkComponentList* List;
     }
 
     public override void Draw()
