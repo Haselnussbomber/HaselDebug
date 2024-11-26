@@ -101,6 +101,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         if (!tabs) return;
 
         DrawUnlockLinks();
+        DrawBuddyEquip();
         DrawAdventure();
         DrawRecipes();
         //DrawStoreItems();
