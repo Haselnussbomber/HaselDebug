@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.7.0] (2024-11-28)
 
 - **Added:** Housing tab, displaying some useless info.
 - **Added:** Unlock tab Aether Currents (Thanks @Scrxtchy; I allowed myself to enhance it a little^^).
@@ -12,7 +12,7 @@
 - **Removed:** Addons in the Addon Inspector can no longer be pinned to the sidebar.
 - **Updated:** ClientStructs now at [e8b73d8f](https://github.com/aers/FFXIVClientStructs/tree/e8b73d8f)
 
-## [1.6.5] (2024-09-28)
+## [1.6.5] (2024-10-20)
 
 Update for 7.1.
 
@@ -126,7 +126,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.5...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.7.0...main
+[1.7.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.5...v1.7.0
 [1.6.5]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.4...v1.6.5
 [1.6.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.2...v1.6.3
