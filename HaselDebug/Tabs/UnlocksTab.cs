@@ -105,7 +105,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         DrawAdventure();
         DrawRecipes();
         //DrawStoreItems();
-        DrawCurrents();
+        DrawAetherCurrents();
         DrawTitles();
         DrawEmotes();
         DrawCutscenes();
