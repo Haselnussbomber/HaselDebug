@@ -753,7 +753,7 @@ public unsafe partial class DebugRenderer
     public string ToBitsString(uint byteIn)
         => ToBitsString(byteIn, 32);
 
-    public void DrawIcon(uint iconId, bool isHq = false, bool sameLine = true, DrawInfo drawInfo = default)
+    public void DrawIcon(uint iconId, bool isHq = false, bool sameLine = true, DrawInfo drawInfo = default, bool canCopy = true)
     {
         drawInfo.DrawSize ??= new Vector2(ImGui.GetTextLineHeight());
 
@@ -779,15 +779,17 @@ public unsafe partial class DebugRenderer
 
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                if (canCopy)
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                 ImGui.BeginTooltip();
-                ImGui.TextUnformatted("Click to copy IconId");
+                if (canCopy)
+                    ImGui.TextUnformatted("Click to copy IconId");
                 ImGui.TextUnformatted($"ID: {iconId} – Size: {texture.Width}x{texture.Height}");
                 ImGui.Image(texture.ImGuiHandle, new(texture.Width, texture.Height));
                 ImGui.EndTooltip();
             }
 
-            if (ImGui.IsItemClicked())
+            if (canCopy && ImGui.IsItemClicked())
                 ImGui.SetClipboardText(iconId.ToString());
         }
         else

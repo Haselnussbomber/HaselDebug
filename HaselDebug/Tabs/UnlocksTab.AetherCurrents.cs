@@ -107,7 +107,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         if (!TryGetFixedQuest(aetherCurrent, out var quest))
             return;
 
-        DebugRenderer.DrawIcon(quest.EventIconType.Value!.MapIconAvailable + 1);
+        DebugRenderer.DrawIcon(quest.EventIconType.Value!.MapIconAvailable + 1, canCopy: false);
         ImGuiUtils.TextUnformattedColored(Color.Yellow, $"[#{index}] {TextService.GetQuestName(quest.RowId)}");
         ImGui.SameLine();
         ImGui.TextUnformatted($"{GetHumanReadableCoords(quest.IssuerLocation.Value)} | {TextService.GetENpcResidentName(quest.IssuerStart.RowId)}");
@@ -121,7 +121,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         if (!TryGetLevel(eobj, out var level))
             return;
 
-        DebugRenderer.DrawIcon(60033);
+        DebugRenderer.DrawIcon(60033, canCopy: false);
         ImGuiUtils.TextUnformattedColored(Color.Green, $"[#{index}] {TextService.GetEObjName(eobj.RowId)}");
         ImGui.SameLine();
         ImGui.TextUnformatted(GetHumanReadableCoords(level));
