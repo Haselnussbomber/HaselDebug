@@ -6,13 +6,15 @@ using HaselCommon.Extensions.Reflection;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel;
+using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
+using static Lumina.Data.Parsing.Uld.NodeData;
 
 namespace HaselDebug.Services;
 
 public unsafe partial class DebugRenderer
 {
-    public void DrawExdSheet(ExcelModule module, Type sheetType, uint rowId, uint depth, NodeOptions nodeOptions)
+    public void DrawExdSheet(Type sheetType, uint rowId, uint depth, NodeOptions nodeOptions)
     {
         if (depth > 10)
         {
@@ -36,15 +38,15 @@ public unsafe partial class DebugRenderer
             ImGui.SameLine();
             ImGui.TextColored(ColorFieldName, propInfo.Name);
             ImGui.SameLine();
-            DrawExdSheetColumnValue(module, sheetType, rowId, propInfo.Name, depth, nodeOptions);
+            DrawExdSheetColumnValue(sheetType, rowId, propInfo.Name, depth, nodeOptions);
         }
     }
 
-    public void DrawExdSheetColumnValue(ExcelModule module, Type sheetType, uint rowId, string propName, uint depth, NodeOptions nodeOptions)
+    public void DrawExdSheetColumnValue(Type sheetType, uint rowId, string propName, uint depth, NodeOptions nodeOptions)
     {
-        var getSheet = module.GetType().GetMethod("GetSheet", BindingFlags.Instance | BindingFlags.Public)!;
+        var getSheet = ExcelModule.GetType().GetMethod("GetSheet", BindingFlags.Instance | BindingFlags.Public)!;
         var genericGetSheet = getSheet.MakeGenericMethod(sheetType);
-        var sheet = genericGetSheet.Invoke(module, [nodeOptions.Language.ToLumina(), sheetType.GetCustomAttribute<SheetAttribute>()?.Name ?? sheetType.Name]);
+        var sheet = genericGetSheet.Invoke(ExcelModule, [nodeOptions.Language.ToLumina(), sheetType.GetCustomAttribute<SheetAttribute>()?.Name ?? sheetType.Name]);
         if (sheet == null)
         {
             ImGui.TextUnformatted("sheet is null");
@@ -69,42 +71,46 @@ public unsafe partial class DebugRenderer
         if (propInfo == null)
             return;
 
-        var value = propInfo.GetValue(row);
+        DrawExcelProp(propInfo.Name, propInfo.PropertyType, propInfo.GetValue(row), depth, nodeOptions);
+    }
+
+    private void DrawExcelProp(string propName, Type propType, object? value, uint depth, NodeOptions nodeOptions)
+    {
         if (value == null)
         {
             ImGui.TextUnformatted("null");
             return;
         }
 
-        if (propInfo.PropertyType == typeof(ReadOnlySeString))
+        if (propType == typeof(ReadOnlySeString))
         {
             DrawSeString(((ReadOnlySeString)value).AsSpan(), true, new NodeOptions()
             {
                 RenderSeString = nodeOptions.RenderSeString,
-                AddressPath = nodeOptions.AddressPath.With(propInfo.Name.GetHashCode())
+                AddressPath = nodeOptions.AddressPath.With(propName.GetHashCode())
             });
             return;
         }
 
-        if (propInfo.PropertyType == typeof(RowRef))
+        if (propType == typeof(RowRef))
         {
-            var columnRowId = (uint)propInfo.PropertyType.GetProperty("RowId")?.GetValue(value)!;
+            var columnRowId = (uint)propType.GetProperty("RowId")?.GetValue(value)!;
             ImGui.TextUnformatted(columnRowId.ToString());
             return;
         }
 
-        if (propInfo.PropertyType.IsGenericType && propInfo.PropertyType.GetGenericTypeDefinition() == typeof(RowRef<>))
+        if (propType.IsGenericType && propType.GetGenericTypeDefinition() == typeof(RowRef<>))
         {
-            var isValid = (bool)propInfo.PropertyType.GetProperty("IsValid")?.GetValue(value)!;
+            var isValid = (bool)propType.GetProperty("IsValid")?.GetValue(value)!;
             if (!isValid)
             {
                 ImGui.TextUnformatted("null");
                 return;
             }
 
-            var columnRowType = propInfo.PropertyType.GenericTypeArguments[0];
-            var columnRowId = (uint)propInfo.PropertyType.GetProperty("RowId")?.GetValue(value)!;
-            DrawExdSheet(module, columnRowType, columnRowId, depth + 1, new NodeOptions()
+            var columnRowType = propType.GenericTypeArguments[0];
+            var columnRowId = (uint)propType.GetProperty("RowId")?.GetValue(value)!;
+            DrawExdSheet(columnRowType, columnRowId, depth + 1, new NodeOptions()
             {
                 RenderSeString = nodeOptions.RenderSeString,
                 Language = nodeOptions.Language,
@@ -113,16 +119,16 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (propInfo.PropertyType.IsGenericType && propInfo.PropertyType.GetGenericTypeDefinition() == typeof(Collection<>))
+        if (propType.IsGenericType && propType.GetGenericTypeDefinition() == typeof(Collection<>))
         {
-            var count = (int)propInfo.PropertyType.GetProperty("Count")?.GetValue(value)!;
+            var count = (int)propType.GetProperty("Count")?.GetValue(value)!;
             if (count == 0)
             {
                 ImGui.TextUnformatted("No values");
                 return;
             }
 
-            var collectionType = propInfo.PropertyType.GenericTypeArguments[0];
+            var collectionType = propType.GenericTypeArguments[0];
             var propNodeOptions = nodeOptions.WithAddress(collectionType.Name.GetHashCode());
 
             using var colTitleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
@@ -147,7 +153,7 @@ public unsafe partial class DebugRenderer
 
                 ImGui.TableNextColumn(); // Value
 
-                var colValue = propInfo.PropertyType.GetMethod("get_Item")?.Invoke(value, [i]);
+                var colValue = propType.GetMethod("get_Item")?.Invoke(value, [i]);
                 if (colValue == null)
                 {
                     ImGui.TextUnformatted("null");
@@ -183,17 +189,44 @@ public unsafe partial class DebugRenderer
                     var columnRowType = collectionType.GenericTypeArguments[0];
                     var columnRowId = (uint)collectionType.GetProperty("RowId")?.GetValue(colValue)!;
 
-                    DrawExdSheet(module, columnRowType, columnRowId, depth + 1, new NodeOptions()
+                    DrawExdSheet(columnRowType, columnRowId, depth + 1, new NodeOptions()
                     {
                         RenderSeString = nodeOptions.RenderSeString,
                         Language = nodeOptions.Language,
                         AddressPath = nodeOptions.AddressPath.With((i, columnRowType.Name.GetHashCode(), (nint)columnRowId).GetHashCode())
                     });
+                    continue;
                 }
-                else
+
+                if (collectionType.IsStruct())
                 {
-                    ImGui.TextUnformatted("Unsupported type");
+                    using var structTitleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
+                    using var structNode = ImRaii.TreeNode($"{collectionType.Name}{propNodeOptions.GetKey($"{collectionType.Name}_{i}")}", nodeOptions.GetTreeNodeFlags());
+                    if (!structNode) continue;
+                    structTitleColor?.Dispose();
+
+                    foreach (var propInfo in collectionType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                    {
+                        if (propInfo.Name == "RowId")
+                            continue;
+
+                        DrawCopyableText(propInfo.PropertyType.ReadableTypeName(), propInfo.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
+                        ImGui.SameLine();
+                        ImGui.TextColored(ColorFieldName, propInfo.Name);
+                        ImGui.SameLine();
+                        DrawExcelProp(propInfo.PropertyType.Name, propInfo.PropertyType, propInfo.GetValue(colValue), depth, nodeOptions);
+                    }
+
+                    continue;
                 }
+
+                if (collectionType.IsPrimitive)
+                {
+                    ImGui.TextUnformatted(colValue.ToString());
+                    continue;
+                }
+
+                ImGui.TextUnformatted($"Unsupported type: {collectionType.Name}");
             }
 
             return;

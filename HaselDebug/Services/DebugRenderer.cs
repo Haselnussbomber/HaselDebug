@@ -24,6 +24,7 @@ using HaselCommon.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using InteropGenerator.Runtime.Attributes;
+using Lumina.Excel;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
 namespace HaselDebug.Services;
@@ -50,6 +51,7 @@ public unsafe partial class DebugRenderer
     private readonly SeStringEvaluatorService SeStringEvaluator;
     private readonly TextService TextService;
     private readonly TextureService TextureService;
+    private readonly ExcelModule ExcelModule;
 
     public ImmutableSortedDictionary<string, Type> AddonTypes { get; }
     public ImmutableSortedDictionary<AgentId, Type> AgentTypes { get; }
@@ -60,7 +62,8 @@ public unsafe partial class DebugRenderer
         ImGuiContextMenuService imGuiContextMenuService,
         SeStringEvaluatorService seStringEvaluator,
         TextService textService,
-        TextureService textureService)
+        TextureService textureService,
+        ExcelModule excelModule)
     {
         WindowManager = windowManager;
         TextureProvider = textureProvider;
@@ -68,6 +71,7 @@ public unsafe partial class DebugRenderer
         SeStringEvaluator = seStringEvaluator;
         TextService = textService;
         TextureService = textureService;
+        ExcelModule = excelModule;
 
         AddonTypes = typeof(AddonAttribute).Assembly.GetTypes()
             .Where(type => type.GetCustomAttribute<AddonAttribute>() != null)

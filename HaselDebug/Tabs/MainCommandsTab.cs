@@ -40,10 +40,7 @@ public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService Ex
 
             ImGui.TableNextColumn(); // Name
             DebugRenderer.DrawIcon((uint)row.Icon);
-            ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X * 2); // idk why this bugs. don't have that problem in the EmotesTab
-
-            // WHAT DID HE DOO????? WOAH
-            // yep, took a little creativity break here^^
+            ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X * 2); // idk why this bugs
 
             using (ImRaii.PushColor(ImGuiCol.Text, ImGui.GetColorU32(ImGuiCol.TextDisabled), !isEnabled))
             using (ImRaii.PushColor(ImGuiCol.HeaderHovered, ImGui.GetColorU32(ImGuiCol.HeaderHovered) & 0xFFFFFF | 0x30000000, !isEnabled))
