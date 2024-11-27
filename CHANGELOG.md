@@ -2,12 +2,15 @@
 
 ## [Unreleased]
 
+- **Added:** Housing tab, displaying some useless info.
+- **Added:** Unlock tab Aether Currents (Thanks @Scrxtchy; I allowed myself to enhance it a little^^).
+- **Added:** Unlock tab BuddyEquip.
 - **Added:** Support for excel Collection structs (like ItemStruct in SpecialShop).
 - **Changed:** Addon and LogMessage tabs have been consolidated into a new Excel tab.
 - **Updated:** SeString inspector will now draw the icon of Icon and Icon2 payloads.
 - **Updated:** Small changes to the header in the Addon Inspector. It will now show the agents using this addon, or the host addon.
 - **Removed:** Addons in the Addon Inspector can no longer be pinned to the sidebar.
-- **Updated:** ClientStructs now at [696f714](https://github.com/aers/FFXIVClientStructs/tree/696f714)
+- **Updated:** ClientStructs now at [e8b73d8f](https://github.com/aers/FFXIVClientStructs/tree/e8b73d8f)
 
 ## [1.6.5] (2024-09-28)
 
