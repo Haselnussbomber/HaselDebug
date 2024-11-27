@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- **Added:** Support for excel Collection structs (like ItemStruct in SpecialShop).
 - **Changed:** Addon and LogMessage tabs have been consolidated into a new Excel tab.
 - **Updated:** SeString inspector will now draw the icon of Icon and Icon2 payloads.
 - **Updated:** Small changes to the header in the Addon Inspector. It will now show the agents using this addon, or the host addon.
