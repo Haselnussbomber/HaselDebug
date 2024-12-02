@@ -10,6 +10,7 @@ using Dalamud.Game;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.System.String;
@@ -25,6 +26,7 @@ using HaselDebug.Utils;
 using ImGuiNET;
 using InteropGenerator.Runtime.Attributes;
 using Lumina.Excel;
+using Microsoft.Extensions.Logging;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
 namespace HaselDebug.Services;
@@ -45,6 +47,8 @@ public unsafe partial class DebugRenderer
         { typeof(AtkTextNode), ["OriginalTextPointer"] }
     };
 
+    private readonly ILogger<DebugRenderer> Logger;
+    private readonly IDalamudPluginInterface PluginInterface;
     private readonly WindowManager WindowManager;
     private readonly ITextureProvider TextureProvider;
     private readonly ImGuiContextMenuService ImGuiContextMenu;
@@ -57,6 +61,8 @@ public unsafe partial class DebugRenderer
     public ImmutableSortedDictionary<AgentId, Type> AgentTypes { get; }
 
     public DebugRenderer(
+        ILogger<DebugRenderer> logger,
+        IDalamudPluginInterface pluginInterface,
         WindowManager windowManager,
         ITextureProvider textureProvider,
         ImGuiContextMenuService imGuiContextMenuService,
@@ -65,6 +71,8 @@ public unsafe partial class DebugRenderer
         TextureService textureService,
         ExcelModule excelModule)
     {
+        Logger = logger;
+        PluginInterface = pluginInterface;
         WindowManager = windowManager;
         TextureProvider = textureProvider;
         ImGuiContextMenu = imGuiContextMenuService;
@@ -73,14 +81,16 @@ public unsafe partial class DebugRenderer
         TextureService = textureService;
         ExcelModule = excelModule;
 
-        AddonTypes = typeof(AddonAttribute).Assembly.GetTypes()
+        var csAssembly = typeof(AddonAttribute).Assembly;
+
+        AddonTypes = csAssembly.GetTypes()
             .Where(type => type.GetCustomAttribute<AddonAttribute>() != null)
             .SelectMany(type => type.GetCustomAttribute<AddonAttribute>()!.AddonIdentifiers, (type, addonName) => (type, addonName))
             .ToImmutableSortedDictionary(
                 tuple => tuple.addonName,
                 tuple => tuple.type);
 
-        AgentTypes = typeof(AgentAttribute).Assembly.GetTypes()
+        AgentTypes = csAssembly.GetTypes()
             .Where(type => type.GetCustomAttribute<AgentAttribute>() != null)
             .Select(type => (type, agentId: type.GetCustomAttribute<AgentAttribute>()!.Id))
             .ToImmutableSortedDictionary(
@@ -312,7 +322,7 @@ public unsafe partial class DebugRenderer
         foreach (var (fieldInfo, offset, size) in processedFields)
         {
             i++;
-            DrawCopyableText($"[0x{offset:X}]", $"{address + offset:X}", textColor: Color.Grey3);
+            DrawCopyableText($"[0x{offset:X}]", ImGui.IsKeyDown(ImGuiKey.LeftShift) ? $"0x{offset:X}" : $"{address + offset:X}", textColor: Color.Grey3);
             ImGui.SameLine();
 
             var fieldNodeOptions = nodeOptions.WithAddress(i);
@@ -343,8 +353,7 @@ public unsafe partial class DebugRenderer
             // delegate*
             if (fieldType.IsFunctionPointer || fieldType.IsUnmanagedFunctionPointer)
             {
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawAddress(*(nint*)fieldAddress);
                 continue;
             }
@@ -354,8 +363,7 @@ public unsafe partial class DebugRenderer
                 && fieldInfo.GetCustomAttribute<FixedSizeArrayAttribute>() is FixedSizeArrayAttribute fixedSizeArrayAttribute
                 && fieldType.GetCustomAttribute<InlineArrayAttribute>() is InlineArrayAttribute inlineArrayAttribute)
             {
-                DrawCopyableText(fieldInfo.Name[1..].FirstCharToUpper(), textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo, fieldInfo.Name[1..].FirstCharToUpper());
                 DrawFixedSizeArray(fieldAddress, fieldType, fixedSizeArrayAttribute.IsString, fieldNodeOptions);
                 continue;
             }
@@ -371,8 +379,7 @@ public unsafe partial class DebugRenderer
                     continue;
                 }
 
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawStdVector(fieldAddress, underlyingType, fieldNodeOptions);
                 continue;
             }
@@ -388,8 +395,7 @@ public unsafe partial class DebugRenderer
                     continue;
                 }
 
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawStdDeque(fieldAddress, underlyingType, fieldNodeOptions);
                 continue;
             }
@@ -405,8 +411,7 @@ public unsafe partial class DebugRenderer
                     continue;
                 }
 
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawStdList(fieldAddress, underlyingType, fieldNodeOptions);
                 continue;
             }
@@ -414,8 +419,7 @@ public unsafe partial class DebugRenderer
             // AtkUnitBase.AtkValues
             if ((type == typeof(AtkUnitBase) || type.GetCustomAttribute<InheritsAttribute<AtkUnitBase>>() != null) && fieldType == typeof(AtkValue*) && fieldInfo.Name == "AtkValues")
             {
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawAtkValues(*(AtkValue**)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, fieldNodeOptions);
                 continue;
             }
@@ -423,8 +427,7 @@ public unsafe partial class DebugRenderer
             // byte* that are strings
             if (fieldType.IsPointer && KnownStringPointers.TryGetValue(type, out var fieldNames) && fieldNames.Contains(fieldInfo.Name))
             {
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawSeString(*(byte**)fieldAddress, fieldNodeOptions);
                 continue;
             }
@@ -432,15 +435,13 @@ public unsafe partial class DebugRenderer
             // Vector2
             if (fieldType == typeof(Vector2))
             {
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(Vector2*)fieldAddress).ToString() });
                 continue;
             }
             if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector2))
             {
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with
                 {
                     Title = (*(FFXIVClientStructs.FFXIV.Common.Math.Vector2*)fieldAddress).ToString()
@@ -451,15 +452,13 @@ public unsafe partial class DebugRenderer
             // Vector3
             if (fieldType == typeof(Vector3))
             {
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(Vector3*)fieldAddress).ToString() });
                 continue;
             }
             if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector3))
             {
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with
                 {
                     Title = (*(FFXIVClientStructs.FFXIV.Common.Math.Vector3*)fieldAddress).ToString()
@@ -470,15 +469,13 @@ public unsafe partial class DebugRenderer
             // Vector4
             if (fieldType == typeof(Vector4))
             {
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(Vector4*)fieldAddress).ToString() });
                 continue;
             }
             if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Vector4))
             {
-                DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-                ImGui.SameLine();
+                DrawFieldName(fieldInfo);
                 DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with
                 {
                     Title = (*(FFXIVClientStructs.FFXIV.Common.Math.Vector4*)fieldAddress).ToString()
@@ -488,8 +485,7 @@ public unsafe partial class DebugRenderer
 
             // TODO: enum values table
 
-            DrawCopyableText(fieldInfo.Name, textColor: ColorFieldName);
-            ImGui.SameLine();
+            DrawFieldName(fieldInfo);
 
             if (fieldType == typeof(uint) && fieldInfo.Name == "IconId")
                 DrawIcon(*(uint*)fieldAddress);
@@ -499,6 +495,66 @@ public unsafe partial class DebugRenderer
 
             DrawPointerType(fieldAddress, fieldType, fieldNodeOptions);
         }
+    }
+
+    private void DrawFieldName(FieldInfo fieldInfo, string? fieldNameOverride = null)
+    {
+        var fullName = (fieldInfo.DeclaringType != null ? fieldInfo.DeclaringType.FullName + "." : string.Empty) + fieldInfo.Name;
+        var hasDoc = HasDocumentation(fullName);
+
+        using (ImRaii.PushColor(ImGuiCol.Text, ImGui.ColorConvertFloat4ToU32((Vector4)ColorFieldName)))
+        {
+            var startPos = ImGui.GetWindowPos() + ImGui.GetCursorPos() - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY());
+
+            ImGui.TextUnformatted(fieldNameOverride ?? fieldInfo.Name);
+
+            if (hasDoc)
+            {
+                var textSize = ImGui.CalcTextSize(fieldNameOverride ?? fieldInfo.Name);
+                ImGui.GetWindowDrawList().AddLine(startPos + new Vector2(0, textSize.Y), startPos + textSize, ColorFieldName);
+            }
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+            using var tooltip = ImRaii.Tooltip();
+            ImGui.TextUnformatted(fieldNameOverride ?? fieldInfo.Name);
+
+            if (hasDoc)
+            {
+                var doc = GetDocumentation(fullName);
+                if (doc != null)
+                {
+                    ImGui.Separator();
+
+                    if (!string.IsNullOrEmpty(doc.Sumamry))
+                        ImGui.TextUnformatted(doc.Sumamry);
+
+                    if (!string.IsNullOrEmpty(doc.Remarks))
+                        ImGui.TextUnformatted(doc.Remarks);
+
+                    if (doc.Parameters.Length > 0)
+                    {
+                        foreach (var param in doc.Parameters)
+                        {
+                            ImGui.TextUnformatted($"{param.Key}: {param.Value}");
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(doc.Returns))
+                        ImGui.TextUnformatted(doc.Returns);
+                }
+            }
+        }
+
+        if (ImGui.IsItemClicked())
+        {
+            ImGui.SetClipboardText(fieldNameOverride ?? fieldInfo.Name);
+        }
+
+
+        ImGui.SameLine();
     }
 
     public void HighlightNode(nint fieldAddress, Type fieldType, ref NodeOptions fieldNodeOptions)

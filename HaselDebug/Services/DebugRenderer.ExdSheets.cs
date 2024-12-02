@@ -6,9 +6,7 @@ using HaselCommon.Extensions.Reflection;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel;
-using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
-using static Lumina.Data.Parsing.Uld.NodeData;
 
 namespace HaselDebug.Services;
 

@@ -22,6 +22,7 @@ public class PluginWindow : SimpleWindow
     private readonly TextService TextService;
     private readonly PinnedInstancesService PinnedInstances;
     private readonly ImGuiContextMenuService ImGuiContextMenu;
+    private readonly DebugRenderer DebugRenderer;
     private IDrawableTab? SelectedTab;
 
     public PluginWindow(
@@ -31,13 +32,15 @@ public class PluginWindow : SimpleWindow
         TextService textService,
         ConfigWindow configWindow,
         PinnedInstancesService pinnedInstances,
-        ImGuiContextMenuService imGuiContextMenuService)
+        ImGuiContextMenuService imGuiContextMenuService,
+        DebugRenderer debugRenderer)
         : base(windowManager, "HaselDebug")
     {
         PluginConfig = pluginConfig;
         TextService = textService;
         PinnedInstances = pinnedInstances;
         ImGuiContextMenu = imGuiContextMenuService;
+        DebugRenderer = debugRenderer;
 
         Size = new Vector2(1440, 880);
         SizeConstraints = new()
@@ -74,6 +77,12 @@ public class PluginWindow : SimpleWindow
             tab.Dispose();
 
         base.Dispose();
+    }
+
+    public override void OnOpen()
+    {
+        base.OnOpen();
+        DebugRenderer.ParseCSDocs();
     }
 
     public override void Draw()
