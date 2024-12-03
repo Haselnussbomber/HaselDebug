@@ -19,7 +19,7 @@ public unsafe class ConfigModuleTab : DebugTab
             ref var commonSystemConfig = ref Framework.Instance()->SystemConfig;
 
             ProcessConfigBase(sb, dict, ref commonSystemConfig.SystemConfigBase.ConfigBase, "System");
-            ProcessConfigBase(sb, dict, ref commonSystemConfig.UiConfig, "Ui");
+            ProcessConfigBase(sb, dict, ref commonSystemConfig.UiConfig, "UiConfig");
             ProcessConfigBase(sb, dict, ref commonSystemConfig.UiControlConfig, "UiControl");
             ProcessConfigBase(sb, dict, ref commonSystemConfig.UiControlGamepadConfig, "UiControlGamepad"); // nothing in here
 
@@ -32,7 +32,7 @@ public unsafe class ConfigModuleTab : DebugTab
             ref var commonSystemConfig = ref Framework.Instance()->SystemConfig;
 
             ProcessConfigBaseDalamud(sb, ref commonSystemConfig.SystemConfigBase.ConfigBase, "System");
-            ProcessConfigBaseDalamud(sb, ref commonSystemConfig.UiConfig, "Ui");
+            ProcessConfigBaseDalamud(sb, ref commonSystemConfig.UiConfig, "UiConfig");
             ProcessConfigBaseDalamud(sb, ref commonSystemConfig.UiControlConfig, "UiControl");
             ProcessConfigBaseDalamud(sb, ref commonSystemConfig.UiControlGamepadConfig, "UiControlGamepad");
 
@@ -121,7 +121,7 @@ public unsafe class ConfigModuleTab : DebugTab
                 _ => $"{configEntry->Type}"
             };
 
-            sb.AppendLine($"\r\n    /// <summary>\r\n    /// System option with the internal name {name}.\r\n    /// This option is a {type}.\r\n    /// </summary>\r\n    [GameConfigOption(\"{name}\", ConfigType.{type})]\r\n    {name},");
+            sb.AppendLine($"\r\n    /// <summary>\r\n    /// {configName} option with the internal name {name}.\r\n    /// This option is a {type}.\r\n    /// </summary>\r\n    [GameConfigOption(\"{name}\", ConfigType.{type})]\r\n    {name},");
             dict.Add(i, name);
         }
 
