@@ -181,7 +181,7 @@ public unsafe class ExcelTab : DebugTab
         ImGui.TextUnformatted(row.RowId.ToString());
 
         ImGui.TableNextColumn(); // Text
-        DebugRenderer.DrawSeStringSelectable(row.Text.AsSpan(), new NodeOptions()
+        DebugRenderer.DrawSeString(row.Text.AsSpan(), new NodeOptions()
         {
             AddressPath = new AddressPath((nint)row.RowId),
             RenderSeString = false,
@@ -198,7 +198,7 @@ public unsafe class ExcelTab : DebugTab
         ImGui.TextUnformatted(row.RowId.ToString());
 
         ImGui.TableNextColumn(); // Text
-        DebugRenderer.DrawSeStringSelectable(row.Text.AsSpan(), new NodeOptions()
+        DebugRenderer.DrawSeString(row.Text.AsSpan(), new NodeOptions()
         {
             AddressPath = new AddressPath((nint)row.RowId),
             RenderSeString = false,

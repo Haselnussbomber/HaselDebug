@@ -76,7 +76,7 @@ public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelServi
 
                     if (!formatted.IsEmpty)
                     {
-                        DebugRenderer.DrawSeStringSelectable(formatted, new NodeOptions()
+                        DebugRenderer.DrawSeString(formatted, new NodeOptions()
                         {
                             AddressPath = new AddressPath(i),
                             Indent = false,

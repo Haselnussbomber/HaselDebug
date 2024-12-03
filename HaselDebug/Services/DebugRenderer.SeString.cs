@@ -123,10 +123,10 @@ public unsafe partial class DebugRenderer
         }
 
         nodeOptions = nodeOptions.WithAddress((nint)ptr);
-        DrawSeStringSelectable(new ReadOnlySeStringSpan(ptr), nodeOptions);
+        DrawSeString(new ReadOnlySeStringSpan(ptr), nodeOptions);
     }
 
-    public void DrawSeStringSelectable(ReadOnlySeStringSpan rosss, NodeOptions nodeOptions)
+    public void DrawSeString(ReadOnlySeStringSpan rosss, NodeOptions nodeOptions)
     {
         if (rosss.PayloadCount == 0)
         {
