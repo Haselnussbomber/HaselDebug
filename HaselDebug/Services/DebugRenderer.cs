@@ -645,7 +645,7 @@ public unsafe partial class DebugRenderer
         }
     }
 
-    public void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Vector4? textColor = null)
+    public void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Vector4? textColor = null, string? highligtedText = null)
     {
         textCopy ??= text;
         textColor ??= (Vector4)Color.White;
@@ -653,9 +653,32 @@ public unsafe partial class DebugRenderer
         using (ImRaii.PushColor(ImGuiCol.Text, ImGui.ColorConvertFloat4ToU32((Vector4)textColor)))
         {
             if (asSelectable)
+            {
                 ImGui.Selectable(text);
+            }
+            else if (!string.IsNullOrEmpty(highligtedText))
+            {
+                var pos = text.IndexOf(highligtedText, StringComparison.InvariantCultureIgnoreCase);
+                if (pos != -1)
+                {
+                    ImGui.TextUnformatted(text[..pos]);
+                    ImGui.SameLine(0, 0);
+
+                    using (Color.Yellow.Push(ImGuiCol.Text))
+                        ImGui.TextUnformatted(text[pos..(pos + highligtedText.Length)]);
+
+                    ImGui.SameLine(0, 0);
+                    ImGui.TextUnformatted(text[(pos + highligtedText.Length)..]);
+                }
+                else
+                {
+                    ImGui.TextUnformatted(text);
+                }
+            }
             else
+            {
                 ImGui.TextUnformatted(text);
+            }
         }
 
         if (ImGui.IsItemHovered())
