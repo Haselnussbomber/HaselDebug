@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -704,78 +705,78 @@ public unsafe partial class DebugRenderer
 
             case Type t when t == typeof(Half):
                 value = *(Half*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((Half)value).ToString(CultureInfo.InvariantCulture));
                 break;
 
             case Type t when t == typeof(byte):
                 value = *(byte*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((byte)value).ToString(CultureInfo.InvariantCulture));
                 ImGui.SameLine();
                 DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(sbyte):
                 value = *(sbyte*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((sbyte)value).ToString(CultureInfo.InvariantCulture));
                 ImGui.SameLine();
                 DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(short):
                 value = *(short*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((short)value).ToString(CultureInfo.InvariantCulture));
                 ImGui.SameLine();
                 DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(ushort):
                 value = *(ushort*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((ushort)value).ToString(CultureInfo.InvariantCulture));
                 ImGui.SameLine();
                 DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(int):
                 value = *(int*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((int)value).ToString(CultureInfo.InvariantCulture));
                 ImGui.SameLine();
                 DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(uint):
                 value = *(uint*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((uint)value).ToString(CultureInfo.InvariantCulture));
                 ImGui.SameLine();
                 DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(long):
                 value = *(long*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((long)value).ToString(CultureInfo.InvariantCulture));
                 ImGui.SameLine();
                 DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(ulong):
                 value = *(ulong*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((ulong)value).ToString(CultureInfo.InvariantCulture));
                 ImGui.SameLine();
                 DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(decimal):
                 value = *(decimal*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((decimal)value).ToString(CultureInfo.InvariantCulture));
                 break;
 
             case Type t when t == typeof(double):
                 value = *(double*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((double)value).ToString(CultureInfo.InvariantCulture));
                 break;
 
             case Type t when t == typeof(float):
                 value = *(float*)address;
-                DrawCopyableText($"{value}");
+                DrawCopyableText(((float)value).ToString(CultureInfo.InvariantCulture));
                 break;
 
             default:
