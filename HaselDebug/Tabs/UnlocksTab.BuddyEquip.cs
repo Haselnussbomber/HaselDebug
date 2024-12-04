@@ -1,17 +1,16 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Graphics;
-using HaselDebug.Abstracts;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab : DebugTab, IDisposable
+public unsafe partial class UnlocksTab
 {
-    public void DrawBuddyEquip()
+    public void DrawBardings()
     {
-        using var tab = ImRaii.TabItem("BuddyEquip");
+        using var tab = ImRaii.TabItem("Bardings");
         if (!tab) return;
 
         ref var companionInfo = ref UIState.Instance()->Buddy.CompanionInfo;
@@ -35,7 +34,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
             ImGui.TextUnformatted(row.RowId.ToString());
 
             ImGui.TableNextColumn(); // Unlocked
-            var isUnlocked = UIState.Instance()->Buddy.CompanionInfo.IsBuddyEquipUnlocked(row.RowId);
+            var isUnlocked = companionInfo.IsBuddyEquipUnlocked(row.RowId);
             using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isUnlocked ? Color.Green : Color.Red)))
                 ImGui.TextUnformatted(isUnlocked.ToString());
 

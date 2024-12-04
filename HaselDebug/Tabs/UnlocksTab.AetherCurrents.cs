@@ -5,14 +5,13 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
-using HaselDebug.Abstracts;
 using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab : DebugTab, IDisposable
+public unsafe partial class UnlocksTab
 {
     private readonly Dictionary<uint, uint> AetherCurrentEObjCache = [];
     private readonly Dictionary<uint, uint> EObjLevelCache = [];

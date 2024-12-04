@@ -10,7 +10,7 @@ namespace HaselDebug.Tabs;
 
 public unsafe partial class UnlocksTab : DebugTab, IDisposable
 {
-    public void DrawAdventure()
+    public void DrawSightseeingLog()
     {
         using var tab = ImRaii.TabItem("Sightseeing Log");
         if (!tab) return;

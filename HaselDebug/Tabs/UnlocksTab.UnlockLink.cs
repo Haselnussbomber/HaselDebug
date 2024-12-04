@@ -5,14 +5,13 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
-using HaselDebug.Abstracts;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab : DebugTab, IDisposable
+public unsafe partial class UnlocksTab
 {
     private (uint Id, HashSet<(string, uint, uint, ReadOnlySeString)> Unlocks)[] UnlockLinks = [];
 

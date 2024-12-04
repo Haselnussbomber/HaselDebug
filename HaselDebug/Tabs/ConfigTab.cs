@@ -11,7 +11,7 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class ConfigModuleTab(TextService TextService, DebugRenderer DebugRenderer) : DebugTab
+public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRenderer) : DebugTab
 {
     private string SearchTerm = string.Empty;
 

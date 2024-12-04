@@ -20,8 +20,6 @@ using Ornament = Lumina.Excel.Sheets.Ornament;
 
 namespace HaselDebug.Tabs;
 
-// TODO: Achievements, Bardings, Mounts, Minions, Fashion Accessories, Facewear, Orchestrion...
-
 public unsafe partial class UnlocksTab : DebugTab, IDisposable
 {
     private readonly Dictionary<uint, Vector2?> _iconSizeCache = [];
@@ -100,17 +98,22 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         using var tabs = ImRaii.TabBar("UnlocksTabBar");
         if (!tabs) return;
 
-        DrawUnlockLinks();
-        DrawBuddyEquip();
-        DrawAdventure();
-        DrawRecipes();
-        //DrawStoreItems();
+        DrawAchievements();
         DrawAetherCurrents();
-        DrawTitles();
-        DrawEmotes();
+        DrawBardings();
         DrawCutscenes();
+        DrawEmotes();
+        DrawFashionAccessories();
+        DrawGlasses();
+        DrawMinions();
+        DrawMounts();
+        DrawOrchestrion();
+        DrawRecipes();
+        DrawSightseeingLog();
+        //DrawStoreItems();
+        DrawTitles();
+        DrawUnlockLinks();
     }
-
 
     public unsafe bool DrawSelectableItem(Item item, ImGuiId id, bool drawIcon = true, bool isHq = false, float? iconSize = null)
     {

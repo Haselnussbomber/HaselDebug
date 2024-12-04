@@ -18,7 +18,7 @@ using Cabinet = Lumina.Excel.Sheets.Cabinet;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab : DebugTab, IDisposable
+public unsafe partial class UnlocksTab
 {
     private List<StoreItem> StoreItemsList = [];
     private FrozenDictionary<uint, uint> CabinetItems = null!;
