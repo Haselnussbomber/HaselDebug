@@ -2,8 +2,11 @@
 
 ## [Unreleased]
 
+- **Added:** More unlock tabs (Achievements, Glasses, Minions, Mounts, Orchestrion Rolls and Fashion Accessories).
+- **Added:** Config tab now shows all config options in a table.
 - **Added:** XML docs on ClientStructs fields are now shown in their tooltip. Fields that have docs are shown with an underline.
 - **Added:** Shift-clicking on offsets now copies the offset. (Clicking on offsets without shift still copies the entire address.)
+- **Fixed:** MainCommands tooltip no longer flickers on first how.
 - **Updated:** ClientStructs now at [e8b73d8f](https://github.com/aers/FFXIVClientStructs/tree/9a4a6e0d)
 
 ## [1.7.0] (2024-11-28)
