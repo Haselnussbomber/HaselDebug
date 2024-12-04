@@ -1,12 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [1.8.0] (2024-12-04)
 
 - **Added:** More unlock tabs (Achievements, Glasses, Minions, Mounts, Orchestrion Rolls and Fashion Accessories).
 - **Added:** Config tab now shows all config options in a table.
 - **Added:** XML docs on ClientStructs fields are now shown in their tooltip. Fields that have docs are shown with an underline.
 - **Added:** Shift-clicking on offsets now copies the offset. (Clicking on offsets without shift still copies the entire address.)
-- **Fixed:** MainCommands tooltip no longer flickers on first how.
+- **Fixed:** MainCommands tooltip no longer flickers on first show.
 - **Updated:** ClientStructs now at [b3a25a18](https://github.com/aers/FFXIVClientStructs/tree/b3a25a18)
 
 ## [1.7.0] (2024-11-28)
@@ -135,7 +135,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.7.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.8.0...main
+[1.8.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.5...v1.7.0
 [1.6.5]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.4...v1.6.5
 [1.6.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.3...v1.6.4
