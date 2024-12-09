@@ -1,18 +1,15 @@
-using System.Text;
 using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextService TextService) : DebugTab
+public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, TextService TextService) : DebugTab
 {
     public override string Title => "CurrencyManager";
 
@@ -21,101 +18,103 @@ public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, ExcelService
         var currencyManager = CurrencyManager.Instance();
         DebugRenderer.DrawPointerType(currencyManager, typeof(CurrencyManager), new NodeOptions());
 
-        ImGui.TextUnformatted(nameof(CurrencyManager.SpecialItemBucket));
-        using (var table = ImRaii.Table(nameof(CurrencyManager.SpecialItemBucket) + "Table", 5))
+        using (var node = ImRaii.TreeNode(nameof(CurrencyManager.SpecialItemBucket), ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.SpanAvailWidth))
         {
-            if (table)
+            if (node)
             {
-                ImGui.TableSetupColumn("ItemId", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("SpecialId", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Count", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Remaining", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableHeadersRow();
-
-                foreach (var (itemId, item) in currencyManager->SpecialItemBucket)
+                using var table = ImRaii.Table(nameof(CurrencyManager.SpecialItemBucket) + "Table", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+                if (table)
                 {
-                    ImGui.TableNextRow();
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted($"{itemId}");
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted($"{item.SpecialId}");
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
-                    ImGui.TableNextColumn();
-                    if (currencyManager->IsItemLimited(itemId))
-                        ImGui.TextUnformatted($"{currencyManager->GetItemCountRemaining(itemId)}");
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(TextService.GetItemName(itemId));
+                    ImGui.TableSetupColumn("ItemId", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("SpecialId", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Count", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Remaining", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableHeadersRow();
+
+                    foreach (var (itemId, item) in currencyManager->SpecialItemBucket)
+                    {
+                        ImGui.TableNextRow();
+                        ImGui.TableNextColumn();
+                        DebugRenderer.DrawCopyableText(itemId.ToString());
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted(item.SpecialId.ToString());
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
+                        ImGui.TableNextColumn();
+                        if (currencyManager->IsItemLimited(itemId))
+                            ImGui.TextUnformatted(currencyManager->GetItemCountRemaining(itemId).ToString());
+                        ImGui.TableNextColumn();
+                        DebugRenderer.DrawCopyableText(TextService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
+                    }
                 }
             }
         }
 
-        ImGui.TextUnformatted(nameof(CurrencyManager.ItemBucket));
-        using (var table = ImRaii.Table(nameof(CurrencyManager.ItemBucket) + "Table", 5))
+        using (var node = ImRaii.TreeNode(nameof(CurrencyManager.ItemBucket), ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.SpanAvailWidth))
         {
-            if (table)
+            if (node)
             {
-                ImGui.TableSetupColumn("ItemId", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Count", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Remaining", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("IsUnlimited", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableHeadersRow();
-
-                foreach (var (itemId, item) in currencyManager->ItemBucket)
+                using var table = ImRaii.Table(nameof(CurrencyManager.ItemBucket) + "Table", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+                if (table)
                 {
-                    ImGui.TableNextRow();
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted($"{itemId}");
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
-                    ImGui.TableNextColumn();
-                    if (currencyManager->IsItemLimited(itemId))
-                        ImGui.TextUnformatted($"{currencyManager->GetItemCountRemaining(itemId)}");
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted($"{item.IsUnlimited}");
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(TextService.GetItemName(itemId));
+                    ImGui.TableSetupColumn("ItemId", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Count", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Remaining", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("IsUnlimited", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableHeadersRow();
+
+                    foreach (var (itemId, item) in currencyManager->ItemBucket)
+                    {
+                        ImGui.TableNextRow();
+                        ImGui.TableNextColumn();
+                        DebugRenderer.DrawCopyableText(itemId.ToString());
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
+                        ImGui.TableNextColumn();
+                        if (currencyManager->IsItemLimited(itemId))
+                            ImGui.TextUnformatted(currencyManager->GetItemCountRemaining(itemId).ToString());
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted(item.IsUnlimited.ToString());
+                        ImGui.TableNextColumn();
+                        DebugRenderer.DrawCopyableText(TextService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
+                    }
                 }
             }
         }
 
-        ImGui.TextUnformatted(nameof(CurrencyManager.ContentItemBucket));
-        using (var table = ImRaii.Table(nameof(CurrencyManager.ContentItemBucket) + "Table", 5))
+        using (var node = ImRaii.TreeNode(nameof(CurrencyManager.ContentItemBucket), ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.SpanAvailWidth))
         {
-            if (table)
+            if (node)
             {
-                ImGui.TableSetupColumn("ItemId", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Count", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Remaining", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("IsUnlimited", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableHeadersRow();
-
-                foreach (var (itemId, item) in currencyManager->ContentItemBucket)
+                using var table = ImRaii.Table(nameof(CurrencyManager.ContentItemBucket) + "Table", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+                if (table)
                 {
-                    ImGui.TableNextRow();
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted($"{itemId}");
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
-                    ImGui.TableNextColumn();
-                    if (currencyManager->IsItemLimited(itemId))
-                        ImGui.TextUnformatted($"{currencyManager->GetItemCountRemaining(itemId)}");
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted($"{item.IsUnlimited}");
-                    ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(TextService.GetItemName(itemId));
+                    ImGui.TableSetupColumn("ItemId", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Count", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Remaining", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("IsUnlimited", ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableHeadersRow();
+
+                    foreach (var (itemId, item) in currencyManager->ContentItemBucket)
+                    {
+                        ImGui.TableNextRow();
+                        ImGui.TableNextColumn();
+                        DebugRenderer.DrawCopyableText(itemId.ToString());
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
+                        ImGui.TableNextColumn();
+                        if (currencyManager->IsItemLimited(itemId))
+                            ImGui.TextUnformatted(currencyManager->GetItemCountRemaining(itemId).ToString());
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted(item.IsUnlimited.ToString());
+                        ImGui.TableNextColumn();
+                        DebugRenderer.DrawCopyableText(TextService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
+                    }
                 }
             }
         }
-
-        var sb = new StringBuilder();
-        foreach (var (itemId, item) in currencyManager->ContentItemBucket)
-        {
-            sb.AppendLine($"| {itemId} | {ExcelService.GetSheet<Item>(ClientLanguage.English).GetRow(itemId).Name.ToDalamudString().ToString()} |<br/>");
-        }
-        DebugRenderer.DrawCopyableText(sb.ToString());
     }
 }

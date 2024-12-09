@@ -518,7 +518,6 @@ public unsafe partial class DebugRenderer
 
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
             using var tooltip = ImRaii.Tooltip();
             ImGui.TextUnformatted(fieldNameOverride ?? fieldInfo.Name);
 
@@ -553,7 +552,6 @@ public unsafe partial class DebugRenderer
         {
             ImGui.SetClipboardText(fieldNameOverride ?? fieldInfo.Name);
         }
-
 
         ImGui.SameLine();
     }
