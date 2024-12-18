@@ -95,7 +95,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         using var hostchild = ImRaii.Child("UnlocksTabChild", new Vector2(-1), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
         if (!hostchild) return;
 
-        using var tabs = ImRaii.TabBar("UnlocksTabBar");
+        using var tabs = ImRaii.TabBar("UnlocksTabBar", ImGuiTabBarFlags.FittingPolicyScroll);
         if (!tabs) return;
 
         DrawAchievements();
@@ -104,12 +104,14 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         DrawCutscenes();
         DrawEmotes();
         DrawFashionAccessories();
+        DrawFish();
         DrawGlasses();
         DrawMinions();
         DrawMounts();
         DrawOrchestrion();
         DrawRecipes();
         DrawSightseeingLog();
+        DrawSpearfish();
         //DrawStoreItems();
         DrawTitles();
         DrawUnlockLinks();
