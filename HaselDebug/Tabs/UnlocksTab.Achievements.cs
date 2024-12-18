@@ -127,7 +127,9 @@ public unsafe partial class UnlocksTab
                 ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
                 ImGuiUtils.PushCursorY(4);
 
-                ImGuiHelpers.SafeTextWrapped(row.Description.ExtractText().StripSoftHypen());
+                ImGuiHelpers.SafeTextWrapped((AchievementsHideSpoilers && !isUnlocked && row.AchievementHideCondition.Value.HideName)
+                    ? "???"
+                    : row.Description.ExtractText().StripSoftHypen());
             }
         }
     }
