@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** Unlock tabs Fish and Spearfish.
+- **Updated:** It's now possible to click on the NPC name in the Satisfaction Supply tab to teleport to the closest aetheryte.
+- **Updated:** Currency Manager tab got a facelift: tree nodes around tables, copyable Item id, hold shift to switch to English name.
+- **Fixed:** Hidden achievements no longer display the description in the tooltip when the Hide Spoilers checkbox is enabled.
+- **Updated:** ClientStructs now at [2f52868d](https://github.com/aers/FFXIVClientStructs/tree/2f52868d)
+
 ## [1.8.0] (2024-12-04)
 
 - **Added:** More unlock tabs (Achievements, Glasses, Minions, Mounts, Orchestrion Rolls and Fashion Accessories).
