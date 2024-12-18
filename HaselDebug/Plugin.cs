@@ -30,6 +30,16 @@ public class Plugin : IDalamudPlugin
     {
         PluginInterface = pluginInterface;
 
+#if HAS_LOCAL_CS
+        FFXIVClientStructs.Interop.Generated.Addresses.Register();
+        //Addresses.Register();
+        Resolver.GetInstance.Setup(
+            sigScanner.SearchBase,
+            dataManager.GameData.Repositories["ffxiv"].Version,
+            new FileInfo(Path.Join(pluginInterface.ConfigDirectory.FullName, "SigCache.json")));
+        Resolver.GetInstance.Resolve();
+#endif
+
         Service
             // Dalamud & HaselCommon
             .Initialize(pluginInterface, pluginLog)
@@ -54,20 +64,6 @@ public class Plugin : IDalamudPlugin
             .AddSingleton<ConfigWindow>();
 
         Service.BuildProvider();
-
-        // ---
-
-#if HAS_LOCAL_CS
-        FFXIVClientStructs.Interop.Generated.Addresses.Register();
-        //Addresses.Register();
-        Resolver.GetInstance.Setup(
-            sigScanner.SearchBase,
-            dataManager.GameData.Repositories["ffxiv"].Version,
-            new FileInfo(Path.Join(pluginInterface.ConfigDirectory.FullName, "SigCache.json")));
-        Resolver.GetInstance.Resolve();
-#endif
-
-        // ---
 
         // TODO: IHostedService?
         framework.RunOnFrameworkThread(() =>
@@ -114,9 +110,5 @@ public class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigWindow;
 
         Service.Dispose();
-
-#if HAS_LOCAL_CS
-        //Addresses.Unregister();
-#endif
     }
 }

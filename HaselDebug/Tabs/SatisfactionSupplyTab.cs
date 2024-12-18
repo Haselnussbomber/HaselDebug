@@ -1,13 +1,15 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class SatisfactionSupplyTab(ExcelService ExcelService, TextService TextService) : DebugTab
+public unsafe class SatisfactionSupplyTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextService TextService, TeleportService TeleportService) : DebugTab
 {
     public override bool DrawInChild => false;
     public override void Draw()
@@ -30,22 +32,44 @@ public unsafe class SatisfactionSupplyTab(ExcelService ExcelService, TextService
                 continue;
 
             var index = (int)row.RowId - 1;
+            var rank = satisfactionSupply->SatisfactionRanks[index];
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Index
             ImGui.TextUnformatted(row.RowId.ToString());
 
             ImGui.TableNextColumn(); // Name
-            ImGui.TextUnformatted(TextService.GetENpcResidentName(row.Npc.RowId));
+            DebugRenderer.DrawIcon((uint)row.RankParams[rank].ImageId);
+
+            if (ExcelService.TryGetRow<Level>(row.Unknown0, out var level) &&
+                TeleportService.TryGetClosestAetheryte(level, out var aetheryte) &&
+                ExcelService.TryGetRow<PlaceName>(aetheryte.Value.PlaceName.RowId, out var placeName))
+            {
+                var clicked = ImGui.Selectable(TextService.GetENpcResidentName(row.Npc.RowId));
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    using var tooltip = ImRaii.Tooltip();
+                    ImGui.TextUnformatted($"Teleport to: {placeName.Name.ExtractText()}");
+                }
+                if (clicked)
+                {
+                    Telepo.Instance()->Teleport(aetheryte.Value.RowId, 0);
+                }
+            }
+            else
+            {
+                ImGui.TextUnformatted(TextService.GetENpcResidentName(row.Npc.RowId));
+            }
 
             ImGui.TableNextColumn(); // Satisfaction
-            ImGui.TextUnformatted($"{satisfactionSupply->Satisfaction[index]}/{row.SatisfactionNpcParams[satisfactionSupply->SatisfactionRanks[index]].SatisfactionRequired}");
+            ImGui.TextUnformatted($"{satisfactionSupply->Satisfaction[index]}/{row.SatisfactionNpcParams[rank].SatisfactionRequired}");
 
             ImGui.TableNextColumn(); // Rank
-            ImGui.TextUnformatted($"{satisfactionSupply->SatisfactionRanks[index]}");
+            ImGui.TextUnformatted(rank.ToString());
 
             ImGui.TableNextColumn(); // UsedAllowance
-            ImGui.TextUnformatted($"{satisfactionSupply->UsedAllowances[index]}");
+            ImGui.TextUnformatted(satisfactionSupply->UsedAllowances[index].ToString());
         }
     }
 }
