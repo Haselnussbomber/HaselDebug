@@ -97,57 +97,79 @@ public partial class DebugRenderer
                 ProcessMember(member);
 
                 var name = member.Name[2..];
-                var summariesText = ListToText(summaries);
-                var remarksText = ListToText(remarks);
+                var lastDotIndex = name.LastIndexOf('.');
+                var parentName = lastDotIndex > -1 ? name.Substring(0, lastDotIndex) : name;
+
+                var summariesText = ListToText(parentName, summaries);
+                var remarksText = ListToText(parentName, remarks);
                 var parametersArray = parameters.ToArray();
-                var returnsText = ListToText(returns);
+                var returnsText = ListToText(parentName, returns);
 
                 if (string.IsNullOrEmpty(summariesText) && string.IsNullOrEmpty(remarksText) && parametersArray.Length == 0 && string.IsNullOrEmpty(returnsText))
                     continue;
 
                 MemberDocs.Add(name, new MemberDocumentation(
                     name,
-                    ListToText(summaries),
-                    ListToText(remarks),
+                    ListToText(parentName, summaries),
+                    ListToText(parentName, remarks),
                     [.. parameters],
-                    ListToText(returns)));
+                    ListToText(parentName, returns)));
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Could not parse FFXIVClientStructs.xml");
         }
+    }
 
-        static string ListToText(List<string> list)
+    private static string GetLongestCommonPrefix(string ns1, string ns2)
+    {
+        // Split both namespaces into parts by '.'
+        var parts1 = ns1.Split('.');
+        var parts2 = ns2.Split('.');
+
+        // Compare parts to find the common prefix
+        var commonParts = parts1.Zip(parts2, (part1, part2) => part1 == part2 ? part1 : null)
+                                .TakeWhile(part => part != null);
+
+        // Join the common parts back into a namespace string
+        return string.Join(".", commonParts);
+    }
+
+    private static string RemovePrefix(string value, string parentName)
+    {
+        return value.Replace(GetLongestCommonPrefix(parentName, value) + ".", string.Empty);
+    }
+
+    private static string ListToText(string parentName, List<string> list)
+    {
+        var sb = new StringBuilder();
+        var firstLineIndentation = -1;
+
+        foreach (var line in list)
         {
-            var sb = new StringBuilder();
-            var firstLineIndentation = -1;
-
-            foreach (var line in list)
+            if (!string.IsNullOrEmpty(line))
             {
-                if (!string.IsNullOrEmpty(line))
-                {
-                    var cutLine = line;
+                var cutLine = line;
 
-                    var indentation = line.TakeWhile(char.IsWhiteSpace).Count();
+                var indentation = line.TakeWhile(char.IsWhiteSpace).Count();
 
-                    if (firstLineIndentation == -1)
-                        firstLineIndentation = indentation;
+                if (firstLineIndentation == -1)
+                    firstLineIndentation = indentation;
 
-                    if (firstLineIndentation <= indentation)
-                        cutLine = cutLine[firstLineIndentation..];
+                if (firstLineIndentation <= indentation)
+                    cutLine = cutLine[firstLineIndentation..];
 
-                    cutLine = RegexXmlNewLine().Replace(cutLine, "\n");
-                    cutLine = RegexXmlSeeAlsoWithText().Replace(cutLine, "$1");
-                    cutLine = RegexXmlSeeAlso().Replace(cutLine, "$1");
-                    cutLine = RegexXmlCode().Replace(cutLine, "$1");
+                cutLine = RegexXmlNewLine().Replace(cutLine, "\n");
+                cutLine = RegexXmlSeeAlsoWithText().Replace(cutLine, match => RemovePrefix(match.Groups[1].Value, parentName));
+                cutLine = RegexXmlSeeAlso().Replace(cutLine, match => match.Groups[1].Value.Replace(GetLongestCommonPrefix(parentName, match.Groups[1].Value) + ".", string.Empty));
+                cutLine = RegexXmlCode().Replace(cutLine, "$1");
 
-                    sb.AppendLine(cutLine.TrimEnd());
-                }
+                sb.AppendLine(cutLine.TrimEnd());
             }
-
-            return sb.ToString().TrimEnd();
         }
+
+        return sb.ToString().TrimEnd();
     }
 
     [GeneratedRegex("<br\\s*/?>", RegexOptions.IgnoreCase)]
@@ -159,7 +181,7 @@ public partial class DebugRenderer
     [GeneratedRegex("<see\\s*cref=\"\\w:[^\"]*\"\\s*>(.*)</see>", RegexOptions.IgnoreCase)]
     private static partial Regex RegexXmlSeeAlsoWithText();
 
-    [GeneratedRegex("<c>(.*)</c>", RegexOptions.IgnoreCase)]
+    [GeneratedRegex("<c>(.*?)</c>", RegexOptions.IgnoreCase)]
     private static partial Regex RegexXmlCode();
 
     [XmlRoot("doc")]
