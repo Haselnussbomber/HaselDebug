@@ -4,8 +4,10 @@
 
 - **Added:** Unlock tabs Fish and Spearfish.
 - **Updated:** It's now possible to click on the NPC name in the Satisfaction Supply tab to teleport to the closest aetheryte.
-- **Updated:** Currency Manager tab got a facelift: tree nodes around tables, copyable Item id, hold shift to switch to English name.
-- **Fixed:** Hidden achievements no longer display the description in the tooltip when the Hide Spoilers checkbox is enabled.
+- **Updated:** Currency Manager tab got a little facelift.
+- **Updated:** Namespaces in xml docs are now truncated based on the parents namespace.
+- **Fixed:** A parsing issue with multiple c-tags on a single xml doc line.
+- **Fixed:** Hidden achievements displayed the description in the tooltip when the Hide Spoilers checkbox was enabled.
 - **Updated:** ClientStructs now at [2f52868d](https://github.com/aers/FFXIVClientStructs/tree/2f52868d)
 
 ## [1.8.0] (2024-12-04)
