@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.9.0] (2024-12-04)
 
 - **Added:** Unlock tabs Fish and Spearfish.
 - **Updated:** It's now possible to click on the NPC name in the Satisfaction Supply tab to teleport to the closest aetheryte.
@@ -145,7 +145,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.8.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.9.0...main
+[1.9.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.5...v1.7.0
 [1.6.5]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.4...v1.6.5
