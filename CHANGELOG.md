@@ -8,7 +8,7 @@
 - **Updated:** Namespaces in xml docs are now truncated based on the parents namespace.
 - **Fixed:** A parsing issue with multiple c-tags on a single xml doc line.
 - **Fixed:** Hidden achievements displayed the description in the tooltip when the Hide Spoilers checkbox was enabled.
-- **Updated:** ClientStructs now at [2f52868d](https://github.com/aers/FFXIVClientStructs/tree/2f52868d)
+- **Updated:** ClientStructs now at [cc98a564](https://github.com/aers/FFXIVClientStructs/tree/cc98a564)
 
 ## [1.8.0] (2024-12-04)
 
