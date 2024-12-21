@@ -3,6 +3,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
@@ -47,7 +48,7 @@ public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService Ex
             using (ImRaii.PushColor(ImGuiCol.HeaderActive, ImGui.GetColorU32(ImGuiCol.HeaderHovered) & 0xFFFFFF | 0x30000000, !isEnabled))
             using (ImRaii.PushColor(ImGuiCol.HeaderActive, ImGui.GetColorU32(ImGuiCol.HeaderHovered) & 0xFFFFFF | 0x30000000, !isEnabled))
             {
-                if (ImGui.Selectable(row.Name.ExtractText()) && isEnabled)
+                if (ImGui.Selectable(row.Name.ExtractText().StripSoftHypen()) && isEnabled)
                 {
                     UIModule.Instance()->ExecuteMainCommand(row.RowId);
                 }
@@ -75,9 +76,9 @@ public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService Ex
                 using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, ImGui.GetStyle().ItemInnerSpacing.X);
                 using var indent = ImRaii.PushIndent(1);
 
-                ImGui.TextUnformatted(row.Name.ExtractText());
+                ImGui.TextUnformatted(row.Name.ExtractText().StripSoftHypen());
 
-                var categoryName = ExcelService.TryGetRow<MainCommandCategory>(row.MainCommandCategory.RowId, out var category) ? category.Name.ExtractText() : string.Empty;
+                var categoryName = ExcelService.TryGetRow<MainCommandCategory>(row.MainCommandCategory.RowId, out var category) ? category.Name.ExtractText().StripSoftHypen() : string.Empty;
                 if (!string.IsNullOrEmpty(categoryName))
                 {
                     ImGuiUtils.PushCursorY(-3);
@@ -91,7 +92,7 @@ public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService Ex
                 ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
                 ImGuiUtils.PushCursorY(4);
 
-                ImGuiHelpers.SafeTextWrapped(row.Description.ExtractText());
+                ImGuiHelpers.SafeTextWrapped(row.Description.ExtractText().StripSoftHypen());
             }
         }
     }
