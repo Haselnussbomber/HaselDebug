@@ -22,7 +22,7 @@ public unsafe partial class UnlocksTab
 
         ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupColumn("Unlocked", ImGuiTableColumnFlags.WidthFixed, 60);
-        ImGui.TableSetupColumn("Category", ImGuiTableColumnFlags.WidthFixed, 150);
+        ImGui.TableSetupColumn("Category", ImGuiTableColumnFlags.WidthFixed, 250);
         ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
@@ -50,10 +50,10 @@ public unsafe partial class UnlocksTab
 
             ImGui.TableNextColumn(); // Category
             var categoryName = uiParam.OrchestrionCategory.Value.Name.ExtractText().StripSoftHypen();
+            DebugRenderer.DrawIcon(uiParam.OrchestrionCategory.Value.Icon);
             ImGui.TextUnformatted(categoryName);
 
             ImGui.TableNextColumn(); // Name
-            DebugRenderer.DrawIcon(uiParam.OrchestrionCategory.Value.Icon);
             var name = row.Name.ExtractText().StripSoftHypen();
             using (Color.Transparent.Push(ImGuiCol.HeaderActive))
             using (Color.Transparent.Push(ImGuiCol.HeaderHovered))
