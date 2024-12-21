@@ -59,10 +59,25 @@ public unsafe partial class UnlocksTab
             if (row.RowId == 0 || row.AchievementCategory.RowId == 0 || !row.AchievementCategory.IsValid || !row.AchievementHideCondition.IsValid)
                 continue;
 
-            var isUnlocked = achievement->IsComplete((int)row.RowId);
+            var isComplete = achievement->IsComplete((int)row.RowId);
 
-            if (AchievementsHideSpoilers && !isUnlocked && (row.AchievementCategory.Value.HideCategory || row.AchievementHideCondition.Value.HideAchievement))
+            var canShow = !AchievementsHideSpoilers || isComplete;
+
+            var isHiddenName = row.AchievementHideCondition.Value.HideName == true;
+            var isHiddenCategory = row.AchievementCategory.Value.HideCategory == true;
+            var isHiddenAchievement = row.AchievementHideCondition.Value.HideAchievement == true;
+
+            var canShowName = canShow || !isHiddenName;
+            var canShowCategory = canShow || !isHiddenCategory;
+            var canShowDescription = canShow || (!isHiddenName && !isHiddenCategory && !isHiddenAchievement); // idk actually
+            var canShowAchievement = canShow || !isHiddenAchievement;
+
+            if (!canShowAchievement)
                 continue;
+
+            var name = canShowName ? row.Name.ExtractText().StripSoftHypen() : "???";
+            var categoryName = canShowCategory ? row.AchievementCategory.Value.Name.ExtractText().StripSoftHypen() : "???";
+            var description = canShowDescription ? row.Description.ExtractText().StripSoftHypen() : "???";
 
             ImGui.TableNextRow();
 
@@ -70,34 +85,29 @@ public unsafe partial class UnlocksTab
             ImGui.TextUnformatted(row.RowId.ToString());
 
             ImGui.TableNextColumn(); // Unlocked
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isUnlocked ? Color.Green : Color.Red)))
-                ImGui.TextUnformatted(isUnlocked.ToString());
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isComplete ? Color.Green : Color.Red)))
+                ImGui.TextUnformatted(isComplete.ToString());
 
             ImGui.TableNextColumn(); // Category
-            var categoryName = row.AchievementCategory.Value.Name.ExtractText().StripSoftHypen();
             ImGui.TextUnformatted(categoryName);
 
             ImGui.TableNextColumn(); // Name
             DebugRenderer.DrawIcon(row.Icon);
 
-            var name = (AchievementsHideSpoilers && !isUnlocked && row.AchievementHideCondition.Value.HideName)
-                ? "???"
-                : row.Name.ExtractText().StripSoftHypen();
-
-            var hideConditions = AchievementsHideSpoilers && !isUnlocked && row.AchievementHideCondition.Value.HideConditions;
+            var canClick = canShowName && canShowCategory;
             var clicked = false;
-            using (Color.Transparent.Push(ImGuiCol.HeaderActive, hideConditions))
-            using (Color.Transparent.Push(ImGuiCol.HeaderHovered, hideConditions))
+            using (Color.Transparent.Push(ImGuiCol.HeaderActive, !canClick))
+            using (Color.Transparent.Push(ImGuiCol.HeaderHovered, !canClick))
                 clicked = ImGui.Selectable(name);
 
-            if (clicked)
+            if (canClick && clicked)
             {
                 AgentAchievement.Instance()->OpenById(row.RowId);
             }
 
             if (ImGui.IsItemHovered())
             {
-                if (!hideConditions)
+                if (canClick)
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
 
                 using var tooltip = ImRaii.Tooltip();
@@ -127,9 +137,7 @@ public unsafe partial class UnlocksTab
                 ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
                 ImGuiUtils.PushCursorY(4);
 
-                ImGuiHelpers.SafeTextWrapped((AchievementsHideSpoilers && !isUnlocked && row.AchievementHideCondition.Value.HideName)
-                    ? "???"
-                    : row.Description.ExtractText().StripSoftHypen());
+                ImGuiHelpers.SafeTextWrapped(description);
             }
         }
     }
