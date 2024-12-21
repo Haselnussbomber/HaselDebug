@@ -112,6 +112,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         DrawMinions();
         DrawMounts();
         DrawOrchestrion();
+        DrawOutfits();
         DrawRecipes();
         DrawSightseeingLog();
         DrawSpearfish();
