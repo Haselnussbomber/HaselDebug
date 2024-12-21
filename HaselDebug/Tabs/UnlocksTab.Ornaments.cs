@@ -1,6 +1,8 @@
 using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
+using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
@@ -27,6 +29,11 @@ public unsafe partial class UnlocksTab
         ImGui.TableHeadersRow();
 
         var playerState = PlayerState.Instance();
+        var actionManager = ActionManager.Instance();
+        var player = Control.GetLocalPlayer();
+        var currentId = 0u;
+        if (player != null)
+            currentId = player->OrnamentData.OrnamentId;
 
         foreach (var row in ExcelService.GetSheet<Ornament>())
         {
@@ -48,12 +55,30 @@ public unsafe partial class UnlocksTab
             ImGui.TableNextColumn(); // Name
             DebugRenderer.DrawIcon(row.Icon);
             var name = TextService.GetOrnamentName(row.RowId);
-            using (Color.Transparent.Push(ImGuiCol.HeaderActive))
-            using (Color.Transparent.Push(ImGuiCol.HeaderHovered))
-                ImGui.Selectable(name);
+            var canUse = isUnlocked && actionManager->GetActionStatus(ActionType.Ornament, row.RowId) == 0;
+            using (Color.Transparent.Push(ImGuiCol.HeaderActive, !canUse))
+            using (Color.Transparent.Push(ImGuiCol.HeaderHovered, !canUse))
+            {
+                if (canUse)
+                {
+                    if (ImGui.Selectable(name, currentId == row.RowId))
+                    {
+                        actionManager->UseAction(ActionType.Ornament, row.RowId);
+                    }
+                }
+                else
+                {
+                    ImGui.TextUnformatted(name);
+                }
+            }
 
             if (ImGui.IsItemHovered())
             {
+                if (canUse)
+                {
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                }
+
                 using var tooltip = ImRaii.Tooltip();
                 if (!tooltip) continue;
 

@@ -1,6 +1,8 @@
 using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
+using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
@@ -27,6 +29,11 @@ public unsafe partial class UnlocksTab
         ImGui.TableHeadersRow();
 
         var uiState = UIState.Instance();
+        var actionManager = ActionManager.Instance();
+        var player = Control.GetLocalPlayer();
+        var currentId = 0u;
+        if (player != null && player->CompanionData.CompanionObject != null)
+            currentId = player->CompanionData.CompanionObject->BaseId;
 
         foreach (var row in ExcelService.GetSheet<Companion>())
         {
@@ -47,12 +54,26 @@ public unsafe partial class UnlocksTab
             ImGui.TableNextColumn(); // Name
             DebugRenderer.DrawIcon(row.Icon);
             var name = TextService.GetCompanionName(row.RowId);
-            using (Color.Transparent.Push(ImGuiCol.HeaderActive))
-            using (Color.Transparent.Push(ImGuiCol.HeaderHovered))
-                ImGui.Selectable(name);
+            var canUse = isUnlocked && actionManager->GetActionStatus(ActionType.Companion, row.RowId) == 0;
+            using (Color.Transparent.Push(ImGuiCol.HeaderActive, !canUse))
+            using (Color.Transparent.Push(ImGuiCol.HeaderHovered, !canUse))
+            {
+                if (canUse)
+                {
+                    if (ImGui.Selectable(name, currentId == row.RowId))
+                        actionManager->UseAction(ActionType.Companion, row.RowId);
+                }
+                else
+                {
+                    ImGui.TextUnformatted(name);
+                }
+            }
 
             if (ImGui.IsItemHovered())
             {
+                if (canUse)
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+
                 using var tooltip = ImRaii.Tooltip();
                 if (!tooltip) continue;
 
