@@ -37,6 +37,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
     private readonly TextureService TextureService;
     private readonly ITextureProvider TextureProvider;
     private readonly ImGuiContextMenuService ImGuiContextMenuService;
+    private readonly SeStringEvaluatorService SeStringEvaluatorService;
 
     public UnlocksTab(
         IDalamudPluginInterface pluginInterface,
@@ -48,7 +49,8 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         ItemService itemService,
         TextureService textureService,
         ITextureProvider textureProvider,
-        ImGuiContextMenuService imGuiContextMenuService)
+        ImGuiContextMenuService imGuiContextMenuService,
+        SeStringEvaluatorService seStringEvaluatorService)
     {
         PluginInterface = pluginInterface;
         DebugRenderer = debugRenderer;
@@ -60,6 +62,7 @@ public unsafe partial class UnlocksTab : DebugTab, IDisposable
         TextureService = textureService;
         TextureProvider = textureProvider;
         ImGuiContextMenuService = imGuiContextMenuService;
+        SeStringEvaluatorService = seStringEvaluatorService;
 
         _tripleTriadNumberFont = new(() => PluginInterface.UiBuilder.FontAtlas.NewGameFontHandle(new GameFontStyle(GameFontFamily.MiedingerMid, 208f / 10f)));
 
