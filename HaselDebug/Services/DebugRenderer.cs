@@ -203,17 +203,17 @@ public unsafe partial class DebugRenderer
         }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdMap<,>))
         {
-            DrawStdMap(address, type, nodeOptions);
+            DrawStdMap(address, type.GenericTypeArguments[0], type.GenericTypeArguments[1], nodeOptions);
             return;
         }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdList<>))
         {
-            DrawStdList(address, type, nodeOptions);
+            DrawStdList(address, type.GenericTypeArguments[0], nodeOptions);
             return;
         }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdDeque<>))
         {
-            DrawStdDeque(address, type, nodeOptions);
+            DrawStdDeque(address, type.GenericTypeArguments[0], nodeOptions);
             return;
         }
         else if (type.IsEnum)

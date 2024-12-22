@@ -1,4 +1,5 @@
 using Dalamud.Interface.Utility.Raii;
+using FFXIVClientStructs.STD;
 using FFXIVClientStructs.STD.ContainerInterface;
 using HaselCommon.Services;
 using HaselDebug.Extensions;
@@ -10,7 +11,7 @@ namespace HaselDebug.Services;
 
 public unsafe partial class DebugRenderer
 {
-    public void DrawStdList(nint address, Type type, NodeOptions nodeOptions)
+    public void DrawStdList(nint address, Type valueType, NodeOptions nodeOptions)
     {
         if (*(nint*)address == 0)
         {
@@ -37,7 +38,7 @@ public unsafe partial class DebugRenderer
                 {
                     Visible = !WindowManager.Contains("0x" + address.ToString("X")),
                     Label = TextService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, this, address, type, "0x" + address.ToString("X")))
+                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, this, address, typeof(StdList<>).MakeGenericType(valueType), "0x" + address.ToString("X")))
                 });
             }
         });
@@ -48,7 +49,6 @@ public unsafe partial class DebugRenderer
 
         var _head = *(nint*)address;
         var _current = _head;
-        var valueType = type.GenericTypeArguments[0];
         var nodeType = typeof(IStdList<>.Node).MakeGenericType(valueType);
         var valueOffset = Marshal.OffsetOf(nodeType, "Value");
 

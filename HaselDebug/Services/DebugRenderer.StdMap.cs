@@ -1,6 +1,5 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.STD;
-using HaselCommon.Extensions.Reflection;
 using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Utils;
@@ -11,7 +10,7 @@ namespace HaselDebug.Services;
 
 public unsafe partial class DebugRenderer
 {
-    public void DrawStdMap(nint address, Type type, NodeOptions nodeOptions)
+    public void DrawStdMap(nint address, Type keyType, Type valueType, NodeOptions nodeOptions)
     {
         var elementCount = *(ulong*)(address + 0x8);
         if (elementCount == 0)
@@ -32,7 +31,7 @@ public unsafe partial class DebugRenderer
                 {
                     Visible = !WindowManager.Contains("0x" + address.ToString("X")),
                     Label = TextService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, this, address, type, "0x" + address.ToString("X")))
+                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, this, address, typeof(StdMap<,>).MakeGenericType(keyType, valueType), "0x" + address.ToString("X")))
                 });
             }
         });
@@ -41,21 +40,6 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
-        var size = type.SizeOf();
-        if (size == 0)
-        {
-            ImGui.TextUnformatted($"Can't get size of {type.Name}");
-            return;
-        }
-
-        if (type.GenericTypeArguments.Length != 2)
-        {
-            ImGui.TextUnformatted($"Invalid GenericTypeArguments.Length of {type.GenericTypeArguments.Length}");
-            return;
-        }
-
-        var keyType = type.GenericTypeArguments[0];
-        var valueType = type.GenericTypeArguments[1];
         var mapType = typeof(StdMapNode<,>).MakeGenericType(keyType, valueType);
         var myvalOffset = Marshal.OffsetOf(mapType, "_Myval");
         var pairType = typeof(StdPair<,>).MakeGenericType(keyType, valueType);

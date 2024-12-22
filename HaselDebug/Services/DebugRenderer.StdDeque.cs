@@ -1,4 +1,5 @@
 using Dalamud.Interface.Utility.Raii;
+using FFXIVClientStructs.STD;
 using HaselCommon.Extensions.Reflection;
 using HaselCommon.Services;
 using HaselDebug.Extensions;
@@ -10,7 +11,7 @@ namespace HaselDebug.Services;
 
 public unsafe partial class DebugRenderer
 {
-    public void DrawStdDeque(nint address, Type type, NodeOptions nodeOptions)
+    public void DrawStdDeque(nint address, Type valueType, NodeOptions nodeOptions)
     {
         var elementCount = *(ulong*)(address + 0x20); // MySize
         if (elementCount == 0)
@@ -31,7 +32,7 @@ public unsafe partial class DebugRenderer
                 {
                     Visible = !WindowManager.Contains("0x" + address.ToString("X")),
                     Label = TextService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, this, address, type, "0x" + address.ToString("X")))
+                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, this, address, typeof(StdDeque<>).MakeGenericType(valueType), "0x" + address.ToString("X")))
                 });
             }
         });
@@ -40,7 +41,7 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
-        var typeSize = type.SizeOf();
+        var typeSize = valueType.SizeOf();
         var blockSize =
             typeSize <= 1 ? 16 :
             typeSize <= 2 ? 8 :
@@ -73,7 +74,7 @@ public unsafe partial class DebugRenderer
             ImGui.TextUnformatted(i.ToString());
 
             ImGui.TableNextColumn(); // Value
-            DrawPointerType(valueAddress, type, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(valueAddress) });
+            DrawPointerType(valueAddress, valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(valueAddress) });
         }
     }
 }
