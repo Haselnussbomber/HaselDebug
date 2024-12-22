@@ -41,6 +41,9 @@ public unsafe partial class DebugRenderer
         var valueType = type.GenericTypeArguments[1];
         var mapType = typeof(StdMapNode<,>).MakeGenericType(keyType, valueType);
         var myvalOffset = Marshal.OffsetOf(mapType, "_Myval");
+        var keySize = keyType.SizeOf();
+        if (keySize < 8)
+            keySize = 8;
 
         var _head = *(nint*)address;
         var _current = _head;
@@ -90,7 +93,7 @@ public unsafe partial class DebugRenderer
         while (MoveNext())
         {
             var keyAddress = _current + myvalOffset;
-            var valueAddress = keyAddress + keyType.SizeOf();
+            var valueAddress = keyAddress + keySize;
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Address
