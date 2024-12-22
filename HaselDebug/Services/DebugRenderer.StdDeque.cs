@@ -1,6 +1,9 @@
 using Dalamud.Interface.Utility.Raii;
 using HaselCommon.Extensions.Reflection;
+using HaselCommon.Services;
+using HaselDebug.Extensions;
 using HaselDebug.Utils;
+using HaselDebug.Windows;
 using ImGuiNET;
 
 namespace HaselDebug.Services;
@@ -18,7 +21,21 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.WithAddress(address);
 
-        using var node = DrawTreeNode(nodeOptions.WithSeStringTitle($"{elementCount} value{(elementCount != 1 ? "s" : "")}"));
+        using var node = DrawTreeNode(nodeOptions.WithSeStringTitle($"{elementCount} value{(elementCount != 1 ? "s" : "")}") with
+        {
+            DrawContextMenu = (nodeOptions, builder) =>
+            {
+                builder.AddCopyAddress(TextService, address);
+                builder.AddSeparator();
+                builder.Add(new ImGuiContextMenuEntry()
+                {
+                    Visible = !WindowManager.Contains("0x" + address.ToString("X")),
+                    Label = TextService.Translate("ContextMenu.TabPopout"),
+                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, this, address, type, "0x" + address.ToString("X")))
+                });
+            }
+        });
+
         if (!node) return;
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();

@@ -7,7 +7,7 @@ using ImGuiNET;
 
 namespace HaselDebug.Windows;
 
-public class PointerTypeWindow(WindowManager WindowManager, DebugRenderer DebugRenderer, nint Address, Type Type) : SimpleWindow(WindowManager, Type.Name)
+public class PointerTypeWindow(WindowManager WindowManager, DebugRenderer DebugRenderer, nint Address, Type Type, string? Name = null) : SimpleWindow(WindowManager, Name ?? Type.Name)
 {
     private NodeOptions? NodeOptions;
 

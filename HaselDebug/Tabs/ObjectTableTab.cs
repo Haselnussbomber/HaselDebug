@@ -96,22 +96,19 @@ public unsafe class ObjectTableTab(
                             ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Color.Orange);
                         }
                     },
-                    DrawContextMenu = (NodeOptions nodeOptions) =>
+                    DrawContextMenu = (nodeOptions, builder) =>
                     {
-                        ImGuiContextMenuService.Draw($"{nodeOptions.AddressPath}ContextMenu", builder =>
+                        builder.Add(new ImGuiContextMenuEntry()
                         {
-                            builder.Add(new ImGuiContextMenuEntry()
-                            {
-                                Visible = ((byte)gameObject->TargetableStatus & 1 << 7) != 0,
-                                Label = TextService.Translate("ContextMenu.GameObject.DisableDraw"),
-                                ClickCallback = () => gameObject->DisableDraw()
-                            });
-                            builder.Add(new ImGuiContextMenuEntry()
-                            {
-                                Visible = ((byte)gameObject->TargetableStatus & 1 << 7) == 0,
-                                Label = TextService.Translate("ContextMenu.GameObject.EnableDraw"),
-                                ClickCallback = () => gameObject->EnableDraw()
-                            });
+                            Visible = ((byte)gameObject->TargetableStatus & 1 << 7) != 0,
+                            Label = TextService.Translate("ContextMenu.GameObject.DisableDraw"),
+                            ClickCallback = () => gameObject->DisableDraw()
+                        });
+                        builder.Add(new ImGuiContextMenuEntry()
+                        {
+                            Visible = ((byte)gameObject->TargetableStatus & 1 << 7) == 0,
+                            Label = TextService.Translate("ContextMenu.GameObject.EnableDraw"),
+                            ClickCallback = () => gameObject->EnableDraw()
                         });
                     }
                 });

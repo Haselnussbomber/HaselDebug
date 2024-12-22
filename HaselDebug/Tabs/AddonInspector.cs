@@ -268,38 +268,35 @@ public unsafe class AddonInspectorTab(
             DebugRenderer.DrawPointerType(agent, agentType, nodeOptions.WithAddress((nint)agent) with
             {
                 DefaultOpen = false,
-                DrawContextMenu = (nodeOptions) =>
+                DrawContextMenu = (nodeOptions, builder) =>
                 {
-                    ImGuiContextMenu.Draw($"ContextMenu{nodeOptions.AddressPath}", builder =>
+                    var pinnedInstances = Service.Get<PinnedInstancesService>();
+                    var isPinned = pinnedInstances.Contains(agentType);
+
+                    builder.AddCopyName(TextService, agentId.ToString());
+                    builder.AddCopyAddress(TextService, (nint)agent);
+
+                    builder.AddSeparator();
+
+                    builder.Add(new ImGuiContextMenuEntry()
                     {
-                        var pinnedInstances = Service.Get<PinnedInstancesService>();
-                        var isPinned = pinnedInstances.Contains(agentType);
+                        Visible = !WindowManager.Contains(agentType.Name),
+                        Label = TextService.Translate("ContextMenu.TabPopout"),
+                        ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, (nint)agent, agentType))
+                    });
 
-                        builder.AddCopyName(TextService, agentId.ToString());
-                        builder.AddCopyAddress(TextService, (nint)agent);
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
+                        Visible = !isPinned,
+                        Label = TextService.Translate("ContextMenu.PinnedInstances.Pin"),
+                        ClickCallback = () => pinnedInstances.Add((nint)agent, agentType)
+                    });
 
-                        builder.AddSeparator();
-
-                        builder.Add(new ImGuiContextMenuEntry()
-                        {
-                            Visible = !WindowManager.Contains(agentType.Name),
-                            Label = TextService.Translate("ContextMenu.TabPopout"),
-                            ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, (nint)agent, agentType))
-                        });
-
-                        builder.Add(new ImGuiContextMenuEntry()
-                        {
-                            Visible = !isPinned,
-                            Label = TextService.Translate("ContextMenu.PinnedInstances.Pin"),
-                            ClickCallback = () => pinnedInstances.Add((nint)agent, agentType)
-                        });
-
-                        builder.Add(new ImGuiContextMenuEntry()
-                        {
-                            Visible = isPinned,
-                            Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
-                            ClickCallback = () => pinnedInstances.Remove(agentType)
-                        });
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
+                        Visible = isPinned,
+                        Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
+                        ClickCallback = () => pinnedInstances.Remove(agentType)
                     });
                 }
             });
@@ -320,24 +317,21 @@ public unsafe class AddonInspectorTab(
                 DebugRenderer.DrawPointerType((nint)host, hostType, nodeOptions.WithAddress((nint)host) with
                 {
                     DefaultOpen = false,
-                    DrawContextMenu = (nodeOptions) =>
+                    DrawContextMenu = (nodeOptions, builder) =>
                     {
-                        ImGuiContextMenu.Draw($"ContextMenu{nodeOptions.AddressPath}", builder =>
+                        var pinnedInstances = Service.Get<PinnedInstancesService>();
+                        var isPinned = pinnedInstances.Contains(hostType);
+
+                        builder.AddCopyName(TextService, host->NameString);
+                        builder.AddCopyAddress(TextService, (nint)host);
+
+                        builder.AddSeparator();
+
+                        builder.Add(new ImGuiContextMenuEntry()
                         {
-                            var pinnedInstances = Service.Get<PinnedInstancesService>();
-                            var isPinned = pinnedInstances.Contains(hostType);
-
-                            builder.AddCopyName(TextService, host->NameString);
-                            builder.AddCopyAddress(TextService, (nint)host);
-
-                            builder.AddSeparator();
-
-                            builder.Add(new ImGuiContextMenuEntry()
-                            {
-                                Visible = !WindowManager.Contains(hostType.Name),
-                                Label = TextService.Translate("ContextMenu.TabPopout"),
-                                ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, (nint)host, hostType))
-                            });
+                            Visible = !WindowManager.Contains(hostType.Name),
+                            Label = TextService.Translate("ContextMenu.TabPopout"),
+                            ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, (nint)host, hostType))
                         });
                     }
                 });

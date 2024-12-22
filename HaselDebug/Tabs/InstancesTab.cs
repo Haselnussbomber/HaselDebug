@@ -40,33 +40,30 @@ public class InstancesTab(
             DebugRenderer.DrawPointerType(ptr, type, new NodeOptions()
             {
                 AddressPath = new AddressPath(i++),
-                DrawContextMenu = (nodeOptions) =>
+                DrawContextMenu = (nodeOptions, builder) =>
                 {
-                    ImGuiContextMenu.Draw($"ContextMenu{nodeOptions.AddressPath}", builder =>
+                    var isPinned = PinnedInstances.Contains(type);
+                    var windowName = type.Name;
+
+                    builder.Add(new ImGuiContextMenuEntry()
                     {
-                        var isPinned = PinnedInstances.Contains(type);
-                        var windowName = type.Name;
+                        Visible = !WindowManager.Contains(windowName),
+                        Label = TextService.Translate("ContextMenu.TabPopout"),
+                        ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, ptr, type))
+                    });
 
-                        builder.Add(new ImGuiContextMenuEntry()
-                        {
-                            Visible = !WindowManager.Contains(windowName),
-                            Label = TextService.Translate("ContextMenu.TabPopout"),
-                            ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, ptr, type))
-                        });
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
+                        Visible = !isPinned,
+                        Label = TextService.Translate("ContextMenu.PinnedInstances.Pin"),
+                        ClickCallback = () => PinnedInstances.Add(ptr, type)
+                    });
 
-                        builder.Add(new ImGuiContextMenuEntry()
-                        {
-                            Visible = !isPinned,
-                            Label = TextService.Translate("ContextMenu.PinnedInstances.Pin"),
-                            ClickCallback = () => PinnedInstances.Add(ptr, type)
-                        });
-
-                        builder.Add(new ImGuiContextMenuEntry()
-                        {
-                            Visible = isPinned,
-                            Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
-                            ClickCallback = () => PinnedInstances.Remove(type)
-                        });
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
+                        Visible = isPinned,
+                        Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
+                        ClickCallback = () => PinnedInstances.Remove(type)
                     });
                 }
             });

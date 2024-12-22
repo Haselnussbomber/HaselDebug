@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -24,7 +25,9 @@ using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselDebug.Utils;
+using HaselDebug.Windows;
 using ImGuiNET;
+using InteropGenerator.Runtime;
 using InteropGenerator.Runtime.Attributes;
 using Lumina.Excel;
 using Microsoft.Extensions.Logging;
@@ -278,7 +281,8 @@ public unsafe partial class DebugRenderer
         if (nodeOptions.OnHovered != null && ImGui.IsItemHovered())
             nodeOptions.OnHovered();
 
-        nodeOptions.DrawContextMenu?.Invoke(nodeOptions);
+        if (nodeOptions.DrawContextMenu != null)
+            ImGuiContextMenu.Draw(nodeOptions.GetKey("ContextMenu"), builder => nodeOptions.DrawContextMenu(nodeOptions, builder));
 
         if (nodeOptions.DrawSeStringTreeNode && nodeOptions.SeStringTitle != null)
         {

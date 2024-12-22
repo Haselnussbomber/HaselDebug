@@ -1,5 +1,6 @@
 using Dalamud.Game;
 using HaselCommon.Graphics;
+using HaselCommon.Services;
 using ImGuiNET;
 using Lumina.Text.ReadOnly;
 
@@ -16,7 +17,7 @@ public record struct NodeOptions
     public bool Indent { get; set; } = true;
     public bool DefaultOpen { get; set; } = false;
     public Action? OnHovered { get; set; } = null;
-    public Action<NodeOptions>? DrawContextMenu { get; set; }
+    public Action<NodeOptions, ImGuiContextMenuBuilder>? DrawContextMenu { get; set; }
     public bool DrawSeStringTreeNode { get; set; } = true;
     public bool RenderSeString { get; set; } = true;
     public ClientLanguage Language { get; set; } = ClientLanguage.English;
