@@ -3,7 +3,6 @@ using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -15,6 +14,8 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.Attributes;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -25,9 +26,7 @@ using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselDebug.Utils;
-using HaselDebug.Windows;
 using ImGuiNET;
-using InteropGenerator.Runtime;
 using InteropGenerator.Runtime.Attributes;
 using Lumina.Excel;
 using Microsoft.Extensions.Logging;
@@ -60,6 +59,7 @@ public unsafe partial class DebugRenderer
     private readonly TextService TextService;
     private readonly TextureService TextureService;
     private readonly ExcelModule ExcelModule;
+    private readonly IGameGui GameGui;
 
     public ImmutableSortedDictionary<string, Type> AddonTypes { get; }
     public ImmutableSortedDictionary<AgentId, Type> AgentTypes { get; }
@@ -73,7 +73,8 @@ public unsafe partial class DebugRenderer
         SeStringEvaluatorService seStringEvaluator,
         TextService textService,
         TextureService textureService,
-        ExcelModule excelModule)
+        ExcelModule excelModule,
+        IGameGui gameGui)
     {
         Logger = logger;
         PluginInterface = pluginInterface;
@@ -84,6 +85,7 @@ public unsafe partial class DebugRenderer
         TextService = textService;
         TextureService = textureService;
         ExcelModule = excelModule;
+        GameGui = gameGui;
 
         var csAssembly = typeof(AddonAttribute).Assembly;
 
@@ -312,6 +314,40 @@ public unsafe partial class DebugRenderer
 
         using var disabled = ImRaii.Disabled(fields.Count() == 0);
         using var node = DrawTreeNode(nodeOptions.WithSeStringTitleIfNull(type.FullName ?? "Unknown Type Name"));
+
+        if (ImGui.IsItemHovered())
+        {
+            if (type == typeof(ILayoutInstance))
+            {
+                var inst = (ILayoutInstance*)address;
+                if (inst != null)
+                {
+                    var transform = inst->GetTransformImpl();
+                    if (transform != null)
+                    {
+                        DrawLine(transform->Translation);
+                    }
+                }
+            }
+            else if (type == typeof(GameObject) || Inherits<GameObject>(type))
+            {
+                var gameObject = (GameObject*)address;
+                if (gameObject != null)
+                {
+                    DrawLine(gameObject->Position);
+                }
+            }
+
+            void DrawLine(Vector3 pos)
+            {
+                if (GameGui.WorldToScreen(pos, out var screenPos))
+                {
+                    ImGui.GetForegroundDrawList().AddLine(ImGui.GetMousePos(), screenPos, Color.Orange);
+                    ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Color.Orange);
+                }
+            }
+        }
+
         if (!node) return;
 
         var processedFields = fields

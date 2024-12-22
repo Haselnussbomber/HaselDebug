@@ -3,7 +3,6 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
@@ -20,8 +19,6 @@ namespace HaselDebug.Tabs;
 public unsafe class ObjectTableTab(
     DebugRenderer DebugRenderer,
     SeStringEvaluatorService SeStringEvaluator,
-    ImGuiContextMenuService ImGuiContextMenuService,
-    IGameGui GameGui,
     TextService TextService,
     ExcelService ExcelService) : DebugTab
 {
@@ -88,14 +85,6 @@ public unsafe class ObjectTableTab(
                 {
                     AddressPath = new AddressPath((nint)gameObject),
                     Title = title,
-                    OnHovered = () =>
-                    {
-                        if (GameGui.WorldToScreen(gameObject->Position, out var screenPos))
-                        {
-                            ImGui.GetForegroundDrawList().AddLine(ImGui.GetMousePos(), screenPos, Color.Orange);
-                            ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Color.Orange);
-                        }
-                    },
                     DrawContextMenu = (nodeOptions, builder) =>
                     {
                         builder.Add(new ImGuiContextMenuEntry()
