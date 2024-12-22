@@ -319,7 +319,7 @@ public unsafe partial class DebugRenderer
 
         if (ImGui.IsItemHovered())
         {
-            if (type == typeof(ILayoutInstance))
+            if (type == typeof(ILayoutInstance) || Inherits<ILayoutInstance>(type))
             {
                 var inst = (ILayoutInstance*)address;
                 if (inst != null)
