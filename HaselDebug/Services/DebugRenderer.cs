@@ -18,6 +18,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
 using HaselCommon.Extensions.Reflection;
@@ -47,6 +48,7 @@ public unsafe partial class DebugRenderer
     private readonly Dictionary<Type, string[]> KnownStringPointers = new() {
         { typeof(FFXIVClientStructs.FFXIV.Client.UI.Agent.MapMarkerBase), ["Subtext"] },
         { typeof(FFXIVClientStructs.FFXIV.Common.Component.Excel.ExcelSheet), ["SheetName"] },
+        { typeof(WorldHelper.World), ["Name"] },
         { typeof(AtkTextNode), ["OriginalTextPointer"] }
     };
 
