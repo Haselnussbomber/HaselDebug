@@ -16,6 +16,7 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
+using FFXIVClientStructs.FFXIV.Client.LayoutEngine.Group;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
@@ -147,6 +148,15 @@ public unsafe partial class DebugRenderer
         {
             ImGui.TextUnformatted($"0x{address:X}"); // TODO: what did I do here?
             return;
+        }
+        else if (type == typeof(ILayoutInstance))
+        {
+            switch (((ILayoutInstance*)address)->Id.Type)
+            {
+                case InstanceType.SharedGroup:
+                    type = typeof(SharedGroupLayoutInstance);
+                    break;
+            }
         }
 
         if (type.IsPointer)
