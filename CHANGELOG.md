@@ -1,6 +1,18 @@
 # Changelog
 
-## [1.9.0] (2024-12-04)
+## [1.10.0] (2024-12-22)
+
+- **Added:** Unlock tabs Outfits.
+- **Updated:** A new context menu on all StdDeque, StdList, StdMap, StdVector nodes that allows to copy the address and to pop them out into a new window.
+- **Updated:** GameObjects and its subclasses, and ILayoutInstances in any struct (not only in the Object Table tab) now draw a line from the cursor to the 3D position.
+- **Updated:** Clicking on collected items in the unlock tabs Fashion Accessories, Minions and Mounts now summon them.
+- **Updated:** Unlock Links now supports entries from the BannerCondition (BannerBg, BannerFrame, BannerDecoration, BannerFacial, BannerTimeline), BuddyAction, CSBonusContentType, CharaMakeCustomize, CraftAction, MJILandmark, Perform, QuestAcceptAdditionCondition and Trait sheets.
+- **Fixed:** Inconsistencies in hiding achievement spoilers were hopefully fully fixed.
+- **Fixed:** An issue with the StdMap key size was solved by using a minimum size of 8 bytes (seen in LayoutManager.InstancesByType where the key is an enum with the underlying type byte).
+- **Fixed:** Removed soft hypens from MainCommands entries.
+- **Fixed:** The Orchestrion Rolls category icon was moved to the Category column.
+
+## [1.9.0] (2024-12-20)
 
 - **Added:** Unlock tabs Fish and Spearfish.
 - **Updated:** It's now possible to click on the NPC name in the Satisfaction Supply tab to teleport to the closest aetheryte.
@@ -8,7 +20,7 @@
 - **Updated:** Namespaces in xml docs are now truncated based on the parents namespace.
 - **Fixed:** A parsing issue with multiple c-tags on a single xml doc line.
 - **Fixed:** Hidden achievements displayed the description in the tooltip when the Hide Spoilers checkbox was enabled.
-- **Updated:** ClientStructs now at [cc98a564](https://github.com/aers/FFXIVClientStructs/tree/cc98a564)
+- **Updated:** ClientStructs now at [cc98a564](https://github.com/aers/FFXIVClientStructs/tree/cc98a564) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b3a25a18..cc98a564)).
 
 ## [1.8.0] (2024-12-04)
 
@@ -17,7 +29,7 @@
 - **Added:** XML docs on ClientStructs fields are now shown in their tooltip. Fields that have docs are shown with an underline.
 - **Added:** Shift-clicking on offsets now copies the offset. (Clicking on offsets without shift still copies the entire address.)
 - **Fixed:** MainCommands tooltip no longer flickers on first show.
-- **Updated:** ClientStructs now at [b3a25a18](https://github.com/aers/FFXIVClientStructs/tree/b3a25a18)
+- **Updated:** ClientStructs now at [b3a25a18](https://github.com/aers/FFXIVClientStructs/tree/b3a25a18) ([compare](https://github.com/aers/FFXIVClientStructs/compare/e8b73d8f..b3a25a18)).
 
 ## [1.7.0] (2024-11-28)
 
@@ -29,7 +41,7 @@
 - **Updated:** SeString inspector will now draw the icon of Icon and Icon2 payloads.
 - **Updated:** Small changes to the header in the Addon Inspector. It will now show the agents using this addon, or the host addon.
 - **Removed:** Addons in the Addon Inspector can no longer be pinned to the sidebar.
-- **Updated:** ClientStructs now at [e8b73d8f](https://github.com/aers/FFXIVClientStructs/tree/e8b73d8f)
+- **Updated:** ClientStructs now at [e8b73d8f](https://github.com/aers/FFXIVClientStructs/tree/e8b73d8f) ([compare](https://github.com/aers/FFXIVClientStructs/compare/cf5ba30..e8b73d8f)).
 
 ## [1.6.5] (2024-10-20)
 
@@ -38,7 +50,7 @@ Update for 7.1.
 - **Added:** Unknown Agents will show the Addon name in yellow, if they are active.
 - **Added:** Addon Inspector will now highlight the nodes on hover.
 - **Fixed:** StdList rendering was incorrect.
-- **Updated:** ClientStructs now at [cf5ba30](https://github.com/aers/FFXIVClientStructs/tree/cf5ba30)
+- **Updated:** ClientStructs now at [cf5ba30](https://github.com/aers/FFXIVClientStructs/tree/cf5ba30) ([compare](https://github.com/aers/FFXIVClientStructs/compare/81fb801..cf5ba30)).
 
 ## [1.6.4] (2024-09-28)
 
@@ -145,7 +157,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.9.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.10.0...main
+[1.10.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.6.5...v1.7.0
