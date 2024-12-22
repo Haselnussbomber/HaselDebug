@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.10.1] (2024-12-22)
+
+Last update broke StdMap for many structs. This time it actually fetches the value offset directly instead of calculating where it could be based on the key type.
+
 ## [1.10.0] (2024-12-22)
 
 - **Added:** Unlock tabs Outfits.
@@ -157,7 +161,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.10.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.10.1...main
+[1.10.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.7.0...v1.8.0
