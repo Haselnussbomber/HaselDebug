@@ -103,7 +103,7 @@ public unsafe partial class UnlocksTab
 
         foreach (var row in ExcelService.GetSheet<CraftAction>())
         {
-            if (row.QuestRequirement.RowId > 0 && row.QuestRequirement.RowId < 0x10000)
+            if (row.QuestRequirement.RowId is > 0 and < 65536)
             {
                 if (!dict.TryGetValue(row.QuestRequirement.RowId, out var names))
                     dict.Add(row.QuestRequirement.RowId, names = []);
@@ -217,7 +217,7 @@ public unsafe partial class UnlocksTab
 
         foreach (var row in ExcelService.GetSheet<NotebookDivision>())
         {
-            if (row.QuestUnlock.RowId > 0 && row.QuestUnlock.RowId < 0x10000)
+            if (row.QuestUnlock.RowId is > 0 and < 65536)
             {
                 if (!dict.TryGetValue(row.QuestUnlock.RowId, out var names))
                     dict.Add(row.QuestUnlock.RowId, names = []);
@@ -228,7 +228,7 @@ public unsafe partial class UnlocksTab
 
         foreach (var row in ExcelService.GetSheet<Trait>())
         {
-            if (row.Quest.RowId > 0 && row.Quest.RowId < 0x10000)
+            if (row.Quest.RowId is > 0 and < 65536)
             {
                 if (!dict.TryGetValue(row.Quest.RowId, out var names))
                     dict.Add(row.Quest.RowId, names = []);
@@ -239,7 +239,7 @@ public unsafe partial class UnlocksTab
 
         foreach (var row in ExcelService.GetSheet<QuestAcceptAdditionCondition>())
         {
-            if (row.Requirement0.RowId > 0 && row.Requirement0.RowId < 0x10000)
+            if (row.Requirement0.RowId is > 0 and < 65536)
             {
                 if (!dict.TryGetValue(row.Requirement0.RowId, out var names))
                     dict.Add(row.Requirement0.RowId, names = []);
@@ -247,7 +247,7 @@ public unsafe partial class UnlocksTab
                 names.Add(($"QuestAcceptAdditionCondition#{row.RowId} (Requirement 0)", 0, TextService.GetQuestName(row.RowId)));
             }
 
-            if (row.Requirement1.RowId > 0 && row.Requirement1.RowId < 0x10000)
+            if (row.Requirement1.RowId is > 0 and < 65536)
             {
                 if (!dict.TryGetValue(row.Requirement1.RowId, out var names))
                     dict.Add(row.Requirement1.RowId, names = []);
