@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.11.0] (2024-12-29)
+
+- **Added:** New tab Addon Config.
+- **Added:** Support for StdSet.
+- **Added:** ILayoutInstance type redirect to SharedGroupLayoutInstance, when the type matches.
+- **Updated:** Instance Content Director tab now uses the correct struct type based on InstanceContentType or PublicContentDirectorType.
+- **Fixed:** A line to 3D positions is now also drawn for structs that inherit ILayoutInstance.
+- **Fixed:** Incorrect usage of Std* struct types.
+- **Updated:** ClientStructs now at [f26035a](https://github.com/aers/FFXIVClientStructs/tree/f26035a) ([compare](https://github.com/aers/FFXIVClientStructs/compare/cc98a564..f26035a)).
+
 ## [1.10.1] (2024-12-22)
 
 Last update broke StdMap for many structs. This time it actually fetches the value offset directly instead of calculating where it could be based on the key type.
