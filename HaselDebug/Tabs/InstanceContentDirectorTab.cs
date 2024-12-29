@@ -21,14 +21,17 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
 
     public override void Draw()
     {
-        foreach (var ((name, type), vtableAddr) in InstanceContentTypeVtables)
+        if (InstanceContentTypeVtables.Count != 0)
         {
-            DebugRenderer.DrawCopyableText($"{type}: {name} @", $"+0x{vtableAddr - SigScanner.Module.BaseAddress:X} - {name}");
-            ImGui.SameLine();
-            DebugRenderer.DrawAddress(vtableAddr);
-        }
+            foreach (var ((name, type), vtableAddr) in InstanceContentTypeVtables)
+            {
+                DebugRenderer.DrawCopyableText($"{type}: {name} @", $"+0x{vtableAddr - SigScanner.Module.BaseAddress:X} - {name}");
+                ImGui.SameLine();
+                DebugRenderer.DrawAddress(vtableAddr);
+            }
 
-        ImGui.Separator();
+            ImGui.Separator();
+        }
 
         foreach (var directorPtr in EventFramework.Instance()->DirectorModule.DirectorList)
         {
@@ -38,7 +41,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
             else
                 ImGui.TextUnformatted($"[{directorPtr.Value->EventHandlerInfo->EventId.ContentId}]");
             ImGui.SameLine();
-            DebugRenderer.DrawPointerType(directorPtr.Value, typeof(Director), new NodeOptions());
+            DebugRenderer.DrawPointerType(directorPtr.Value, GetDirectorType(directorPtr), new NodeOptions() { AddressPath = new([1, (nint)directorPtr.Value]) });
         }
 
         ImGui.TextUnformatted("ContentDirector:");
@@ -50,7 +53,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         }
         else
         {
-            DebugRenderer.DrawPointerType(contentDirector, typeof(ContentDirector), new NodeOptions());
+            DebugRenderer.DrawPointerType(contentDirector, typeof(ContentDirector), new NodeOptions() { AddressPath = new([2, (nint)contentDirector]) });
         }
 
         ImGui.Separator();
@@ -64,7 +67,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         }
         else
         {
-            DebugRenderer.DrawPointerType(craftLeveEventHandler, typeof(EventHandler), new NodeOptions());
+            DebugRenderer.DrawPointerType(craftLeveEventHandler, typeof(EventHandler), new NodeOptions() { AddressPath = new([3, (nint)craftLeveEventHandler]) });
         }
 
         ImGui.Separator();
@@ -78,7 +81,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         }
         else
         {
-            DebugRenderer.DrawPointerType(publicContentDirector, typeof(PublicContentDirector), new NodeOptions());
+            DebugRenderer.DrawPointerType(publicContentDirector, GetPublicContentDirectorType((Director*)publicContentDirector), new NodeOptions() { AddressPath = new([4, (nint)publicContentDirector]) });
         }
 
         ImGui.Separator();
@@ -100,7 +103,48 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
                 InstanceContentTypeVtables.Add(key, *(nint*)instanceContentDirector);
             }
 
-            DebugRenderer.DrawPointerType(instanceContentDirector, typeof(InstanceContentDirector), new NodeOptions());
+            DebugRenderer.DrawPointerType(instanceContentDirector, GetInstanceContentDirectorType((Director*)instanceContentDirector), new NodeOptions() { AddressPath = new([5, (nint)instanceContentDirector]) });
         }
+    }
+
+    private Type GetDirectorType(Director* director)
+    {
+        if (director == null || director->EventHandlerInfo == null)
+            return typeof(Director);
+
+        return director->EventHandlerInfo->EventId.ContentId switch
+        {
+            EventHandlerType.InstanceContentDirector => typeof(InstanceContentDirector),
+            EventHandlerType.PublicContentDirector => GetPublicContentDirectorType(director),
+            _ => typeof(Director),
+        };
+    }
+
+    private Type GetInstanceContentDirectorType(Director* director)
+    {
+        var instanceContentDirector = (InstanceContentDirector*)director;
+        if (instanceContentDirector == null)
+            return typeof(InstanceContentDirector);
+
+        return instanceContentDirector->InstanceContentType switch
+        {
+            InstanceContentType.DeepDungeon => typeof(InstanceContentDeepDungeon),
+            InstanceContentType.OceanFishing => typeof(InstanceContentOceanFishing),
+            _ => typeof(InstanceContentDirector)
+        };
+    }
+
+    private Type GetPublicContentDirectorType(Director* director)
+    {
+        var publicContentDirector = (PublicContentDirector*)director;
+        if (publicContentDirector == null)
+            return typeof(PublicContentDirector);
+
+        return publicContentDirector->Type switch
+        {
+            PublicContentDirectorType.Bozja => typeof(PublicContentBozja),
+            PublicContentDirectorType.Eureka => typeof(PublicContentEureka),
+            _ => typeof(PublicContentDirector)
+        };
     }
 }
