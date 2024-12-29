@@ -32,7 +32,7 @@ public class Plugin : IDalamudPlugin
 
 #if HAS_LOCAL_CS
         FFXIVClientStructs.Interop.Generated.Addresses.Register();
-        //Addresses.Register();
+        Addresses.Register();
         Resolver.GetInstance.Setup(
             sigScanner.SearchBase,
             dataManager.GameData.Repositories["ffxiv"].Version,
