@@ -206,6 +206,11 @@ public unsafe partial class DebugRenderer
             DrawStdMap(address, type.GenericTypeArguments[0], type.GenericTypeArguments[1], nodeOptions);
             return;
         }
+        else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdSet<>))
+        {
+            DrawStdSet(address, type.GenericTypeArguments[0], nodeOptions);
+            return;
+        }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdList<>))
         {
             DrawStdList(address, type.GenericTypeArguments[0], nodeOptions);
