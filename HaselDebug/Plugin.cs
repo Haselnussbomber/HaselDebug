@@ -10,6 +10,7 @@ using HaselDebug.Abstracts;
 using HaselDebug.Config;
 using HaselDebug.Services;
 using HaselDebug.Windows;
+using ImGuiNET;
 using InteropGenerator.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -73,6 +74,7 @@ public class Plugin : IDalamudPlugin
 
             Service.Get<CommandService>().Register(OnCommand, true);
 
+            PluginInterface.UiBuilder.Draw += DrawMainMenuItem;
             PluginInterface.UiBuilder.OpenMainUi += TogglePluginWindow;
             PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigWindow;
         });
@@ -94,6 +96,19 @@ public class Plugin : IDalamudPlugin
         }
     }
 
+    private static void DrawMainMenuItem()
+    {
+        if (ImGui.BeginMainMenuBar())
+        {
+            if (ImGui.MenuItem("HaselDebug"))
+            {
+                Service.Get<PluginWindow>().Toggle();
+            }
+
+            ImGui.EndMainMenuBar();
+        }
+    }
+
     private static void TogglePluginWindow()
     {
         Service.Get<PluginWindow>().Toggle();
@@ -106,6 +121,7 @@ public class Plugin : IDalamudPlugin
 
     void IDisposable.Dispose()
     {
+        PluginInterface.UiBuilder.Draw -= DrawMainMenuItem;
         PluginInterface.UiBuilder.OpenMainUi -= TogglePluginWindow;
         PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigWindow;
 
