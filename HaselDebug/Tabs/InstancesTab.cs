@@ -16,8 +16,7 @@ public class InstancesTab(
     DebugRenderer DebugRenderer,
     WindowManager WindowManager,
     InstancesService InstancesService,
-    PinnedInstancesService PinnedInstances,
-    ImGuiContextMenuService ImGuiContextMenu) : DebugTab
+    PinnedInstancesService PinnedInstances) : DebugTab
 {
     private string SearchTerm = string.Empty;
 

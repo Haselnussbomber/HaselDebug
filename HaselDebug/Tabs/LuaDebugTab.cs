@@ -96,7 +96,7 @@ public unsafe class LuaDebugTab : DebugTab
         switch (type)
         {
             case LuaType.Table:
-                if (ImGui.TreeNodeEx($"{key} [{type}]##{id}"))
+                if (ImGui.TreeNodeEx($"[{type}] {key}##{id}", ImGuiTreeNodeFlags.SpanAvailWidth))
                 {
                     var top = L->lua_gettop();
                     L->lua_pushvalue(idx);
@@ -119,7 +119,7 @@ public unsafe class LuaDebugTab : DebugTab
                         }
                         else
                         {
-                            ImGui.TreeNodeEx($"{key}.?? [{typeValue}]##{id}", ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen);
+                            ImGui.TreeNodeEx($"[{typeValue}] {key}.??##{id}", ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.NoTreePushOnOpen);
                         }
 
                         L->lua_pop(1);
@@ -131,7 +131,7 @@ public unsafe class LuaDebugTab : DebugTab
 
                 break;
             case LuaType.UserData:
-                if (ImGui.TreeNodeEx($"{key} [{type}]##{id}"))
+                if (ImGui.TreeNodeEx($"[{type}] {key}##{id}", ImGuiTreeNodeFlags.SpanAvailWidth))
                 {
                     var top = L->lua_gettop();
 
@@ -149,7 +149,7 @@ public unsafe class LuaDebugTab : DebugTab
                     {
                         L->lua_getfield(idx, "className");
                         if (L->lua_type(-1) == LuaType.String)
-                            ImGui.TreeNodeEx($"className = {L->lua_tostring(-1)}##{id}", ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen);
+                            ImGui.TreeNodeEx($"className = {L->lua_tostring(-1)}##{id}", ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.NoTreePushOnOpen);
                         L->lua_pop(1);
                     }
 
@@ -161,7 +161,7 @@ public unsafe class LuaDebugTab : DebugTab
             case LuaType.Boolean:
             case LuaType.Number:
             case LuaType.String:
-                ImGui.TreeNodeEx($"{key} [{type}] = \"{L->lua_tostring(idx)}\"##{id}", ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen);
+                ImGui.TreeNodeEx($"[{type}] {key} = \"{L->lua_tostring(idx)}\"##{id}", ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.NoTreePushOnOpen);
                 break;
             case LuaType.LightUserData:
             case LuaType.Function:
@@ -171,7 +171,7 @@ public unsafe class LuaDebugTab : DebugTab
             case LuaType.None:
             case LuaType.Nil:
             default:
-                ImGui.TreeNodeEx($"{key} [{type}]##{id}", ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen);
+                ImGui.TreeNodeEx($"[{type}] {key}##{id}", ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.NoTreePushOnOpen);
                 break;
         }
 
