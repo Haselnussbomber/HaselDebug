@@ -182,18 +182,14 @@ public class PluginWindow : SimpleWindow
             return;
         }
 
-        var child = SelectedTab.DrawInChild
-            ? ImRaii.Child("##Tab", new Vector2(-1), true)
+        using var child = SelectedTab.DrawInChild
+            ? ImRaii.Child($"###{SelectedTab.InternalName}_Child", new Vector2(-1), true)
             : null;
 
-        using var id = ImRaii.PushId(SelectedTab.InternalName);
         try
         {
             SelectedTab.Draw();
         }
-        finally
-        {
-            child?.Dispose();
-        }
+        catch { }
     }
 }
