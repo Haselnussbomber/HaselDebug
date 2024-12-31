@@ -96,9 +96,9 @@ public class Plugin : IDalamudPlugin
         }
     }
 
-    private static void DrawMainMenuItem()
+    private void DrawMainMenuItem()
     {
-        if (ImGui.BeginMainMenuBar())
+        if (PluginInterface.IsDevMenuOpen && ImGui.BeginMainMenuBar())
         {
             if (ImGui.MenuItem("HaselDebug"))
             {
