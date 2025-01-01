@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Hooking;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.System.String;
@@ -15,10 +17,38 @@ using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService TextService) : DebugTab
+public unsafe class EventFrameworkTab : DebugTab, IDisposable
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly TextService _textService;
+    private readonly Hook<EventSceneModuleTaskManager.Delegates.AddTask> _addTaskHook;
+    private readonly List<(DateTime, nint, EventSceneTaskInterface)> _taskTypeHistory = [];
+
     public override string Title => "EventFramework";
     public override bool DrawInChild => false;
+
+    public EventFrameworkTab(DebugRenderer DebugRenderer, TextService TextService, IGameInteropProvider GameInteropProvider)
+    {
+        _debugRenderer = DebugRenderer;
+        _textService = TextService;
+
+        _addTaskHook = GameInteropProvider.HookFromAddress<EventSceneModuleTaskManager.Delegates.AddTask>(
+            EventSceneModuleTaskManager.MemberFunctionPointers.AddTask,
+            AddTaskDetour);
+
+        _addTaskHook.Enable();
+    }
+
+    public void Dispose()
+    {
+        _addTaskHook.Dispose();
+    }
+
+    private void AddTaskDetour(EventSceneModuleTaskManager* thisPtr, EventSceneTaskInterface* task)
+    {
+        _taskTypeHistory.Add((DateTime.Now, (nint)task, *task));
+        _addTaskHook.Original(thisPtr, task);
+    }
 
     public override void Draw()
     {
@@ -44,7 +74,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
 
         var eventFramework = EventFramework.Instance();
 
-        DebugRenderer.DrawPointerType(eventFramework, typeof(EventFramework), new NodeOptions());
+        _debugRenderer.DrawPointerType(eventFramework, typeof(EventFramework), new NodeOptions());
 
         ImGui.Separator();
 
@@ -67,20 +97,20 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
 
         foreach (Director* director in directorList)
         {
-            DebugRenderer.DrawAddress(director);
+            _debugRenderer.DrawAddress(director);
             ImGui.SameLine();
 
             ImGui.TextUnformatted(director->EventHandlerInfo->EventId.ContentId.ToString());
             ImGui.SameLine();
 
             if (director->IconId != 0)
-                DebugRenderer.DrawIcon(director->IconId);
+                _debugRenderer.DrawIcon(director->IconId);
 
             ReadOnlySeString? title = null;
             if (!director->Title.IsEmpty)
                 title = new ReadOnlySeString(director->Title.AsSpan().ToArray());
 
-            DebugRenderer.DrawPointerType(director, typeof(Director), new NodeOptions()
+            _debugRenderer.DrawPointerType(director, typeof(Director), new NodeOptions()
             {
                 SeStringTitle = title
             });
@@ -100,7 +130,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
             var eventHandler = kv.Item2.Value;
             var type = eventHandler->Info.EventId.ContentId;
 
-            DebugRenderer.DrawAddress(eventHandler);
+            _debugRenderer.DrawAddress(eventHandler);
             ImGui.SameLine(110);
 
             ImGui.TextUnformatted(kv.Item1.ToString("X4"));
@@ -119,18 +149,18 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
                 DebugUtils.DrawIcon(TextureProvider, iconId);
                 */
 
-                title = $"{type} {questId} ({TextService.GetQuestName(questId)})";
+                title = $"{type} {questId} ({_textService.GetQuestName(questId)})";
             }
             else
             {
                 if (eventHandler->IconId != 0)
-                    DebugRenderer.DrawIcon(eventHandler->IconId);
+                    _debugRenderer.DrawIcon(eventHandler->IconId);
             }
 
             if (title == null)
                 title = $"{type} {kv.Item2.Value->Info.EventId.Id}";
 
-            DebugRenderer.DrawPointerType(eventHandler, typeof(EventHandler), new NodeOptions()
+            _debugRenderer.DrawPointerType(eventHandler, typeof(EventHandler), new NodeOptions()
             {
                 Title = title
             });
@@ -141,7 +171,6 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
         }
     }
 
-    private readonly List<(nint, EventSceneTaskType)> TaskTypeHistory = [];
     private void DrawTasksTab()
     {
         var tasks = EventFramework.Instance()->EventSceneModule.TaskManager.Tasks;
@@ -152,37 +181,27 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
         using var child = ImRaii.Child("TasksTab", new Vector2(-1), true, ImGuiWindowFlags.NoSavedSettings);
         if (!child) return;
 
+        ImGui.TextUnformatted("Current Tasks:");
+
         foreach (EventSceneTaskInterface* task in tasks)
         {
-            DebugRenderer.DrawAddress(task);
+            _debugRenderer.DrawAddress(task);
             ImGui.SameLine();
-            ImGui.TextUnformatted(task->Type.ToString());
-
-            var exists = false;
-            foreach (var (ptr, type) in TaskTypeHistory)
-            {
-                if (ptr == (nint)task)
-                {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists)
-                TaskTypeHistory.Add(((nint)task, task->Type));
+            ImGui.TextUnformatted($"Type: {task->Type}, Flags: {task->Flags}");
         }
 
         ImGui.Separator();
 
         ImGui.TextUnformatted("History:");
 
-        foreach (var (_, type) in TaskTypeHistory)
+        foreach (var (time, _, task) in _taskTypeHistory)
         {
-            ImGui.TextUnformatted(type.ToString());
+            ImGui.TextUnformatted($"[{time}] Type: {task.Type}, Flags: {task.Flags}");
         }
 
         if (ImGui.Button("Reset History"))
         {
-            TaskTypeHistory.Clear();
+            _taskTypeHistory.Clear();
         }
     }
 
@@ -214,7 +233,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
             ImGui.TextUnformatted(i.ToString());
 
             ImGui.TableNextColumn(); // Object
-            DebugRenderer.DrawPointerType(eventObject.Value, typeof(GameObject), new NodeOptions());
+            _debugRenderer.DrawPointerType(eventObject.Value, typeof(GameObject), new NodeOptions());
             i++;
         }
     }
@@ -224,7 +243,7 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
         if (eventHandler->Info.EventId.ContentId != EventHandlerType.CustomTalk)
             return;
 
-        var texts = *(StdMap<uint, LuaText>*)((nint)eventHandler + 0x310); // TODO: contribute
+        var texts = *(StdMap<uint, LuaText>*)((nint)eventHandler + 0x310); // TODO: contribute, StdPair?
         if (texts.Count == 0)
             return;
 
@@ -250,10 +269,10 @@ public unsafe class EventFrameworkTab(DebugRenderer DebugRenderer, TextService T
             ImGui.TextUnformatted(text.Item1.ToString());
 
             ImGui.TableNextColumn(); // Key
-            DebugRenderer.DrawUtf8String((nint)(&text.Item2.Key), new NodeOptions());
+            _debugRenderer.DrawUtf8String((nint)(&text.Item2.Key), new NodeOptions());
 
             ImGui.TableNextColumn(); // Value
-            DebugRenderer.DrawUtf8String((nint)(&text.Item2.Value), new NodeOptions());
+            _debugRenderer.DrawUtf8String((nint)(&text.Item2.Value), new NodeOptions());
         }
     }
 }
