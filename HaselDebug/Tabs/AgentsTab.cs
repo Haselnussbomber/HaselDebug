@@ -52,7 +52,6 @@ public unsafe class AgentsTab(
         ImGui.SetNextItemWidth(-1);
         var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref AgentNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         var hasSearchTerm = !string.IsNullOrWhiteSpace(AgentNameSearchTerm);
-        var hasSearchTermAutoSelected = false;
 
         using var table = ImRaii.Table("AgentsTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new Vector2(300, -1));
         if (!table) return;
@@ -74,12 +73,6 @@ public unsafe class AgentsTab(
             if (hasSearchTerm && !agentName.Contains(AgentNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
                 continue;
 
-            if (hasSearchTerm && !hasSearchTermAutoSelected)
-            {
-                SelectedAgentId = agentId;
-                hasSearchTermAutoSelected = true;
-            }
-
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Id
             ImGui.TextUnformatted(i.ToString());
@@ -88,7 +81,7 @@ public unsafe class AgentsTab(
 
             using (Color.Yellow.Push(ImGuiCol.Text, isAgentNameAddonName))
             {
-                if (ImGui.Selectable(agentName + $"##Agent{i}", SelectedAgentId == agentId, ImGuiSelectableFlags.SpanAllColumns))
+                if (ImGui.Selectable(agentName + $"###AgentSelectable{i}", SelectedAgentId == agentId, ImGuiSelectableFlags.SpanAllColumns))
                 {
                     SelectedAgentId = agentId;
                 }
