@@ -23,6 +23,7 @@ public unsafe class EventFrameworkTab : DebugTab, IDisposable
     private readonly TextService _textService;
     private readonly Hook<EventSceneModuleTaskManager.Delegates.AddTask> _addTaskHook;
     private readonly List<(DateTime, nint, EventSceneTaskInterface)> _taskTypeHistory = [];
+    private bool _logEnabled;
 
     public override string Title => "EventFramework";
     public override bool DrawInChild => false;
@@ -42,11 +43,16 @@ public unsafe class EventFrameworkTab : DebugTab, IDisposable
     public void Dispose()
     {
         _addTaskHook.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     private void AddTaskDetour(EventSceneModuleTaskManager* thisPtr, EventSceneTaskInterface* task)
     {
-        _taskTypeHistory.Add((DateTime.Now, (nint)task, *task));
+        if (_logEnabled)
+        {
+            _taskTypeHistory.Add((DateTime.Now, (nint)task, *task));
+        }
+
         _addTaskHook.Original(thisPtr, task);
     }
 
@@ -191,6 +197,8 @@ public unsafe class EventFrameworkTab : DebugTab, IDisposable
         }
 
         ImGui.Separator();
+
+        ImGui.Checkbox("Enable Logging", ref _logEnabled);
 
         ImGui.TextUnformatted("History:");
 
