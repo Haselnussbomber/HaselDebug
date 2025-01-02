@@ -5,18 +5,21 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Graphics;
+using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabTitle(ExcelService ExcelService) : DebugTab, ISubTab<UnlocksTab>
 {
-    public void DrawTitles()
-    {
-        using var tab = ImRaii.TabItem("Titles");
-        if (!tab) return;
+    public override string Title => "Titles";
+    public override bool DrawInChild => false;
 
+    public override void Draw()
+    {
         var localPlayer = Control.GetLocalPlayer();
         if (localPlayer == null)
         {

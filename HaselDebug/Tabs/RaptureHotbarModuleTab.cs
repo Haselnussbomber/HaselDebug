@@ -12,7 +12,12 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class RaptureHotbarModuleTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextService TextService, SeStringEvaluatorService SeStringEvaluatorService, ITextureProvider TextureProvider) : DebugTab
+public unsafe class RaptureHotbarModuleTab(
+    DebugRenderer DebugRenderer,
+    ExcelService ExcelService,
+    TextService TextService,
+    SeStringEvaluatorService SeStringEvaluatorService,
+    ITextureProvider TextureProvider) : DebugTab
 {
     public override void Draw()
     {

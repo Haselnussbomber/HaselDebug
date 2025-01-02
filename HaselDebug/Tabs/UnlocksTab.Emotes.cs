@@ -1,17 +1,23 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabEmotes(
+    DebugRenderer DebugRenderer,
+    ExcelService ExcelService) : DebugTab, ISubTab<UnlocksTab>
 {
-    public void DrawEmotes()
-    {
-        using var tab = ImRaii.TabItem("Emotes");
-        if (!tab) return;
+    public override string Title => "Emotes";
+    public override bool DrawInChild => false;
 
+    public override void Draw()
+    {
         var agentEmote = AgentEmote.Instance();
 
         using var table = ImRaii.Table("EmotesTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);

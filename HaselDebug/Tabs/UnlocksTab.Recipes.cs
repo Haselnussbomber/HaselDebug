@@ -4,32 +4,35 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
+using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabRecipes(ExcelService ExcelService, UnlocksTabUtils UnlocksTabUtils) : DebugTab, ISubTab<UnlocksTab>
 {
-    private Recipe[]? Recipes;
+    private Recipe[]? _recipes;
 
-    public void DrawRecipes()
+    public override string Title => "Recipes";
+    public override bool DrawInChild => false;
+
+    public override void Draw()
     {
-        using var tab = ImRaii.TabItem("Recipes");
-        if (!tab) return;
-
         using var table = ImRaii.Table("RecipesTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        Recipes ??= ExcelService.FindRows<Recipe>(row => row.ItemResult.RowId != 0);
+        _recipes ??= ExcelService.FindRows<Recipe>(row => row.ItemResult.RowId != 0);
 
-        ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupColumn("Completed", ImGuiTableColumnFlags.WidthFixed, 60);
         ImGui.TableSetupColumn("Name");
         ImGui.TableSetupScrollFreeze(3, 1);
         ImGui.TableHeadersRow();
 
-        ImGuiClip.ClippedDraw(Recipes, DrawRecipeRow, ImGui.GetTextLineHeightWithSpacing());
+        ImGuiClip.ClippedDraw(_recipes, DrawRecipeRow, ImGui.GetTextLineHeightWithSpacing());
     }
 
     private void DrawRecipeRow(Recipe row)
@@ -52,7 +55,7 @@ public unsafe partial class UnlocksTab
 
         ImGui.TableNextColumn(); // Name
 
-        var clicked = DrawSelectableItem(row.ItemResult.Value!, $"Recipe{row.RowId}");
+        var clicked = UnlocksTabUtils.DrawSelectableItem(row.ItemResult.Value!, $"Recipe{row.RowId}");
         if (ImGui.IsItemHovered())
             ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
         if (clicked)

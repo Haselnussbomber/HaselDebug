@@ -5,18 +5,25 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
+using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabOrchestrion(
+    DebugRenderer DebugRenderer,
+    ExcelService ExcelService,
+    TextureService TextureService) : DebugTab, ISubTab<UnlocksTab>
 {
-    public void DrawOrchestrion()
-    {
-        using var tab = ImRaii.TabItem("Orchestrion Rolls");
-        if (!tab) return;
+    public override string Title => "Orchestrion Rolls";
+    public override bool DrawInChild => false;
 
+    public override void Draw()
+    {
         using var table = ImRaii.Table("OrchestrionTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 

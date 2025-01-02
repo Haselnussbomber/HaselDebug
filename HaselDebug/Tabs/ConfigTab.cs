@@ -13,7 +13,7 @@ namespace HaselDebug.Tabs;
 
 public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRenderer) : DebugTab
 {
-    private string SearchTerm = string.Empty;
+    private string _searchTerm = string.Empty;
 
     public override void Draw()
     {
@@ -49,7 +49,7 @@ public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRender
         ImGui.Separator();
 
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref SearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
 
         using var tabBar = ImRaii.TabBar("ConfigTabs");
         if (!tabBar) return;
@@ -71,7 +71,7 @@ public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRender
                 continue;
 
             var optionName = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(option->Name));
-            if (!optionName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+            if (!optionName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
                 continue;
 
             count++;
@@ -83,7 +83,7 @@ public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRender
     private void DrawConfigTab(ref ConfigBase configBase, string configName)
     {
         var tabTitle = configName;
-        var hasSearchTerm = !string.IsNullOrWhiteSpace(SearchTerm);
+        var hasSearchTerm = !string.IsNullOrWhiteSpace(_searchTerm);
         var numSearchResults = hasSearchTerm ? GetNumSearchResults(ref configBase) : 0;
 
         if (hasSearchTerm)
@@ -112,7 +112,7 @@ public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRender
                 continue;
 
             var optionName = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(option->Name));
-            if (!optionName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+            if (!optionName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
                 continue;
 
             ImGui.TableNextRow();
@@ -148,7 +148,7 @@ public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRender
             }
 
             ImGui.TableNextColumn(); // Name
-            DebugRenderer.DrawCopyableText(optionName, highligtedText: hasSearchTerm ? SearchTerm : null);
+            DebugRenderer.DrawCopyableText(optionName, highligtedText: hasSearchTerm ? _searchTerm : null);
 
             switch (option->Type)
             {

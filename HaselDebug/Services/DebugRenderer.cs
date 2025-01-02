@@ -36,7 +36,6 @@ using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
 namespace HaselDebug.Services;
 
-#pragma warning disable SeStringRenderer
 public unsafe partial class DebugRenderer
 {
     public Color ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1);
@@ -900,7 +899,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!ImGuiUtils.IsInViewport(drawInfo.DrawSize.Value))
+        if (!ImGui.IsRectVisible(drawInfo.DrawSize.Value))
         {
             ImGui.Dummy(drawInfo.DrawSize.Value);
             if (sameLine)

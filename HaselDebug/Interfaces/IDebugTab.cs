@@ -1,3 +1,3 @@
-namespace HaselDebug.Abstracts;
+namespace HaselDebug.Interfaces;
 
 public interface IDebugTab : IDrawableTab;

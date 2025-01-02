@@ -5,22 +5,29 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabAetherCurrents(
+    DebugRenderer DebugRenderer,
+    ExcelService ExcelService,
+    TextService TextService,
+    MapService MapService) : DebugTab, ISubTab<UnlocksTab>
 {
     private readonly Dictionary<uint, uint> AetherCurrentEObjCache = [];
     private readonly Dictionary<uint, uint> EObjLevelCache = [];
 
-    public void DrawAetherCurrents()
-    {
-        using var tab = ImRaii.TabItem("Aether Currents");
-        if (!tab) return;
+    public override string Title => "Aether Currents";
+    public override bool DrawInChild => false;
 
+    public override void Draw()
+    {
         using var table = ImRaii.Table("CurrentsTabTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 

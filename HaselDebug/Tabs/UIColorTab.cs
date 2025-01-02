@@ -35,19 +35,19 @@ public unsafe class UIColorTab(ExcelService ExcelService, TextService TextServic
 
             ImGui.TableNextColumn();
             var color = (Vector4)Color.FromABGR(row.UIForeground);
-            ImGui.ColorEdit4($"##UIColor_{row.RowId}_UIForeground", ref color, ImGuiColorEditFlags.DisplayHex);
+            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Dark", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
             color = (Vector4)Color.FromABGR(row.UIGlow);
-            ImGui.ColorEdit4($"##UIColor_{row.RowId}_UIGlow", ref color, ImGuiColorEditFlags.DisplayHex);
+            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Light", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
             color = (Vector4)Color.FromABGR(row.Unknown0);
-            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown0", ref color, ImGuiColorEditFlags.DisplayHex);
+            ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClassicFF", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
             color = (Vector4)Color.FromABGR(row.Unknown1);
-            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown1", ref color, ImGuiColorEditFlags.DisplayHex);
+            ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearBlue", ref color, ImGuiColorEditFlags.DisplayHex);
         }
     }
 }

@@ -24,14 +24,15 @@ public unsafe class AgentsTab(
     PinnedInstancesService PinnedInstances,
     WindowManager WindowManager) : DebugTab
 {
-    private ImmutableSortedDictionary<AgentId, (Pointer<AgentInterface> Address, Type Type)>? Agents;
-    private AgentId SelectedAgentId = AgentId.Lobby;
-    private string AgentNameSearchTerm = string.Empty;
+    private ImmutableSortedDictionary<AgentId, (Pointer<AgentInterface> Address, Type Type)>? _agents;
+    private AgentId _selectedAgentId = AgentId.Lobby;
+    private string _agentNameSearchTerm = string.Empty;
 
     public override bool DrawInChild => false;
+
     public override void Draw()
     {
-        Agents ??= typeof(AgentAttribute).Assembly.GetTypes()
+        _agents ??= typeof(AgentAttribute).Assembly.GetTypes()
             .Where(t => t.GetCustomAttribute<AgentAttribute>() != null)
             .ToImmutableSortedDictionary(
                 type => type.GetCustomAttribute<AgentAttribute>()!.Id,
@@ -41,7 +42,7 @@ public unsafe class AgentsTab(
 
         ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
 
-        DrawAgent(SelectedAgentId);
+        DrawAgent(_selectedAgentId);
     }
 
     private void DrawAgentsList()
@@ -50,8 +51,8 @@ public unsafe class AgentsTab(
         if (!sidebarchild) return;
 
         ImGui.SetNextItemWidth(-1);
-        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref AgentNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
-        var hasSearchTerm = !string.IsNullOrWhiteSpace(AgentNameSearchTerm);
+        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref _agentNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTerm = !string.IsNullOrWhiteSpace(_agentNameSearchTerm);
 
         using var table = ImRaii.Table("AgentsTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new Vector2(300, -1));
         if (!table) return;
@@ -70,7 +71,7 @@ public unsafe class AgentsTab(
             var agentId = (AgentId)i;
             var (agentName, isAgentNameAddonName) = GetAgentName(agentId);
 
-            if (hasSearchTerm && !agentName.Contains(AgentNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
+            if (hasSearchTerm && !agentName.Contains(_agentNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
                 continue;
 
             ImGui.TableNextRow();
@@ -81,9 +82,9 @@ public unsafe class AgentsTab(
 
             using (Color.Yellow.Push(ImGuiCol.Text, isAgentNameAddonName))
             {
-                if (ImGui.Selectable(agentName + $"###AgentSelectable{i}", SelectedAgentId == agentId, ImGuiSelectableFlags.SpanAllColumns))
+                if (ImGui.Selectable(agentName + $"###AgentSelectable{i}", _selectedAgentId == agentId, ImGuiSelectableFlags.SpanAllColumns))
                 {
-                    SelectedAgentId = agentId;
+                    _selectedAgentId = agentId;
                 }
             }
             ImGuiContextMenu.Draw($"ContextMenuAgent{i}", builder =>
@@ -143,7 +144,7 @@ public unsafe class AgentsTab(
         using var hostchild = ImRaii.Child("AgentChild", new Vector2(-1), true, ImGuiWindowFlags.NoSavedSettings);
 
         var agent = AgentModule.Instance()->GetAgentByInternalId(agentId);
-        var agentType = Agents!.TryGetValue(agentId, out var value) ? value.Type : typeof(AgentInterface);
+        var agentType = _agents!.TryGetValue(agentId, out var value) ? value.Type : typeof(AgentInterface);
 
         DebugRenderer.DrawPointerType(agent, agentType, new NodeOptions()
         {

@@ -17,6 +17,7 @@ namespace HaselDebug.Tabs;
 public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextureService TextureService) : DebugTab
 {
     public override bool DrawInChild => false;
+
     public override void Draw()
     {
         var agentHud = AgentHUD.Instance();

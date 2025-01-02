@@ -14,10 +14,9 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-#pragma warning disable SeStringRenderer
 public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelService ExcelService) : DebugTab
 {
-    private readonly List<TextEntry> entries = [
+    private readonly List<TextEntry> _entries = [
         new TextEntry(ExcelService, TextEntryType.String, "Test1 "),
         new TextEntry(ExcelService, TextEntryType.Macro, "<color(0xFF9000)>"),
         new TextEntry(ExcelService, TextEntryType.String, "Test2 "),
@@ -30,6 +29,7 @@ public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelServi
     ];
 
     public override bool DrawInChild => false;
+
     public override unsafe void Draw()
     {
         using var hostchild = ImRaii.Child("RaptureTextModuleTabChild", new Vector2(-1), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
@@ -218,7 +218,7 @@ public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelServi
 
         if (ImGui.Button("Add entry"))
         {
-            entries.Add(new(ExcelService));
+            _entries.Add(new(ExcelService));
         }
 
         ImGui.SameLine();
@@ -226,7 +226,7 @@ public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelServi
         if (ImGui.Button("PrintString"))
         {
             var temp = Utf8String.CreateEmpty();
-            foreach (var entry in entries)
+            foreach (var entry in _entries)
                 temp->Append(entry.Run());
             RaptureLogModule.Instance()->PrintString(temp->StringPtr);
             temp->Dtor(true);
@@ -252,10 +252,10 @@ public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelServi
         var entryToMoveUp = -1;
         var entryToMoveDown = -1;
 
-        for (var i = 0; i < entries.Count; i++)
+        for (var i = 0; i < _entries.Count; i++)
         {
             var key = $"##Entry{i}";
-            var entry = entries[i];
+            var entry = _entries[i];
 
             ImGui.TableNextRow();
 
@@ -293,7 +293,7 @@ public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelServi
 
             ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
 
-            if (i < entries.Count - 1)
+            if (i < _entries.Count - 1)
             {
                 if (ImGuiUtils.IconButton(key + "_Down", FontAwesomeIcon.ArrowDown, "Move down"))
                 {
@@ -328,21 +328,21 @@ public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelServi
 
         if (entryToMoveUp != -1)
         {
-            var removedItem = entries[entryToMoveUp];
-            entries.RemoveAt(entryToMoveUp);
-            entries.Insert(entryToMoveUp - 1, removedItem);
+            var removedItem = _entries[entryToMoveUp];
+            _entries.RemoveAt(entryToMoveUp);
+            _entries.Insert(entryToMoveUp - 1, removedItem);
         }
 
         if (entryToMoveDown != -1)
         {
-            var removedItem = entries[entryToMoveDown];
-            entries.RemoveAt(entryToMoveDown);
-            entries.Insert(entryToMoveDown + 1, removedItem);
+            var removedItem = _entries[entryToMoveDown];
+            _entries.RemoveAt(entryToMoveDown);
+            _entries.Insert(entryToMoveDown + 1, removedItem);
         }
 
         if (entryToRemove != -1)
         {
-            entries.RemoveAt(entryToRemove);
+            _entries.RemoveAt(entryToRemove);
         }
     }
 

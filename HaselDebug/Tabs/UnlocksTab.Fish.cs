@@ -2,18 +2,25 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Graphics;
+using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabFish(
+    DebugRenderer DebugRenderer,
+    ExcelService ExcelService,
+    TextService TextService) : DebugTab, ISubTab<UnlocksTab>
 {
-    public void DrawFish()
-    {
-        using var tab = ImRaii.TabItem("Fish");
-        if (!tab) return;
+    public override string Title => "Fish";
+    public override bool DrawInChild => false;
 
+    public override void Draw()
+    {
         var playerState = PlayerState.Instance();
         if (playerState->IsLoaded != 1)
         {

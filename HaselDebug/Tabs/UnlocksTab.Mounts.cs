@@ -1,24 +1,32 @@
 using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
+using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabMounts(
+    DebugRenderer DebugRenderer,
+    ExcelService ExcelService,
+    TextService TextService,
+    TextureService TextureService) : DebugTab, ISubTab<UnlocksTab>
 {
-    public void DrawMounts()
-    {
-        using var tab = ImRaii.TabItem("Mounts");
-        if (!tab) return;
+    public override string Title => "Mounts";
+    public override bool DrawInChild => false;
 
+    public override void Draw()
+    {
         using var table = ImRaii.Table("MountsTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 

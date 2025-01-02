@@ -7,18 +7,26 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
+using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabMinions(
+    DebugRenderer DebugRenderer,
+    ExcelService ExcelService,
+    TextService TextService,
+    TextureService TextureService) : DebugTab, ISubTab<UnlocksTab>
 {
-    public void DrawMinions()
-    {
-        using var tab = ImRaii.TabItem("Minions");
-        if (!tab) return;
+    public override string Title => "Minions";
+    public override bool DrawInChild => false;
 
+    public override void Draw()
+    {
         using var table = ImRaii.Table("MinionsTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 

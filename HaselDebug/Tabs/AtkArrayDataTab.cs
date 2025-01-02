@@ -13,23 +13,21 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
-// almost the same as in Dalamud :)
-#pragma warning disable SeStringRenderer
 public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer DebugRenderer) : DebugTab
 {
-    private readonly Type numberType = typeof(NumberArrayType);
-    private readonly Type stringType = typeof(StringArrayType);
-    private readonly Type extendType = typeof(ExtendArrayType);
+    private readonly Type _numberType = typeof(NumberArrayType);
+    private readonly Type _stringType = typeof(StringArrayType);
+    private readonly Type _extendType = typeof(ExtendArrayType);
 
-    private int selectedNumberArray;
-    private int selectedStringArray;
-    private int selectedExtendArray;
+    private int _selectedNumberArray;
+    private int _selectedStringArray;
+    private int _selectedExtendArray;
 
-    private string searchTerm = string.Empty;
-    private bool hideUnsetStringArrayEntries = false;
-    private bool hideUnsetExtendArrayEntries = false;
-    private bool showTextAddress = false;
-    private bool showMacroString = false;
+    private string _searchTerm = string.Empty;
+    private bool _hideUnsetStringArrayEntries = false;
+    private bool _hideUnsetExtendArrayEntries = false;
+    private bool _showTextAddress = false;
+    private bool _showMacroString = false;
 
     public override bool DrawInChild => false;
 
@@ -75,7 +73,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
         ImGui.TableSetupScrollFreeze(3, 1);
         ImGui.TableHeadersRow();
 
-        var hasSearchTerm = !string.IsNullOrEmpty(searchTerm);
+        var hasSearchTerm = !string.IsNullOrEmpty(_searchTerm);
 
         for (var arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
         {
@@ -95,7 +93,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
                     if (isNull)
                         continue;
 
-                    if (new ReadOnlySeStringSpan(stringArrayData->StringArray[rowIndex]).ExtractText().Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
+                    if (new ReadOnlySeStringSpan(stringArrayData->StringArray[rowIndex]).ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
                         rowsFound++;
                 }
 
@@ -188,22 +186,22 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
         if (!tab) return;
 
         DrawArrayList(
-            numberType,
+            _numberType,
             atkArrayDataHolder.NumberArrayCount,
             atkArrayDataHolder.NumberArrayKeys,
             (AtkArrayData**)atkArrayDataHolder.NumberArrays,
-            ref selectedNumberArray);
+            ref _selectedNumberArray);
 
-        if (selectedNumberArray >= atkArrayDataHolder.NumberArrayCount || atkArrayDataHolder.NumberArrayKeys[selectedNumberArray] == -1)
-            selectedNumberArray = 0;
+        if (_selectedNumberArray >= atkArrayDataHolder.NumberArrayCount || atkArrayDataHolder.NumberArrayKeys[_selectedNumberArray] == -1)
+            _selectedNumberArray = 0;
 
         ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
 
         using var child = ImRaii.Child("AtkArrayContent", new Vector2(-1), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
         if (!child) return;
 
-        var array = atkArrayDataHolder.NumberArrays[selectedNumberArray];
-        DrawArrayHeader(numberType, "Number", selectedNumberArray, (AtkArrayData*)array);
+        var array = atkArrayDataHolder.NumberArrays[_selectedNumberArray];
+        DrawArrayHeader(_numberType, "Number", _selectedNumberArray, (AtkArrayData*)array);
 
         using var table = ImRaii.Table("NumberArrayDataTable", 7, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
@@ -258,49 +256,49 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
             if (sidebarchild)
             {
                 ImGui.SetNextItemWidth(-1);
-                ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+                ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
 
                 DrawArrayList(
-                    stringType,
+                    _stringType,
                     atkArrayDataHolder.StringArrayCount,
                     atkArrayDataHolder.StringArrayKeys,
                     (AtkArrayData**)atkArrayDataHolder.StringArrays,
-                    ref selectedStringArray);
+                    ref _selectedStringArray);
             }
         }
 
-        if (selectedStringArray >= atkArrayDataHolder.StringArrayCount || atkArrayDataHolder.StringArrayKeys[selectedStringArray] == -1)
-            selectedStringArray = 0;
+        if (_selectedStringArray >= atkArrayDataHolder.StringArrayCount || atkArrayDataHolder.StringArrayKeys[_selectedStringArray] == -1)
+            _selectedStringArray = 0;
 
         ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
 
         using var child = ImRaii.Child("AtkArrayContent", new Vector2(-1), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
         if (!child) return;
 
-        var array = atkArrayDataHolder.StringArrays[selectedStringArray];
-        DrawArrayHeader(stringType, "String", selectedStringArray, (AtkArrayData*)array);
-        ImGui.Checkbox("Hide unset entries##HideUnsetStringArrayEntriesCheckbox", ref hideUnsetStringArrayEntries);
+        var array = atkArrayDataHolder.StringArrays[_selectedStringArray];
+        DrawArrayHeader(_stringType, "String", _selectedStringArray, (AtkArrayData*)array);
+        ImGui.Checkbox("Hide unset entries##HideUnsetStringArrayEntriesCheckbox", ref _hideUnsetStringArrayEntries);
         ImGui.SameLine();
-        ImGui.Checkbox("Show text address##WordWrapCheckbox", ref showTextAddress);
+        ImGui.Checkbox("Show text address##WordWrapCheckbox", ref _showTextAddress);
         ImGui.SameLine();
-        ImGui.Checkbox("Show macro string##RenderStringsCheckbox", ref showMacroString);
+        ImGui.Checkbox("Show macro string##RenderStringsCheckbox", ref _showMacroString);
 
         using var table = ImRaii.Table("StringArrayDataTable", 4, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn(showTextAddress ? "Text Address" : "Entry Address", ImGuiTableColumnFlags.WidthFixed, 120);
+        ImGui.TableSetupColumn(_showTextAddress ? "Text Address" : "Entry Address", ImGuiTableColumnFlags.WidthFixed, 120);
         ImGui.TableSetupColumn("Managed", ImGuiTableColumnFlags.WidthFixed, 60);
         ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(4, 1);
         ImGui.TableHeadersRow();
 
-        var hasSearchTerm = !string.IsNullOrEmpty(searchTerm);
+        var hasSearchTerm = !string.IsNullOrEmpty(_searchTerm);
 
         for (var i = 0; i < array->Size; i++)
         {
             var isNull = (nint)array->StringArray[i] == 0;
-            if (isNull && hideUnsetStringArrayEntries)
+            if (isNull && _hideUnsetStringArrayEntries)
                 continue;
 
             if (hasSearchTerm)
@@ -308,7 +306,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
                 if (isNull)
                     continue;
 
-                if (!new ReadOnlySeStringSpan(array->StringArray[i]).ExtractText().Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
+                if (!new ReadOnlySeStringSpan(array->StringArray[i]).ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
                     continue;
             }
 
@@ -319,7 +317,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
             ImGui.TextUnformatted($"#{i}");
 
             ImGui.TableNextColumn(); // Address
-            if (showTextAddress)
+            if (_showTextAddress)
             {
                 if (!isNull)
                     DrawCopyableText($"0x{(nint)array->StringArray[i]:X}", "Copy text address");
@@ -338,7 +336,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
             ImGui.TableNextColumn(); // Text
             if (!isNull)
             {
-                if (showMacroString)
+                if (_showMacroString)
                 {
                     DrawCopyableText(new ReadOnlySeStringSpan(array->StringArray[i]).ToString(), "Copy text");
                 }
@@ -358,22 +356,22 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
         var atkArrayDataHolder = RaptureAtkModule.Instance()->AtkArrayDataHolder;
 
         DrawArrayList(
-            extendType,
+            _extendType,
             atkArrayDataHolder.ExtendArrayCount,
             atkArrayDataHolder.ExtendArrayKeys,
             (AtkArrayData**)atkArrayDataHolder.ExtendArrays,
-            ref selectedExtendArray);
+            ref _selectedExtendArray);
 
-        if (selectedExtendArray >= atkArrayDataHolder.ExtendArrayCount || atkArrayDataHolder.ExtendArrayKeys[selectedExtendArray] == -1)
-            selectedExtendArray = 0;
+        if (_selectedExtendArray >= atkArrayDataHolder.ExtendArrayCount || atkArrayDataHolder.ExtendArrayKeys[_selectedExtendArray] == -1)
+            _selectedExtendArray = 0;
 
         ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
 
         using var child = ImRaii.Child("AtkArrayContent", new Vector2(-1), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
 
-        var array = atkArrayDataHolder.ExtendArrays[selectedExtendArray];
-        DrawArrayHeader(null, "Extend", selectedExtendArray, (AtkArrayData*)array);
-        ImGui.Checkbox("Hide unset entries##HideUnsetExtendArrayEntriesCheckbox", ref hideUnsetExtendArrayEntries);
+        var array = atkArrayDataHolder.ExtendArrays[_selectedExtendArray];
+        DrawArrayHeader(null, "Extend", _selectedExtendArray, (AtkArrayData*)array);
+        ImGui.Checkbox("Hide unset entries##HideUnsetExtendArrayEntriesCheckbox", ref _hideUnsetExtendArrayEntries);
 
         using var table = ImRaii.Table("ExtendArrayDataTable", 3, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
@@ -387,7 +385,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
         for (var i = 0; i < array->Size; i++)
         {
             var isNull = (nint)array->DataArray[i] == 0;
-            if (isNull && hideUnsetExtendArrayEntries)
+            if (isNull && _hideUnsetExtendArrayEntries)
                 continue;
 
             using var disabledColor = ImRaii.PushColor(ImGuiCol.Text, ImGui.GetColorU32(ImGuiCol.TextDisabled), isNull);

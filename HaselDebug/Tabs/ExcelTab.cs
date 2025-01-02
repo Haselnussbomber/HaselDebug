@@ -21,26 +21,26 @@ public unsafe class ExcelTab : DebugTab
 {
     private const int LanguageSelectorWidth = 90;
 
-    private readonly TextService TextService;
-    private readonly DebugRenderer DebugRenderer;
-    private readonly ExcelModule ExcelModule;
-    private Addon[] AddonRows;
-    private LogMessage[] LogMessageRows;
-    private Addon[]? FilteredAddonRows;
-    private LogMessage[]? FilteredLogMessageRows;
-    private CancellationTokenSource? FilterCTS;
-    private string SearchTerm = string.Empty;
-    private ClientLanguage SelectedLanguage;
+    private readonly TextService _textService;
+    private readonly DebugRenderer _debugRenderer;
+    private readonly ExcelModule _excelModule;
+    private Addon[] _addonRows;
+    private LogMessage[] _logMessageRows;
+    private Addon[]? _filteredAddonRows;
+    private LogMessage[]? _filteredLogMessageRows;
+    private CancellationTokenSource? _filterCTS;
+    private string _searchTerm = string.Empty;
+    private ClientLanguage _selectedLanguage;
 
     public ExcelTab(TextService textService, DebugRenderer debugRenderer, ExcelModule excelModule)
     {
-        TextService = textService;
-        DebugRenderer = debugRenderer;
-        ExcelModule = excelModule;
+        _textService = textService;
+        _debugRenderer = debugRenderer;
+        _excelModule = excelModule;
 
-        SelectedLanguage = TextService.ClientLanguage;
-        AddonRows = ExcelModule.GetSheet<Addon>(SelectedLanguage.ToLumina()).ToArray();
-        LogMessageRows = ExcelModule.GetSheet<LogMessage>(SelectedLanguage.ToLumina()).ToArray();
+        _selectedLanguage = _textService.ClientLanguage;
+        _addonRows = _excelModule.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
+        _logMessageRows = _excelModule.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
     }
 
     public override bool DrawInChild => false;
@@ -49,21 +49,21 @@ public unsafe class ExcelTab : DebugTab
         using var hostChild = ImRaii.Child("Host", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - LanguageSelectorWidth * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X);
-        var listDirty = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref SearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var listDirty = ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         ImGui.SameLine();
         ImGui.SetNextItemWidth(LanguageSelectorWidth * ImGuiHelpers.GlobalScale);
-        using (var dropdown = ImRaii.Combo("##Language", SelectedLanguage.ToString() ?? "Language..."))
+        using (var dropdown = ImRaii.Combo("##Language", _selectedLanguage.ToString() ?? "Language..."))
         {
             if (dropdown)
             {
                 var values = Enum.GetValues<ClientLanguage>().OrderBy((ClientLanguage lang) => lang.ToString());
                 foreach (var value in values)
                 {
-                    if (ImGui.Selectable(Enum.GetName(value), value == SelectedLanguage))
+                    if (ImGui.Selectable(Enum.GetName(value), value == _selectedLanguage))
                     {
-                        SelectedLanguage = value;
-                        AddonRows = ExcelModule.GetSheet<Addon>(SelectedLanguage.ToLumina()).ToArray();
-                        LogMessageRows = ExcelModule.GetSheet<LogMessage>(SelectedLanguage.ToLumina()).ToArray();
+                        _selectedLanguage = value;
+                        _addonRows = _excelModule.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
+                        _logMessageRows = _excelModule.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
                         listDirty |= true;
                     }
                 }
@@ -71,9 +71,9 @@ public unsafe class ExcelTab : DebugTab
         }
         if (listDirty)
         {
-            FilterCTS?.Cancel();
-            FilterCTS = new();
-            Task.Run(() => FilterList(FilterCTS.Token));
+            _filterCTS?.Cancel();
+            _filterCTS = new();
+            Task.Run(() => FilterList(_filterCTS.Token));
         }
 
         using var tabBar = ImRaii.TabBar("ExcelTabs");
@@ -87,9 +87,9 @@ public unsafe class ExcelTab : DebugTab
     {
         var tabTitle = "Addon";
 
-        if (!string.IsNullOrWhiteSpace(SearchTerm) && FilteredAddonRows != null)
+        if (!string.IsNullOrWhiteSpace(_searchTerm) && _filteredAddonRows != null)
         {
-            tabTitle = $"{tabTitle} ({FilteredAddonRows.Length})";
+            tabTitle = $"{tabTitle} ({_filteredAddonRows.Length})";
         }
 
         using var tab = ImRaii.TabItem(tabTitle + "###AddonTab");
@@ -105,16 +105,16 @@ public unsafe class ExcelTab : DebugTab
         ImGui.TableSetupScrollFreeze(2, 1);
         ImGui.TableHeadersRow();
 
-        ImGuiClip.ClippedDraw(FilteredAddonRows ?? AddonRows, DrawAddonRow, ImGui.GetTextLineHeightWithSpacing());
+        ImGuiClip.ClippedDraw(_filteredAddonRows ?? _addonRows, DrawAddonRow, ImGui.GetTextLineHeightWithSpacing());
     }
 
     public void DrawLogMessageTab()
     {
         var tabTitle = "LogMessage";
 
-        if (!string.IsNullOrWhiteSpace(SearchTerm) && FilteredLogMessageRows != null)
+        if (!string.IsNullOrWhiteSpace(_searchTerm) && _filteredLogMessageRows != null)
         {
-            tabTitle = $"{tabTitle} ({FilteredLogMessageRows.Length})";
+            tabTitle = $"{tabTitle} ({_filteredLogMessageRows.Length})";
         }
 
         using var tab = ImRaii.TabItem(tabTitle + "###LogMessageTab");
@@ -130,47 +130,47 @@ public unsafe class ExcelTab : DebugTab
         ImGui.TableSetupScrollFreeze(2, 1);
         ImGui.TableHeadersRow();
 
-        ImGuiClip.ClippedDraw(FilteredLogMessageRows ?? LogMessageRows, DrawLogMessageRow, ImGui.GetTextLineHeightWithSpacing());
+        ImGuiClip.ClippedDraw(_filteredLogMessageRows ?? _logMessageRows, DrawLogMessageRow, ImGui.GetTextLineHeightWithSpacing());
     }
 
     private void FilterList(CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(SearchTerm))
+        if (string.IsNullOrWhiteSpace(_searchTerm))
         {
-            FilteredAddonRows = null;
-            FilteredLogMessageRows = null;
+            _filteredAddonRows = null;
+            _filteredLogMessageRows = null;
             return;
         }
 
         var addonList = new List<Addon>();
 
-        for (var i = 0; i < AddonRows.Length && !cancellationToken.IsCancellationRequested; i++)
+        for (var i = 0; i < _addonRows.Length && !cancellationToken.IsCancellationRequested; i++)
         {
-            var row = AddonRows[i];
-            if (row.RowId.ToString().Contains(SearchTerm)
-             || row.Text.ToString().Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase)
-             || row.Text.ExtractText().Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase))
+            var row = _addonRows[i];
+            if (row.RowId.ToString().Contains(_searchTerm)
+             || row.Text.ToString().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase)
+             || row.Text.ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
             {
                 addonList.Add(row);
             }
         }
 
-        FilteredAddonRows = addonList.ToArray();
+        _filteredAddonRows = addonList.ToArray();
 
         var logMessageList = new List<LogMessage>();
 
-        for (var i = 0; i < LogMessageRows.Length && !cancellationToken.IsCancellationRequested; i++)
+        for (var i = 0; i < _logMessageRows.Length && !cancellationToken.IsCancellationRequested; i++)
         {
-            var row = LogMessageRows[i];
-            if (row.RowId.ToString().Contains(SearchTerm)
-             || row.Text.ToString().Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase)
-             || row.Text.ExtractText().Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase))
+            var row = _logMessageRows[i];
+            if (row.RowId.ToString().Contains(_searchTerm)
+             || row.Text.ToString().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase)
+             || row.Text.ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
             {
                 logMessageList.Add(row);
             }
         }
 
-        FilteredLogMessageRows = logMessageList.ToArray();
+        _filteredLogMessageRows = logMessageList.ToArray();
     }
 
     private void DrawAddonRow(Addon row)
@@ -181,12 +181,12 @@ public unsafe class ExcelTab : DebugTab
         ImGui.TextUnformatted(row.RowId.ToString());
 
         ImGui.TableNextColumn(); // Text
-        DebugRenderer.DrawSeString(row.Text.AsSpan(), new NodeOptions()
+        _debugRenderer.DrawSeString(row.Text.AsSpan(), new NodeOptions()
         {
             AddressPath = new AddressPath((nint)row.RowId),
             RenderSeString = false,
-            Title = $"Addon#{row.RowId} ({SelectedLanguage})",
-            Language = SelectedLanguage
+            Title = $"Addon#{row.RowId} ({_selectedLanguage})",
+            Language = _selectedLanguage
         });
     }
 
@@ -198,12 +198,12 @@ public unsafe class ExcelTab : DebugTab
         ImGui.TextUnformatted(row.RowId.ToString());
 
         ImGui.TableNextColumn(); // Text
-        DebugRenderer.DrawSeString(row.Text.AsSpan(), new NodeOptions()
+        _debugRenderer.DrawSeString(row.Text.AsSpan(), new NodeOptions()
         {
             AddressPath = new AddressPath((nint)row.RowId),
             RenderSeString = false,
-            Title = $"LogMessage#{row.RowId} ({SelectedLanguage})",
-            Language = SelectedLanguage
+            Title = $"LogMessage#{row.RowId} ({_selectedLanguage})",
+            Language = _selectedLanguage
         });
     }
 }

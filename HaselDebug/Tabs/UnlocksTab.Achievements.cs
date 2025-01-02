@@ -5,22 +5,28 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
+using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
+using HaselDebug.Services;
 using ImGuiNET;
 using Achievement = FFXIVClientStructs.FFXIV.Client.Game.UI.Achievement;
 using AchievementSheet = Lumina.Excel.Sheets.Achievement;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabAchievements(
+    DebugRenderer DebugRenderer,
+    ExcelService ExcelService,
+    TextureService TextureService) : DebugTab, ISubTab<UnlocksTab>
 {
-    private bool AchievementsRequested;
-    private bool AchievementsHideSpoilers = true;
+    private bool _achievementsRequested;
+    private bool _achievementsHideSpoilers = true;
 
-    public void DrawAchievements()
+    public override string Title => "Achievements";
+
+    public override void Draw()
     {
-        using var tab = ImRaii.TabItem("Achievements");
-        if (!tab) return;
-
         var achievement = Achievement.Instance();
         if (!achievement->IsLoaded())
         {
@@ -29,20 +35,20 @@ public unsafe partial class UnlocksTab
                 if (ImGui.Button("Request Achievements List"))
                 {
                     AgentAchievement.Instance()->Show();
-                    AchievementsRequested = true;
+                    _achievementsRequested = true;
                 }
             }
 
             return;
         }
 
-        if (AchievementsRequested)
+        if (_achievementsRequested)
         {
             AgentAchievement.Instance()->Hide();
-            AchievementsRequested = false;
+            _achievementsRequested = false;
         }
 
-        ImGui.Checkbox("Hide Spoilers", ref AchievementsHideSpoilers);
+        ImGui.Checkbox("Hide Spoilers", ref _achievementsHideSpoilers);
 
         using var table = ImRaii.Table("AchievementsTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
@@ -61,7 +67,7 @@ public unsafe partial class UnlocksTab
 
             var isComplete = achievement->IsComplete((int)row.RowId);
 
-            var canShow = !AchievementsHideSpoilers || isComplete;
+            var canShow = !_achievementsHideSpoilers || isComplete;
 
             var isHiddenName = row.AchievementHideCondition.Value.HideName == true;
             var isHiddenCategory = row.AchievementCategory.Value.HideCategory == true;

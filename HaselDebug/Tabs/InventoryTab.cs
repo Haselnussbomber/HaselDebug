@@ -14,7 +14,6 @@ using Lumina.Text;
 
 namespace HaselDebug.Tabs;
 
-#pragma warning disable SeStringRenderer
 public unsafe class InventoryTab(
     DebugRenderer DebugRenderer,
     TextService TextService,
@@ -22,9 +21,9 @@ public unsafe class InventoryTab(
     ItemService ItemService,
     ImGuiContextMenuService ImGuiContextMenu) : DebugTab
 {
-    public override bool DrawInChild => false;
+    private InventoryType? _selectedInventoryType = InventoryType.Inventory1;
 
-    private InventoryType? selectedInventoryType = InventoryType.Inventory1;
+    public override bool DrawInChild => false;
 
     public override void Draw()
     {
@@ -44,12 +43,12 @@ public unsafe class InventoryTab(
 
         DrawInventoryTypeList();
 
-        if (selectedInventoryType == null)
+        if (_selectedInventoryType == null)
             return;
 
         ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
 
-        DrawInventoryType((InventoryType)selectedInventoryType);
+        DrawInventoryType((InventoryType)_selectedInventoryType);
     }
 
     private void DrawInventoryTypeList()
@@ -73,9 +72,9 @@ public unsafe class InventoryTab(
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Type
-            if (ImGui.Selectable(inventoryType.ToString(), selectedInventoryType == inventoryType, ImGuiSelectableFlags.SpanAllColumns))
+            if (ImGui.Selectable(inventoryType.ToString(), _selectedInventoryType == inventoryType, ImGuiSelectableFlags.SpanAllColumns))
             {
-                selectedInventoryType = inventoryType;
+                _selectedInventoryType = inventoryType;
             }
             ImGuiContextMenu.Draw($"##InventoryContext{inventoryType}", builder =>
             {

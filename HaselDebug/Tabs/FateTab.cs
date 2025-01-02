@@ -7,8 +7,6 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-// same as in Dalamud :)
-#pragma warning disable SeStringRenderer
 public class FateTab(IFateTable FateTable, ITextureProvider TextureProvider) : DebugTab
 {
     public override void Draw()

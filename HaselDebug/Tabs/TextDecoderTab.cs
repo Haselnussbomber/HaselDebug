@@ -19,7 +19,7 @@ namespace HaselDebug.Tabs;
 
 public class TextDecoderTab : DebugTab
 {
-    private readonly Dictionary<Type, uint> Sheets = new() {
+    private readonly Dictionary<Type, uint> _sheets = new() {
         { typeof(Attributive), 0xECF11B18 },
         { typeof(Aetheryte), 0xB41A2B3C },
         { typeof(BNpcName), 0x77A72DA0 },
@@ -49,75 +49,75 @@ public class TextDecoderTab : DebugTab
         { typeof(TripleTriadCard), 0x45C06AE0 },
     };
 
-    private readonly TextDecoder TextDecoder;
-    private readonly IDataManager DataManager;
-    private readonly ClientLanguage[] Languages;
-    private readonly string[] SheetNames;
-    private readonly string[] LanguageNames;
+    private readonly TextDecoder _textDecoder;
+    private readonly IDataManager _dataManager;
+    private readonly ClientLanguage[] _languages;
+    private readonly string[] _sheetNames;
+    private readonly string[] _languageNames;
 
-    private int SelectedSheetNameIndex = 0;
-    private int SelectedLanguageIndex = 0;
-    private CultureInfo CultureInfo;
-    private int RowId = 1;
-    private int Amount = 1;
-    private bool EnableTitleCase = false;
+    private int _selectedSheetNameIndex = 0;
+    private int _selectedLanguageIndex = 0;
+    private CultureInfo _cultureInfo;
+    private int _rowId = 1;
+    private int _amount = 1;
+    private bool _enableTitleCase = false;
 
     public TextDecoderTab(TextDecoder textDecoder, IDataManager dataManager, IClientState clientState)
     {
-        TextDecoder = textDecoder;
-        DataManager = dataManager;
+        _textDecoder = textDecoder;
+        _dataManager = dataManager;
 
-        Languages = Enum.GetValues<ClientLanguage>();
-        LanguageNames = Enum.GetNames<ClientLanguage>();
-        SelectedLanguageIndex = (int)clientState.ClientLanguage;
-        CultureInfo = CultureInfo.GetCultureInfo(clientState.ClientLanguage.ToCode());
-        SheetNames = Sheets.Select(kv => kv.Key.Name).Where(name => name != "Attributive").ToArray();
+        _languages = Enum.GetValues<ClientLanguage>();
+        _languageNames = Enum.GetNames<ClientLanguage>();
+        _selectedLanguageIndex = (int)clientState.ClientLanguage;
+        _cultureInfo = CultureInfo.GetCultureInfo(clientState.ClientLanguage.ToCode());
+        _sheetNames = _sheets.Select(kv => kv.Key.Name).Where(name => name != "Attributive").ToArray();
     }
 
     public override void Draw()
     {
-        var sheetName = SheetNames.ElementAt(SelectedSheetNameIndex);
-        var language = Languages[SelectedLanguageIndex];
+        var sheetName = _sheetNames.ElementAt(_selectedSheetNameIndex);
+        var language = _languages[_selectedLanguageIndex];
 
         ImGui.SetNextItemWidth(300);
-        if (ImGui.Combo("###SelectedSheetName", ref SelectedSheetNameIndex, SheetNames, SheetNames.Length))
+        if (ImGui.Combo("###SelectedSheetName", ref _selectedSheetNameIndex, _sheetNames, _sheetNames.Length))
         {
-            RowId = 1;
+            _rowId = 1;
         }
 
         ImGui.SameLine();
 
         ImGui.SetNextItemWidth(120);
-        if (ImGui.Combo("###SelectedLanguage", ref SelectedLanguageIndex, LanguageNames, LanguageNames.Length))
+        if (ImGui.Combo("###SelectedLanguage", ref _selectedLanguageIndex, _languageNames, _languageNames.Length))
         {
-            language = Languages[SelectedLanguageIndex];
-            RowId = 1;
-            CultureInfo = CultureInfo.GetCultureInfo(language.ToCode());
+            language = _languages[_selectedLanguageIndex];
+            _rowId = 1;
+            _cultureInfo = CultureInfo.GetCultureInfo(language.ToCode());
         }
 
         ImGui.SetNextItemWidth(120);
-        var sheet = DataManager.Excel.GetSheet<RawRow>(Language.English, sheetName);
+        var sheet = _dataManager.Excel.GetSheet<RawRow>(Language.English, sheetName);
         var minRowId = (int)sheet.FirstOrDefault().RowId;
         var maxRowId = (int)sheet.LastOrDefault().RowId;
-        if (ImGui.InputInt("RowId###RowId", ref RowId, 1, 10, ImGuiInputTextFlags.AutoSelectAll))
+        if (ImGui.InputInt("RowId###RowId", ref _rowId, 1, 10, ImGuiInputTextFlags.AutoSelectAll))
         {
-            if (RowId < minRowId)
-                RowId = minRowId;
+            if (_rowId < minRowId)
+                _rowId = minRowId;
 
-            if (RowId >= maxRowId)
-                RowId = maxRowId;
+            if (_rowId >= maxRowId)
+                _rowId = maxRowId;
         }
         ImGui.SameLine();
         ImGui.TextUnformatted($"(Range: {minRowId} - {maxRowId})");
 
         ImGui.SetNextItemWidth(120);
-        if (ImGui.InputInt("Amount###Amount", ref Amount, 1, 10, ImGuiInputTextFlags.AutoSelectAll))
+        if (ImGui.InputInt("Amount###Amount", ref _amount, 1, 10, ImGuiInputTextFlags.AutoSelectAll))
         {
-            if (Amount <= 0)
-                Amount = 1;
+            if (_amount <= 0)
+                _amount = 1;
         }
 
-        ImGui.Checkbox("Title Case###TitleCase", ref EnableTitleCase);
+        ImGui.Checkbox("Title Case###TitleCase", ref _enableTitleCase);
 
         using var table = ImRaii.Table("TextDecoderTable", 6, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
@@ -137,10 +137,10 @@ public class TextDecoderTab : DebugTab
             for (var @case = 1; @case < 6; @case++)
             {
                 ImGui.TableNextColumn();
-                var text = TextDecoder.ProcessNoun(language, sheetName, person, RowId, Amount, @case).ExtractText();
+                var text = _textDecoder.ProcessNoun(language, sheetName, person, _rowId, _amount, @case).ExtractText();
 
-                if (EnableTitleCase)
-                    text = CultureInfo.TextInfo.ToTitleCase(text);
+                if (_enableTitleCase)
+                    text = _cultureInfo.TextInfo.ToTitleCase(text);
 
                 ImGui.TextUnformatted(text);
             }

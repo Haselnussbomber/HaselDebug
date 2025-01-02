@@ -9,9 +9,14 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class SatisfactionSupplyTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextService TextService, TeleportService TeleportService) : DebugTab
+public unsafe class SatisfactionSupplyTab(
+    DebugRenderer DebugRenderer,
+    ExcelService ExcelService,
+    TextService TextService,
+    TeleportService TeleportService) : DebugTab
 {
     public override bool DrawInChild => false;
+
     public override void Draw()
     {
         var satisfactionSupply = SatisfactionSupplyManager.Instance();

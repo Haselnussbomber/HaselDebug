@@ -16,7 +16,6 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Windows;
 
-#pragma warning disable SeStringRenderer
 public class SeStringInspectorWindow(
     WindowManager windowManager,
     DebugRenderer DebugRenderer,

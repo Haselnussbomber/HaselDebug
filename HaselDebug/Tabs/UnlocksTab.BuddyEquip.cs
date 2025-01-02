@@ -1,18 +1,22 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Graphics;
+using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabBardings(DebugRenderer DebugRenderer, ExcelService ExcelService) : DebugTab, ISubTab<UnlocksTab>
 {
-    public void DrawBardings()
-    {
-        using var tab = ImRaii.TabItem("Bardings");
-        if (!tab) return;
+    public override string Title => "Bardings";
+    public override bool DrawInChild => false;
 
+    public override void Draw()
+    {
         ref var companionInfo = ref UIState.Instance()->Buddy.CompanionInfo;
 
         using var table = ImRaii.Table("BuddyEquipTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);

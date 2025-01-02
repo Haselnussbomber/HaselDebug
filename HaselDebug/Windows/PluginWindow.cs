@@ -3,10 +3,11 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
+using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
-using HaselDebug.Abstracts;
 using HaselDebug.Config;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Tabs;
 using ImGuiNET;
@@ -65,7 +66,10 @@ public class PluginWindow : SimpleWindow
             Click = (button) => configWindow.Toggle()
         });
 
-        Tabs = [.. tabs.OrderBy(t => t.Title)];
+        Tabs = [.. tabs
+            .Where(t => !t.GetType().GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition().IsAssignableTo(typeof(ISubTab<>)))) // no sub tabs
+            .OrderBy(t => t.Title)
+        ];
 
         SelectedTab = PinnedInstances.FirstOrDefault(tab => tab.InternalName == pluginConfig.LastSelectedTab)
             ?? (IDrawableTab?)Tabs.FirstOrDefault(tab => tab.InternalName == pluginConfig.LastSelectedTab);
@@ -120,7 +124,7 @@ public class PluginWindow : SimpleWindow
                 {
                     builder.Add(new ImGuiContextMenuEntry()
                     {
-                        Visible = !WindowManager.Contains(tab.Title),
+                        Visible = tab.CanPopOut && !WindowManager.Contains(tab.Title),
                         Label = TextService.Translate("ContextMenu.TabPopout"),
                         ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, tab))
                     });
@@ -155,23 +159,65 @@ public class PluginWindow : SimpleWindow
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
 
-            if (ImGui.Selectable($"{tab.Title}##Selectable_{tab.InternalName}", SelectedTab == tab))
+            using var disabled = Color.From(ImGuiCol.TextDisabled).Push(ImGuiCol.Text, !tab.IsEnabled);
+
+            if (ImGui.Selectable($"{tab.Title}###Selectable_{tab.InternalName}", SelectedTab == tab))
             {
-                SelectedTab = SelectedTab != tab ? tab : null;
-                PluginConfig.LastSelectedTab = SelectedTab != null ? tab.InternalName : string.Empty;
-                PluginConfig.Save();
+                SelectTab(tab);
             }
+
+            disabled.Pop();
 
             ImGuiContextMenu.Draw($"{tab.InternalName}ContextMenu", builder =>
             {
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = !WindowManager.Contains(tab.Title),
+                    Visible = tab.CanPopOut && !WindowManager.Contains(tab.Title),
                     Label = TextService.Translate("ContextMenu.TabPopout"),
                     ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, tab))
                 });
             });
+
+            if (tab.SubTabs != null)
+            {
+                var subTabCount = tab.SubTabs.Value.Length;
+                for (var i = 0; i < subTabCount; i++)
+                {
+                    var subTab = tab.SubTabs.Value[i];
+
+                    // pls don't make me handle nested subtabs
+                    var prefix = "├";
+                    if (i == subTabCount - 1)
+                        prefix = "└";
+
+                    using var subTabDisabled = Color.From(ImGuiCol.TextDisabled).Push(ImGuiCol.Text, !tab.IsEnabled || !subTab.IsEnabled);
+
+                    if (ImGui.Selectable($"{prefix} {subTab.Title}###Selectable_{subTab.InternalName}", SelectedTab == subTab))
+                    {
+                        SelectTab(subTab);
+                    }
+
+                    subTabDisabled.Pop();
+
+                    ImGuiContextMenu.Draw($"{subTab.InternalName}ContextMenu", builder =>
+                    {
+                        builder.Add(new ImGuiContextMenuEntry()
+                        {
+                            Visible = subTab.CanPopOut && !WindowManager.Contains(subTab.Title),
+                            Label = TextService.Translate("ContextMenu.TabPopout"),
+                            ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, subTab))
+                        });
+                    });
+                }
+            }
         }
+    }
+
+    private void SelectTab(IDrawableTab tab)
+    {
+        SelectedTab = tab;
+        PluginConfig.LastSelectedTab = tab.InternalName;
+        PluginConfig.Save();
     }
 
     private unsafe void DrawTab()

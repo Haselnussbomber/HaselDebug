@@ -6,9 +6,10 @@ using HaselCommon.Commands;
 using HaselCommon.Extensions.DependencyInjection;
 using HaselCommon.Logger;
 using HaselCommon.Services;
-using HaselDebug.Abstracts;
 using HaselDebug.Config;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 using HaselDebug.Windows;
 using ImGuiNET;
 using InteropGenerator.Runtime;
@@ -60,7 +61,9 @@ public class Plugin : IDalamudPlugin
             .AddSingleton<DebugRenderer>()
             .AddSingleton<InstancesService>()
             .AddSingleton<PinnedInstancesService>()
+            .AddSingleton<UnlocksTabUtils>()
             .AddIServices<IDebugTab>()
+            .AddSubTabs()
             .AddSingleton<PluginWindow>()
             .AddSingleton<ConfigWindow>();
 

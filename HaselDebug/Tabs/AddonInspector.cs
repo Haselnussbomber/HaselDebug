@@ -21,7 +21,6 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
-#pragma warning disable SeStringRenderer
 public unsafe class AddonInspectorTab(
     TextService TextService,
     DebugRenderer DebugRenderer,
@@ -29,15 +28,15 @@ public unsafe class AddonInspectorTab(
     PinnedInstancesService PinnedInstances,
     WindowManager WindowManager) : DebugTab
 {
-    private ushort SelectedAddonId = 0;
-    private string SelectedAddonName = string.Empty;
-    private bool SortDirty = true;
-    private short SortColumnIndex = 1;
-    private ImGuiSortDirection SortDirection = ImGuiSortDirection.Ascending;
-    private string AddonNameSearchTerm = string.Empty;
-    private bool ShowPicker;
-    private int NodePickerSelectionIndex;
-    private Vector2 LastMousePos;
+    private ushort _selectedAddonId = 0;
+    private string _selectedAddonName = string.Empty;
+    private bool _sortDirty = true;
+    private short _sortColumnIndex = 1;
+    private ImGuiSortDirection _sortDirection = ImGuiSortDirection.Ascending;
+    private string _addonNameSearchTerm = string.Empty;
+    private bool _showPicker;
+    private int _nodePickerSelectionIndex;
+    private Vector2 _lastMousePos;
 
     public override bool DrawInChild => false;
 
@@ -58,15 +57,15 @@ public unsafe class AddonInspectorTab(
         if (!sidebarchild) return;
 
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - ImGuiUtils.GetIconButtonSize(FontAwesomeIcon.ObjectUngroup).X - ImGui.GetStyle().ItemSpacing.X);
-        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref AddonNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
-        var hasSearchTerm = !string.IsNullOrWhiteSpace(AddonNameSearchTerm);
+        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref _addonNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTerm = !string.IsNullOrWhiteSpace(_addonNameSearchTerm);
         var hasSearchTermAutoSelected = false;
 
         ImGui.SameLine();
-        if (ImGuiUtils.IconButton("NodeSelectorToggleButton", FontAwesomeIcon.ObjectUngroup, "Pick Addon/Node", active: ShowPicker))
+        if (ImGuiUtils.IconButton("NodeSelectorToggleButton", FontAwesomeIcon.ObjectUngroup, "Pick Addon/Node", active: _showPicker))
         {
-            ShowPicker = !ShowPicker;
-            NodePickerSelectionIndex = 0;
+            _showPicker = !_showPicker;
+            _nodePickerSelectionIndex = 0;
         }
 
         using var table = ImRaii.Table("AddonsTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable | ImGuiTableFlags.NoSavedSettings, new Vector2(-1));
@@ -87,7 +86,7 @@ public unsafe class AddonInspectorTab(
             if (unitBase == null)
                 continue;
 
-            if (hasSearchTerm && !unitBase->NameString.Contains(AddonNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
+            if (hasSearchTerm && !unitBase->NameString.Contains(_addonNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
                 continue;
 
             allUnitsList.Add(unitBase);
@@ -99,18 +98,18 @@ public unsafe class AddonInspectorTab(
             if (unitBase == null)
                 continue;
 
-            if (hasSearchTerm && !unitBase->NameString.Contains(AddonNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
+            if (hasSearchTerm && !unitBase->NameString.Contains(_addonNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
                 continue;
 
             focusedList.Add(unitBase);
         }
 
-        allUnitsList.Sort((a, b) => SortColumnIndex switch
+        allUnitsList.Sort((a, b) => _sortColumnIndex switch
         {
-            0 when SortDirection == ImGuiSortDirection.Ascending => a.Value->Id - b.Value->Id,
-            0 when SortDirection == ImGuiSortDirection.Descending => b.Value->Id - a.Value->Id,
-            1 when SortDirection == ImGuiSortDirection.Ascending => a.Value->NameString.CompareTo(b.Value->NameString),
-            1 when SortDirection == ImGuiSortDirection.Descending => b.Value->NameString.CompareTo(a.Value->NameString),
+            0 when _sortDirection == ImGuiSortDirection.Ascending => a.Value->Id - b.Value->Id,
+            0 when _sortDirection == ImGuiSortDirection.Descending => b.Value->Id - a.Value->Id,
+            1 when _sortDirection == ImGuiSortDirection.Ascending => a.Value->NameString.CompareTo(b.Value->NameString),
+            1 when _sortDirection == ImGuiSortDirection.Descending => b.Value->NameString.CompareTo(a.Value->NameString),
             _ => 0,
         });
 
@@ -126,8 +125,8 @@ public unsafe class AddonInspectorTab(
 
             if (hasSearchTermChanged && !hasSearchTermAutoSelected)
             {
-                SelectedAddonId = addonId;
-                SelectedAddonName = addonName;
+                _selectedAddonId = addonId;
+                _selectedAddonName = addonName;
                 hasSearchTermAutoSelected = true;
             }
 
@@ -139,10 +138,10 @@ public unsafe class AddonInspectorTab(
             using (ImRaii.PushColor(ImGuiCol.Text, ImGui.GetColorU32(ImGuiCol.TextDisabled), !unitBase->IsVisible))
             using (ImRaii.PushColor(ImGuiCol.Text, (uint)Color.Gold, focusedList.Contains(unitBase)))
             {
-                if (ImGui.Selectable(addonName + $"##Addon_{addonId}_{addonName}", addonId == SelectedAddonId && SelectedAddonName == addonName, ImGuiSelectableFlags.SpanAllColumns))
+                if (ImGui.Selectable(addonName + $"##Addon_{addonId}_{addonName}", addonId == _selectedAddonId && _selectedAddonName == addonName, ImGuiSelectableFlags.SpanAllColumns))
                 {
-                    SelectedAddonId = addonId;
-                    SelectedAddonName = addonName;
+                    _selectedAddonId = addonId;
+                    _selectedAddonName = addonName;
                 }
             }
 
@@ -194,28 +193,28 @@ public unsafe class AddonInspectorTab(
         }
 
         var sortSpecs = ImGui.TableGetSortSpecs();
-        SortDirty |= sortSpecs.SpecsDirty;
+        _sortDirty |= sortSpecs.SpecsDirty;
 
-        if (!SortDirty)
+        if (!_sortDirty)
             return;
 
-        SortColumnIndex = sortSpecs.Specs.ColumnIndex;
-        SortDirection = sortSpecs.Specs.SortDirection;
-        sortSpecs.SpecsDirty = SortDirty = false;
+        _sortColumnIndex = sortSpecs.Specs.ColumnIndex;
+        _sortDirection = sortSpecs.Specs.SortDirection;
+        sortSpecs.SpecsDirty = _sortDirty = false;
     }
 
     private void DrawAddon()
     {
-        if (string.IsNullOrEmpty(SelectedAddonName) || SelectedAddonId == 0)
+        if (string.IsNullOrEmpty(_selectedAddonName) || _selectedAddonId == 0)
             return;
 
         using var hostchild = ImRaii.Child("AddonChild", new Vector2(-1), true, ImGuiWindowFlags.NoSavedSettings);
 
         var unitManager = RaptureAtkUnitManager.Instance();
-        var unitBase = unitManager->GetAddonById(SelectedAddonId);
+        var unitBase = unitManager->GetAddonById(_selectedAddonId);
         if (unitBase == null)
         {
-            ImGui.TextUnformatted($"Could not find addon with id {SelectedAddonId}");
+            ImGui.TextUnformatted($"Could not find addon with id {_selectedAddonId}");
             return;
         }
 
@@ -256,7 +255,7 @@ public unsafe class AddonInspectorTab(
         foreach (var agentId in Enum.GetValues<AgentId>())
         {
             var agent = agentModule->GetAgentByInternalId(agentId);
-            if (agent == null || agent->AddonId != SelectedAddonId)
+            if (agent == null || agent->AddonId != _selectedAddonId)
                 continue;
 
             ImGui.TextUnformatted($"Used by Agent{agentId}");
@@ -722,7 +721,7 @@ public unsafe class AddonInspectorTab(
 
     private void DrawNodePicker()
     {
-        if (!ShowPicker)
+        if (!_showPicker)
             return;
 
         var raptureAtkUnitManager = RaptureAtkUnitManager.Instance();
@@ -773,7 +772,7 @@ public unsafe class AddonInspectorTab(
 
         if (nodeCount == 0)
         {
-            ShowPicker = false;
+            _showPicker = false;
             return;
         }
 
@@ -781,9 +780,9 @@ public unsafe class AddonInspectorTab(
         ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
 
         var mousePos = ImGui.GetMousePos();
-        var mouseMoved = LastMousePos != mousePos;
+        var mouseMoved = _lastMousePos != mousePos;
         if (mouseMoved)
-            NodePickerSelectionIndex = 0;
+            _nodePickerSelectionIndex = 0;
 
         if (!ImGui.Begin("NodePicker", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBackground))
             return;
@@ -807,7 +806,7 @@ public unsafe class AddonInspectorTab(
                     var node = nodes[i].Value;
                     node->GetBounds(bounds);
 
-                    if (NodePickerSelectionIndex == nodeIndex)
+                    if (_nodePickerSelectionIndex == nodeIndex)
                     {
                         using (ImRaii.PushFont(UiBuilder.IconFont))
                             ImGui.TextUnformatted(FontAwesomeIcon.CaretRight.ToIconString());
@@ -820,11 +819,11 @@ public unsafe class AddonInspectorTab(
 
                         if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                         {
-                            SelectedAddonId = unitBase.Value->Id;
-                            SelectedAddonName = unitBase.Value->NameString;
+                            _selectedAddonId = unitBase.Value->Id;
+                            _selectedAddonName = unitBase.Value->NameString;
 
-                            NodePickerSelectionIndex = 0;
-                            ShowPicker = false;
+                            _nodePickerSelectionIndex = 0;
+                            _showPicker = false;
                         }
                     }
 
@@ -846,14 +845,14 @@ public unsafe class AddonInspectorTab(
             }
         }
 
-        NodePickerSelectionIndex -= (int)ImGui.GetIO().MouseWheel;
-        if (NodePickerSelectionIndex < 0)
-            NodePickerSelectionIndex = nodeCount - 1;
-        if (NodePickerSelectionIndex > nodeCount - 1)
-            NodePickerSelectionIndex = 0;
+        _nodePickerSelectionIndex -= (int)ImGui.GetIO().MouseWheel;
+        if (_nodePickerSelectionIndex < 0)
+            _nodePickerSelectionIndex = nodeCount - 1;
+        if (_nodePickerSelectionIndex > nodeCount - 1)
+            _nodePickerSelectionIndex = 0;
 
         if (mouseMoved)
-            LastMousePos = mousePos;
+            _lastMousePos = mousePos;
 
         ImGui.End();
     }

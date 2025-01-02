@@ -3,10 +3,14 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
+using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
@@ -14,29 +18,33 @@ using PlayerState = FFXIVClientStructs.FFXIV.Client.Game.UI.PlayerState;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabOutfits(
+    ExcelService ExcelService,
+    ImGuiContextMenuService ImGuiContextMenuService,
+    ItemService ItemService,
+    TextService TextService,
+    TextureService TextureService,
+    ITextureProvider TextureProvider) : DebugTab, ISubTab<UnlocksTab>
 {
-    private bool PrismBoxBackedUp = false;
-    private DateTime PrismBoxLastCheck = DateTime.MinValue;
-    private readonly List<uint> PrismBoxItemIds = [];
+    private readonly List<uint> _prismBoxItemIds = [];
+    private bool _prismBoxBackedUp = false;
+    private DateTime _prismBoxLastCheck = DateTime.MinValue;
+    private List<CustomMirageStoreSetItem>? _validSets;
 
-    private List<CustomMirageStoreSetItem>? ValidSets;
+    public override string Title => "Outfits";
 
-    public void DrawOutfits()
+    public override void Draw()
     {
-        using var tab = ImRaii.TabItem("Outfits");
-        if (!tab) return;
-
         var playerState = PlayerState.Instance();
         if (playerState->IsLoaded != 1)
         {
             ImGui.TextUnformatted("PlayerState not loaded.");
 
             // in case of logout
-            if (PrismBoxBackedUp)
+            if (_prismBoxBackedUp)
             {
-                ValidSets = null;
-                PrismBoxBackedUp = false;
+                _validSets = null;
+                _prismBoxBackedUp = false;
             }
 
             return;
@@ -45,7 +53,7 @@ public unsafe partial class UnlocksTab
         var mirageManager = MirageManager.Instance();
         if (!mirageManager->PrismBoxLoaded)
         {
-            if (PrismBoxBackedUp)
+            if (_prismBoxBackedUp)
             {
                 using (Color.Yellow.Push(ImGuiCol.Text))
                     ImGui.TextUnformatted("PrismBox not loaded. Using cache.");
@@ -60,30 +68,30 @@ public unsafe partial class UnlocksTab
         {
             var hasChanges = false;
 
-            if (DateTime.Now - PrismBoxLastCheck > TimeSpan.FromSeconds(2))
+            if (DateTime.Now - _prismBoxLastCheck > TimeSpan.FromSeconds(2))
             {
-                hasChanges = !CollectionsMarshal.AsSpan(PrismBoxItemIds).SequenceEqual(mirageManager->PrismBoxItemIds);
-                PrismBoxLastCheck = DateTime.Now;
+                hasChanges = !CollectionsMarshal.AsSpan(_prismBoxItemIds).SequenceEqual(mirageManager->PrismBoxItemIds);
+                _prismBoxLastCheck = DateTime.Now;
             }
 
-            if (!PrismBoxBackedUp || hasChanges)
+            if (!_prismBoxBackedUp || hasChanges)
             {
-                PrismBoxItemIds.Clear();
-                PrismBoxItemIds.AddRange(mirageManager->PrismBoxItemIds);
-                PrismBoxBackedUp = true;
+                _prismBoxItemIds.Clear();
+                _prismBoxItemIds.AddRange(mirageManager->PrismBoxItemIds);
+                _prismBoxBackedUp = true;
             }
         }
 
-        ValidSets ??= GetValidSets();
+        _validSets ??= GetValidSets();
         var numCollectedSets = 0;
 
-        foreach (var row in ValidSets!)
+        foreach (var row in _validSets!)
         {
-            if (PrismBoxItemIds.Contains(row.RowId))
+            if (_prismBoxItemIds.Contains(row.RowId))
                 numCollectedSets++;
         }
 
-        ImGui.TextUnformatted($"{numCollectedSets} out of {ValidSets.Count} filtered sets collected");
+        ImGui.TextUnformatted($"{numCollectedSets} out of {_validSets.Count} filtered sets collected");
 
         using var table = ImRaii.Table("OutfitsTable", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
@@ -96,9 +104,9 @@ public unsafe partial class UnlocksTab
         const float iconSize = 32;
         var scale = ImGuiHelpers.GlobalScale;
 
-        foreach (var row in ValidSets!)
+        foreach (var row in _validSets!)
         {
-            var isSetCollected = PrismBoxItemIds.Contains(row.RowId);
+            var isSetCollected = _prismBoxItemIds.Contains(row.RowId);
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Set
@@ -157,7 +165,7 @@ public unsafe partial class UnlocksTab
                 var item = row.Items[i];
                 if (item.RowId != 0 && item.IsValid)
                 {
-                    var isSetItemCollected = PrismBoxItemIds.Contains(item.RowId) || PrismBoxItemIds.Contains(item.RowId + 1_000_000);
+                    var isSetItemCollected = _prismBoxItemIds.Contains(item.RowId) || _prismBoxItemIds.Contains(item.RowId + 1_000_000);
 
                     ImGui.Dummy(new(iconSize));
                     ImGui.SameLine(0, 0);

@@ -18,13 +18,13 @@ public class InstancesTab(
     InstancesService InstancesService,
     PinnedInstancesService PinnedInstances) : DebugTab
 {
-    private string SearchTerm = string.Empty;
+    private string _searchTerm = string.Empty;
 
     public override void Draw()
     {
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref SearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
-        var hasSearchTerm = !string.IsNullOrWhiteSpace(SearchTerm);
+        ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTerm = !string.IsNullOrWhiteSpace(_searchTerm);
 
         using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
@@ -32,7 +32,7 @@ public class InstancesTab(
         foreach (var (ptr, type) in InstancesService.Instances)
         {
             if (type.GetCustomAttribute<AgentAttribute>() != null) continue;
-            if (hasSearchTerm && !type.FullName!.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)) continue;
+            if (hasSearchTerm && !type.FullName!.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)) continue;
 
             DebugRenderer.DrawAddress(ptr);
             ImGui.SameLine(120);

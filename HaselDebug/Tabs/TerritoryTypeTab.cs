@@ -7,7 +7,10 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class TerritoryTypeTab(DebugRenderer DebugRenderer, IClientState ClientState, TextService TextService) : DebugTab
+public unsafe class TerritoryTypeTab(
+    DebugRenderer DebugRenderer,
+    IClientState ClientState,
+    TextService TextService) : DebugTab
 {
     public override void Draw()
     {

@@ -16,7 +16,6 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Services;
 
-#pragma warning disable SeStringRenderer
 public unsafe partial class DebugRenderer
 {
     private readonly Dictionary<MacroCode, string[]> ExpressionNames = new()

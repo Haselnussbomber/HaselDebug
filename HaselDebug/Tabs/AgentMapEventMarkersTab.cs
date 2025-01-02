@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs;
 public unsafe class AgentMapEventMarkersTab(ITextureProvider TextureProvider) : DebugTab
 {
     public override bool DrawInChild => false;
+
     public override void Draw()
     {
         var agent = AgentMap.Instance();

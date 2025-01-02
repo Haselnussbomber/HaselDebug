@@ -3,18 +3,23 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab : DebugTab, IDisposable
+public unsafe class UnlocksTabSightseeingLog(
+    DebugRenderer DebugRenderer,
+    ExcelService ExcelService,
+    MapService MapService) : DebugTab, ISubTab<UnlocksTab>
 {
-    public void DrawSightseeingLog()
-    {
-        using var tab = ImRaii.TabItem("Sightseeing Log");
-        if (!tab) return;
+    public override string Title => "Sightseeing Log";
+    public override bool DrawInChild => false;
 
+    public override void Draw()
+    {
         using var table = ImRaii.Table("AdventureTabTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 

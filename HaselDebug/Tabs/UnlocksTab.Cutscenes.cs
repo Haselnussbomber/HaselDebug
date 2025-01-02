@@ -3,20 +3,45 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
+using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+public unsafe class UnlocksTabCutscenes : DebugTab, ISubTab<UnlocksTab>, IDisposable
 {
+    private readonly ExcelService _excelService;
+    private readonly TextService _textService;
+
     private readonly Dictionary<uint, HashSet<(Type SheetType, uint RowId, string Label)>> Cutscenes = [];
 
-    public void DrawCutscenes()
-    {
-        using var tab = ImRaii.TabItem("Cutscenes");
-        if (!tab) return;
+    public override string Title => "Cutscenes";
+    public override bool DrawInChild => false;
 
+    public UnlocksTabCutscenes(ExcelService excelService, TextService textService) : base()
+    {
+        _excelService = excelService;
+        _textService = textService;
+
+        _textService.LanguageChanged += OnLanguageChanged;
+        Update();
+    }
+
+    public void Dispose()
+    {
+        _textService.LanguageChanged -= OnLanguageChanged;
+        GC.SuppressFinalize(this);
+    }
+
+    private void OnLanguageChanged(string langCode)
+    {
+        Update();
+    }
+
+    public override void Draw()
+    {
         using var table = ImRaii.Table("CutsceneTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
@@ -28,8 +53,8 @@ public unsafe partial class UnlocksTab
         ImGui.TableHeadersRow();
 
         var uiState = UIState.Instance();
-        var sheet = ExcelService.GetSheet<Cutscene>()!;
-        var sheetWI = ExcelService.GetSheet<CutsceneWorkIndex>()!;
+        var sheet = _excelService.GetSheet<Cutscene>()!;
+        var sheetWI = _excelService.GetSheet<CutsceneWorkIndex>()!;
         for (var i = 0u; i < sheet.Count; i++)
         {
             var row = sheet.GetRow(i);
@@ -60,9 +85,9 @@ public unsafe partial class UnlocksTab
         }
     }
 
-    private void UpdateCutscenes()
+    public void Update()
     {
-        foreach (var row in ExcelService.GetSheet<CompleteJournal>())
+        foreach (var row in _excelService.GetSheet<CompleteJournal>())
         {
             foreach (var cutscene in row.Cutscene)
             {
@@ -76,12 +101,12 @@ public unsafe partial class UnlocksTab
             }
         }
 
-        foreach (var row in ExcelService.GetSheet<Lumina.Excel.Sheets.InstanceContent>())
+        foreach (var row in _excelService.GetSheet<Lumina.Excel.Sheets.InstanceContent>())
         {
             if (row.Cutscene.RowId == 0)
                 continue;
 
-            if (!ExcelService.TryFindRow<ContentFinderCondition>(cfcrow => cfcrow!.ContentLinkType == 1 && cfcrow.Content.RowId == row.RowId, out var cfc))
+            if (!_excelService.TryFindRow<ContentFinderCondition>(cfcrow => cfcrow!.ContentLinkType == 1 && cfcrow.Content.RowId == row.RowId, out var cfc))
                 continue;
 
             var tuple = (typeof(Lumina.Excel.Sheets.InstanceContent), row.RowId, cfc.Name.ExtractText() ?? "?");

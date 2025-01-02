@@ -25,19 +25,19 @@ public unsafe partial struct AddonConfigFunctions
 
 public unsafe class AddonConfigTab : DebugTab
 {
-    private readonly DebugRenderer debugRenderer;
-    private readonly Dictionary<uint, string> addonNames = [];
+    private readonly DebugRenderer _debugRenderer;
+    private readonly Dictionary<uint, string> _addonNames = [];
 
     public AddonConfigTab(DebugRenderer DebugRenderer)
     {
-        debugRenderer = DebugRenderer;
+        _debugRenderer = DebugRenderer;
 
         for (var i = 0u; i < 99; i++)
         {
             var namePtr = AddonConfigFunctions.GetNameByIndex(i);
             var name = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(namePtr));
             var hash = AddonConfigFunctions.GetNameHash(namePtr);
-            addonNames[hash] = name;
+            _addonNames[hash] = name;
         }
 
         foreach (var addonName in RaptureAtkModule.Instance()->AddonNames)
@@ -46,7 +46,7 @@ public unsafe class AddonConfigTab : DebugTab
                 continue;
 
             var hash = AddonConfigFunctions.GetNameHash(addonName.StringPtr);
-            addonNames[hash] = addonName.ToString();
+            _addonNames[hash] = addonName.ToString();
 
             for (var i = 0u; i < 10; i++)
             {
@@ -57,7 +57,7 @@ public unsafe class AddonConfigTab : DebugTab
                     continue;
 
                 hash = AddonConfigFunctions.GetNameHash(numName->StringPtr);
-                addonNames[hash] = numName->ToString();
+                _addonNames[hash] = numName->ToString();
 
                 numName->SetString($"{addonName.ToString().TrimEnd('\0')}{i:00}");
 
@@ -65,7 +65,7 @@ public unsafe class AddonConfigTab : DebugTab
                     continue;
 
                 hash = AddonConfigFunctions.GetNameHash(numName->StringPtr);
-                addonNames[hash] = numName->ToString();
+                _addonNames[hash] = numName->ToString();
                 numName->Dtor(true);
             }
         }
@@ -173,7 +173,7 @@ public unsafe class AddonConfigTab : DebugTab
 
         ImGui.TableNextColumn();
         var hash = configEntry->AddonNameHash;
-        ImGui.TextUnformatted(addonNames.TryGetValue(hash, out var name) ? name : hash.ToString("X"));
+        ImGui.TextUnformatted(_addonNames.TryGetValue(hash, out var name) ? name : hash.ToString("X"));
 
         ImGui.TableNextColumn();
         ImGui.TextUnformatted(configEntry->X.ToString("0.###", CultureInfo.InvariantCulture));
