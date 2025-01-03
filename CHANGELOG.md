@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.11.1] (2025-01-03)
+
+- **Added:** An ImGui Main Menu button for /xldev to toggle the HaselDebug window.
+- **Changed:** The Unlocks tabs are now sub-categories in the sidebar.
+- **Changed:** In the EventFramework tab, the task history is now logged by hooking the AddTask function, instead of observing the Tasks vector.
+- **Changed:** In the Lua Debug tab, the types have been moved to the front and the TreeNodes now have the SpanAvailWidth flag.
+- **Fixed:** When searching Agents by name, the results couldn't be clicked on, because it would auto-select the first entry. This was removed, so it's now possible to select the agents.
+- **Updated:** ClientStructs now at [f26035a](https://github.com/aers/FFXIVClientStructs/tree/7ba7ab4) ([compare](https://github.com/aers/FFXIVClientStructs/compare/f26035a..7ba7ab4)).
+
 ## [1.11.0] (2024-12-29)
 
 - **Added:** New tab Addon Config.
@@ -171,7 +180,9 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.10.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.11.1...main
+[1.11.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.11.0...v1.11.1
+[1.11.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.10.1...v1.11.0
 [1.10.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.8.0...v1.9.0
