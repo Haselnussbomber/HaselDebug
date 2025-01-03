@@ -198,16 +198,6 @@ public class PluginWindow : SimpleWindow
 
                     subTabDisabled.Pop();
 
-                    ImGui.SameLine(0, lineHeight);
-                    ImGui.TextUnformatted(subTab.Title);
-
-                    var linePos = ImGui.GetWindowPos() + pos
-                        - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY())
-                        + new Vector2(MathF.Round(halfLineHeight - ImGui.GetStyle().ItemSpacing.Y / 2), -MathF.Round(ImGui.GetStyle().ItemSpacing.Y / 2));
-
-                    ImGui.GetWindowDrawList().AddLine(linePos, linePos + new Vector2(0, i == subTabCount - 1 ? halfLineHeight : lineHeight), Color.Grey3);
-                    ImGui.GetWindowDrawList().AddLine(linePos + new Vector2(0, halfLineHeight), linePos + new Vector2(halfLineHeight, halfLineHeight), Color.Grey3);
-
                     ImGuiContextMenu.Draw($"{subTab.InternalName}ContextMenu", builder =>
                     {
                         builder.Add(new ImGuiContextMenuEntry()
@@ -217,6 +207,16 @@ public class PluginWindow : SimpleWindow
                             ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, subTab))
                         });
                     });
+
+                    ImGui.SameLine(0, lineHeight);
+                    ImGui.TextUnformatted(subTab.Title);
+
+                    var linePos = ImGui.GetWindowPos() + pos
+                        - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY())
+                        + new Vector2(MathF.Round(halfLineHeight - ImGui.GetStyle().ItemSpacing.Y / 2), -MathF.Round(ImGui.GetStyle().ItemSpacing.Y / 2));
+
+                    ImGui.GetWindowDrawList().AddLine(linePos, linePos + new Vector2(0, i == subTabCount - 1 ? halfLineHeight : lineHeight), Color.Grey3);
+                    ImGui.GetWindowDrawList().AddLine(linePos + new Vector2(0, halfLineHeight), linePos + new Vector2(halfLineHeight, halfLineHeight), Color.Grey3);
                 }
             }
         }
