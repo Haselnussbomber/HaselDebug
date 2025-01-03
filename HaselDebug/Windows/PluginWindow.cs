@@ -99,6 +99,9 @@ public class PluginWindow : SimpleWindow
     private void DrawSidebar()
     {
         var scale = ImGui.GetIO().FontGlobalScale;
+        var lineHeight = ImGui.GetTextLineHeightWithSpacing();
+        var halfLineHeight = (int)MathF.Round(lineHeight / 2f);
+
         using var child = ImRaii.Child("Sidebar", new Vector2(SidebarWidth * scale, -1), true, ImGuiWindowFlags.NoSavedSettings);
         if (!child || !child.Success)
             return;
@@ -185,19 +188,25 @@ public class PluginWindow : SimpleWindow
                 {
                     var subTab = tab.SubTabs.Value[i];
 
-                    // pls don't make me handle nested subtabs
-                    var prefix = "├";
-                    if (i == subTabCount - 1)
-                        prefix = "└";
-
                     using var subTabDisabled = Color.From(ImGuiCol.TextDisabled).Push(ImGuiCol.Text, !tab.IsEnabled || !subTab.IsEnabled);
+                    var pos = ImGui.GetCursorPos();
 
-                    if (ImGui.Selectable($"{prefix} {subTab.Title}###Selectable_{subTab.InternalName}", SelectedTab == subTab))
+                    if (ImGui.Selectable($"###Selectable_{subTab.InternalName}", SelectedTab == subTab))
                     {
                         SelectTab(subTab);
                     }
 
                     subTabDisabled.Pop();
+
+                    ImGui.SameLine(0, lineHeight);
+                    ImGui.TextUnformatted(subTab.Title);
+
+                    var linePos = ImGui.GetWindowPos() + pos
+                        - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY())
+                        + new Vector2(MathF.Round(halfLineHeight - ImGui.GetStyle().ItemSpacing.Y / 2), -MathF.Round(ImGui.GetStyle().ItemSpacing.Y / 2));
+
+                    ImGui.GetWindowDrawList().AddLine(linePos, linePos + new Vector2(0, i == subTabCount - 1 ? halfLineHeight : lineHeight), Color.Grey3);
+                    ImGui.GetWindowDrawList().AddLine(linePos + new Vector2(0, halfLineHeight), linePos + new Vector2(halfLineHeight, halfLineHeight), Color.Grey3);
 
                     ImGuiContextMenu.Draw($"{subTab.InternalName}ContextMenu", builder =>
                     {
