@@ -10,14 +10,14 @@ namespace HaselDebug.Tabs;
 public unsafe class TerritoryTypeTab(
     DebugRenderer DebugRenderer,
     IClientState ClientState,
-    TextService TextService) : DebugTab
+    LanguageProvider LanguageProvider) : DebugTab
 {
     public override void Draw()
     {
         DebugRenderer.DrawExdSheet(typeof(TerritoryType), ClientState.TerritoryType, 0, new NodeOptions()
         {
             DefaultOpen = true,
-            Language = TextService.ClientLanguage
+            Language = LanguageProvider.ClientLanguage
         });
     }
 }

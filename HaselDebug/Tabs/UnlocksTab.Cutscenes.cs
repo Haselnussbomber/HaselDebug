@@ -13,25 +13,25 @@ namespace HaselDebug.Tabs;
 public unsafe class UnlocksTabCutscenes : DebugTab, ISubTab<UnlocksTab>, IDisposable
 {
     private readonly ExcelService _excelService;
-    private readonly TextService _textService;
+    private readonly LanguageProvider _languageProvider;
 
     private readonly Dictionary<uint, HashSet<(Type SheetType, uint RowId, string Label)>> Cutscenes = [];
 
     public override string Title => "Cutscenes";
     public override bool DrawInChild => false;
 
-    public UnlocksTabCutscenes(ExcelService excelService, TextService textService) : base()
+    public UnlocksTabCutscenes(ExcelService excelService, LanguageProvider languageProvider) : base()
     {
         _excelService = excelService;
-        _textService = textService;
+        _languageProvider = languageProvider;
 
-        _textService.LanguageChanged += OnLanguageChanged;
+        _languageProvider.LanguageChanged += OnLanguageChanged;
         Update();
     }
 
     public void Dispose()
     {
-        _textService.LanguageChanged -= OnLanguageChanged;
+        _languageProvider.LanguageChanged -= OnLanguageChanged;
         GC.SuppressFinalize(this);
     }
 

@@ -21,25 +21,34 @@ public unsafe class ExcelTab : DebugTab
 {
     private const int LanguageSelectorWidth = 90;
 
+    private readonly LanguageProvider _languageProvider;
     private readonly TextService _textService;
-    private readonly DebugRenderer _debugRenderer;
     private readonly ExcelModule _excelModule;
+    private readonly DebugRenderer _debugRenderer;
     private Addon[] _addonRows;
+    private Lobby[] _lobbyRows;
     private LogMessage[] _logMessageRows;
     private Addon[]? _filteredAddonRows;
+    private Lobby[]? _filteredLobbyRows;
     private LogMessage[]? _filteredLogMessageRows;
     private CancellationTokenSource? _filterCTS;
     private string _searchTerm = string.Empty;
     private ClientLanguage _selectedLanguage;
 
-    public ExcelTab(TextService textService, DebugRenderer debugRenderer, ExcelModule excelModule)
+    public ExcelTab(
+        LanguageProvider languageProvider,
+        TextService textService,
+        ExcelModule excelModule,
+        DebugRenderer debugRenderer)
     {
+        _languageProvider = languageProvider;
         _textService = textService;
-        _debugRenderer = debugRenderer;
         _excelModule = excelModule;
+        _debugRenderer = debugRenderer;
 
-        _selectedLanguage = _textService.ClientLanguage;
+        _selectedLanguage = _languageProvider.ClientLanguage;
         _addonRows = _excelModule.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
+        _lobbyRows = _excelModule.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
         _logMessageRows = _excelModule.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
     }
 
@@ -63,6 +72,7 @@ public unsafe class ExcelTab : DebugTab
                     {
                         _selectedLanguage = value;
                         _addonRows = _excelModule.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
+                        _lobbyRows = _excelModule.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
                         _logMessageRows = _excelModule.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
                         listDirty |= true;
                     }
@@ -80,6 +90,7 @@ public unsafe class ExcelTab : DebugTab
         if (!tabBar) return;
 
         DrawAddonTab();
+        DrawLobbyTab();
         DrawLogMessageTab();
     }
 
@@ -106,6 +117,31 @@ public unsafe class ExcelTab : DebugTab
         ImGui.TableHeadersRow();
 
         ImGuiClip.ClippedDraw(_filteredAddonRows ?? _addonRows, DrawAddonRow, ImGui.GetTextLineHeightWithSpacing());
+    }
+
+    public void DrawLobbyTab()
+    {
+        var tabTitle = "Lobby";
+
+        if (!string.IsNullOrWhiteSpace(_searchTerm) && _filteredLobbyRows != null)
+        {
+            tabTitle = $"{tabTitle} ({_filteredLobbyRows.Length})";
+        }
+
+        using var tab = ImRaii.TabItem(tabTitle + "###LobbyTab");
+        if (!tab) return;
+
+        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
+
+        using var table = ImRaii.Table("RowTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        if (!table) return;
+
+        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupScrollFreeze(2, 1);
+        ImGui.TableHeadersRow();
+
+        ImGuiClip.ClippedDraw(_filteredLobbyRows ?? _lobbyRows, DrawLobbyRow, ImGui.GetTextLineHeightWithSpacing());
     }
 
     public void DrawLogMessageTab()
@@ -138,6 +174,7 @@ public unsafe class ExcelTab : DebugTab
         if (string.IsNullOrWhiteSpace(_searchTerm))
         {
             _filteredAddonRows = null;
+            _filteredLobbyRows = null;
             _filteredLogMessageRows = null;
             return;
         }
@@ -155,7 +192,20 @@ public unsafe class ExcelTab : DebugTab
             }
         }
 
-        _filteredAddonRows = addonList.ToArray();
+        var lobbyList = new List<Lobby>();
+
+        for (var i = 0; i < _lobbyRows.Length && !cancellationToken.IsCancellationRequested; i++)
+        {
+            var row = _lobbyRows[i];
+            if (row.RowId.ToString().Contains(_searchTerm)
+             || row.Text.ToString().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase)
+             || row.Text.ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
+            {
+                lobbyList.Add(row);
+            }
+        }
+
+        _filteredLobbyRows = lobbyList.ToArray();
 
         var logMessageList = new List<LogMessage>();
 
@@ -186,6 +236,23 @@ public unsafe class ExcelTab : DebugTab
             AddressPath = new AddressPath((nint)row.RowId),
             RenderSeString = false,
             Title = $"Addon#{row.RowId} ({_selectedLanguage})",
+            Language = _selectedLanguage
+        });
+    }
+
+    private void DrawLobbyRow(Lobby row)
+    {
+        ImGui.TableNextRow();
+
+        ImGui.TableNextColumn(); // RowId
+        ImGui.TextUnformatted(row.RowId.ToString());
+
+        ImGui.TableNextColumn(); // Text
+        _debugRenderer.DrawSeString(row.Text.AsSpan(), new NodeOptions()
+        {
+            AddressPath = new AddressPath((nint)row.RowId),
+            RenderSeString = false,
+            Title = $"Lobby#{row.RowId} ({_selectedLanguage})",
             Language = _selectedLanguage
         });
     }

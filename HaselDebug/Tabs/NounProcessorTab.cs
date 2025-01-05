@@ -4,9 +4,11 @@ using System.Linq;
 using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
+using Dalamud.Utility;
 using HaselCommon.Extensions.Dalamud;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Data;
 using Lumina.Excel;
@@ -17,7 +19,7 @@ namespace HaselDebug.Tabs;
 // TODO: display current SheetHashes and compare
 // https://github.com/NotAdam/Lumina/blob/master/src/Lumina/Data/Files/Excel/ExcelHeaderFile.cs#L59
 
-public class TextDecoderTab : DebugTab
+public class NounProcessorTab : DebugTab
 {
     private readonly Dictionary<Type, uint> _sheets = new() {
         { typeof(Attributive), 0xECF11B18 },
@@ -49,8 +51,9 @@ public class TextDecoderTab : DebugTab
         { typeof(TripleTriadCard), 0x45C06AE0 },
     };
 
-    private readonly TextDecoder _textDecoder;
+    private readonly NounProcessor _nounProcessor;
     private readonly IDataManager _dataManager;
+    private readonly DebugRenderer _debugRenderer;
     private readonly ClientLanguage[] _languages;
     private readonly string[] _sheetNames;
     private readonly string[] _languageNames;
@@ -61,11 +64,13 @@ public class TextDecoderTab : DebugTab
     private int _rowId = 1;
     private int _amount = 1;
     private bool _enableTitleCase = false;
+    private static readonly string[] GermanCases = ["Nominative", "Genitive", "Dative", "Accusative"];
 
-    public TextDecoderTab(TextDecoder textDecoder, IDataManager dataManager, IClientState clientState)
+    public NounProcessorTab(NounProcessor nounProcessor, IDataManager dataManager, IClientState clientState, DebugRenderer debugRenderer)
     {
-        _textDecoder = textDecoder;
+        _nounProcessor = nounProcessor;
         _dataManager = dataManager;
+        _debugRenderer = debugRenderer;
 
         _languages = Enum.GetValues<ClientLanguage>();
         _languageNames = Enum.GetNames<ClientLanguage>();
@@ -118,31 +123,49 @@ public class TextDecoderTab : DebugTab
         }
 
         ImGui.Checkbox("Title Case###TitleCase", ref _enableTitleCase);
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip("Won't be accurate since C# doesn't care enough for some languages.");
 
-        using var table = ImRaii.Table("TextDecoderTable", 6, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
+        var numCases = language == ClientLanguage.German ? 4 : 1;
+        using var table = ImRaii.Table("TextDecoderTable", 1 + numCases, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Person", ImGuiTableColumnFlags.WidthFixed, 60);
-        for (var i = 1; i < 6; i++)
-            ImGui.TableSetupColumn($"Case {i}");
+        ImGui.TableSetupColumn("ArticleType", ImGuiTableColumnFlags.WidthFixed, 150);
+        for (var i = 0; i < numCases; i++)
+            ImGui.TableSetupColumn(language == ClientLanguage.German ? GermanCases[i] : "Text");
         ImGui.TableSetupScrollFreeze(6, 1);
         ImGui.TableHeadersRow();
 
-        for (var person = 1; person < 6; person++)
+        var articleTypeEnumType = language switch
+        {
+            ClientLanguage.Japanese => typeof(JapaneseArticleType),
+            ClientLanguage.German => typeof(GermanArticleType),
+            ClientLanguage.French => typeof(FrenchArticleType),
+            _ => typeof(EnglishArticleType)
+        };
+
+        foreach (var articleType in Enum.GetValues(articleTypeEnumType))
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TableHeader($"Person {person}");
+            ImGui.TableHeader(articleType.ToString());
 
-            for (var @case = 1; @case < 6; @case++)
+            for (var _case = 0; _case < numCases; _case++)
             {
                 ImGui.TableNextColumn();
-                var text = _textDecoder.ProcessNoun(language, sheetName, person, _rowId, _amount, @case).ExtractText();
 
-                if (_enableTitleCase)
-                    text = _cultureInfo.TextInfo.ToTitleCase(text);
+                try
+                {
+                    var text = _nounProcessor.ProcessRow(sheetName, (uint)_rowId, language.ToLumina(), _amount, (int)articleType, _case).ExtractText();
 
-                ImGui.TextUnformatted(text);
+                    if (_enableTitleCase)
+                        text = _cultureInfo.TextInfo.ToTitleCase(text);
+
+                    _debugRenderer.DrawCopyableText(text);
+                }
+                catch (Exception ex)
+                {
+                    _debugRenderer.DrawCopyableText(ex.ToString());
+                }
             }
         }
     }

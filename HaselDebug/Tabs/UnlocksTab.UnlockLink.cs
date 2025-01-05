@@ -21,6 +21,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
 
     private readonly DebugRenderer _debugRenderer;
     private readonly ExcelService _excelService;
+    private readonly LanguageProvider _languageProvider;
     private readonly TextService _textService;
     private readonly SeStringEvaluatorService _seStringEvaluatorService;
 
@@ -30,22 +31,24 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
     public UnlocksTabUnlockLinks(
         DebugRenderer debugRenderer,
         ExcelService excelService,
+        LanguageProvider languageProvider,
         TextService textService,
         SeStringEvaluatorService seStringEvaluatorService) : base()
     {
         _debugRenderer = debugRenderer;
         _excelService = excelService;
+        _languageProvider = languageProvider;
         _textService = textService;
         _seStringEvaluatorService = seStringEvaluatorService;
 
-        _textService.LanguageChanged += OnLanguageChanged;
+        _languageProvider.LanguageChanged += OnLanguageChanged;
 
         Update();
     }
 
     public void Dispose()
     {
-        _textService.LanguageChanged -= OnLanguageChanged;
+        _languageProvider.LanguageChanged -= OnLanguageChanged;
         GC.SuppressFinalize(this);
     }
 

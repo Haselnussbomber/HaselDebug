@@ -9,7 +9,7 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class HousingTab(DebugRenderer DebugRenderer, TextService TextService) : DebugTab
+public unsafe class HousingTab(DebugRenderer DebugRenderer, LanguageProvider LanguageProvider) : DebugTab
 {
     public override void Draw()
     {
@@ -128,7 +128,7 @@ public unsafe class HousingTab(DebugRenderer DebugRenderer, TextService TextServ
         ImGui.SameLine();
         DebugRenderer.DrawExdSheet(typeof(TerritoryType), territoryTypeId, 0, new NodeOptions()
         {
-            Language = TextService.ClientLanguage
+            Language = LanguageProvider.ClientLanguage
         });
         ImGui.Separator();
 

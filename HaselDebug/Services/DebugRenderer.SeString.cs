@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
+using System.Xml.Linq;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
@@ -10,6 +11,7 @@ using HaselCommon.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 using ImGuiNET;
+using Lumina.Data;
 using Lumina.Text.Expressions;
 using Lumina.Text.Payloads;
 using Lumina.Text.ReadOnly;
@@ -62,11 +64,11 @@ public unsafe partial class DebugRenderer
         { MacroCode.HeadAll, ["String"] },
         // { MacroCode.Fixed, [] },
         { MacroCode.Lower, ["String"] },
-        { MacroCode.JaNoun, ["SheetName", "Person", "RowId", "Amount", "Case", "UnkInt5"] },
-        { MacroCode.EnNoun, ["SheetName", "Person", "RowId", "Amount", "Case", "UnkInt5"] },
-        { MacroCode.DeNoun, ["SheetName", "Person", "RowId", "Amount", "Case", "UnkInt5"] },
-        { MacroCode.FrNoun, ["SheetName", "Person", "RowId", "Amount", "Case", "UnkInt5"] },
-        { MacroCode.ChNoun, ["SheetName", "Person", "RowId", "Amount", "Case", "UnkInt5"] },
+        { MacroCode.JaNoun, ["SheetName", "ArticleType", "RowId", "Amount", "Case", "UnkInt5"] },
+        { MacroCode.EnNoun, ["SheetName", "ArticleType", "RowId", "Amount", "Case", "UnkInt5"] },
+        { MacroCode.DeNoun, ["SheetName", "ArticleType", "RowId", "Amount", "Case", "UnkInt5"] },
+        { MacroCode.FrNoun, ["SheetName", "ArticleType", "RowId", "Amount", "Case", "UnkInt5"] },
+        { MacroCode.ChNoun, ["SheetName", "ArticleType", "RowId", "Amount", "Case", "UnkInt5"] },
         { MacroCode.LowerHead, ["String"] },
         { MacroCode.ColorType, ["ColorType"] },
         { MacroCode.EdgeColorType, ["ColorType"] },
@@ -296,6 +298,26 @@ public unsafe partial class DebugRenderer
                     ImGui.SameLine();
                     ImGui.TextUnformatted(name);
                 }
+            }
+
+            if (macroCode is MacroCode.JaNoun or MacroCode.EnNoun or MacroCode.DeNoun or MacroCode.FrNoun && idx == 1)
+            {
+                var language = macroCode switch
+                {
+                    MacroCode.JaNoun => Language.Japanese,
+                    MacroCode.DeNoun => Language.German,
+                    MacroCode.FrNoun => Language.French,
+                    _ => Language.English,
+                };
+                var articleTypeEnumType = language switch
+                {
+                    Language.Japanese => typeof(JapaneseArticleType),
+                    Language.German => typeof(GermanArticleType),
+                    Language.French => typeof(FrenchArticleType),
+                    _ => typeof(EnglishArticleType)
+                };
+                ImGui.SameLine();
+                ImGui.TextUnformatted(Enum.GetName(articleTypeEnumType, u32));
             }
 
             // TODO: clickable link to open row in new window :O
