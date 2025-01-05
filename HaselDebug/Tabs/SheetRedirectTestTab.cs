@@ -21,18 +21,65 @@ public unsafe partial struct HaselRaptureTextModule
         ushort* flags);
 }
 
-public unsafe partial class SheetRedirectTestTab(SeStringEvaluatorService seStringEvaluator) : DebugTab
+public unsafe partial class SheetRedirectTestTab(SeStringEvaluatorService seStringEvaluator) : DebugTab, IDisposable
 {
-    public override bool DrawInChild => false;
+    private string _inputSheetName = "Item";
+    private int _inputRowId = 0;
+    private Utf8String* _sheetName = Utf8String.CreateEmpty();
+
+    public void Dispose()
+    {
+        if (_sheetName != null)
+        {
+            _sheetName->Dtor(true);
+            _sheetName = null;
+        }
+
+        GC.SuppressFinalize(this);
+    }
 
     public override void Draw()
     {
+        {
+            ImGui.TextUnformatted("WARNING: This crashes the game if RowId is out of range!");
+
+            ImGui.SetNextItemWidth(300);
+            ImGui.InputText("SheetName", ref _inputSheetName, 255);
+            ImGui.SetNextItemWidth(300);
+            ImGui.InputInt("RowId", ref _inputRowId);
+
+            _sheetName->SetString(_inputSheetName);
+            var rowId1 = (uint)_inputRowId;
+            ushort flags = 0xFFFF;
+            HaselRaptureTextModule.Instance()->ResolveSheetRedirect(_sheetName, &rowId1, &flags);
+            ImGui.TextUnformatted($"{_sheetName->ToString()}#{rowId1}");
+
+            ImGui.SameLine();
+
+            var sheetName2 = _inputSheetName;
+            var rowId2 = (uint)_inputRowId;
+            seStringEvaluator.ResolveSheetRedirect(ref sheetName2, ref rowId2);
+            ImGui.TextUnformatted($"{sheetName2}#{rowId2}");
+
+            ImGui.SameLine();
+
+            var matches = _sheetName->ToString() == sheetName2 && rowId1 == rowId2;
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(matches ? Color.Green : Color.Red)))
+                ImGui.TextUnformatted(matches.ToString());
+        }
+
+        ImGui.Spacing();
+        ImGui.Separator();
+        ImGui.Spacing();
+
+        ImGui.TextUnformatted("To confirm it works, here some examples:");
+
         using var table = ImRaii.Table("SheetRedirectTestTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
         if (!table) return;
 
         ImGui.TableSetupColumn("Input", ImGuiTableColumnFlags.WidthFixed, 200);
-        ImGui.TableSetupColumn("Game", ImGuiTableColumnFlags.WidthFixed, 200);
-        ImGui.TableSetupColumn("Mine", ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupColumn("Native", ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupColumn("C# implementation", ImGuiTableColumnFlags.WidthFixed, 200);
         ImGui.TableSetupColumn("Matches", ImGuiTableColumnFlags.WidthFixed, 50);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
@@ -88,33 +135,27 @@ public unsafe partial class SheetRedirectTestTab(SeStringEvaluatorService seStri
 
     private void PrintRedirect(string sheetName, uint rowId)
     {
-        var sheetName1 = Utf8String.FromString(sheetName);
-        try
-        {
-            ImGui.TableNextRow();
-            ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{sheetName}#{rowId}");
+        _sheetName->SetString(sheetName);
 
-            ImGui.TableNextColumn();
-            var rowId1 = rowId;
-            ushort flags = 0xFFFF;
-            HaselRaptureTextModule.Instance()->ResolveSheetRedirect(sheetName1, &rowId1, &flags);
-            ImGui.TextUnformatted($"{sheetName1->ToString()}#{rowId1}");
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TextUnformatted($"{sheetName}#{rowId}");
 
-            ImGui.TableNextColumn();
-            var sheetName2 = sheetName;
-            var rowId2 = rowId;
-            seStringEvaluator.ResolveSheetRedirect(ref sheetName2, ref rowId2);
-            ImGui.TextUnformatted($"{sheetName2}#{rowId2}");
+        ImGui.TableNextColumn();
+        var rowId1 = rowId;
+        ushort flags = 0xFFFF;
+        HaselRaptureTextModule.Instance()->ResolveSheetRedirect(_sheetName, &rowId1, &flags);
+        ImGui.TextUnformatted($"{_sheetName->ToString()}#{rowId1}");
 
-            ImGui.TableNextColumn();
-            var matches = sheetName1->ToString() == sheetName2 && rowId1 == rowId2;
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(matches ? Color.Green : Color.Red)))
-                ImGui.TextUnformatted(matches.ToString());
-        }
-        finally
-        {
-            sheetName1->Dtor(true);
-        }
+        ImGui.TableNextColumn();
+        var sheetName2 = sheetName;
+        var rowId2 = rowId;
+        seStringEvaluator.ResolveSheetRedirect(ref sheetName2, ref rowId2);
+        ImGui.TextUnformatted($"{sheetName2}#{rowId2}");
+
+        ImGui.TableNextColumn();
+        var matches = _sheetName->ToString() == sheetName2 && rowId1 == rowId2;
+        using (ImRaii.PushColor(ImGuiCol.Text, (uint)(matches ? Color.Green : Color.Red)))
+            ImGui.TextUnformatted(matches.ToString());
     }
 }
