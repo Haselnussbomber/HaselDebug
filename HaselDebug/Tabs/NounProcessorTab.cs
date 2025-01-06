@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using Dalamud.Utility;
-using HaselCommon.Extensions.Dalamud;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Services;
@@ -60,10 +58,8 @@ public class NounProcessorTab : DebugTab
 
     private int _selectedSheetNameIndex = 0;
     private int _selectedLanguageIndex = 0;
-    private CultureInfo _cultureInfo;
     private int _rowId = 1;
     private int _amount = 1;
-    private bool _enableTitleCase = false;
     private static readonly string[] GermanCases = ["Nominative", "Genitive", "Dative", "Accusative"];
 
     public NounProcessorTab(NounProcessor nounProcessor, IDataManager dataManager, IClientState clientState, DebugRenderer debugRenderer)
@@ -75,7 +71,6 @@ public class NounProcessorTab : DebugTab
         _languages = Enum.GetValues<ClientLanguage>();
         _languageNames = Enum.GetNames<ClientLanguage>();
         _selectedLanguageIndex = (int)clientState.ClientLanguage;
-        _cultureInfo = CultureInfo.GetCultureInfo(clientState.ClientLanguage.ToCode());
         _sheetNames = _sheets.Select(kv => kv.Key.Name).Where(name => name != "Attributive").ToArray();
     }
 
@@ -97,7 +92,6 @@ public class NounProcessorTab : DebugTab
         {
             language = _languages[_selectedLanguageIndex];
             _rowId = 1;
-            _cultureInfo = CultureInfo.GetCultureInfo(language.ToCode());
         }
 
         ImGui.SetNextItemWidth(120);
@@ -121,9 +115,6 @@ public class NounProcessorTab : DebugTab
             if (_amount <= 0)
                 _amount = 1;
         }
-
-        ImGui.Checkbox("Title Case###TitleCase", ref _enableTitleCase);
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip("Won't be accurate since C# doesn't care enough for some languages.");
 
         var numCases = language == ClientLanguage.German ? 4 : 1;
         using var table = ImRaii.Table("TextDecoderTable", 1 + numCases, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
@@ -155,12 +146,7 @@ public class NounProcessorTab : DebugTab
 
                 try
                 {
-                    var text = _nounProcessor.ProcessRow(sheetName, (uint)_rowId, language.ToLumina(), _amount, (int)articleType, _case).ExtractText();
-
-                    if (_enableTitleCase)
-                        text = _cultureInfo.TextInfo.ToTitleCase(text);
-
-                    _debugRenderer.DrawCopyableText(text);
+                    _debugRenderer.DrawCopyableText(_nounProcessor.ProcessRow(sheetName, (uint)_rowId, language.ToLumina(), _amount, (int)articleType, _case).ExtractText());
                 }
                 catch (Exception ex)
                 {
