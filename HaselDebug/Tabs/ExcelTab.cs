@@ -192,6 +192,8 @@ public unsafe class ExcelTab : DebugTab
             }
         }
 
+        _filteredAddonRows = addonList.ToArray();
+
         var lobbyList = new List<Lobby>();
 
         for (var i = 0; i < _lobbyRows.Length && !cancellationToken.IsCancellationRequested; i++)
