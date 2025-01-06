@@ -1,10 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [1.12.0] (2025-01-06)
 
-- **Added:** Unlock tabs Quests, Triple Triad Cards.
+- **Added:** Unlock tabs Quests and Triple Triad Cards.
 - **Added:** Excel supports Lobby sheet now. (This is all hardcoded btw, so sadly this is still not a super duper Excel browser and won't be for a while.)
-- **Added:** For my SeStringEvaluatorService I've added support for sheet redirects (It resolves ActStr, ObjStr etc. if you've ever seen those). A tab for testing that has been added.
+- **Added:** For my SeStringEvaluator I've added support for sheet redirects (It resolves ActStr, ObjStr etc. if you've ever seen those). A tab for testing that has been added.
 - **Updated:** Continued work on TextDecoder, now called NounProcessor, in preparations of possible contribution to Lumina, once finished.
   - Renamed to NounProcessor, as it implements the games Noun classes and doesn't actually do any decoding.
   - The Person argument/rows was renamed to ArticleType and every language has its own enum now, because the values have different meanings depending on the language.
@@ -191,7 +191,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.11.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.0...main
+[1.12.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.11.1...v1.12.0
 [1.11.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.10.1...v1.11.0
 [1.10.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.10.0...v1.10.1
