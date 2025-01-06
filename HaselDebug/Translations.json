@@ -39,6 +39,10 @@
     "en": "Copy address",
     "de": "Addresse kopieren"
   },
+  "ContextMenu.OpenInArchive": {
+    "en": "Open in Journal",
+    "de": "Im Archiv öffnen"
+  },
   "ContextMenu.PinnedInstances.Pin": {
     "en": "Pin instance",
     "de": "Instanz anpinnen"

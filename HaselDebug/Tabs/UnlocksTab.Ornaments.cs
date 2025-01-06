@@ -1,16 +1,14 @@
-using System.Numerics;
-using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
-using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
@@ -20,7 +18,7 @@ public unsafe class UnlocksTabOrnaments(
     DebugRenderer DebugRenderer,
     ExcelService ExcelService,
     TextService TextService,
-    TextureService TextureService) : DebugTab, ISubTab<UnlocksTab>
+    UnlocksTabUtils UnlocksTabUtils) : DebugTab, ISubTab<UnlocksTab>
 {
     public override string Title => "Fashion Accessories";
     public override bool DrawInChild => false;
@@ -87,33 +85,13 @@ public unsafe class UnlocksTabOrnaments(
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                 }
 
-                using var tooltip = ImRaii.Tooltip();
-                if (!tooltip) continue;
-
-                using var popuptable = ImRaii.Table("PopupTable", 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
-                if (!popuptable) continue;
-
-                ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 40 + ImGui.GetStyle().ItemInnerSpacing.X);
-                ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, 300);
-
-                ImGui.TableNextColumn(); // Icon
-                TextureService.DrawIcon((uint)row.Icon, 40);
-
-                ImGui.TableNextColumn(); // Text
-                using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, ImGui.GetStyle().ItemInnerSpacing.X);
-                using var indent = ImRaii.PushIndent(1);
-
-                ImGui.TextUnformatted(name);
-
-                if (ExcelService.TryGetRow<OrnamentTransient>(row.RowId, out var transient))
-                {
-                    // separator
-                    var pos = ImGui.GetCursorScreenPos();
-                    ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
-                    ImGuiUtils.PushCursorY(4);
-
-                    ImGuiHelpers.SafeTextWrapped(transient.Unknown0.ExtractText().StripSoftHypen());
-                }
+                UnlocksTabUtils.DrawTooltip(
+                    row.Icon,
+                    name,
+                    null,
+                    ExcelService.TryGetRow<OrnamentTransient>(row.RowId, out var transient) && !transient.Unknown0.IsEmpty
+                        ? transient.Unknown0.ExtractText().StripSoftHypen()
+                        : null);
             }
         }
     }

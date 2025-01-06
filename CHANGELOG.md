@@ -2,13 +2,14 @@
 
 ## [Unreleased]
 
+- **Added:** Unlock tabs Quests, Triple Triad Cards.
 - **Added:** Excel supports Lobby sheet now. (This is all hardcoded btw, so sadly this is still not a super duper Excel browser and won't be for a while.)
 - **Added:** For my SeStringEvaluatorService I've added support for sheet redirects (It resolves ActStr, ObjStr etc. if you've ever seen those). A tab for testing that has been added.
 - **Updated:** Continued work on TextDecoder, now called NounProcessor, in preparations of possible contribution to Lumina, once finished.
   - Renamed to NounProcessor, as it implements the games Noun classes and doesn't actually do any decoding.
   - The Person argument/rows was renamed to ArticleType and every language has its own enum now, because the values have different meanings depending on the language.
   - Grammatical cases are only valid for the German language, so the columns were removed when displaying other languages.
-- **Updated:** ClientStructs now at [f26035a](https://github.com/aers/FFXIVClientStructs/tree/b3e539ab) ([compare](https://github.com/aers/FFXIVClientStructs/compare/7ba7ab4..b3e539ab)).
+- **Updated:** ClientStructs now at [f26035a](https://github.com/aers/FFXIVClientStructs/tree/fb4dfc09) ([compare](https://github.com/aers/FFXIVClientStructs/compare/7ba7ab4..fb4dfc09)).
 
 ## [1.11.1] (2025-01-03)
 

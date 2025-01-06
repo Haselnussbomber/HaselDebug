@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Numerics;
+using System.Xml.Linq;
 using Dalamud.Interface.GameFonts;
 using Dalamud.Interface.ManagedFontAtlas;
+using Dalamud.Interface.Textures;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin;
@@ -9,6 +12,8 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using HaselCommon.Extensions.Sheets;
 using HaselCommon.Game.Enums;
+using HaselCommon.Graphics;
+using HaselCommon.Gui;
 using HaselCommon.Services;
 using ImGuiNET;
 using Lumina.Data.Files;
@@ -195,7 +200,9 @@ public unsafe class UnlocksTabUtils(
                     {
                         var iconPath = TextureProvider.GetIconPath(pictureId);
                         if (string.IsNullOrEmpty(iconPath))
+                        {
                             _iconSizeCache.Add(pictureId, null);
+                        }
                         else
                         {
                             var file = DataManager.GetFile<TexFile>(iconPath);
@@ -259,5 +266,55 @@ public unsafe class UnlocksTabUtils(
         }
 
         return clicked;
+    }
+
+    public void DrawTooltip(uint iconId, string title, string? category = null, string? description = null)
+    {
+        if (!TextureProvider.TryGetFromGameIcon(iconId, out var tex) || !tex.TryGetWrap(out var texture, out _))
+            return;
+
+        DrawTooltip(texture, title, category, description);
+    }
+
+    public void DrawTooltip(IDalamudTextureWrap icon, string title, string? category = null, string? description = null)
+    {
+        using var tooltip = ImRaii.Tooltip();
+        if (!tooltip) return;
+
+        using var popuptable = ImRaii.Table("PopupTable", 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
+        if (!popuptable) return;
+
+        var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing;
+
+        ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 40 + itemInnerSpacing.X);
+        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300));
+
+        ImGui.TableNextColumn(); // Icon
+        ImGui.Image(icon.ImGuiHandle, new Vector2(40));
+
+        ImGui.TableNextColumn(); // Text
+        using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
+        using var indent = ImRaii.PushIndent(1);
+
+        ImGui.TextUnformatted(title);
+
+        if (!string.IsNullOrEmpty(category))
+        {
+            ImGuiUtils.PushCursorY(-3);
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)Color.Grey))
+                ImGui.TextUnformatted(category);
+        }
+
+        if (!string.IsNullOrEmpty(description))
+        {
+            ImGuiUtils.PushCursorY(1);
+
+            // separator
+            var pos = ImGui.GetCursorScreenPos();
+            ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
+            ImGuiUtils.PushCursorY(4);
+
+            ImGuiHelpers.SafeTextWrapped(description);
+        }
     }
 }
