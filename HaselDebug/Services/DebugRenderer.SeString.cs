@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
-using System.Xml.Linq;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
