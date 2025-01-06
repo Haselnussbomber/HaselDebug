@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.12.1] (2025-01-06)
+
+- **Added:** A checkbox in the Unlock Links tab to filter CharaMakeCustomize rows, displaying only those that are usable by the currently logged-in character.
+- **Fixed:** Forgot to update the version number last release and the CS version had the wrong text (it's at fb4dfc09, as linked).
+
 ## [1.12.0] (2025-01-06)
 
 - **Added:** Unlock tabs Quests and Triple Triad Cards.
@@ -191,7 +196,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.1...main
+[1.12.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.0...v1.12.1
 [1.12.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.11.1...v1.12.0
 [1.11.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.10.1...v1.11.0
