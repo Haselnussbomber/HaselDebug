@@ -251,7 +251,6 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
         }
     }
 
-    // TODO: i really should make this a reusable component
     private void DrawRewardItem(Item item)
     {
         DrawIconWithTooltip(
