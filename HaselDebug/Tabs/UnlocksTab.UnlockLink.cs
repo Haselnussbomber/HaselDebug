@@ -6,6 +6,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
+using HaselCommon.Sheets;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -17,16 +18,16 @@ namespace HaselDebug.Tabs;
 
 public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisposable
 {
-    private (uint Index, HashSet<UnlockEntry> Unlocks)[] UnlockLinks = [];
-
     private readonly DebugRenderer _debugRenderer;
     private readonly ExcelService _excelService;
     private readonly LanguageProvider _languageProvider;
     private readonly TextService _textService;
     private readonly SeStringEvaluatorService _seStringEvaluatorService;
 
+    private (uint Index, HashSet<UnlockEntry> Unlocks)[] UnlockLinks = [];
+    private bool _personalCharaMakeCustomizeOnly = true;
+
     public override string Title => "Unlock Links";
-    public override bool DrawInChild => false;
 
     public UnlocksTabUnlockLinks(
         DebugRenderer debugRenderer,
@@ -59,6 +60,11 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
 
     public override void Draw()
     {
+        var uiState = UIState.Instance();
+
+        if (uiState->PlayerState.IsLoaded == 1 && ImGui.Checkbox("Only show CharaMakeCustomize rows usable on current character", ref _personalCharaMakeCustomizeOnly))
+            Update();
+
         using var table = ImRaii.Table("UnlockLinksTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
@@ -68,7 +74,6 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
         ImGui.TableSetupScrollFreeze(3, 1);
         ImGui.TableHeadersRow();
 
-        var uiState = UIState.Instance();
         foreach (var (id, entries) in UnlockLinks)
         {
             ImGui.TableNextRow();
@@ -105,6 +110,12 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
     private void Update()
     {
         var dict = new Dictionary<uint, HashSet<UnlockEntry>>();
+
+        var playerState = PlayerState.Instance();
+
+        var isLoggedIn = playerState->IsLoaded == 1;
+        var tribeId = isLoggedIn ? playerState->Tribe : 1;
+        var sexId = isLoggedIn ? playerState->Sex : 1;
 
         foreach (var row in _excelService.GetSheet<GeneralAction>())
         {
@@ -209,9 +220,15 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
             }
         }
 
+        HairMakeTypeCustom hairMakeType = default;
+        var hasFoundHairMakeType = isLoggedIn && _excelService.TryFindRow(t => t.HairMakeType.Tribe.RowId == tribeId && t.HairMakeType.Gender == sexId, out hairMakeType);
+
         foreach (var row in _excelService.GetSheet<CharaMakeCustomize>())
         {
             if (!row.IsPurchasable)
+                continue;
+
+            if (isLoggedIn && _personalCharaMakeCustomizeOnly && hasFoundHairMakeType && !hairMakeType.HairStyles.Any(h => h.RowId == row.RowId))
                 continue;
 
             if (!dict.TryGetValue(row.Data, out var names))
