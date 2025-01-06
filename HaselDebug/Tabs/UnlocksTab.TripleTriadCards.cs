@@ -5,15 +5,28 @@ using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using HaselDebug.Windows.ItemTooltips;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-public unsafe class UnlocksTabTripleTriadCards(DebugRenderer DebugRenderer, ExcelService ExcelService) : DebugTab, ISubTab<UnlocksTab>
+public unsafe class UnlocksTabTripleTriadCards(
+    DebugRenderer DebugRenderer,
+    ExcelService ExcelService,
+    MapService MapService,
+    TextureService TextureService,
+    TripleTriadNumberFontManager TripleTriadNumberFontManager) : DebugTab, ISubTab<UnlocksTab>, IDisposable
 {
+    private TripleTriadCardTooltip? TripleTriadCardTooltip;
+
     public override string Title => "Triple Triad Cards";
     public override bool DrawInChild => false;
+
+    public void Dispose()
+    {
+        TripleTriadCardTooltip?.Dispose();
+    }
 
     public override void Draw()
     {
@@ -30,7 +43,7 @@ public unsafe class UnlocksTabTripleTriadCards(DebugRenderer DebugRenderer, Exce
 
         foreach (var row in ExcelService.GetSheet<TripleTriadCard>())
         {
-            if (row.RowId == 0)
+            if (row.RowId == 0 || !ExcelService.TryGetRow<TripleTriadCardResident>(row.RowId, out var resident))
                 continue;
 
             ImGui.TableNextRow();
@@ -45,7 +58,28 @@ public unsafe class UnlocksTabTripleTriadCards(DebugRenderer DebugRenderer, Exce
 
             ImGui.TableNextColumn(); // Name
             DebugRenderer.DrawIcon(88000 + row.RowId);
-            ImGui.TextUnformatted(row.Name.ExtractText());
+            var hasLevel = resident.Location.TryGetValue<Level>(out var level);
+            using (Color.Transparent.Push(ImGuiCol.HeaderActive, !hasLevel))
+            using (Color.Transparent.Push(ImGuiCol.HeaderHovered, !hasLevel))
+            {
+                if (ImGui.Selectable(row.Name.ExtractText()))
+                {
+                    if (hasLevel)
+                    {
+                        MapService.OpenMap(level);
+                    }
+                }
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                using var tooltip = ImRaii.Tooltip();
+                TripleTriadCardTooltip ??= new TripleTriadCardTooltip(TextureService, ExcelService, TripleTriadNumberFontManager);
+                TripleTriadCardTooltip?.SetCard(row.RowId);
+                TripleTriadCardTooltip?.CalculateLayout();
+                TripleTriadCardTooltip?.Update();
+                TripleTriadCardTooltip?.Draw();
+            }
         }
     }
 }

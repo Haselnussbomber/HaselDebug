@@ -62,6 +62,7 @@ public class Plugin : IDalamudPlugin
             .AddSingleton<InstancesService>()
             .AddSingleton<PinnedInstancesService>()
             .AddSingleton<UnlocksTabUtils>()
+            .AddSingleton<TripleTriadNumberFontManager>()
             .AddIServices<IDebugTab>()
             .AddSubTabs()
             .AddSingleton<PluginWindow>()
