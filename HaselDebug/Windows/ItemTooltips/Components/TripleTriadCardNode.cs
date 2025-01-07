@@ -23,40 +23,49 @@ public class TripleTriadCardNode : Node
     {
         _textureService = textureService;
 
-        Width = 208;
-        Height = 256;
         JustifyContent = YGJustify.SpaceBetween;
+        PositionType = YGPositionType.Relative;
 
         Add(new Node()
         {
-            Margin = YGValue.Percent(4),
+            PositionType = YGPositionType.Absolute,
+            Width = YGValue.Percent(100),
+            Height = YGValue.Percent(25),
+            Padding = YGValue.Percent(6),
             FlexDirection = YGFlexDirection.Row,
             JustifyContent = YGJustify.SpaceBetween,
             Children = [
                 _cardStars = new TripleTriadCardStars(textureService)
                 {
-                    Margin = YGValue.Percent(2),
+                    FlexGrow = 1,
+                    Overflow = YGOverflow.Hidden,
                 },
                 _cardType = new UldImage()
                 {
+                    AlignSelf = YGAlign.FlexStart,
                     UldName = "CardTripleTriad",
                     PartListId = 1,
                     PartIndex = 1,
                     Scale = 0.75f,
-                    Display = YGDisplay.None
+                    Display = YGDisplay.None,
+                    Overflow = YGOverflow.Hidden
                 }
             ]
         });
 
         Add(_cardNumbers = new TripleTriadCardNumbers(tripleTriadNumberFontManager)
         {
-            Display = YGDisplay.None,
-            AlignSelf = YGAlign.Center,
-            MarginBottom = YGValue.Percent(4)
+            Display = YGDisplay.None
         });
     }
 
-    internal void SetCard(uint cardRowId, TripleTriadCard cardRow, TripleTriadCardResident cardResident)
+    public override void ApplyGlobalScale(float globalFontScale)
+    {
+        Width = 208 * globalFontScale;
+        Height = 256 * globalFontScale;
+    }
+
+    internal void SetCard(uint cardRowId, TripleTriadCardResident cardResident)
     {
         var cardSizeScaled = ImGuiHelpers.ScaledVector2(208, 256);
         Width = cardSizeScaled.X;
@@ -67,8 +76,11 @@ public class TripleTriadCardNode : Node
 
         _cardStars.Stars = cardRarity.Stars;
 
-        _cardType.Display = cardResident.TripleTriadCardType.RowId != 0 ? YGDisplay.Flex : YGDisplay.None;
-        _cardType.PartIndex = cardResident.TripleTriadCardType.RowId + 2;
+        _cardType.Display = cardResident.TripleTriadCardType.RowId != 0? YGDisplay.Flex : YGDisplay.None;
+        _cardType.PartIndex = cardResident.TripleTriadCardType.RowId switch {
+            4 => 2,
+            _ => cardResident.TripleTriadCardType.RowId + 2
+        };
 
         _cardNumbers.SetCard(cardResident);
         _cardNumbers.Display = YGDisplay.Flex;

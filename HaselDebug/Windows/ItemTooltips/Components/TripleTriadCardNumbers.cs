@@ -5,16 +5,29 @@ using HaselCommon.Gui.Yoga;
 using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
+using YogaSharp;
 
 namespace HaselDebug.Windows.ItemTooltips.Components;
 
-public class TripleTriadCardNumbers(TripleTriadNumberFontManager tripleTriadNumberFontManager) : Node()
+public class TripleTriadCardNumbers : Node
 {
     private TripleTriadCardResident _card;
     private string _textTop = string.Empty;
     private string _textBottom = string.Empty;
     private string _textRight = string.Empty;
     private string _textLeft = string.Empty;
+    private readonly TripleTriadNumberFontManager tripleTriadNumberFontManager;
+
+    public TripleTriadCardNumbers(TripleTriadNumberFontManager tripleTriadNumberFontManager) : base()
+    {
+        this.tripleTriadNumberFontManager = tripleTriadNumberFontManager;
+
+        PositionType = YGPositionType.Absolute;
+        PositionTop = YGValue.Percent(75);
+        Width = YGValue.Percent(100);
+        Height = YGValue.Percent(25);
+        Overflow = YGOverflow.Hidden;
+    }
 
     public void SetCard(TripleTriadCardResident card)
     {
@@ -37,12 +50,8 @@ public class TripleTriadCardNumbers(TripleTriadNumberFontManager tripleTriadNumb
         using var font = tripleTriadNumberFontManager.GetFont().Push();
 
         var letterSize = ImGui.CalcTextSize("A");
-        Width = letterSize.X * 2;
-        Height = letterSize.Y * 2;
-
-        var pos = AbsolutePosition;
-        var scale = 2.25f;
-        var scaledLetterSize = letterSize / scale;
+        var scaledLetterSize = letterSize / 2.25f;
+        var pos = ComputedSize / 2f - letterSize;
 
         var positionTop = pos + new Vector2(scaledLetterSize.X, -scaledLetterSize.Y);
         var positionBottom = pos + new Vector2(scaledLetterSize.X, scaledLetterSize.Y);
@@ -62,7 +71,7 @@ public class TripleTriadCardNumbers(TripleTriadNumberFontManager tripleTriadNumb
 
     private static void DrawTextShadow(Vector2 position, string text)
     {
-        DrawShadow(ImGui.GetWindowPos() + position, ImGui.CalcTextSize(text), 8, Color.Black with { A = 0.1f });
+        DrawShadow(position, ImGui.CalcTextSize(text), 8, Color.Black with { A = 0.1f });
     }
 
     private static void DrawText(Vector2 position, string text)

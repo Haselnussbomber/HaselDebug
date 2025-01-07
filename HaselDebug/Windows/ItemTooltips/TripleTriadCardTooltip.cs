@@ -50,6 +50,6 @@ public class TripleTriadCardTooltip : Node
         _cardRowId = cardId;
 
         _infoLine.Text = $"{(cardResident.TripleTriadCardRarity.RowId == 5 ? "Ex" : "No")}. {cardResident.Order} - {cardRow.Name}";
-        _card.SetCard(_cardRowId, cardRow, cardResident);
+        _card.SetCard(_cardRowId, cardResident);
     }
 }

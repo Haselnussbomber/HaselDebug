@@ -14,7 +14,7 @@ public class TripleTriadCardStars(TextureService textureService) : Node()
     {
         var starSize = 32 * 0.75f * ImGuiHelpers.GlobalScale;
         var starRadius = starSize / 1.666f;
-        var starCenter = AbsolutePosition + new Vector2(ComputedMarginLeft, ComputedMarginTop) + new Vector2(starSize) / 2f;
+        var starCenter = new Vector2(ComputedMarginLeft, ComputedMarginTop) + new Vector2(starSize) / 2f;
 
         void DrawStar(StarPosition pos)
         {
