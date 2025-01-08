@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.12.2] (2025-01-08)
+
+- **Added:** Excel tab now also has support for AddonTransient sheet.
+- **Fixed:** Info on Triple Triad Card tooltips didn't render correctly.
+
 ## [1.12.1] (2025-01-06)
 
 - **Added:** A checkbox in the Unlock Links tab to filter CharaMakeCustomize rows, displaying only those that are usable by the currently logged-in character.
@@ -196,7 +201,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.2...main
+[1.12.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.1...v1.12.2
 [1.12.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.0...v1.12.1
 [1.12.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.11.1...v1.12.0
 [1.11.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.11.0...v1.11.1
