@@ -21,6 +21,11 @@ public class TabPopoutWindow(WindowManager wm, IDrawableTab tab) : SimpleWindow(
         };
     }
 
+    public override bool DrawConditions()
+    {
+        return true;
+    }
+
     public override void Draw()
     {
         tab.Draw();

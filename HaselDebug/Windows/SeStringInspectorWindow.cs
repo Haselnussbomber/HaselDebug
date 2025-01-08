@@ -53,6 +53,11 @@ public class SeStringInspectorWindow(
             WindowManager.Close<SeStringInspectorWindow>();
     }
 
+    public override bool DrawConditions()
+    {
+        return true;
+    }
+
     public override void Draw()
     {
         LocalParameters ??= GetLocalParameters(SeString.AsSpan(), []);

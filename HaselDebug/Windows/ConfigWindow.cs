@@ -28,6 +28,11 @@ public class ConfigWindow : SimpleWindow
         SizeCondition = ImGuiCond.Appearing;
     }
 
+    public override bool DrawConditions()
+    {
+        return true;
+    }
+
     public override void Draw()
     {
         var configChanged = false;

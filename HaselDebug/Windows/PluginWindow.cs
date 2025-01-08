@@ -93,6 +93,11 @@ public class PluginWindow : SimpleWindow
         DebugRenderer.ParseCSDocs();
     }
 
+    public override bool DrawConditions()
+    {
+        return true;
+    }
+
     public override void Draw()
     {
         DrawSidebar();
