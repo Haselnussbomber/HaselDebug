@@ -332,7 +332,7 @@ public unsafe partial class DebugRenderer
 
         if (ImGui.IsItemHovered())
         {
-            if (type == typeof(ILayoutInstance) || Inherits<ILayoutInstance>(type))
+            if (Inherits<ILayoutInstance>(type))
             {
                 var inst = (ILayoutInstance*)address;
                 if (inst != null)
@@ -344,7 +344,7 @@ public unsafe partial class DebugRenderer
                     }
                 }
             }
-            else if (type == typeof(GameObject) || Inherits<GameObject>(type))
+            else if (Inherits<GameObject>(type))
             {
                 var gameObject = (GameObject*)address;
                 if (gameObject != null)
@@ -473,7 +473,7 @@ public unsafe partial class DebugRenderer
             }
 
             // AtkUnitBase.AtkValues
-            if ((type == typeof(AtkUnitBase) || type.GetCustomAttribute<InheritsAttribute<AtkUnitBase>>() != null) && fieldType == typeof(AtkValue*) && fieldInfo.Name == "AtkValues")
+            if (Inherits<AtkUnitBase>(type) && fieldType == typeof(AtkValue*) && fieldInfo.Name == "AtkValues")
             {
                 DrawFieldName(fieldInfo);
                 DrawAtkValues(*(AtkValue**)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, fieldNodeOptions);
