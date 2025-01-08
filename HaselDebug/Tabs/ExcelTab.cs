@@ -25,12 +25,17 @@ public unsafe class ExcelTab : DebugTab
     private readonly TextService _textService;
     private readonly ExcelModule _excelModule;
     private readonly DebugRenderer _debugRenderer;
+
     private Addon[] _addonRows;
+    private AddonTransient[] _addonTransientRows;
     private Lobby[] _lobbyRows;
     private LogMessage[] _logMessageRows;
+
     private Addon[]? _filteredAddonRows;
+    private AddonTransient[]? _filteredAddonTransientRows;
     private Lobby[]? _filteredLobbyRows;
     private LogMessage[]? _filteredLogMessageRows;
+
     private CancellationTokenSource? _filterCTS;
     private string _searchTerm = string.Empty;
     private ClientLanguage _selectedLanguage;
@@ -48,6 +53,7 @@ public unsafe class ExcelTab : DebugTab
 
         _selectedLanguage = _languageProvider.ClientLanguage;
         _addonRows = _excelModule.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
+        _addonTransientRows = _excelModule.GetSheet<AddonTransient>(_selectedLanguage.ToLumina()).ToArray();
         _lobbyRows = _excelModule.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
         _logMessageRows = _excelModule.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
     }
@@ -72,6 +78,7 @@ public unsafe class ExcelTab : DebugTab
                     {
                         _selectedLanguage = value;
                         _addonRows = _excelModule.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
+                        _addonTransientRows = _excelModule.GetSheet<AddonTransient>(_selectedLanguage.ToLumina()).ToArray();
                         _lobbyRows = _excelModule.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
                         _logMessageRows = _excelModule.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
                         listDirty |= true;
@@ -90,6 +97,7 @@ public unsafe class ExcelTab : DebugTab
         if (!tabBar) return;
 
         DrawAddonTab();
+        DrawAddonTransientTab();
         DrawLobbyTab();
         DrawLogMessageTab();
     }
@@ -117,6 +125,31 @@ public unsafe class ExcelTab : DebugTab
         ImGui.TableHeadersRow();
 
         ImGuiClip.ClippedDraw(_filteredAddonRows ?? _addonRows, DrawAddonRow, ImGui.GetTextLineHeightWithSpacing());
+    }
+
+    public void DrawAddonTransientTab()
+    {
+        var tabTitle = "AddonTransient";
+
+        if (!string.IsNullOrWhiteSpace(_searchTerm) && _filteredAddonTransientRows != null)
+        {
+            tabTitle = $"{tabTitle} ({_filteredAddonTransientRows.Length})";
+        }
+
+        using var tab = ImRaii.TabItem(tabTitle + "###AddonTransientTab");
+        if (!tab) return;
+
+        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
+
+        using var table = ImRaii.Table("RowTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        if (!table) return;
+
+        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupScrollFreeze(2, 1);
+        ImGui.TableHeadersRow();
+
+        ImGuiClip.ClippedDraw(_filteredAddonTransientRows ?? _addonTransientRows, DrawAddonTransientRow, ImGui.GetTextLineHeightWithSpacing());
     }
 
     public void DrawLobbyTab()
@@ -174,6 +207,7 @@ public unsafe class ExcelTab : DebugTab
         if (string.IsNullOrWhiteSpace(_searchTerm))
         {
             _filteredAddonRows = null;
+            _filteredAddonTransientRows = null;
             _filteredLobbyRows = null;
             _filteredLogMessageRows = null;
             return;
@@ -193,6 +227,21 @@ public unsafe class ExcelTab : DebugTab
         }
 
         _filteredAddonRows = addonList.ToArray();
+
+        var addonTransientList = new List<AddonTransient>();
+
+        for (var i = 0; i < _addonTransientRows.Length && !cancellationToken.IsCancellationRequested; i++)
+        {
+            var row = _addonTransientRows[i];
+            if (row.RowId.ToString().Contains(_searchTerm)
+             || row.Unknown0.ToString().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase)
+             || row.Unknown0.ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
+            {
+                addonTransientList.Add(row);
+            }
+        }
+
+        _filteredAddonTransientRows = addonTransientList.ToArray();
 
         var lobbyList = new List<Lobby>();
 
@@ -238,6 +287,23 @@ public unsafe class ExcelTab : DebugTab
             AddressPath = new AddressPath((nint)row.RowId),
             RenderSeString = false,
             Title = $"Addon#{row.RowId} ({_selectedLanguage})",
+            Language = _selectedLanguage
+        });
+    }
+
+    private void DrawAddonTransientRow(AddonTransient row)
+    {
+        ImGui.TableNextRow();
+
+        ImGui.TableNextColumn(); // RowId
+        ImGui.TextUnformatted(row.RowId.ToString());
+
+        ImGui.TableNextColumn(); // Text
+        _debugRenderer.DrawSeString(row.Unknown0.AsSpan(), new NodeOptions()
+        {
+            AddressPath = new AddressPath((nint)row.RowId),
+            RenderSeString = false,
+            Title = $"AddonTransient#{row.RowId} ({_selectedLanguage})",
             Language = _selectedLanguage
         });
     }
