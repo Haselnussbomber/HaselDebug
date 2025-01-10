@@ -1,5 +1,4 @@
 using Dalamud.Interface.Utility.Raii;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using HaselCommon.Gui;
@@ -73,14 +72,7 @@ public unsafe class ObjectTableTab(
             ImGui.TableNextColumn(); // Name
             DebugRenderer.DrawPointerType(
                 gameObject,
-                objectKind switch
-                {
-                    ObjectKind.Pc or ObjectKind.EventNpc or ObjectKind.BattleNpc => typeof(BattleChara),
-                    ObjectKind.Ornament => typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Ornament),
-                    ObjectKind.GatheringPoint => typeof(GatheringPointObject),
-                    ObjectKind.HousingEventObject => typeof(HousingObject),
-                    _ => typeof(GameObject),
-                },
+                typeof(GameObject),
                 new NodeOptions()
                 {
                     AddressPath = new AddressPath((nint)gameObject),

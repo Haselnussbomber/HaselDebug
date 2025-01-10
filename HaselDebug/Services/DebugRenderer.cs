@@ -156,6 +156,40 @@ public unsafe partial class DebugRenderer
                     break;
             }
         }
+        else if (type == typeof(GameObject))
+        {
+            switch (((GameObject*)address)->ObjectKind)
+            {
+                case ObjectKind.Pc:
+                case ObjectKind.BattleNpc:
+                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara);
+                    break;
+                case ObjectKind.EventNpc:
+                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Character);
+                    break;
+                case ObjectKind.Treasure:
+                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.Treasure);
+                    break;
+                case ObjectKind.Aetheryte:
+                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.Aetheryte);
+                    break;
+                case ObjectKind.GatheringPoint:
+                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.GatheringPointObject);
+                    break;
+                case ObjectKind.EventObj:
+                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.EventObject);
+                    break;
+                case ObjectKind.HousingEventObject:
+                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.HousingObject);
+                    break;
+                case ObjectKind.MjiObject:
+                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.MJIObject);
+                    break;
+                case ObjectKind.Ornament:
+                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Ornament);
+                    break;
+            }
+        }
 
         if (type.IsPointer)
         {
