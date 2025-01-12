@@ -10,11 +10,11 @@ namespace HaselDebug.Tabs.UnlocksTabs;
 [RegisterSingleton]
 public class TitlesTable : Table<Title>
 {
+    private readonly ExcelService _excelService;
+
     public TitlesTable(ExcelService excelService, LanguageProvider languageProvider) : base("TitlesTable", languageProvider)
     {
-        Rows = excelService.GetSheet<Title>()
-            .Where(row => row.RowId != 0 && !row.Feminine.IsEmpty && !row.Masculine.IsEmpty)
-            .ToList();
+        _excelService = excelService;
 
         Columns = [
             new RowIdColumn() {
@@ -35,5 +35,12 @@ public class TitlesTable : Table<Title>
             new TitleColumn(true),
             new TitleColumn(false),
         ];
+    }
+
+    protected override void LoadRows()
+    {
+        Rows = _excelService.GetSheet<Title>()
+            .Where(row => row.RowId != 0 && !row.Feminine.IsEmpty && !row.Masculine.IsEmpty)
+            .ToList();
     }
 }

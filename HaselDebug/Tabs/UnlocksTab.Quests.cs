@@ -9,7 +9,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Extensions.Sheets;
 using HaselCommon.Extensions.Strings;
-using HaselCommon.Game.Enums;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
@@ -65,11 +64,7 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
 
         _languageProvider.LanguageChanged += OnLanguageChanged;
 
-        _quests = _excelService.GetSheet<Quest>().Skip(1).Where(quest =>
-        {
-            return quest.Reward.Any(rew => rew.TryGetValue<Item>(out var item) && item.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard)
-            || quest.OptionalItemReward.Any(item => item.Value.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard);
-        }).ToArray();
+        _quests = _excelService.GetSheet<Quest>().Skip(1).ToArray();
     }
 
     public void Dispose()
