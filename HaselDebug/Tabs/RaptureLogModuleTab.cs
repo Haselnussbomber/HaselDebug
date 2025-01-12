@@ -3,10 +3,12 @@ using Dalamud.Game.Text.SeStringHandling;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class RaptureLogModuleTab : DebugTab
 {
     private string _input = "";

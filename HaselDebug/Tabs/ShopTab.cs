@@ -1,10 +1,12 @@
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class ShopTab(DebugRenderer DebugRenderer) : DebugTab
 {
     [StructLayout(LayoutKind.Explicit)]

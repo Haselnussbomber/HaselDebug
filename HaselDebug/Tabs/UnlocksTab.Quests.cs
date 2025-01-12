@@ -2,12 +2,14 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Game.Text;
 using Dalamud.Interface.Textures;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Extensions.Sheets;
 using HaselCommon.Extensions.Strings;
+using HaselCommon.Game.Enums;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
@@ -15,12 +17,14 @@ using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
+using HaselDebug.Windows.ItemTooltips;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 using InstanceContent = Lumina.Excel.Sheets.InstanceContent;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposable
 {
     private readonly DebugRenderer _debugRenderer;
@@ -31,7 +35,10 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
     private readonly TextService _textService;
     private readonly LanguageProvider _languageProvider;
     private readonly UnlocksTabUtils _unlocksTabUtils;
+    private readonly TextureService _textureService;
+    private readonly TripleTriadNumberFontManager _tripleTriadNumberFontManager;
     private Quest[] _quests;
+    private TripleTriadCardTooltip? _tripleTriadCardTooltip;
 
     public UnlocksTabQuests(
         DebugRenderer DebugRenderer,
@@ -41,7 +48,9 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
         ITextureProvider TextureProvider,
         TextService TextService,
         LanguageProvider LanguageProvider,
-        UnlocksTabUtils UnlocksTabUtils)
+        UnlocksTabUtils UnlocksTabUtils,
+        TextureService TextureService,
+        TripleTriadNumberFontManager tripleTriadNumberFontManager)
     {
         _debugRenderer = DebugRenderer;
         _excelService = ExcelService;
@@ -51,15 +60,24 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
         _textService = TextService;
         _languageProvider = LanguageProvider;
         _unlocksTabUtils = UnlocksTabUtils;
+        _textureService = TextureService;
+        _tripleTriadNumberFontManager = tripleTriadNumberFontManager;
 
         _languageProvider.LanguageChanged += OnLanguageChanged;
 
-        _quests = _excelService.GetSheet<Quest>().Skip(1).ToArray();
+        _quests = _excelService.GetSheet<Quest>().Skip(1).Where(quest =>
+        {
+            return quest.Reward.Any(rew => rew.TryGetValue<Item>(out var item) && item.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard)
+            || quest.OptionalItemReward.Any(item => item.Value.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard);
+        }).ToArray();
     }
 
     public void Dispose()
     {
         _languageProvider.LanguageChanged -= OnLanguageChanged;
+        _tripleTriadCardTooltip?.Dispose();
+        _tripleTriadCardTooltip = null;
+        GC.SuppressFinalize(this);
     }
 
     private void OnLanguageChanged(string langCode)
@@ -72,15 +90,19 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
 
     public override void Draw()
     {
-        using var table = ImRaii.Table("QuestsTable", 6, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("QuestsTable7", 10, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("QuestId", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Completed", ImGuiTableColumnFlags.WidthFixed, 60);
+        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale);
+        ImGui.TableSetupColumn("QuestId", ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale);
+        ImGui.TableSetupColumn("Completed", ImGuiTableColumnFlags.WidthFixed, 60 * ImGuiHelpers.GlobalScale);
         ImGui.TableSetupColumn("Name");
+        ImGui.TableSetupColumn("Currency Reward", ImGuiTableColumnFlags.WidthFixed, 70 * ImGuiHelpers.GlobalScale);
+        ImGui.TableSetupColumn("Emote Reward", ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale);
+        ImGui.TableSetupColumn("Instance Unlock", ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale);
         ImGui.TableSetupColumn("Rewards");
-        ImGui.TableSetupColumn("Gil Reward", ImGuiTableColumnFlags.WidthFixed, 90);
+        ImGui.TableSetupColumn("Optional Rewards");
+        ImGui.TableSetupColumn("Gil Reward", ImGuiTableColumnFlags.WidthFixed, 90 * ImGuiHelpers.GlobalScale);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
@@ -156,9 +178,7 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
             builder.AddOpenOnGarlandTools("quest", row.RowId);
         });
 
-        ImGui.TableNextColumn(); // Rewards
-
-        var hasDrawnReward = false;
+        ImGui.TableNextColumn(); // Currency Reward
 
         if (row.CurrencyReward.RowId > 0 && row.CurrencyRewardCount != 0 && row.CurrencyReward.Value.ItemUICategory.RowId != 0)
         {
@@ -166,32 +186,27 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
             ImGui.TextUnformatted($"{row.CurrencyRewardCount}x");
             ImGui.SameLine(0, 3);
             DrawRewardItem(row.CurrencyReward.Value);
-
-            hasDrawnReward = true;
         }
+
+        ImGui.TableNextColumn(); // Emote Reward
 
         if (row.EmoteReward.RowId > 0)
         {
-            if (hasDrawnReward)
-                ImGui.SameLine();
-
             using var id = ImRaii.PushId($"Quest{row.Id}Emote");
             DrawRewardEmote(row.EmoteReward.Value);
-
-            hasDrawnReward = true;
         }
+
+        ImGui.TableNextColumn(); // Instance Unlock
 
         if (row.InstanceContentUnlock.RowId > 0)
         {
-            if (hasDrawnReward)
-                ImGui.SameLine();
-
             using var id = ImRaii.PushId($"Quest{row.Id}InstanceContent");
             DrawRewardInstanceContentUnlock(row.InstanceContentUnlock.Value);
-
-            hasDrawnReward = true;
         }
 
+        ImGui.TableNextColumn(); // Rewards
+
+        var hasDrawnReward = false;
         var rewardIndex = 0;
         foreach (var reward in row.Reward)
         {
@@ -235,9 +250,45 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
 
                         DrawRewardItem(rewardItem.Value);
 
-                        hasDrawnReward = true;
+                        hasDrawnReward |= true;
                     }
                 }
+            }
+        }
+
+        ImGui.TableNextColumn(); // Optional Rewards
+
+        if (row.OptionalItemReward.Any(reward => reward.RowId != 0))
+        {
+            hasDrawnReward = false;
+
+            for (var i = 0; i < row.OptionalItemReward.Count; i++)
+            {
+                var itemRef = row.OptionalItemReward[i];
+                if (itemRef.RowId == 0)
+                    continue;
+
+                if (itemRef.Value.ItemUICategory.RowId == 0)
+                    continue;
+
+                var amount = row.OptionalItemCountReward[i];
+                if (amount == 0)
+                    continue;
+
+                if (hasDrawnReward)
+                    ImGui.SameLine();
+
+                using var id = ImRaii.PushId($"Quest{row.Id}OptionalReward{rewardIndex++}");
+
+                if (amount > 1)
+                {
+                    ImGui.TextUnformatted($"{amount}x");
+                    ImGui.SameLine(0, 3);
+                }
+
+                DrawRewardItem(itemRef.Value); // TODO: HQ (row.OptionalItemIsHQReward)
+
+                hasDrawnReward |= true;
             }
         }
 
@@ -249,24 +300,6 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
             ImGui.SameLine(0, 3);
             ImGui.TextUnformatted($"{row.GilReward} {SeIconChar.Gil.ToIconChar()}");
         }
-    }
-
-    private void DrawRewardItem(Item item)
-    {
-        DrawIconWithTooltip(
-            new GameIconLookup(item.Icon),
-            _textService.GetItemName(item.RowId),
-            item.ItemUICategory.IsValid ? item.ItemUICategory.Value.Name.ExtractText().StripSoftHypen() : null,
-            !item.Description.IsEmpty ? item.Description.ExtractText().StripSoftHypen() : null);
-
-        _imGuiContextMenu.Draw($"Reward{item.RowId}ContextMenu", builder =>
-        {
-            builder.AddTryOn(item.AsRef());
-            builder.AddItemFinder(item.RowId);
-            builder.AddCopyItemName(item.RowId);
-            builder.AddItemSearch(item.AsRef());
-            builder.AddOpenOnGarlandTools("item", item.RowId);
-        });
     }
 
     private void DrawRewardEmote(Emote emote)
@@ -289,7 +322,7 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
     {
         if (!_excelService.TryGetRow<ContentFinderCondition>(instanceContent.Order, out var cfc))
         {
-            ImGui.Dummy(new(40));
+            ImGui.Dummy(new(ImGui.GetTextLineHeight()));
             return;
         }
 
@@ -311,7 +344,7 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
     {
         if (!_textureProvider.TryGetFromGameIcon(icon, out var tex) || !tex.TryGetWrap(out var texture, out _))
         {
-            ImGui.Dummy(new(40));
+            ImGui.Dummy(new(ImGui.GetTextLineHeight()));
             return;
         }
 
@@ -320,6 +353,31 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
         if (ImGui.IsItemHovered())
         {
             _unlocksTabUtils.DrawTooltip(texture, title, category, description);
+        }
+    }
+
+    private void DrawRewardItem(Item item)
+    {
+        if (!_textureProvider.TryGetFromGameIcon((uint)item.Icon, out var tex) || !tex.TryGetWrap(out var texture, out _))
+        {
+            ImGui.Dummy(new(ImGui.GetTextLineHeight()));
+            return;
+        }
+
+        ImGui.Image(texture.ImGuiHandle, new Vector2(ImGui.GetTextLineHeight()));
+
+        _imGuiContextMenu.Draw($"Item{item.RowId}ContextMenu", builder =>
+        {
+            builder.AddTryOn(item.AsRef());
+            builder.AddItemFinder(item.RowId);
+            builder.AddCopyItemName(item.RowId);
+            builder.AddItemSearch(item.AsRef());
+            builder.AddOpenOnGarlandTools("item", item.RowId);
+        });
+
+        if (ImGui.IsItemHovered())
+        {
+            _unlocksTabUtils.DrawItemTooltip(item);
         }
     }
 }

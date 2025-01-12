@@ -6,6 +6,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
@@ -14,6 +15,7 @@ using Lumina.Text;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class InventoryTab(
     DebugRenderer DebugRenderer,
     TextService TextService,

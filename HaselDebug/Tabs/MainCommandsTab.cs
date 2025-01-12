@@ -8,12 +8,14 @@ using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextureService TextureService) : DebugTab
 {
     public override bool DrawInChild => false;

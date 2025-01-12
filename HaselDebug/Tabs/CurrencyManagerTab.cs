@@ -3,12 +3,14 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, TextService TextService) : DebugTab
 {
     public override string Title => "CurrencyManager";

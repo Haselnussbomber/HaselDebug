@@ -3,12 +3,14 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class SatisfactionSupplyTab(
     DebugRenderer DebugRenderer,
     ExcelService ExcelService,

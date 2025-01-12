@@ -2,6 +2,7 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
@@ -9,6 +10,7 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class HousingTab(DebugRenderer DebugRenderer, LanguageProvider LanguageProvider) : DebugTab
 {
     public override void Draw()

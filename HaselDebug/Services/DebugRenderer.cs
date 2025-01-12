@@ -35,6 +35,7 @@ using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
 namespace HaselDebug.Services;
 
+[RegisterSingleton]
 public unsafe partial class DebugRenderer
 {
     public Color ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1);
@@ -74,7 +75,7 @@ public unsafe partial class DebugRenderer
         SeStringEvaluatorService seStringEvaluator,
         TextService textService,
         TextureService textureService,
-        ExcelModule excelModule,
+        IDataManager dataManager,
         IGameGui gameGui)
     {
         Logger = logger;
@@ -85,7 +86,7 @@ public unsafe partial class DebugRenderer
         SeStringEvaluator = seStringEvaluator;
         TextService = textService;
         TextureService = textureService;
-        ExcelModule = excelModule;
+        ExcelModule = dataManager.Excel;
         GameGui = gameGui;
 
         var csAssembly = typeof(AddonAttribute).Assembly;

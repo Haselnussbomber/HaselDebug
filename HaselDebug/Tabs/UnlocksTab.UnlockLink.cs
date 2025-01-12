@@ -16,6 +16,7 @@ using UnlockEntry = (string SheetRow, uint IconId, Lumina.Text.ReadOnly.ReadOnly
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisposable
 {
     private readonly DebugRenderer _debugRenderer;

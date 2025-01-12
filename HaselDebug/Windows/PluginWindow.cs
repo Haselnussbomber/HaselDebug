@@ -9,11 +9,12 @@ using HaselCommon.Services;
 using HaselDebug.Config;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
-using HaselDebug.Tabs;
+using HaselDebug.Utils;
 using ImGuiNET;
 
 namespace HaselDebug.Windows;
 
+[RegisterSingleton]
 public class PluginWindow : SimpleWindow
 {
     private const uint SidebarWidth = 250;

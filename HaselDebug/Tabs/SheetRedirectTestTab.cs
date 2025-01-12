@@ -4,23 +4,13 @@ using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using ImGuiNET;
 using InteropGenerator.Runtime.Attributes;
 
 namespace HaselDebug.Tabs;
 
-[GenerateInterop]
-public unsafe partial struct HaselRaptureTextModule
-{
-    public static HaselRaptureTextModule* Instance() => (HaselRaptureTextModule*)RaptureTextModule.Instance();
-
-    [MemberFunction("E8 ?? ?? ?? ?? 44 8B E8 A8 10")]
-    public partial uint ResolveSheetRedirect(
-        Utf8String* sheetName,
-        uint* rowId,
-        ushort* flags);
-}
-
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe partial class SheetRedirectTestTab(SeStringEvaluatorService seStringEvaluator) : DebugTab, IDisposable
 {
     private string _inputSheetName = "Item";
@@ -158,4 +148,16 @@ public unsafe partial class SheetRedirectTestTab(SeStringEvaluatorService seStri
         using (ImRaii.PushColor(ImGuiCol.Text, (uint)(matches ? Color.Green : Color.Red)))
             ImGui.TextUnformatted(matches.ToString());
     }
+}
+
+[GenerateInterop]
+public unsafe partial struct HaselRaptureTextModule
+{
+    public static HaselRaptureTextModule* Instance() => (HaselRaptureTextModule*)RaptureTextModule.Instance();
+
+    [MemberFunction("E8 ?? ?? ?? ?? 44 8B E8 A8 10")]
+    public partial uint ResolveSheetRedirect(
+        Utf8String* sheetName,
+        uint* rowId,
+        ushort* flags);
 }

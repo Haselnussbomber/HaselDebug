@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using Dalamud.Game;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using Dalamud.Utility;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
@@ -17,6 +19,7 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class ExcelTab : DebugTab
 {
     private const int LanguageSelectorWidth = 90;
@@ -43,12 +46,12 @@ public unsafe class ExcelTab : DebugTab
     public ExcelTab(
         LanguageProvider languageProvider,
         TextService textService,
-        ExcelModule excelModule,
+        IDataManager dataManager,
         DebugRenderer debugRenderer)
     {
         _languageProvider = languageProvider;
         _textService = textService;
-        _excelModule = excelModule;
+        _excelModule = dataManager.Excel;
         _debugRenderer = debugRenderer;
 
         _selectedLanguage = _languageProvider.ClientLanguage;

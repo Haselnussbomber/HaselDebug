@@ -8,12 +8,14 @@ using FFXIVClientStructs.FFXIV.Component.Text;
 using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class RaptureTextModuleTab(DebugRenderer DebugRenderer, ExcelService ExcelService) : DebugTab
 {
     private readonly List<TextEntry> _entries = [

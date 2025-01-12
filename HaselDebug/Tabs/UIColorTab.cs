@@ -3,11 +3,13 @@ using Dalamud.Interface.Utility.Raii;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class UIColorTab(ExcelService ExcelService, TextService TextService) : DebugTab
 {
     public override string Title => "UIColor";

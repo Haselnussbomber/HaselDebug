@@ -10,6 +10,7 @@ using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
@@ -17,6 +18,7 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class AgentsTab(
     TextService TextService,
     DebugRenderer DebugRenderer,

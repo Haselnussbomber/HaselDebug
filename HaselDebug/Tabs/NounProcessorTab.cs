@@ -6,6 +6,7 @@ using Dalamud.Plugin.Services;
 using Dalamud.Utility;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Data;
@@ -17,6 +18,7 @@ namespace HaselDebug.Tabs;
 // TODO: display current SheetHashes and compare
 // https://github.com/NotAdam/Lumina/blob/master/src/Lumina/Data/Files/Excel/ExcelHeaderFile.cs#L59
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public class NounProcessorTab : DebugTab
 {
     private readonly Dictionary<Type, uint> _sheets = new() {

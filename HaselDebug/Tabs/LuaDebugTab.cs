@@ -3,6 +3,7 @@ using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Common.Lua;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
@@ -11,6 +12,7 @@ namespace HaselDebug.Tabs;
 
 public readonly record struct LuaGlobal(string Key, string? Value, LuaType Type);
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class LuaDebugTab : DebugTab
 {
     public static lua_State* L => Framework.Instance()->LuaState.State;

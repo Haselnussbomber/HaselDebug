@@ -6,6 +6,7 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using ImGuiNET;
 using InteropGenerator.Runtime.Attributes;
@@ -23,6 +24,7 @@ public unsafe partial struct AddonConfigFunctions
     public static partial uint GetNameHash(byte* name);
 }
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class AddonConfigTab : DebugTab
 {
     private readonly DebugRenderer _debugRenderer;

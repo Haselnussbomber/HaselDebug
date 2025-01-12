@@ -14,11 +14,11 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class UnlocksTabMinions(
     DebugRenderer DebugRenderer,
     ExcelService ExcelService,
     TextService TextService,
-    TextureService TextureService,
     UnlocksTabUtils UnlocksTabUtils) : DebugTab, ISubTab<UnlocksTab>
 {
     public override string Title => "Minions";

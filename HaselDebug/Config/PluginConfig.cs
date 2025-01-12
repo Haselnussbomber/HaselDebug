@@ -6,6 +6,7 @@ using Dalamud.Configuration;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Dalamud.Utility;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Config;
 
@@ -30,14 +31,12 @@ public partial class PluginConfig : IPluginConfiguration
     [JsonIgnore]
     private static IPluginLog? PluginLog;
 
-    public static PluginConfig Load(
-        IDalamudPluginInterface pluginInterface,
-        IPluginLog pluginLog)
+    public static PluginConfig Load(IServiceProvider serviceProvider)
     {
-        PluginInterface = pluginInterface;
-        PluginLog = pluginLog;
+        PluginInterface = serviceProvider.GetRequiredService<IDalamudPluginInterface>();
+        PluginLog = serviceProvider.GetRequiredService<IPluginLog>();
 
-        var fileInfo = pluginInterface.ConfigFile;
+        var fileInfo = PluginInterface.ConfigFile;
         if (!fileInfo.Exists || fileInfo.Length < 2)
             return new();
 

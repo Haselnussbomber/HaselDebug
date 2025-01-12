@@ -6,6 +6,7 @@ using FFXIVClientStructs.FFXIV.Common.Math;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
@@ -13,6 +14,7 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer DebugRenderer) : DebugTab
 {
     private readonly Type _numberType = typeof(NumberArrayType);

@@ -13,6 +13,7 @@ using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
@@ -21,6 +22,7 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class AddonInspectorTab(
     TextService TextService,
     DebugRenderer DebugRenderer,

@@ -5,6 +5,7 @@ using HaselCommon.Extensions.Reflection;
 
 namespace HaselDebug.Services;
 
+[RegisterSingleton]
 public class InstancesService
 {
     public Instance[] Instances { get; init; }

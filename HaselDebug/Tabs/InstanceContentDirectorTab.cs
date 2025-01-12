@@ -4,6 +4,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
@@ -14,6 +15,7 @@ using InstanceContentType = FFXIVClientStructs.FFXIV.Client.Game.InstanceContent
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISigScanner SigScanner, ExcelService ExcelService) : DebugTab
 {
 

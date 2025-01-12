@@ -10,6 +10,7 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class UnlocksTabCutscenes : DebugTab, ISubTab<UnlocksTab>, IDisposable
 {
     private readonly ExcelService _excelService;

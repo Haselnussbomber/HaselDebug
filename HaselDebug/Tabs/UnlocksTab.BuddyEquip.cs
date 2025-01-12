@@ -10,6 +10,7 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class UnlocksTabBardings(DebugRenderer DebugRenderer, ExcelService ExcelService) : DebugTab, ISubTab<UnlocksTab>
 {
     public override string Title => "Bardings";

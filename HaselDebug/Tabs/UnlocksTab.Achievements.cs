@@ -13,6 +13,7 @@ using AchievementSheet = Lumina.Excel.Sheets.Achievement;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class UnlocksTabAchievements(
     DebugRenderer DebugRenderer,
     ExcelService ExcelService,

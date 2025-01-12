@@ -1,9 +1,9 @@
 using System.Collections.Immutable;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
-using HaselDebug.Utils;
+using HaselDebug.Tabs;
 
-namespace HaselDebug.Tabs;
+namespace HaselDebug.Utils;
 
 public class PinnedInstanceTab(DebugRenderer DebugRenderer, nint address, Type type) : IDrawableTab
 {

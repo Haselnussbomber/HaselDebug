@@ -4,6 +4,7 @@ using Dalamud.Plugin;
 
 namespace HaselDebug.Services;
 
+[RegisterSingleton]
 public class TripleTriadNumberFontManager(IDalamudPluginInterface PluginInterface) : IDisposable
 {
     private IFontHandle? TripleTriadNumberFont;

@@ -4,6 +4,7 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.Attributes;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
@@ -11,6 +12,7 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public class InstancesTab(
     TextService TextService,
     DebugRenderer DebugRenderer,

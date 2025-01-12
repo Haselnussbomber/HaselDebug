@@ -2,25 +2,20 @@ using System.IO;
 using Dalamud.Game;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using HaselCommon;
 using HaselCommon.Commands;
-using HaselCommon.Extensions.DependencyInjection;
-using HaselCommon.Logger;
 using HaselCommon.Services;
 using HaselDebug.Config;
-using HaselDebug.Interfaces;
-using HaselDebug.Services;
-using HaselDebug.Utils;
 using HaselDebug.Windows;
 using ImGuiNET;
 using InteropGenerator.Runtime;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace HaselDebug;
 
 public class Plugin : IDalamudPlugin
 {
-    private readonly IDalamudPluginInterface PluginInterface;
+    private readonly IDalamudPluginInterface _pluginInterface;
 
     public Plugin(
         IDalamudPluginInterface pluginInterface,
@@ -30,7 +25,7 @@ public class Plugin : IDalamudPlugin
         IDataManager dataManager,
         IClientState clientState)
     {
-        PluginInterface = pluginInterface;
+        _pluginInterface = pluginInterface;
 
 #if HAS_LOCAL_CS
         FFXIVClientStructs.Interop.Generated.Addresses.Register();
@@ -42,35 +37,14 @@ public class Plugin : IDalamudPlugin
         Resolver.GetInstance.Resolve();
 #endif
 
-        Service
-            // Dalamud & HaselCommon
-            .Initialize(pluginInterface, pluginLog)
-
-            // Logging
-            .AddLogging(builder =>
-            {
-                builder.ClearProviders();
-                builder.SetMinimumLevel(LogLevel.Trace);
-                builder.AddProvider(new DalamudLoggerProvider(pluginLog));
-            })
-
-            .AddSingleton(dataManager.Excel)
-
-            // HaselDebug
-            .AddSingleton(PluginConfig.Load(pluginInterface, pluginLog))
-            .AddSingleton<DebugRenderer>()
-            .AddSingleton<InstancesService>()
-            .AddSingleton<PinnedInstancesService>()
-            .AddSingleton<UnlocksTabUtils>()
-            .AddSingleton<TripleTriadNumberFontManager>()
-            .AddIServices<IDebugTab>()
-            .AddSubTabs()
-            .AddSingleton<PluginWindow>()
-            .AddSingleton<ConfigWindow>();
+        Service.Collection
+            .AddDalamud(pluginInterface)
+            .AddSingleton(PluginConfig.Load)
+            .AddHaselCommon()
+            .AddHaselDebug();
 
         Service.BuildProvider();
 
-        // TODO: IHostedService?
         framework.RunOnFrameworkThread(() =>
         {
             if (Service.Get<PluginConfig>().AutoOpenPluginWindow)
@@ -78,9 +52,9 @@ public class Plugin : IDalamudPlugin
 
             Service.Get<CommandService>().Register(OnCommand, true);
 
-            PluginInterface.UiBuilder.Draw += DrawMainMenuItem;
-            PluginInterface.UiBuilder.OpenMainUi += TogglePluginWindow;
-            PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigWindow;
+            _pluginInterface.UiBuilder.Draw += DrawMainMenuItem;
+            _pluginInterface.UiBuilder.OpenMainUi += TogglePluginWindow;
+            _pluginInterface.UiBuilder.OpenConfigUi += ToggleConfigWindow;
         });
     }
 
@@ -102,7 +76,7 @@ public class Plugin : IDalamudPlugin
 
     private void DrawMainMenuItem()
     {
-        if (PluginInterface.IsDevMenuOpen && ImGui.BeginMainMenuBar())
+        if (_pluginInterface.IsDevMenuOpen && ImGui.BeginMainMenuBar())
         {
             if (ImGui.MenuItem("HaselDebug"))
             {
@@ -125,9 +99,9 @@ public class Plugin : IDalamudPlugin
 
     void IDisposable.Dispose()
     {
-        PluginInterface.UiBuilder.Draw -= DrawMainMenuItem;
-        PluginInterface.UiBuilder.OpenMainUi -= TogglePluginWindow;
-        PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigWindow;
+        _pluginInterface.UiBuilder.Draw -= DrawMainMenuItem;
+        _pluginInterface.UiBuilder.OpenMainUi -= TogglePluginWindow;
+        _pluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigWindow;
 
         Service.Dispose();
     }

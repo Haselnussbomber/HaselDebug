@@ -12,6 +12,7 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class UnlocksTabOrchestrion(
     DebugRenderer DebugRenderer,
     ExcelService ExcelService,

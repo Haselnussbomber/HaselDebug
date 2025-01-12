@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using HaselDebug.Config;
-using HaselDebug.Tabs;
+using HaselDebug.Utils;
 
 namespace HaselDebug.Services;
 
+[RegisterSingleton]
 public class PinnedInstancesService : IReadOnlyCollection<PinnedInstanceTab>
 {
     private readonly PluginConfig PluginConfig;

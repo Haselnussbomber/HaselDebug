@@ -7,6 +7,7 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public class UnlocksTab : DebugTab
 {
     public override bool IsPinnable => false;

@@ -36,6 +36,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Injectio" Version="4.0.0" PrivateAssets="all" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\HaselCommon\HaselCommon\HaselCommon.csproj" />
   </ItemGroup>
 </Project>

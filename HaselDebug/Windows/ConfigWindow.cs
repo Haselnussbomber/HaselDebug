@@ -6,6 +6,7 @@ using ImGuiNET;
 
 namespace HaselDebug.Windows;
 
+[RegisterSingleton]
 public class ConfigWindow : SimpleWindow
 {
     private readonly PluginConfig PluginConfig;

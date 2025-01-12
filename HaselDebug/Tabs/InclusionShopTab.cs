@@ -1,11 +1,27 @@
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using InteropGenerator.Runtime.Attributes;
 
 namespace HaselDebug.Tabs;
+
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
+public unsafe class InclusionShopTab(DebugRenderer DebugRenderer) : DebugTab
+{
+    public override void Draw()
+    {
+        if (!TryGetAddon<AtkUnitBase>("InclusionShop", out var addon))
+        {
+            ImGui.TextUnformatted("No shop open!");
+            return;
+        }
+
+        DebugRenderer.DrawPointerType(addon->AtkValues, typeof(InclusionShopAtkValues), new NodeOptions());
+    }
+}
 
 [GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x10 * 2939)]
@@ -34,18 +50,4 @@ public partial struct InclusionShopItem
     [FieldOffset(0x10 * 15)] public AtkValue MaxAmount;
     [FieldOffset(0x10 * 16)] public AtkValue Flags; // 0b10 = CanSelectAmount
     [FieldOffset(0x10 * 17)] public AtkValue Index;
-}
-
-public unsafe class InclusionShopTab(DebugRenderer DebugRenderer) : DebugTab
-{
-    public override void Draw()
-    {
-        if (!TryGetAddon<AtkUnitBase>("InclusionShop", out var addon))
-        {
-            ImGui.TextUnformatted("No shop open!");
-            return;
-        }
-
-        DebugRenderer.DrawPointerType(addon->AtkValues, typeof(InclusionShopAtkValues), new NodeOptions());
-    }
 }
