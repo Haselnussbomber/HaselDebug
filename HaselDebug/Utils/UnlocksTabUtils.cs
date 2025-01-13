@@ -18,6 +18,7 @@ using HaselDebug.Services;
 using HaselDebug.Windows.ItemTooltips;
 using ImGuiNET;
 using Lumina.Data.Files;
+using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using Companion = Lumina.Excel.Sheets.Companion;
 using Ornament = Lumina.Excel.Sheets.Ornament;
@@ -34,7 +35,8 @@ public unsafe class UnlocksTabUtils(
     IDataManager DataManager,
     ITextureProvider TextureProvider,
     IDalamudPluginInterface PluginInterface,
-    TripleTriadNumberFontManager TripleTriadNumberFontManager) : IDisposable
+    TripleTriadNumberFontManager TripleTriadNumberFontManager,
+    SeStringEvaluatorService SeStringEvaluator) : IDisposable
 {
     private readonly Dictionary<uint, Vector2?> _iconSizeCache = [];
     private readonly Lazy<IFontHandle> _tripleTriadNumberFont = new(() => PluginInterface.UiBuilder.FontAtlas.NewGameFontHandle(new GameFontStyle(GameFontFamily.MiedingerMid, 208f / 10f)));
@@ -238,6 +240,14 @@ public unsafe class UnlocksTabUtils(
         }
     }
 
+    public void DrawItemTooltip(RowRef rowRef)
+    {
+        if (rowRef.TryGetValue<Item>(out var item))
+            DrawItemTooltip(item);
+        else if (rowRef.TryGetValue<EventItem>(out var eventItem))
+            DrawEventItemTooltip(eventItem);
+    }
+
     public void DrawItemTooltip(Item item)
     {
         if (!TextureProvider.TryGetFromGameIcon((uint)item.Icon, out var tex) || !tex.TryGetWrap(out var icon, out _))
@@ -301,6 +311,66 @@ public unsafe class UnlocksTabUtils(
             TripleTriadCardTooltip?.CalculateLayout();
             TripleTriadCardTooltip?.Update();
             TripleTriadCardTooltip?.Draw();
+        }
+    }
+
+    public void DrawEventItemTooltip(EventItem item)
+    {
+        if (!TextureProvider.TryGetFromGameIcon((uint)item.Icon, out var tex) || !tex.TryGetWrap(out var icon, out _))
+            return;
+
+        using var id = ImRaii.PushId($"ItemTooltip{item.RowId}");
+
+        using var tooltip = ImRaii.Tooltip();
+        if (!tooltip) return;
+
+        using var popuptable = ImRaii.Table("PopupTable", 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
+        if (!popuptable) return;
+
+        var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
+        var title = TextService.GetItemName(item.RowId);
+
+        ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale + itemInnerSpacing.X);
+        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
+
+        ImGui.TableNextColumn(); // Icon
+        ImGui.Image(icon.ImGuiHandle, ImGuiHelpers.ScaledVector2(40));
+
+        ImGui.TableNextColumn(); // Text
+        using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
+        using var indent = ImRaii.PushIndent(1);
+
+        ImGui.TextUnformatted(title);
+
+        if (item.Unknown2 != 0 && ExcelService.TryGetRow<EventItemCategory>(item.Unknown2, out var itemCategoy) && !itemCategoy.Unknown0.IsEmpty)
+        {
+            var text = itemCategoy.RowId switch
+            {
+                1 when item.Quest.IsValid && !item.Quest.Value.Name.IsEmpty => SeStringEvaluator.Evaluate(itemCategoy.Unknown0, new()
+                {
+                    LocalParameters = [TextService.GetQuestName(item.Quest.RowId)]
+                }),
+                _ => itemCategoy.Unknown0
+            };
+
+            if (!text.IsEmpty)
+            {
+                ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
+                using (ImRaii.PushColor(ImGuiCol.Text, (uint)Color.Grey))
+                    ImGui.TextUnformatted(text.ExtractText());
+            }
+        }
+
+        if (ExcelService.TryGetRow<EventItemHelp>(item.RowId, out var itemHelp) && !itemHelp.Description.IsEmpty)
+        {
+            ImGuiUtils.PushCursorY(1 * ImGuiHelpers.GlobalScale);
+
+            // separator
+            var pos = ImGui.GetCursorScreenPos();
+            ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
+            ImGuiUtils.PushCursorY(4 * ImGuiHelpers.GlobalScale);
+
+            ImGuiHelpers.SafeTextWrapped(itemHelp.Description.ExtractText().StripSoftHypen());
         }
     }
 }
