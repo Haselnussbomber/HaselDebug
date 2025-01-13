@@ -107,4 +107,16 @@ public class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
             ImGui.GetWindowDrawList().AddImage(tex.ImGuiHandle, pos, pos + ImGuiHelpers.ScaledVector2(IconSize) / 1.5f, new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
         }
     }
+
+    private class RowIdColumn : ColumnNumber<CustomMirageStoreSetItem>
+    {
+        public override void DrawColumn(CustomMirageStoreSetItem row)
+        {
+            ImGuiUtils.PushCursorY(ImGui.GetTextLineHeight() / 2f);
+            ImGui.TextUnformatted(row.RowId.ToString());
+        }
+
+        public override int ToValue(CustomMirageStoreSetItem row)
+            => (int)row.RowId;
+    }
 }
