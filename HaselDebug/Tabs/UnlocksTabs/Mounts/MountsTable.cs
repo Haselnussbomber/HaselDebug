@@ -47,7 +47,7 @@ public unsafe class MountsTable : Table<Mount>
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<Mount>()
-            .Where(row => row.RowId != 0 && row.Order != 0)
+            .Where(row => row.RowId != 0 && row.Order != 0 && row.Icon != 0)
             .ToList();
     }
 
