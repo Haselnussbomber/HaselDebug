@@ -1,6 +1,7 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using ImGuiNET;
@@ -15,10 +16,16 @@ public unsafe class TitlesTab(TitlesTable table) : DebugTab, ISubTab<UnlocksTab>
 
     public override void Draw()
     {
+        if (!AgentLobby.Instance()->IsLoggedIn)
+        {
+            ImGui.TextUnformatted("Not logged in.");
+            return;
+        }
+
         var localPlayer = Control.GetLocalPlayer();
         if (localPlayer == null)
         {
-            ImGui.TextUnformatted("LocalPlayer unavailable");
+            ImGui.TextUnformatted("LocalPlayer unavailable.");
             return;
         }
 

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Interface.Utility.Table;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
@@ -51,47 +52,46 @@ public unsafe class OutfitsTab : DebugTab, ISubTab<UnlocksTab>, IDisposable
 
     public override void Draw()
     {
-        var playerState = PlayerState.Instance();
-        if (playerState->IsLoaded != 1)
+        if (!AgentLobby.Instance()->IsLoggedIn)
         {
-            ImGui.TextUnformatted("PlayerState not loaded.");
+            ImGui.TextUnformatted("Not logged in.");
 
             // in case of logout
             if (_prismBoxBackedUp)
                 _prismBoxBackedUp = false;
-
-            return;
-        }
-
-        var mirageManager = MirageManager.Instance();
-        if (!mirageManager->PrismBoxLoaded)
-        {
-            if (_prismBoxBackedUp)
-            {
-                using (Color.Yellow.Push(ImGuiCol.Text))
-                    ImGui.TextUnformatted("PrismBox not loaded. Using cache.");
-            }
-            else
-            {
-                using (Color.Red.Push(ImGuiCol.Text))
-                    ImGui.TextUnformatted("PrismBox not loaded.");
-            }
         }
         else
         {
-            var hasChanges = false;
-
-            if (DateTime.Now - _prismBoxLastCheck > TimeSpan.FromSeconds(2))
+            var mirageManager = MirageManager.Instance();
+            if (!mirageManager->PrismBoxLoaded)
             {
-                hasChanges = !CollectionsMarshal.AsSpan(_prismBoxItemIds).SequenceEqual(mirageManager->PrismBoxItemIds);
-                _prismBoxLastCheck = DateTime.Now;
+                if (_prismBoxBackedUp)
+                {
+                    using (Color.Yellow.Push(ImGuiCol.Text))
+                        ImGui.TextUnformatted("PrismBox not loaded. Using cache.");
+                }
+                else
+                {
+                    using (Color.Red.Push(ImGuiCol.Text))
+                        ImGui.TextUnformatted("PrismBox not loaded.");
+                }
             }
-
-            if (!_prismBoxBackedUp || hasChanges)
+            else
             {
-                _prismBoxItemIds.Clear();
-                _prismBoxItemIds.AddRange(mirageManager->PrismBoxItemIds);
-                _prismBoxBackedUp = true;
+                var hasChanges = false;
+
+                if (DateTime.Now - _prismBoxLastCheck > TimeSpan.FromSeconds(2))
+                {
+                    hasChanges = !CollectionsMarshal.AsSpan(_prismBoxItemIds).SequenceEqual(mirageManager->PrismBoxItemIds);
+                    _prismBoxLastCheck = DateTime.Now;
+                }
+
+                if (!_prismBoxBackedUp || hasChanges)
+                {
+                    _prismBoxItemIds.Clear();
+                    _prismBoxItemIds.AddRange(mirageManager->PrismBoxItemIds);
+                    _prismBoxBackedUp = true;
+                }
             }
         }
 
