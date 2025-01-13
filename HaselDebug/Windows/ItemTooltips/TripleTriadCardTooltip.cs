@@ -10,6 +10,7 @@ namespace HaselDebug.Windows.ItemTooltips;
 public class TripleTriadCardTooltip : Node
 {
     private readonly ExcelService _excelService;
+    private readonly SeStringEvaluatorService _seStringEvaluator;
     private readonly TextNode _infoLine;
     private readonly TripleTriadCardNode _card;
     private uint _cardRowId;
@@ -17,9 +18,11 @@ public class TripleTriadCardTooltip : Node
     public TripleTriadCardTooltip(
         TextureService textureService,
         ExcelService excelService,
+        SeStringEvaluatorService seStringEvaluator,
         TripleTriadNumberFontManager tripleTriadNumberFontManager) : base()
     {
         _excelService = excelService;
+        _seStringEvaluator = seStringEvaluator;
 
         Margin = 8;
         AlignItems = YGAlign.Center;
@@ -49,7 +52,11 @@ public class TripleTriadCardTooltip : Node
 
         _cardRowId = cardId;
 
-        _infoLine.Text = $"{(cardResident.TripleTriadCardRarity.RowId == 5 ? "Ex" : "No")}. {cardResident.Order} - {cardRow.Name}";
+        var isEx = cardResident.UIPriority == 5;
+        var order = (uint)cardResident.Order;
+        var addonRowId = isEx ? 9773u : 9772;
+
+        _infoLine.Text = $"{_seStringEvaluator.EvaluateFromAddon(addonRowId, new() { LocalParameters = [order] }).ExtractText()} - {cardRow.Name}";
         _card.SetCard(_cardRowId, cardResident);
     }
 }

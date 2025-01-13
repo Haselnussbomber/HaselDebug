@@ -239,7 +239,7 @@ public unsafe class UnlocksTabUtils(
             ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
             ImGuiUtils.PushCursorY(5 * ImGuiHelpers.GlobalScale);
 
-            TripleTriadCardTooltip ??= new TripleTriadCardTooltip(TextureService, ExcelService, TripleTriadNumberFontManager);
+            TripleTriadCardTooltip ??= new TripleTriadCardTooltip(TextureService, ExcelService, SeStringEvaluator, TripleTriadNumberFontManager);
             TripleTriadCardTooltip.MarginTop = ImGui.GetCursorPosY();
             TripleTriadCardTooltip.MarginLeft = ImGui.GetContentRegionAvail().X / 2f - 208 * ImGuiHelpers.GlobalScale / 2f + ImGui.GetCursorPosX() - itemInnerSpacing.X;
             TripleTriadCardTooltip?.SetItem(item);
