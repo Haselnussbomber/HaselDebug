@@ -5,7 +5,7 @@ using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using ImGuiNET;
 
-namespace HaselDebug.Tabs.UnlocksTabs;
+namespace HaselDebug.Tabs.UnlocksTabs.Titles;
 
 [RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class TitlesTab(TitlesTable table) : DebugTab, ISubTab<UnlocksTab>

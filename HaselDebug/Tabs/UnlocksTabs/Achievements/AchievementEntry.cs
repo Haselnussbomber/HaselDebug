@@ -2,7 +2,7 @@ using HaselCommon.Extensions.Strings;
 using Achievement = FFXIVClientStructs.FFXIV.Client.Game.UI.Achievement;
 using AchievementSheet = Lumina.Excel.Sheets.Achievement;
 
-namespace HaselDebug.Tabs.UnlocksTabs;
+namespace HaselDebug.Tabs.UnlocksTabs.Achievements;
 
 public record AchievementEntry
 {
@@ -29,9 +29,9 @@ public record AchievementEntry
     public bool CanShowDescription => CanShow || (!IsHiddenName && !IsHiddenCategory && !IsHiddenAchievement); // idk actually
     public bool CanShowAchievement => CanShow || !IsHiddenAchievement;
 
-    public string Name => (CanShowAchievement && CanShowName) ? Row.Name.ExtractText().StripSoftHypen() : "???";
-    public string CategoryName => (CanShowAchievement && CanShowCategory) ? Row.AchievementCategory.Value.Name.ExtractText().StripSoftHypen() : "???";
-    public string Description => (CanShowAchievement && CanShowDescription) ? Row.Description.ExtractText().StripSoftHypen() : "???";
+    public string Name => CanShowAchievement && CanShowName ? Row.Name.ExtractText().StripSoftHypen() : "???";
+    public string CategoryName => CanShowAchievement && CanShowCategory ? Row.AchievementCategory.Value.Name.ExtractText().StripSoftHypen() : "???";
+    public string Description => CanShowAchievement && CanShowDescription ? Row.Description.ExtractText().StripSoftHypen() : "???";
 
     public AchievementEntry(AchievementsTable table, AchievementSheet row)
     {

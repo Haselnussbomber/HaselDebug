@@ -6,11 +6,11 @@ using HaselCommon.Gui;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Sheets;
-using HaselDebug.Tabs.UnlocksTabs.OutfitsTableColumns;
+using HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
-namespace HaselDebug.Tabs.UnlocksTabs;
+namespace HaselDebug.Tabs.UnlocksTabs.Outfits;
 
 [RegisterSingleton]
 public class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable

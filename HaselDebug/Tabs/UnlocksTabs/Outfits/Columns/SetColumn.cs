@@ -9,7 +9,7 @@ using HaselCommon.Services;
 using HaselDebug.Sheets;
 using ImGuiNET;
 
-namespace HaselDebug.Tabs.UnlocksTabs.OutfitsTableColumns;
+namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
 [RegisterSingleton]
 public class SetColumn(
@@ -22,9 +22,7 @@ public class SetColumn(
     private const float IconSize = OutfitsTable.IconSize;
 
     public override string ToName(CustomMirageStoreSetItem row)
-    {
-        return textService.GetItemName(row.RowId);
-    }
+        => textService.GetItemName(row.RowId);
 
     public override void DrawColumn(CustomMirageStoreSetItem row)
     {

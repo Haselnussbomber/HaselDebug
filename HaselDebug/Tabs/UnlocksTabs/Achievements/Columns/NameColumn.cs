@@ -5,14 +5,12 @@ using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 
-namespace HaselDebug.Tabs.UnlocksTabs.AchievementsTableColumns;
+namespace HaselDebug.Tabs.UnlocksTabs.Achievements.Columns;
 
 public class NameColumn(DebugRenderer debugRenderer, UnlocksTabUtils unlocksTabUtils) : ColumnString<AchievementEntry>
 {
     public override string ToName(AchievementEntry entry)
-    {
-        return entry.Name;
-    }
+        => entry.Name;
 
     public override unsafe void DrawColumn(AchievementEntry entry)
     {

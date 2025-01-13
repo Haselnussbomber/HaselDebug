@@ -2,12 +2,12 @@ using System.Linq;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Services;
-using HaselDebug.Tabs.UnlocksTabs.AchievementsTableColumns;
+using HaselDebug.Tabs.UnlocksTabs.Achievements.Columns;
 using HaselDebug.Utils;
 using ImGuiNET;
 using AchievementSheet = Lumina.Excel.Sheets.Achievement;
 
-namespace HaselDebug.Tabs.UnlocksTabs;
+namespace HaselDebug.Tabs.UnlocksTabs.Achievements;
 
 [RegisterSingleton]
 public unsafe class AchievementsTable : Table<AchievementEntry>

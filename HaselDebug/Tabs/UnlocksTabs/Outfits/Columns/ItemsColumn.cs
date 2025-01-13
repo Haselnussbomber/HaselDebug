@@ -10,7 +10,7 @@ using HaselCommon.Services;
 using HaselDebug.Sheets;
 using ImGuiNET;
 
-namespace HaselDebug.Tabs.UnlocksTabs.OutfitsTableColumns;
+namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
 [RegisterSingleton]
 public class ItemsColumn(

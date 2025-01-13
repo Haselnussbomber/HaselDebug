@@ -76,8 +76,9 @@ public class TripleTriadCardNode : Node
 
         _cardStars.Stars = cardRarity.Stars;
 
-        _cardType.Display = cardResident.TripleTriadCardType.RowId != 0? YGDisplay.Flex : YGDisplay.None;
-        _cardType.PartIndex = cardResident.TripleTriadCardType.RowId switch {
+        _cardType.Display = cardResident.TripleTriadCardType.RowId != 0 ? YGDisplay.Flex : YGDisplay.None;
+        _cardType.PartIndex = cardResident.TripleTriadCardType.RowId switch
+        {
             4 => 2,
             _ => cardResident.TripleTriadCardType.RowId + 2
         };

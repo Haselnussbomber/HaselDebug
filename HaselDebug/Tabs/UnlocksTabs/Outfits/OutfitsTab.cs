@@ -10,7 +10,7 @@ using HaselDebug.Sheets;
 using ImGuiNET;
 using PlayerState = FFXIVClientStructs.FFXIV.Client.Game.UI.PlayerState;
 
-namespace HaselDebug.Tabs.UnlocksTabs;
+namespace HaselDebug.Tabs.UnlocksTabs.Outfits;
 
 [RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class OutfitsTab : DebugTab, ISubTab<UnlocksTab>, IDisposable

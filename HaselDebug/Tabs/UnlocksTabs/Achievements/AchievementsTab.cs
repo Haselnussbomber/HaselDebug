@@ -5,7 +5,7 @@ using HaselDebug.Interfaces;
 using ImGuiNET;
 using Achievement = FFXIVClientStructs.FFXIV.Client.Game.UI.Achievement;
 
-namespace HaselDebug.Tabs.UnlocksTabs;
+namespace HaselDebug.Tabs.UnlocksTabs.Achievements;
 
 [RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class AchievementsTab(AchievementsTable table) : DebugTab, ISubTab<UnlocksTab>

@@ -1,11 +1,11 @@
 using System.Linq;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
-using HaselDebug.Tabs.UnlocksTabs.TitlesTableColumns;
+using HaselDebug.Tabs.UnlocksTabs.Titles.Columns;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
-namespace HaselDebug.Tabs.UnlocksTabs;
+namespace HaselDebug.Tabs.UnlocksTabs.Titles;
 
 [RegisterSingleton]
 public class TitlesTable : Table<Title>

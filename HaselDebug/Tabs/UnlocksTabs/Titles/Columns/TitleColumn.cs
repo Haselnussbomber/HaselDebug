@@ -8,7 +8,7 @@ using HaselCommon.Gui.ImGuiTable;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
-namespace HaselDebug.Tabs.UnlocksTabs.TitlesTableColumns;
+namespace HaselDebug.Tabs.UnlocksTabs.Titles.Columns;
 
 public class TitleColumn : ColumnString<Title>
 {
