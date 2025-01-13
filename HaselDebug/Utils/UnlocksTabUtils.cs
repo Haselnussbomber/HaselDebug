@@ -71,100 +71,7 @@ public unsafe class UnlocksTabUtils(
 
         if (isHovered && !ImGui.IsKeyDown(ImGuiKey.LeftAlt))
         {
-            if (item.ItemAction.Value.Type == (uint)ItemActionType.Mount)
-            {
-                if (ExcelService.TryGetRow<Mount>(item.ItemAction.Value!.Data[0], out var mount))
-                {
-                    using var tooltip = ImRaii.Tooltip();
-                    TextureService.DrawIcon(64000 + mount.Icon, 192);
-                }
-            }
-            else if (item.ItemAction.Value.Type == (uint)ItemActionType.Companion)
-            {
-                if (ExcelService.TryGetRow<Companion>(item.ItemAction.Value!.Data[0], out var companion))
-                {
-                    using var tooltip = ImRaii.Tooltip();
-                    TextureService.DrawIcon(64000 + companion.Icon, 192);
-                }
-            }
-            else if (item.ItemAction.Value.Type == (uint)ItemActionType.Ornament)
-            {
-                if (ExcelService.TryGetRow<Ornament>(item.ItemAction.Value!.Data[0], out var ornament))
-                {
-                    using var tooltip = ImRaii.Tooltip();
-                    TextureService.DrawIcon(59000 + ornament.Icon, 192);
-                }
-            }
-            else if (item.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink && item.ItemAction.Value.Data[1] == 5211) // Emotes
-            {
-                if (ExcelService.TryGetRow<Emote>(item.ItemAction.Value!.Data[2], out var emote))
-                {
-                    using var tooltip = ImRaii.Tooltip();
-                    TextureService.DrawIcon(emote.Icon, 80);
-                }
-            }
-            else if (item.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard)
-            {
-                using var tooltip = ImRaii.Tooltip();
-                TripleTriadCardTooltip ??= new TripleTriadCardTooltip(TextureService, ExcelService, TripleTriadNumberFontManager);
-                TripleTriadCardTooltip?.SetItem(item);
-                TripleTriadCardTooltip?.CalculateLayout();
-                TripleTriadCardTooltip?.Update();
-                TripleTriadCardTooltip?.Draw();
-            }
-            else if (item.ItemUICategory.RowId == 95) // Paintings
-            {
-                if (ExcelService.TryGetRow<Picture>(item.AdditionalData.RowId, out var picture))
-                {
-                    var pictureId = (uint)picture.Image;
-
-                    if (!_iconSizeCache.TryGetValue(pictureId, out var size))
-                    {
-                        var iconPath = TextureProvider.GetIconPath(pictureId);
-                        if (string.IsNullOrEmpty(iconPath))
-                        {
-                            _iconSizeCache.Add(pictureId, null);
-                        }
-                        else
-                        {
-                            var file = DataManager.GetFile<TexFile>(iconPath);
-                            _iconSizeCache.Add(pictureId, size = file != null ? new(file.Header.Width, file.Header.Height) : null);
-                        }
-                    }
-
-                    if (size != null)
-                    {
-                        using var tooltip = ImRaii.Tooltip();
-                        TextureService.DrawIcon(pictureId, (Vector2)size * 0.5f);
-                    }
-                }
-            }
-            else if (item.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink && ExcelService.TryFindRow<CharaMakeCustomize>(row => row.HintItem.RowId == item.RowId, out _)) // Hairstyles etc.
-            {
-                byte tribeId = 1;
-                byte sex = 1;
-                unsafe
-                {
-                    var character = Control.GetLocalPlayer();
-                    if (character != null)
-                    {
-                        tribeId = character->DrawData.CustomizeData.Tribe;
-                        sex = character->DrawData.CustomizeData.Sex;
-                    }
-                }
-
-                var hairStyleIconId = ItemService.GetHairstyleIconId(item.RowId, tribeId, sex);
-                if (hairStyleIconId != 0)
-                {
-                    using var tooltip = ImRaii.Tooltip();
-                    TextureService.DrawIcon(hairStyleIconId, 192);
-                }
-            }
-            else
-            {
-                using var tooltip = ImRaii.Tooltip();
-                TextureService.DrawIcon(item.Icon, 64);
-            }
+            DrawItemTooltip(item);
         }
 
         ImGuiContextMenuService.Draw($"##{id}_ItemContextMenu{item.RowId}_IconTooltip", builder =>
@@ -297,7 +204,35 @@ public unsafe class UnlocksTabUtils(
             ImGuiHelpers.SafeTextWrapped(description);
         }
 
-        if (item.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard)
+        if (item.ItemAction.Value.Type == (uint)ItemActionType.Mount)
+        {
+            if (ExcelService.TryGetRow<Mount>(item.ItemAction.Value!.Data[0], out var mount))
+            {
+                TextureService.DrawIcon(64000 + mount.Icon, 192);
+            }
+        }
+        else if (item.ItemAction.Value.Type == (uint)ItemActionType.Companion)
+        {
+            if (ExcelService.TryGetRow<Companion>(item.ItemAction.Value!.Data[0], out var companion))
+            {
+                TextureService.DrawIcon(64000 + companion.Icon, 192);
+            }
+        }
+        else if (item.ItemAction.Value.Type == (uint)ItemActionType.Ornament)
+        {
+            if (ExcelService.TryGetRow<Ornament>(item.ItemAction.Value!.Data[0], out var ornament))
+            {
+                TextureService.DrawIcon(59000 + ornament.Icon, 192);
+            }
+        }
+        else if (item.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink && item.ItemAction.Value.Data[1] == 5211) // Emotes
+        {
+            if (ExcelService.TryGetRow<Emote>(item.ItemAction.Value!.Data[2], out var emote))
+            {
+                TextureService.DrawIcon(emote.Icon, 80);
+            }
+        }
+        else if (item.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard)
         {
             ImGuiUtils.PushCursorY(2 * ImGuiHelpers.GlobalScale);
             var pos = ImGui.GetCursorScreenPos();
@@ -311,6 +246,50 @@ public unsafe class UnlocksTabUtils(
             TripleTriadCardTooltip?.CalculateLayout();
             TripleTriadCardTooltip?.Update();
             TripleTriadCardTooltip?.Draw();
+        }
+        else if (item.ItemUICategory.RowId == 95) // Paintings
+        {
+            if (ExcelService.TryGetRow<Picture>(item.AdditionalData.RowId, out var picture))
+            {
+                var pictureId = (uint)picture.Image;
+
+                if (!_iconSizeCache.TryGetValue(pictureId, out var size))
+                {
+                    var iconPath = TextureProvider.GetIconPath(pictureId);
+                    if (string.IsNullOrEmpty(iconPath))
+                    {
+                        _iconSizeCache.Add(pictureId, null);
+                    }
+                    else
+                    {
+                        var file = DataManager.GetFile<TexFile>(iconPath);
+                        _iconSizeCache.Add(pictureId, size = file != null ? new(file.Header.Width, file.Header.Height) : null);
+                    }
+                }
+
+                if (size != null)
+                {
+                    TextureService.DrawIcon(pictureId, (Vector2)size * 0.5f);
+                }
+            }
+        }
+        else if (item.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink && ExcelService.TryFindRow<CharaMakeCustomize>(row => row.HintItem.RowId == item.RowId, out _)) // Hairstyles etc.
+        {
+            byte tribeId = 1;
+            byte sex = 1;
+            unsafe
+            {
+                var character = Control.GetLocalPlayer();
+                if (character != null)
+                {
+                    tribeId = character->DrawData.CustomizeData.Tribe;
+                    sex = character->DrawData.CustomizeData.Sex;
+                }
+            }
+
+            var hairStyleIconId = ItemService.GetHairstyleIconId(item.RowId, tribeId, sex);
+            if (hairStyleIconId != 0)
+                TextureService.DrawIcon(hairStyleIconId, 192);
         }
     }
 
