@@ -52,17 +52,13 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
     public override void LoadRows()
     {
         var residentSheet = _excelService.GetSheet<TripleTriadCardResident>();
+        var cardItems = _excelService.GetSheet<Item>()
+            .Where(itemRow => itemRow.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard)
+            .ToDictionary(itemRow => (uint)itemRow.ItemAction.Value!.Data[0]);
+
         Rows = _excelService.GetSheet<TripleTriadCard>()
-            .Where(row => row.RowId != 0 && residentSheet.HasRow(row.RowId))
-            .Select(row =>
-            {
-                _excelService.TryGetRow<TripleTriadCardResident>(row.RowId, out var resident);
-                var hasItem = _excelService.TryFindRow<Item>(
-                    itemRow => itemRow.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard &&
-                        itemRow.ItemAction.Value!.Data[0] == row.RowId,
-                    out var item);
-                return new TripleTriadCardEntry(row, resident, hasItem ? item : null);
-            })
+            .Where(row => row.RowId != 0 && residentSheet.HasRow(row.RowId) && cardItems.ContainsKey(row.RowId))
+            .Select(row => new TripleTriadCardEntry(row, residentSheet.GetRow(row.RowId), cardItems[row.RowId]))
             .ToList();
     }
 
