@@ -1,5 +1,6 @@
 using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Services;
@@ -57,8 +58,8 @@ public unsafe class SightseeingLogTable : Table<AdventureEntry>
         public override string ToName(AdventureEntry entry)
             => entry.Index.ToString();
 
-        public override int ToValue(AdventureEntry row)
-            => row.Index;
+        public override int ToValue(AdventureEntry entry)
+            => entry.Index;
     }
 
     private class RowIdColumn : ColumnNumber<AdventureEntry>
@@ -66,8 +67,8 @@ public unsafe class SightseeingLogTable : Table<AdventureEntry>
         public override string ToName(AdventureEntry entry)
             => entry.Row.RowId.ToString();
 
-        public override int ToValue(AdventureEntry row)
-            => (int)row.Row.RowId;
+        public override int ToValue(AdventureEntry entry)
+            => (int)entry.Row.RowId;
     }
 
     private class CompletedColumn : ColumnBool<AdventureEntry>
@@ -85,11 +86,18 @@ public unsafe class SightseeingLogTable : Table<AdventureEntry>
         {
             debugRenderer.DrawIcon((uint)entry.Row.IconList);
 
-            var clicked = ImGui.Selectable(entry.Row.Name.ExtractText());
-            if (ImGui.IsItemHovered())
-                ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            if (clicked)
-                mapService.OpenMap(entry.Row.Level.Value);
+            if (AgentLobby.Instance()->IsLoggedIn)
+            {
+                var clicked = ImGui.Selectable(entry.Row.Name.ExtractText());
+                if (ImGui.IsItemHovered())
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                if (clicked)
+                    mapService.OpenMap(entry.Row.Level.Value);
+            }
+            else
+            {
+                ImGui.TextUnformatted(entry.Row.Name.ExtractText());
+            }
         }
     }
 }

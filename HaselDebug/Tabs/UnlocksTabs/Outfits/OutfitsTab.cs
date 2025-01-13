@@ -59,39 +59,39 @@ public unsafe class OutfitsTab : DebugTab, ISubTab<UnlocksTab>, IDisposable
             // in case of logout
             if (_prismBoxBackedUp)
                 _prismBoxBackedUp = false;
+
+            return;
         }
-        else
+
+        var mirageManager = MirageManager.Instance();
+        if (!mirageManager->PrismBoxLoaded)
         {
-            var mirageManager = MirageManager.Instance();
-            if (!mirageManager->PrismBoxLoaded)
+            if (_prismBoxBackedUp)
             {
-                if (_prismBoxBackedUp)
-                {
-                    using (Color.Yellow.Push(ImGuiCol.Text))
-                        ImGui.TextUnformatted("PrismBox not loaded. Using cache.");
-                }
-                else
-                {
-                    using (Color.Red.Push(ImGuiCol.Text))
-                        ImGui.TextUnformatted("PrismBox not loaded.");
-                }
+                using (Color.Yellow.Push(ImGuiCol.Text))
+                    ImGui.TextUnformatted("PrismBox not loaded. Using cache.");
             }
             else
             {
-                var hasChanges = false;
+                using (Color.Red.Push(ImGuiCol.Text))
+                    ImGui.TextUnformatted("PrismBox not loaded.");
+            }
+        }
+        else
+        {
+            var hasChanges = false;
 
-                if (DateTime.Now - _prismBoxLastCheck > TimeSpan.FromSeconds(2))
-                {
-                    hasChanges = !CollectionsMarshal.AsSpan(_prismBoxItemIds).SequenceEqual(mirageManager->PrismBoxItemIds);
-                    _prismBoxLastCheck = DateTime.Now;
-                }
+            if (DateTime.Now - _prismBoxLastCheck > TimeSpan.FromSeconds(2))
+            {
+                hasChanges = !CollectionsMarshal.AsSpan(_prismBoxItemIds).SequenceEqual(mirageManager->PrismBoxItemIds);
+                _prismBoxLastCheck = DateTime.Now;
+            }
 
-                if (!_prismBoxBackedUp || hasChanges)
-                {
-                    _prismBoxItemIds.Clear();
-                    _prismBoxItemIds.AddRange(mirageManager->PrismBoxItemIds);
-                    _prismBoxBackedUp = true;
-                }
+            if (!_prismBoxBackedUp || hasChanges)
+            {
+                _prismBoxItemIds.Clear();
+                _prismBoxItemIds.AddRange(mirageManager->PrismBoxItemIds);
+                _prismBoxBackedUp = true;
             }
         }
 

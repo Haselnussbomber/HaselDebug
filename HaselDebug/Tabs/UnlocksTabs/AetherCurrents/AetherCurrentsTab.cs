@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.AetherCurrents;
 public unsafe class AetherCurrentsTab(AetherCurrentsTable table) : DebugTab, ISubTab<UnlocksTab>
 {
     public override string Title => "Aether Currents";
+    public override bool DrawInChild => !AgentLobby.Instance()->IsLoggedIn;
 
     public override void Draw()
     {

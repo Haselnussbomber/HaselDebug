@@ -12,7 +12,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Titles;
 public unsafe class TitlesTab(TitlesTable table) : DebugTab, ISubTab<UnlocksTab>
 {
     public override string Title => "Titles";
-    public override bool DrawInChild => false;
+    public override bool DrawInChild => !AgentLobby.Instance()->IsLoggedIn;
 
     public override void Draw()
     {
