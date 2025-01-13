@@ -3,112 +3,54 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using HaselCommon.Graphics;
+using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
 using HaselCommon.Sheets;
-using HaselDebug.Abstracts;
-using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
-using UnlockEntry = (string SheetRow, uint IconId, Lumina.Text.ReadOnly.ReadOnlySeString Text);
 
-namespace HaselDebug.Tabs;
+namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks;
 
-[RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisposable
+[RegisterSingleton]
+public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
 {
-    private readonly DebugRenderer _debugRenderer;
-    private readonly ExcelService _excelService;
-    private readonly LanguageProvider _languageProvider;
+    internal readonly ExcelService _excelService;
+    private readonly SeStringEvaluatorService _seStringEvaluator;
     private readonly TextService _textService;
-    private readonly SeStringEvaluatorService _seStringEvaluatorService;
 
-    private (uint Index, HashSet<UnlockEntry> Unlocks)[] UnlockLinks = [];
-    private bool _personalCharaMakeCustomizeOnly = true;
+    public bool PersonalCharaMakeCustomizeOnly = true;
 
-    public override string Title => "Unlock Links";
-
-    public UnlocksTabUnlockLinks(
-        DebugRenderer debugRenderer,
+    public UnlockLinksTable(
         ExcelService excelService,
-        LanguageProvider languageProvider,
+        DebugRenderer debugRenderer,
+        SeStringEvaluatorService seStringEvaluator,
         TextService textService,
-        SeStringEvaluatorService seStringEvaluatorService) : base()
+        LanguageProvider languageProvider) : base("UnlockLinksTable", languageProvider)
     {
-        _debugRenderer = debugRenderer;
         _excelService = excelService;
-        _languageProvider = languageProvider;
+        _seStringEvaluator = seStringEvaluator;
         _textService = textService;
-        _seStringEvaluatorService = seStringEvaluatorService;
 
-        _languageProvider.LanguageChanged += OnLanguageChanged;
-
-        Update();
-    }
-
-    public void Dispose()
-    {
-        _languageProvider.LanguageChanged -= OnLanguageChanged;
-        GC.SuppressFinalize(this);
-    }
-
-    private void OnLanguageChanged(string langCode)
-    {
-        Update();
-    }
-
-    public override void Draw()
-    {
-        var uiState = UIState.Instance();
-
-        if (uiState->PlayerState.IsLoaded == 1 && ImGui.Checkbox("Only show CharaMakeCustomize rows usable on current character", ref _personalCharaMakeCustomizeOnly))
-            Update();
-
-        using var table = ImRaii.Table("UnlockLinksTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
-        if (!table) return;
-
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Unlocked", ImGuiTableColumnFlags.WidthFixed, 60);
-        ImGui.TableSetupColumn("Unlocks", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupScrollFreeze(3, 1);
-        ImGui.TableHeadersRow();
-
-        foreach (var (id, entries) in UnlockLinks)
-        {
-            ImGui.TableNextRow();
-
-            ImGui.TableNextColumn(); // Id
-            ImGui.TextUnformatted(id.ToString());
-
-            ImGui.TableNextColumn(); // Unlocked
-            var isUnlocked = UIState.Instance()->IsUnlockLinkUnlocked(id);
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isUnlocked ? Color.Green : Color.Red)))
-                ImGui.TextUnformatted(isUnlocked.ToString());
-
-            ImGui.TableNextColumn(); // Unlocks
-
-            using var innertable = ImRaii.Table($"InnerTable{id}", 2, ImGuiTableFlags.NoSavedSettings, new Vector2(-1, -1));
-            if (!innertable) return;
-
-            ImGui.TableSetupColumn("Sheet", ImGuiTableColumnFlags.WidthFixed, 320);
-            ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-
-            foreach (var (SheetRow, IconId, Text) in entries)
-            {
-                ImGui.TableNextRow();
-                ImGui.TableNextColumn(); // Sheet
-                ImGui.TextUnformatted(SheetRow);
-
-                ImGui.TableNextColumn(); // Name
-                _debugRenderer.DrawIcon(IconId);
-                ImGui.TextUnformatted(Text.ExtractText());
+        Columns = [
+            new IndexColumn() {
+                Label = "Index",
+                Flags = ImGuiTableColumnFlags.WidthFixed,
+                Width = 60,
+            },
+            new UnlockedColumn() {
+                Label = "Unlocked",
+                Flags = ImGuiTableColumnFlags.WidthFixed,
+                Width = 75,
+            },
+            new UnlocksColumn(debugRenderer) {
+                Label = "Unlocks",
             }
-        }
+        ];
     }
 
-    private void Update()
+    public override void LoadRows()
     {
         var dict = new Dictionary<uint, HashSet<UnlockEntry>>();
 
@@ -125,7 +67,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
                 if (!dict.TryGetValue(row.UnlockLink, out var names))
                     dict.Add(row.UnlockLink, names = []);
 
-                names.Add(($"GeneralAction#{row.RowId}", (uint)row.Icon, row.Name));
+                names.Add(new ($"GeneralAction#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -136,7 +78,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
                 if (!dict.TryGetValue(row.UnlockLink.RowId, out var names))
                     dict.Add(row.UnlockLink.RowId, names = []);
 
-                names.Add(($"Action#{row.RowId}", row.Icon, row.Name));
+                names.Add(new ($"Action#{row.RowId}", row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -147,7 +89,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
                 if (!dict.TryGetValue(row.Reward, out var names))
                     dict.Add(row.Reward, names = []);
 
-                names.Add(($"BuddyAction#{row.RowId}", (uint)row.Icon, row.Name));
+                names.Add(new ($"BuddyAction#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -158,7 +100,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
                 if (!dict.TryGetValue(row.QuestRequirement.RowId, out var names))
                     dict.Add(row.QuestRequirement.RowId, names = []);
 
-                names.Add(($"CraftAction#{row.RowId}", row.Icon, row.Name));
+                names.Add(new ($"CraftAction#{row.RowId}", row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -169,7 +111,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
                 if (!dict.TryGetValue(row.UnlockLink, out var names))
                     dict.Add(row.UnlockLink, names = []);
 
-                names.Add(($"Emote#{row.RowId}", row.Icon, row.Name));
+                names.Add(new ($"Emote#{row.RowId}", row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -180,7 +122,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
                 if (!dict.TryGetValue(row.StopAnimation.RowId, out var names))
                     dict.Add(row.StopAnimation.RowId, names = []);
 
-                names.Add(($"Perform#{row.RowId}", 0, row.Name));
+                names.Add(new ($"Perform#{row.RowId}", 0, row.Name.ExtractText()));
             }
         }
 
@@ -196,28 +138,28 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
 
             foreach (var bgRow in _excelService.FindRows<BannerBg>(bgRow => bgRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(($"BannerBg#{bgRow.RowId}", (uint)bgRow.Icon, bgRow.Name));
+                names.Add(new ($"BannerBg#{bgRow.RowId}", (uint)bgRow.Icon, bgRow.Name.ExtractText()));
             }
 
             foreach (var frameRow in _excelService.FindRows<BannerFrame>(frameRow => frameRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(($"BannerFrame#{frameRow.RowId}", (uint)frameRow.Icon, frameRow.Name));
+                names.Add(new ($"BannerFrame#{frameRow.RowId}", (uint)frameRow.Icon, frameRow.Name.ExtractText()));
             }
 
             foreach (var decorationRow in _excelService.FindRows<BannerDecoration>(decorationRow => decorationRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(($"BannerDecoration#{decorationRow.RowId}", (uint)decorationRow.Icon, decorationRow.Name));
+                names.Add(new ($"BannerDecoration#{decorationRow.RowId}", (uint)decorationRow.Icon, decorationRow.Name.ExtractText()));
             }
 
             foreach (var facialRow in _excelService.FindRows<BannerFacial>(facialRow => facialRow.UnlockCondition.RowId == row.RowId))
             {
                 if (facialRow.Emote.IsValid)
-                    names.Add(($"BannerFacial#{facialRow.RowId}", facialRow.Emote.Value.Icon, facialRow.Emote.Value.Name));
+                    names.Add(new ($"BannerFacial#{facialRow.RowId}", facialRow.Emote.Value.Icon, facialRow.Emote.Value.Name.ExtractText()));
             }
 
             foreach (var timelineRow in _excelService.FindRows<BannerTimeline>(timelineRow => timelineRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(($"BannerTimeline#{timelineRow.RowId}", (uint)timelineRow.Icon, timelineRow.Name));
+                names.Add(new ($"BannerTimeline#{timelineRow.RowId}", (uint)timelineRow.Icon, timelineRow.Name.ExtractText()));
             }
         }
 
@@ -229,7 +171,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
             if (!row.IsPurchasable)
                 continue;
 
-            if (isLoggedIn && _personalCharaMakeCustomizeOnly && hasFoundHairMakeType && !hairMakeType.HairStyles.Any(h => h.RowId == row.RowId))
+            if (isLoggedIn && PersonalCharaMakeCustomizeOnly && hasFoundHairMakeType && !hairMakeType.HairStyles.Any(h => h.RowId == row.RowId))
                 continue;
 
             if (!dict.TryGetValue(row.Data, out var names))
@@ -243,10 +185,10 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
             }
             else if (row.Hint.RowId != 0 && row.Hint.IsValid)
             {
-                title = _seStringEvaluatorService.EvaluateFromLobby(row.Hint.RowId, new SeStringContext() { LocalParameters = [row.HintItem.RowId] }).ExtractText();
+                title = _seStringEvaluator.EvaluateFromLobby(row.Hint.RowId, new SeStringContext() { LocalParameters = [row.HintItem.RowId] }).ExtractText();
             }
 
-            names.Add(($"CharaMakeCustomize#{row.RowId} (FeatureID: {row.FeatureID})", row.Icon, title));
+            names.Add(new ($"CharaMakeCustomize#{row.RowId} (FeatureID: {row.FeatureID})", row.Icon, title));
         }
 
         foreach (var row in _excelService.GetSheet<MJILandmark>())
@@ -257,7 +199,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
             if (!dict.TryGetValue(row.Unknown0, out var names))
                 dict.Add(row.Unknown0, names = []);
 
-            names.Add(($"MJILandmark#{row.RowId}", row.Icon, row.Name.Value.Text));
+            names.Add(new ($"MJILandmark#{row.RowId}", row.Icon, row.Name.Value.Text.ExtractText()));
         }
 
         foreach (var row in _excelService.GetSheet<CSBonusContentType>())
@@ -268,7 +210,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
             if (!dict.TryGetValue(row.Unknown11, out var names))
                 dict.Add(row.Unknown11, names = []);
 
-            names.Add(($"CSBonusContentType#{row.RowId}", row.ContentType.Value.Icon, row.ContentType.Value.Name));
+            names.Add(new ($"CSBonusContentType#{row.RowId}", row.ContentType.Value.Icon, row.ContentType.Value.Name.ExtractText()));
         }
 
         foreach (var row in _excelService.GetSheet<NotebookDivision>())
@@ -278,7 +220,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
                 if (!dict.TryGetValue(row.QuestUnlock.RowId, out var names))
                     dict.Add(row.QuestUnlock.RowId, names = []);
 
-                names.Add(($"NotebookDivision#{row.RowId}", 0, row.Name));
+                names.Add(new ($"NotebookDivision#{row.RowId}", 0, row.Name.ExtractText()));
             }
         }
 
@@ -289,7 +231,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
                 if (!dict.TryGetValue(row.Quest.RowId, out var names))
                     dict.Add(row.Quest.RowId, names = []);
 
-                names.Add(($"Trait#{row.RowId}", (uint)row.Icon, row.Name));
+                names.Add(new ($"Trait#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -300,7 +242,7 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
                 if (!dict.TryGetValue(row.Requirement0.RowId, out var names))
                     dict.Add(row.Requirement0.RowId, names = []);
 
-                names.Add(($"QuestAcceptAdditionCondition#{row.RowId} (Requirement 0)", 0, _textService.GetQuestName(row.RowId)));
+                names.Add(new ($"QuestAcceptAdditionCondition#{row.RowId} (Requirement 0)", 0, _textService.GetQuestName(row.RowId)));
             }
 
             if (row.Requirement1.RowId is > 0 and < 65536)
@@ -308,13 +250,53 @@ public unsafe class UnlocksTabUnlockLinks : DebugTab, ISubTab<UnlocksTab>, IDisp
                 if (!dict.TryGetValue(row.Requirement1.RowId, out var names))
                     dict.Add(row.Requirement1.RowId, names = []);
 
-                names.Add(($"QuestAcceptAdditionCondition#{row.RowId} (Requirement 1)", 0, _textService.GetQuestName(row.RowId)));
+                names.Add(new ($"QuestAcceptAdditionCondition#{row.RowId} (Requirement 1)", 0, _textService.GetQuestName(row.RowId)));
             }
         }
 
-        UnlockLinks = dict
-            .OrderBy(kv => kv.Key)
-            .Select(kv => (Id: kv.Key, Unlocks: kv.Value))
-            .ToArray();
+        Rows = dict
+            .Select(kv => new UnlockLinkEntry(kv.Key, [.. kv.Value]))
+            .ToList();
+    }
+
+    private class IndexColumn : ColumnNumber<UnlockLinkEntry>
+    {
+        public override string ToName(UnlockLinkEntry entry)
+            => entry.Index.ToString();
+
+        public override int ToValue(UnlockLinkEntry entry)
+            => (int)entry.Index;
+    }
+
+    private class UnlockedColumn : ColumnBool<UnlockLinkEntry>
+    {
+        public override unsafe bool ToBool(UnlockLinkEntry entry)
+            => UIState.Instance()->IsUnlockLinkUnlocked((ushort)entry.Index);
+    }
+
+    private class UnlocksColumn(DebugRenderer debugRenderer) : ColumnString<UnlockLinkEntry>
+    {
+        public override string ToName(UnlockLinkEntry entry)
+            => string.Join(' ', entry.Unlocks.Select(unlock => unlock.SheetRow + ' ' + unlock.Text));
+
+        public override unsafe void DrawColumn(UnlockLinkEntry entry)
+        {
+            using var innertable = ImRaii.Table($"InnerTable{entry.Index}", 2, ImGuiTableFlags.NoSavedSettings, new Vector2(-1, -1));
+            if (!innertable) return;
+
+            ImGui.TableSetupColumn("Sheet", ImGuiTableColumnFlags.WidthFixed, 320);
+            ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+
+            foreach (var (SheetRow, IconId, Text) in entry.Unlocks)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn(); // Sheet
+                ImGui.TextUnformatted(SheetRow);
+
+                ImGui.TableNextColumn(); // Name
+                debugRenderer.DrawIcon(IconId);
+                ImGui.TextUnformatted(Text);
+            }
+        }
     }
 }
