@@ -17,7 +17,7 @@ public unsafe class SightseeingLogTable : Table<AdventureEntry>
         ExcelService excelService,
         DebugRenderer debugRenderer,
         MapService mapService,
-        LanguageProvider languageProvider) : base("AchievementsTable", languageProvider)
+        LanguageProvider languageProvider) : base("SightseeingLogTable", languageProvider)
     {
         _excelService = excelService;
 
