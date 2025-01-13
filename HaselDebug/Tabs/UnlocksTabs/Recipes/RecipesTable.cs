@@ -79,9 +79,7 @@ public unsafe class RecipesTable : Table<Recipe>
             => row.ItemResult.Value.ItemUICategory.Value.Name.ExtractText().StripSoftHypen();
     }
 
-    private class NameColumn(
-        TextService textService,
-        UnlocksTabUtils unlocksTabUtils) : ColumnString<Recipe>
+    private class NameColumn(TextService textService, UnlocksTabUtils unlocksTabUtils) : ColumnString<Recipe>
     {
         public override string ToName(Recipe row)
             => textService.GetItemName(row.ItemResult.RowId);
