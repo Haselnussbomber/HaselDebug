@@ -45,8 +45,6 @@ public unsafe class FishTable : Table<FishParameter>
         ];
     }
 
-    public bool HideSpoilers = true;
-
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<FishParameter>()

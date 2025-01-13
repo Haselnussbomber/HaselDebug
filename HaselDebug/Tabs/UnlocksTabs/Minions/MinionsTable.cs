@@ -44,8 +44,6 @@ public unsafe class MinionsTable : Table<Companion>
         ];
     }
 
-    public bool HideSpoilers = true;
-
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<Companion>()

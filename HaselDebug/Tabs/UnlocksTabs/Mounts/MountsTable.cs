@@ -44,8 +44,6 @@ public unsafe class MountsTable : Table<Mount>
         ];
     }
 
-    public bool HideSpoilers = true;
-
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<Mount>()

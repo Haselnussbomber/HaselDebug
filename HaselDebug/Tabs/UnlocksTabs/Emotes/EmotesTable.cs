@@ -40,8 +40,6 @@ public unsafe class EmotesTable : Table<Emote>
         ];
     }
 
-    public bool HideSpoilers = true;
-
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<Emote>()

@@ -42,8 +42,6 @@ public unsafe class GlassesTable : Table<GlassesSheet>
         ];
     }
 
-    public bool HideSpoilers = true;
-
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<GlassesSheet>()

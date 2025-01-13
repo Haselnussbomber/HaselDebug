@@ -44,8 +44,6 @@ public unsafe class SightseeingLogTable : Table<AdventureEntry>
         ];
     }
 
-    public bool HideSpoilers = true;
-
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<Adventure>()

@@ -37,8 +37,6 @@ public unsafe class BardingsTable : Table<BuddyEquip>
         ];
     }
 
-    public bool HideSpoilers = true;
-
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<BuddyEquip>()

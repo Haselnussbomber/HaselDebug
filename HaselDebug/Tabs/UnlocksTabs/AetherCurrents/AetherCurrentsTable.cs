@@ -50,8 +50,6 @@ public unsafe class AetherCurrentsTable : Table<AetherCurrentEntry>
         ];
     }
 
-    public bool HideSpoilers = true;
-
     public override void LoadRows()
     {
         Rows.Clear();

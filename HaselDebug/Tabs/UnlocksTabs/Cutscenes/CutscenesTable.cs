@@ -44,8 +44,6 @@ public unsafe class CutscenesTable : Table<CutsceneEntry>
         LineHeight = 0;
     }
 
-    public bool HideSpoilers = true;
-
     public override void LoadRows()
     {
         var cutsceneSheet = _excelService.GetSheet<Cutscene>();
