@@ -67,7 +67,7 @@ public class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
         LineHeight = IconSize * scale + ImGui.GetStyle().ItemSpacing.Y; // I honestly don't know why using ItemSpacing here works
     }
 
-    protected override void LoadRows()
+    public override void LoadRows()
     {
         var cabinetSheet = _excelService.GetSheet<Cabinet>().Select(row => row.Item.RowId).ToArray();
         foreach (var row in _excelService.GetSheet<CustomMirageStoreSetItem>())
@@ -92,7 +92,7 @@ public class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
         }
     }
 
-    protected override void SortTristate()
+    public override void SortTristate()
     {
         Rows.Sort((a, b) => a.Set.RowId.CompareTo(b.Set.RowId));
     }

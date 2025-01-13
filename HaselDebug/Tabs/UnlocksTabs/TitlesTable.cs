@@ -37,7 +37,7 @@ public class TitlesTable : Table<Title>
         ];
     }
 
-    protected override void LoadRows()
+    public override void LoadRows()
     {
         Rows = _excelService.GetSheet<Title>()
             .Where(row => row.RowId != 0 && !row.Feminine.IsEmpty && !row.Masculine.IsEmpty)
