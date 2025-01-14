@@ -84,17 +84,20 @@ public unsafe class SightseeingLogTable : Table<AdventureEntry>
         {
             debugRenderer.DrawIcon((uint)entry.Row.IconList);
 
+            var isLoggedIn = AgentLobby.Instance()->IsLoggedIn;
             if (AgentLobby.Instance()->IsLoggedIn)
             {
-                var clicked = ImGui.Selectable(entry.Row.Name.ExtractText());
+                var clicked = ImGui.Selectable(ToName(entry));
+
                 if (ImGui.IsItemHovered())
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+
                 if (clicked)
                     mapService.OpenMap(entry.Row.Level.Value);
             }
             else
             {
-                ImGui.TextUnformatted(entry.Row.Name.ExtractText());
+                ImGui.TextUnformatted(ToName(entry));
             }
         }
     }

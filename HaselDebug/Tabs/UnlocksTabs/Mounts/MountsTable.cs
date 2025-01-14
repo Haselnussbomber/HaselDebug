@@ -1,7 +1,9 @@
 using System.Linq;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
@@ -17,6 +19,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Mounts;
 public unsafe class MountsTable : Table<Mount>
 {
     internal readonly ExcelService _excelService;
+    private readonly TextService _textService;
 
     public MountsTable(
         ExcelService excelService,
@@ -26,6 +29,7 @@ public unsafe class MountsTable : Table<Mount>
         LanguageProvider languageProvider) : base("MountsTable", languageProvider)
     {
         _excelService = excelService;
+        _textService = textService;
 
         Columns = [
             new RowIdColumn() {
@@ -47,7 +51,7 @@ public unsafe class MountsTable : Table<Mount>
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<Mount>()
-            .Where(row => row.RowId != 0 && row.Order != 0 && row.Icon != 0)
+            .Where(row => row.RowId != 0 && row.Order != 0 && row.Icon != 0 && !_textService.GetMountName(row.RowId).IsNullOrWhitespace())
             .ToList();
     }
 
@@ -80,11 +84,12 @@ public unsafe class MountsTable : Table<Mount>
             debugRenderer.DrawIcon(row.Icon);
 
             var name = ToName(row);
-            var isUnlocked = PlayerState.Instance()->IsMountUnlocked(row.RowId);
+            var isLoggedIn = AgentLobby.Instance()->IsLoggedIn;
+            var isUnlocked = isLoggedIn && PlayerState.Instance()->IsMountUnlocked(row.RowId);
             var canUse = isUnlocked && ActionManager.Instance()->GetActionStatus(ActionType.Mount, row.RowId) == 0;
             var player = Control.GetLocalPlayer();
             var currentId = 0u;
-            if (player != null)
+            if (isLoggedIn && player != null)
                 currentId = player->Mount.MountId;
 
             using (Color.Transparent.Push(ImGuiCol.HeaderActive, !canUse))

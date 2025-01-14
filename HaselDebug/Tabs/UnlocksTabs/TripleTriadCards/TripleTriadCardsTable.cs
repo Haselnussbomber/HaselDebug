@@ -1,5 +1,6 @@
 using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Game.Enums;
 using HaselCommon.Graphics;
@@ -104,21 +105,29 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
         public override unsafe void DrawColumn(TripleTriadCardEntry entry)
         {
             debugRenderer.DrawIcon(88000 + entry.Row.RowId);
-            var hasLevel = entry.ResidentRow.Location.TryGetValue<Level>(out var level);
-            using (Color.Transparent.Push(ImGuiCol.HeaderActive, !hasLevel))
-            using (Color.Transparent.Push(ImGuiCol.HeaderHovered, !hasLevel))
+
+            if (AgentLobby.Instance()->IsLoggedIn)
             {
-                if (ImGui.Selectable(entry.Row.Name.ExtractText()))
+                var hasLevel = entry.ResidentRow.Location.TryGetValue<Level>(out var level);
+                using (Color.Transparent.Push(ImGuiCol.HeaderActive, !hasLevel))
+                using (Color.Transparent.Push(ImGuiCol.HeaderHovered, !hasLevel))
                 {
-                    if (hasLevel)
+                    if (ImGui.Selectable(ToName(entry)))
                     {
-                        mapService.OpenMap(level);
+                        if (hasLevel)
+                        {
+                            mapService.OpenMap(level);
+                        }
                     }
                 }
-            }
 
-            if (entry.Item.HasValue && ImGui.IsItemHovered())
-                unlocksTabUtils.DrawItemTooltip(entry.Item.Value);
+                if (entry.Item.HasValue && ImGui.IsItemHovered())
+                    unlocksTabUtils.DrawItemTooltip(entry.Item.Value);
+            }
+            else
+            {
+                ImGui.TextUnformatted(ToName(entry));
+            }
         }
     }
 }

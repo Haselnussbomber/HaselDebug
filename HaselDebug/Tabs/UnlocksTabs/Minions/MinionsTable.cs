@@ -2,6 +2,7 @@ using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
@@ -80,11 +81,12 @@ public unsafe class MinionsTable : Table<Companion>
             debugRenderer.DrawIcon(row.Icon);
 
             var name = ToName(row);
-            var isUnlocked = UIState.Instance()->IsCompanionUnlocked(row.RowId);
+            var isLoggedIn = AgentLobby.Instance()->IsLoggedIn;
+            var isUnlocked = isLoggedIn && UIState.Instance()->IsCompanionUnlocked(row.RowId);
             var canUse = isUnlocked && ActionManager.Instance()->GetActionStatus(ActionType.Companion, row.RowId) == 0;
             var player = Control.GetLocalPlayer();
             var currentId = 0u;
-            if (player != null && player->CompanionData.CompanionObject != null)
+            if (isLoggedIn && player != null && player->CompanionData.CompanionObject != null)
                 currentId = player->CompanionData.CompanionObject->BaseId;
 
             using (Color.Transparent.Push(ImGuiCol.HeaderActive, !canUse))

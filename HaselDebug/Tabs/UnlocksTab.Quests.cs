@@ -122,6 +122,8 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
 
     private void DrawRow(Quest row)
     {
+        var isLoggedIn = AgentLobby.Instance()->IsLoggedIn;
+
         ImGui.TableNextRow();
 
         ImGui.TableNextColumn(); // RowId
@@ -131,17 +133,16 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
         _debugRenderer.DrawCopyableText((row.RowId - 0x10000).ToString());
 
         ImGui.TableNextColumn(); // Completed
-        var isCompleted = UIState.Instance()->IsUnlockLinkUnlockedOrQuestCompleted((ushort)row.RowId + 0x10000u);
+        var isCompleted = isLoggedIn && UIState.Instance()->IsUnlockLinkUnlockedOrQuestCompleted((ushort)row.RowId + 0x10000u);
         using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isCompleted ? Color.Green : Color.Red)))
             ImGui.TextUnformatted(isCompleted.ToString());
 
         ImGui.TableNextColumn(); // Name
         _debugRenderer.DrawIcon(row.Icon);
 
-        if (ImGui.Selectable(row.Name.ExtractText()))
+        if (ImGui.Selectable(row.Name.ExtractText()) && isLoggedIn && row.IssuerLocation.IsValid)
         {
-            if (row.IssuerLocation.IsValid)
-                _mapService.OpenMap(row.IssuerLocation.Value);
+            _mapService.OpenMap(row.IssuerLocation.Value);
         }
 
         _imGuiContextMenu.Draw($"Quest{row.RowId}ContextMenu", builder =>
@@ -150,7 +151,7 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
 
             builder.Add(new ImGuiContextMenuEntry()
             {
-                Visible = row.IssuerLocation.IsValid,
+                Visible = isLoggedIn && row.IssuerLocation.IsValid,
                 Label = _textService.GetAddonText(8506), // "Open Map"
                 LoseFocusOnClick = true,
                 ClickCallback = () =>
@@ -161,7 +162,7 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
 
             builder.Add(new ImGuiContextMenuEntry()
             {
-                Visible = row.IssuerLocation.IsValid,
+                Visible = isLoggedIn && row.IssuerLocation.IsValid,
                 Label = _textService.Translate("ContextMenu.OpenInArchive"),
                 LoseFocusOnClick = true,
                 ClickCallback = () =>

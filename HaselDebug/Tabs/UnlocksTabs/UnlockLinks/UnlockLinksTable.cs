@@ -48,6 +48,8 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 Label = "Unlocks",
             }
         ];
+
+        LineHeight = 0;
     }
 
     public override void LoadRows()

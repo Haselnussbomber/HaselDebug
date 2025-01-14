@@ -91,7 +91,7 @@ public unsafe class RecipesTable : Table<Recipe>
             if (ImGui.IsItemHovered())
                 ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
 
-            if (clicked)
+            if (clicked && AgentLobby.Instance()->IsLoggedIn)
                 AgentRecipeNote.Instance()->OpenRecipeByRecipeId(row.RowId);
         }
     }

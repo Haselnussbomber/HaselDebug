@@ -86,7 +86,7 @@ public unsafe class SpearfishTable : Table<SpearfishingItem>
 
             debugRenderer.DrawIcon(item.Icon);
 
-            if (ImGui.Selectable(ToName(row)))
+            if (ImGui.Selectable(ToName(row)) && AgentLobby.Instance()->IsLoggedIn)
                 AgentFishGuide.Instance()->OpenForItemId(row.Item.RowId, true);
 
             if (ImGui.IsItemHovered())

@@ -71,14 +71,21 @@ public unsafe class EmotesTable : Table<Emote>
         {
             debugRenderer.DrawIcon(row.Icon);
 
-            using var disabled = ImRaii.Disabled(!AgentEmote.Instance()->CanUseEmote((ushort)row.RowId));
-            var clicked = ImGui.Selectable(ToName(row));
+            if (AgentLobby.Instance()->IsLoggedIn)
+            {
+                using var disabled = ImRaii.Disabled(!AgentEmote.Instance()->CanUseEmote((ushort)row.RowId));
+                var clicked = ImGui.Selectable(ToName(row));
 
-            if (ImGui.IsItemHovered())
-                ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                if (ImGui.IsItemHovered())
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
 
-            if (clicked)
-                AgentEmote.Instance()->ExecuteEmote((ushort)row.RowId, addToHistory: false);
+                if (clicked)
+                    AgentEmote.Instance()->ExecuteEmote((ushort)row.RowId, addToHistory: false);
+            }
+            else
+            {
+                ImGui.TextUnformatted(ToName(row));
+            }
         }
     }
 }

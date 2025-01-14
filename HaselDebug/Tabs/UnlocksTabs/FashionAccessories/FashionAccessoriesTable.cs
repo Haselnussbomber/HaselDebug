@@ -2,6 +2,7 @@ using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
@@ -77,14 +78,15 @@ public unsafe class FashionAccessoriesTable : Table<Ornament>
 
         public override unsafe void DrawColumn(Ornament row)
         {
+            var isLoggedIn = AgentLobby.Instance()->IsLoggedIn;
             var player = Control.GetLocalPlayer();
             var currentId = 0u;
-            if (player != null)
+            if (isLoggedIn && player != null)
                 currentId = player->OrnamentData.OrnamentId;
 
             debugRenderer.DrawIcon(row.Icon);
             var name = ToName(row);
-            var isUnlocked = PlayerState.Instance()->IsOrnamentUnlocked(row.RowId);
+            var isUnlocked = isLoggedIn && PlayerState.Instance()->IsOrnamentUnlocked(row.RowId);
             var canUse = isUnlocked && ActionManager.Instance()->GetActionStatus(ActionType.Ornament, row.RowId) == 0;
             using (Color.Transparent.Push(ImGuiCol.HeaderActive, !canUse))
             using (Color.Transparent.Push(ImGuiCol.HeaderHovered, !canUse))

@@ -88,7 +88,7 @@ public unsafe class FishTable : Table<FishParameter>
             var isEventItem = row.Item.TryGetValue(out EventItem eventItem);
             debugRenderer.DrawIcon(isItem ? item.Icon : isEventItem ? eventItem.Icon : 0u);
 
-            if (ImGui.Selectable(ToName(row)))
+            if (ImGui.Selectable(ToName(row)) && AgentLobby.Instance()->IsLoggedIn)
                 AgentFishGuide.Instance()->OpenForItemId(row.Item.RowId, false);
 
             if (ImGui.IsItemHovered())
