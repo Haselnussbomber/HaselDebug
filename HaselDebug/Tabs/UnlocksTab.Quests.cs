@@ -64,7 +64,7 @@ public unsafe class UnlocksTabQuests : DebugTab, IUnlockTab, IDisposable
 
         _languageProvider.LanguageChanged += OnLanguageChanged;
 
-        _quests = _excelService.GetSheet<Quest>().Skip(1).ToArray();
+        LoadQuests();
     }
 
     public void Dispose()
@@ -86,7 +86,12 @@ public unsafe class UnlocksTabQuests : DebugTab, IUnlockTab, IDisposable
 
     private void OnLanguageChanged(string langCode)
     {
-        _quests = _excelService.GetSheet<Quest>().Skip(1).ToArray();
+        LoadQuests();
+    }
+
+    private void LoadQuests()
+    {
+        _quests = _excelService.GetSheet<Quest>().Where(row => row.RowId != 0 && !string.IsNullOrEmpty(_textService.GetQuestName(row.RowId))).ToArray();
     }
 
     public override string Title => "Quests";

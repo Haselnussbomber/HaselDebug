@@ -3,6 +3,7 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using HaselCommon.Game.Enums;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
@@ -165,6 +166,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
             }
         }
 
+        // TODO: reload table when logging out/in
         HairMakeTypeCustom hairMakeType = default;
         var hasFoundHairMakeType = isLoggedIn && _excelService.TryFindRow(t => t.HairMakeType.Tribe.RowId == tribeId && t.HairMakeType.Gender == sexId, out hairMakeType);
 
@@ -173,8 +175,20 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
             if (!row.IsPurchasable)
                 continue;
 
-            if (isLoggedIn && PersonalCharaMakeCustomizeOnly && hasFoundHairMakeType && !hairMakeType.HairStyles.Any(h => h.RowId == row.RowId))
+            if (isLoggedIn &&
+                PersonalCharaMakeCustomizeOnly &&
+                hasFoundHairMakeType &&
+                row.HintItem.RowId != 0 &&
+                row.HintItem.IsValid &&
+                row.HintItem.Value.ItemAction.RowId != 0 &&
+                row.HintItem.Value.ItemAction.IsValid &&
+                row.HintItem.Value.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink &&
+                row.HintItem.Value.ItemAction.Value.Data[0] == row.Data &&
+                row.HintItem.Value.ItemAction.Value.Data[1] == 4659 && // LogMessage id
+                !hairMakeType.HairStyles.Any(h => h.RowId == row.RowId))
+            {
                 continue;
+            }
 
             if (!dict.TryGetValue(row.Data, out var names))
                 dict.Add(row.Data, names = []);
@@ -280,6 +294,12 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
     {
         public override string ToName(UnlockLinkEntry entry)
             => string.Join(' ', entry.Unlocks.Select(unlock => unlock.SheetRow + ' ' + unlock.Text));
+
+        public override int Compare(UnlockLinkEntry lhs, UnlockLinkEntry rhs)
+        {
+            static string toName(UnlockLinkEntry entry) => string.Join(' ', entry.Unlocks.Select(unlock => unlock.Text));
+            return toName(lhs).CompareTo(toName(rhs));
+        }
 
         public override unsafe void DrawColumn(UnlockLinkEntry entry)
         {

@@ -52,6 +52,7 @@ public class UnlocksTabSummaryWrapper : Node
         AlignItems = YGAlign.Center;
 
         Add(new UnlocksTabSummary(unlockTabs));
+        Add(new TextNode() { MarginTop = 20, Text = "Note: This is completely inaccurate and totally useless. :)" });
     }
 
     public override void ApplyLayout()
@@ -67,7 +68,8 @@ public class UnlocksTabSummary : Node
     public UnlocksTabSummary(IUnlockTab[] unlockTabs)
     {
         // flex box? in my imgui? kinda. though i'm struggling with it. but maybe i'm just using it wrong.
-
+        
+        MarginTop = 20;
         MaxWidth = 650;
         FlexWrap = YGWrap.Wrap;
         FlexDirection = YGFlexDirection.Row;
