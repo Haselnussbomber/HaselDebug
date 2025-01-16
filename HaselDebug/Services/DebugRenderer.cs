@@ -613,6 +613,7 @@ public unsafe partial class DebugRenderer
 
             if (hasDoc)
             {
+                using var font = PluginInterface.UiBuilder.MonoFontHandle.Push();
                 var doc = GetDocumentation(fullName);
                 if (doc != null)
                 {

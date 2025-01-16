@@ -77,7 +77,6 @@ public partial class DebugRenderer
                 {
                     processedMembers.Add(member.Inheritdoc.CRef);
                     ProcessMember(inheritedMember);
-                    ProcessMemberText(inheritedMember);
                 }
 
                 ProcessMemberText(member);
@@ -148,25 +147,42 @@ public partial class DebugRenderer
 
         foreach (var line in list)
         {
-            if (!string.IsNullOrEmpty(line))
+            if (string.IsNullOrEmpty(line))
+                continue;
+
+            var cutLine = line;
+
+            var indentation = line.TakeWhile(char.IsWhiteSpace).Count();
+
+            if (firstLineIndentation == -1)
+                firstLineIndentation = indentation;
+
+            if (firstLineIndentation <= indentation)
+                cutLine = cutLine[firstLineIndentation..];
+
+            cutLine = RegexXmlNewLine().Replace(cutLine, "\n");
+            cutLine = RegexXmlSeeAlsoWithText().Replace(cutLine, match => RemovePrefix(match.Groups[1].Value, parentName));
+            cutLine = RegexXmlSeeAlso().Replace(cutLine, match => match.Groups[1].Value.Replace(GetLongestCommonPrefix(parentName, match.Groups[1].Value) + ".", string.Empty));
+            cutLine = RegexXmlCode().Replace(cutLine, "$1");
+            cutLine = RegexXmlList().Replace(cutLine, match =>
             {
-                var cutLine = line;
+                if (match.Groups[1].Value == "table")
+                    return match.Value; // not supported
 
-                var indentation = line.TakeWhile(char.IsWhiteSpace).Count();
+                var index = 1;
+                return RegexXmlItem().Replace(match.Groups[2].Value, lineMatch =>
+                {
+                    var prefix = match.Groups[1].Value switch
+                    {
+                        "bullet" => "\u2022 ",
+                        "number" => $"{index++}) ", // idk actually
+                        _ => "- "
+                    };
+                    return prefix + lineMatch.Groups[1].Value + "\n";
+                });
+            });
 
-                if (firstLineIndentation == -1)
-                    firstLineIndentation = indentation;
-
-                if (firstLineIndentation <= indentation)
-                    cutLine = cutLine[firstLineIndentation..];
-
-                cutLine = RegexXmlNewLine().Replace(cutLine, "\n");
-                cutLine = RegexXmlSeeAlsoWithText().Replace(cutLine, match => RemovePrefix(match.Groups[1].Value, parentName));
-                cutLine = RegexXmlSeeAlso().Replace(cutLine, match => match.Groups[1].Value.Replace(GetLongestCommonPrefix(parentName, match.Groups[1].Value) + ".", string.Empty));
-                cutLine = RegexXmlCode().Replace(cutLine, "$1");
-
-                sb.AppendLine(cutLine.TrimEnd());
-            }
+            sb.AppendLine(cutLine.TrimEnd());
         }
 
         return sb.ToString().TrimEnd();
@@ -183,6 +199,12 @@ public partial class DebugRenderer
 
     [GeneratedRegex("<c>(.*?)</c>", RegexOptions.IgnoreCase)]
     private static partial Regex RegexXmlCode();
+
+    [GeneratedRegex("<list(?: type=\"(bullet|number)\")?>(.*?)</list>", RegexOptions.IgnoreCase)]
+    private static partial Regex RegexXmlList();
+
+    [GeneratedRegex("<item>(.*?)</item>", RegexOptions.IgnoreCase)]
+    private static partial Regex RegexXmlItem();
 
     [XmlRoot("doc")]
     public record XmlDoc
