@@ -24,6 +24,7 @@ public unsafe partial class DebugRenderer
 
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"{sheetType.Name}#{rowId}###{nodeOptions.AddressPath}", nodeOptions.GetTreeNodeFlags());
+        nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
         if (!node) return;
         titleColor.Dispose();
 

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Game.Enums;
 using HaselCommon.Gui.ImGuiTable;
@@ -9,30 +8,33 @@ using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
 using HaselCommon.Sheets;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks;
 
 [RegisterSingleton]
-public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
+public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 {
     internal readonly ExcelService _excelService;
     private readonly SeStringEvaluatorService _seStringEvaluator;
     private readonly TextService _textService;
-
-    public bool PersonalCharaMakeCustomizeOnly = true;
+    private readonly IClientState _clientState;
 
     public UnlockLinksTable(
         ExcelService excelService,
         DebugRenderer debugRenderer,
         SeStringEvaluatorService seStringEvaluator,
         TextService textService,
-        LanguageProvider languageProvider) : base("UnlockLinksTable", languageProvider)
+        UnlocksTabUtils unlocksTabUtils,
+        LanguageProvider languageProvider,
+        IClientState clientState) : base("UnlockLinksTable", languageProvider)
     {
         _excelService = excelService;
         _seStringEvaluator = seStringEvaluator;
         _textService = textService;
+        _clientState = clientState;
 
         Columns = [
             new IndexColumn() {
@@ -46,11 +48,37 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 Width = 75,
             },
             new UnlocksColumn(debugRenderer) {
-                Label = "Unlocks",
+                Label = "Sheet/Row",
+                Flags = ImGuiTableColumnFlags.WidthFixed,
+                Width = 300,
+            },
+            new UnlocksNameColumn(debugRenderer, unlocksTabUtils) {
+                Label = "Name",
             }
         ];
 
         LineHeight = 0;
+
+        _clientState.Login += OnLogin;
+        _clientState.Logout += OnLogout;
+    }
+
+    public override void Dispose()
+    {
+        _clientState.Logout -= OnLogout;
+        _clientState.Login -= OnLogin;
+        base.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    private void OnLogin()
+    {
+        LoadRows();
+    }
+
+    private void OnLogout(int type, int code)
+    {
+        LoadRows();
     }
 
     public override void LoadRows()
@@ -70,7 +98,14 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.UnlockLink, out var names))
                     dict.Add(row.UnlockLink, names = []);
 
-                names.Add(new($"GeneralAction#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "GeneralAction",
+                    RowId = row.RowId,
+                    IconId = (uint)row.Icon,
+                    Label = row.Name.ExtractText(),
+                    Category = "General Action"
+                });
             }
         }
 
@@ -81,7 +116,14 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.UnlockLink.RowId, out var names))
                     dict.Add(row.UnlockLink.RowId, names = []);
 
-                names.Add(new($"Action#{row.RowId}", row.Icon, row.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "Action",
+                    RowId = row.RowId,
+                    IconId = row.Icon,
+                    Label = row.Name.ExtractText(),
+                    Category = _excelService.TryFindRow<AozAction>(aozRow => aozRow.Action.RowId == row.RowId, out var aozAction) ? $"Blue Mage Action {aozAction.RowId}" : "Action"
+                });
             }
         }
 
@@ -92,7 +134,14 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.Reward, out var names))
                     dict.Add(row.Reward, names = []);
 
-                names.Add(new($"BuddyAction#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "BuddyAction",
+                    RowId = row.RowId,
+                    IconId = (uint)row.Icon,
+                    Label = row.Name.ExtractText(),
+                    Category = "Pet Action"
+                });
             }
         }
 
@@ -103,7 +152,14 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.QuestRequirement.RowId, out var names))
                     dict.Add(row.QuestRequirement.RowId, names = []);
 
-                names.Add(new($"CraftAction#{row.RowId}", row.Icon, row.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "CraftAction",
+                    RowId = row.RowId,
+                    IconId = row.Icon,
+                    Label = row.Name.ExtractText(),
+                    Category = "Crafting Action"
+                });
             }
         }
 
@@ -114,7 +170,13 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.UnlockLink, out var names))
                     dict.Add(row.UnlockLink, names = []);
 
-                names.Add(new($"Emote#{row.RowId}", row.Icon, row.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "Emote",
+                    RowId = row.RowId,
+                    IconId = row.Icon,
+                    Label = row.Name.ExtractText()
+                });
             }
         }
 
@@ -125,7 +187,12 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.StopAnimation.RowId, out var names))
                     dict.Add(row.StopAnimation.RowId, names = []);
 
-                names.Add(new($"Perform#{row.RowId}", 0, row.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "Perform",
+                    RowId = row.RowId,
+                    Label = row.Name.ExtractText()
+                });
             }
         }
 
@@ -141,53 +208,122 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
 
             foreach (var bgRow in _excelService.FindRows<BannerBg>(bgRow => bgRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(new($"BannerBg#{bgRow.RowId}", (uint)bgRow.Icon, bgRow.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "BannerBg",
+                    RowId = bgRow.RowId,
+                    IconId = (uint)bgRow.Icon,
+                    Label = bgRow.Name.ExtractText(),
+                    Category = _textService.GetAddonText(14687)
+                });
             }
 
             foreach (var frameRow in _excelService.FindRows<BannerFrame>(frameRow => frameRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(new($"BannerFrame#{frameRow.RowId}", (uint)frameRow.Icon, frameRow.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "BannerFrame",
+                    RowId = frameRow.RowId,
+                    IconId = (uint)frameRow.Icon,
+                    Label = frameRow.Name.ExtractText(),
+                    Category = _textService.GetAddonText(14688)
+                });
             }
 
             foreach (var decorationRow in _excelService.FindRows<BannerDecoration>(decorationRow => decorationRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(new($"BannerDecoration#{decorationRow.RowId}", (uint)decorationRow.Icon, decorationRow.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "BannerDecoration",
+                    RowId = decorationRow.RowId,
+                    IconId = (uint)decorationRow.Icon,
+                    Label = decorationRow.Name.ExtractText(),
+                    Category = _textService.GetAddonText(14689)
+                });
             }
 
             foreach (var facialRow in _excelService.FindRows<BannerFacial>(facialRow => facialRow.UnlockCondition.RowId == row.RowId))
             {
                 if (facialRow.Emote.IsValid)
-                    names.Add(new($"BannerFacial#{facialRow.RowId}", facialRow.Emote.Value.Icon, facialRow.Emote.Value.Name.ExtractText()));
+                {
+                    names.Add(new UnlockEntry()
+                    {
+                        SheetName = "BannerFacial",
+                        RowId = facialRow.RowId,
+                        IconId = facialRow.Emote.Value.Icon,
+                        Label = facialRow.Emote.Value.Name.ExtractText(),
+                        Category = _textService.GetAddonText(14691)
+                    });
+                }
             }
 
             foreach (var timelineRow in _excelService.FindRows<BannerTimeline>(timelineRow => timelineRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(new($"BannerTimeline#{timelineRow.RowId}", (uint)timelineRow.Icon, timelineRow.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "BannerTimeline",
+                    RowId = timelineRow.RowId,
+                    IconId = (uint)timelineRow.Icon,
+                    Label = timelineRow.Name.ExtractText(),
+                    Category = _textService.GetAddonText(14690)
+                });
             }
         }
 
-        // TODO: reload table when logging out/in
-        HairMakeTypeCustom hairMakeType = default;
-        var hasFoundHairMakeType = isLoggedIn && _excelService.TryFindRow(t => t.HairMakeType.Tribe.RowId == tribeId && t.HairMakeType.Gender == sexId, out hairMakeType);
+        CustomHairMakeType hairMakeType = default;
+        var hasFoundHairMakeType = isLoggedIn && _excelService.TryFindRow(t => t.Tribe.RowId == tribeId && t.Gender == sexId, out hairMakeType);
 
         foreach (var row in _excelService.GetSheet<CharaMakeCustomize>())
         {
             if (!row.IsPurchasable)
                 continue;
 
-            if (isLoggedIn &&
-                PersonalCharaMakeCustomizeOnly &&
-                hasFoundHairMakeType &&
-                row.HintItem.RowId != 0 &&
-                row.HintItem.IsValid &&
-                row.HintItem.Value.ItemAction.RowId != 0 &&
-                row.HintItem.Value.ItemAction.IsValid &&
-                row.HintItem.Value.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink &&
-                row.HintItem.Value.ItemAction.Value.Data[0] == row.Data &&
-                row.HintItem.Value.ItemAction.Value.Data[1] == 4659 && // LogMessage id
-                !hairMakeType.HairStyles.Any(h => h.RowId == row.RowId))
+            var description = string.Empty;
+
+            if (isLoggedIn && hasFoundHairMakeType)
             {
-                continue;
+                if (row.HintItem.RowId != 0 &&
+                    row.HintItem.IsValid &&
+                    row.HintItem.Value.ItemAction.RowId != 0 &&
+                    row.HintItem.Value.ItemAction.IsValid &&
+                    row.HintItem.Value.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink &&
+                    row.HintItem.Value.ItemAction.Value.Data[0] == row.Data)
+                {
+                    // Hairstyles
+                    if (row.HintItem.Value.ItemAction.Value.Data[1] == 4659 && // LogMessage id
+                        !hairMakeType.CharaMakeStruct[0].SubMenuParam.Any(id => id == row.RowId))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        description = _textService.GetLobbyText(234);
+                    }
+
+                    // Face Paint
+                    if (row.HintItem.Value.ItemAction.Value.Data[1] == 9390 && // LogMessage id
+                        !hairMakeType.CharaMakeStruct[7].SubMenuParam.Any(id => id == row.RowId))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        description = _textService.GetLobbyText(249);
+                    }
+                }
+
+                // Hairstyle available in preparation for the Ceremony of Eternal Bonding.
+                if (row.Hint.RowId == 641)
+                {
+                    if (!hairMakeType.CharaMakeStruct[0].SubMenuParam.Any(id => id == row.RowId))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        description = _textService.GetLobbyText(234);
+                    }
+                }
             }
 
             if (!dict.TryGetValue(row.Data, out var names))
@@ -204,7 +340,15 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 title = _seStringEvaluator.EvaluateFromLobby(row.Hint.RowId, new SeStringContext() { LocalParameters = [row.HintItem.RowId] }).ExtractText();
             }
 
-            names.Add(new($"CharaMakeCustomize#{row.RowId} (FeatureID: {row.FeatureID})", row.Icon, title));
+            names.Add(new UnlockEntry()
+            {
+                SheetName = "CharaMakeCustomize",
+                RowId = row.RowId,
+                ExtraSheetText = $" (FeatureID: {row.FeatureID})",
+                IconId = row.Icon,
+                Label = title,
+                Category = description
+            });
         }
 
         foreach (var row in _excelService.GetSheet<MJILandmark>())
@@ -215,7 +359,14 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
             if (!dict.TryGetValue(row.Unknown0, out var names))
                 dict.Add(row.Unknown0, names = []);
 
-            names.Add(new($"MJILandmark#{row.RowId}", row.Icon, row.Name.Value.Text.ExtractText()));
+            names.Add(new UnlockEntry()
+            {
+                SheetName = "MJILandmark",
+                RowId = row.RowId,
+                IconId = row.Icon,
+                Label = row.Name.Value.Text.ExtractText(),
+                Category = _textService.GetAddonText(14269)
+            });
         }
 
         foreach (var row in _excelService.GetSheet<CSBonusContentType>())
@@ -226,7 +377,13 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
             if (!dict.TryGetValue(row.Unknown11, out var names))
                 dict.Add(row.Unknown11, names = []);
 
-            names.Add(new($"CSBonusContentType#{row.RowId}", row.ContentType.Value.Icon, row.ContentType.Value.Name.ExtractText()));
+            names.Add(new UnlockEntry()
+            {
+                SheetName = "CSBonusContentType",
+                RowId = row.RowId,
+                IconId = row.ContentType.Value.Icon,
+                Label = row.ContentType.Value.Name.ExtractText()
+            });
         }
 
         foreach (var row in _excelService.GetSheet<NotebookDivision>())
@@ -236,7 +393,12 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.QuestUnlock.RowId, out var names))
                     dict.Add(row.QuestUnlock.RowId, names = []);
 
-                names.Add(new($"NotebookDivision#{row.RowId}", 0, row.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "NotebookDivision",
+                    RowId = row.RowId,
+                    Label = row.Name.ExtractText()
+                });
             }
         }
 
@@ -247,7 +409,14 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.Quest.RowId, out var names))
                     dict.Add(row.Quest.RowId, names = []);
 
-                names.Add(new($"Trait#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "Trait",
+                    RowId = row.RowId,
+                    IconId = (uint)row.Icon,
+                    Label = row.Name.ExtractText(),
+                    Category = _textService.GetAddonText(102478)
+                });
             }
         }
 
@@ -258,7 +427,13 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.Requirement0.RowId, out var names))
                     dict.Add(row.Requirement0.RowId, names = []);
 
-                names.Add(new($"QuestAcceptAdditionCondition#{row.RowId} (Requirement 0)", 0, _textService.GetQuestName(row.RowId)));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "QuestAcceptAdditionCondition",
+                    RowId = row.RowId,
+                    ExtraSheetText = " (Requirement 0)",
+                    Label = _textService.GetQuestName(row.RowId)
+                });
             }
 
             if (row.Requirement1.RowId is > 0 and < 65536)
@@ -266,8 +441,31 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.Requirement1.RowId, out var names))
                     dict.Add(row.Requirement1.RowId, names = []);
 
-                names.Add(new($"QuestAcceptAdditionCondition#{row.RowId} (Requirement 1)", 0, _textService.GetQuestName(row.RowId)));
+                names.Add(new UnlockEntry()
+                {
+                    SheetName = "QuestAcceptAdditionCondition",
+                    RowId = row.RowId,
+                    ExtraSheetText = " (Requirement 1)",
+                    Label = _textService.GetQuestName(row.RowId)
+                });
             }
+        }
+
+        foreach (var row in _excelService.GetSheet<Item>())
+        {
+            if (row.ItemAction.RowId == 0 || !row.ItemAction.IsValid || row.ItemAction.Value.Type != (uint)ItemActionType.UnlockLink)
+                continue;
+
+            if (!dict.TryGetValue(row.ItemAction.Value.Data[0], out var names))
+                dict.Add(row.ItemAction.Value.Data[0], names = []);
+
+            names.Add(new UnlockEntry()
+            {
+                SheetName = "Item",
+                RowId = row.RowId,
+                IconId = row.Icon,
+                Label = _textService.GetItemName(row.RowId)
+            });
         }
 
         Rows = dict
@@ -293,31 +491,50 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
     private class UnlocksColumn(DebugRenderer debugRenderer) : ColumnString<UnlockLinkEntry>
     {
         public override string ToName(UnlockLinkEntry entry)
-            => string.Join(' ', entry.Unlocks.Select(unlock => unlock.SheetRow + ' ' + unlock.Text));
-
-        public override int Compare(UnlockLinkEntry lhs, UnlockLinkEntry rhs)
-        {
-            static string toName(UnlockLinkEntry entry) => string.Join(' ', entry.Unlocks.Select(unlock => unlock.Text));
-            return toName(lhs).CompareTo(toName(rhs));
-        }
+            => string.Join(' ', entry.Unlocks.Select(unlock => $"{unlock.SheetName}#{unlock.RowId}"));
 
         public override unsafe void DrawColumn(UnlockLinkEntry entry)
         {
-            using var innertable = ImRaii.Table($"InnerTable{entry.Index}", 2, ImGuiTableFlags.NoSavedSettings, new Vector2(-1, -1));
-            if (!innertable) return;
-
-            ImGui.TableSetupColumn("Sheet", ImGuiTableColumnFlags.WidthFixed, 320);
-            ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-
-            foreach (var (SheetRow, IconId, Text) in entry.Unlocks)
+            foreach (var unlock in entry.Unlocks)
             {
-                ImGui.TableNextRow();
-                ImGui.TableNextColumn(); // Sheet
-                ImGui.TextUnformatted(SheetRow);
+                debugRenderer.DrawCopyableText($"{unlock.SheetName}#{unlock.RowId}{unlock.ExtraSheetText}");
+            }
+        }
+    }
 
-                ImGui.TableNextColumn(); // Name
-                debugRenderer.DrawIcon(IconId);
-                ImGui.TextUnformatted(Text);
+    private class UnlocksNameColumn(DebugRenderer debugRenderer, UnlocksTabUtils unlocksTabUtils) : ColumnString<UnlockLinkEntry>
+    {
+        public override string ToName(UnlockLinkEntry entry)
+            => string.Join(' ', entry.Unlocks.Select(unlock => unlock.Label));
+
+        public override unsafe void DrawColumn(UnlockLinkEntry entry)
+        {
+            foreach (var unlock in entry.Unlocks)
+            {
+                switch (unlock.SheetName)
+                {
+                    case "Item":
+                        unlocksTabUtils.DrawSelectableItem(unlock.RowId, $"Unlock{entry.Index}Item{unlock.RowId}");
+                        break;
+
+                    default:
+                        ImGui.BeginGroup();
+                        debugRenderer.DrawIcon(unlock.IconId, noTooltip: true);
+                        debugRenderer.DrawCopyableText(unlock.Label, noTooltip: true);
+                        ImGui.EndGroup();
+
+                        if (ImGui.IsItemHovered())
+                        {
+                            unlocksTabUtils.DrawTooltip(
+                                unlock.IconId,
+                                unlock.Label,
+                                !string.IsNullOrEmpty(unlock.Category)
+                                    ? unlock.Category
+                                    : unlock.SheetName);
+                        }
+
+                        break;
+                }
             }
         }
     }

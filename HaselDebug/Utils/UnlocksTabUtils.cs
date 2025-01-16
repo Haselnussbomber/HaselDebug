@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.GameFonts;
 using Dalamud.Interface.ManagedFontAtlas;
@@ -8,12 +9,14 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Extensions.Sheets;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Game.Enums;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
+using HaselCommon.Sheets;
 using HaselDebug.Services;
 using HaselDebug.Windows.ItemTooltips;
 using ImGuiNET;
@@ -52,6 +55,13 @@ public unsafe class UnlocksTabUtils(
         TripleTriadCardTooltip = null;
 
         GC.SuppressFinalize(this);
+    }
+
+    public bool DrawSelectableItem(uint itemId, ImGuiId id, bool drawIcon = true, bool isHq = false, float? iconSize = null)
+    {
+        if (ExcelService.TryGetRow<Item>(itemId, out var item))
+            return DrawSelectableItem(item, id, drawIcon, isHq, iconSize);
+        return false;
     }
 
     public bool DrawSelectableItem(Item item, ImGuiId id, bool drawIcon = true, bool isHq = false, float? iconSize = null)
@@ -177,11 +187,26 @@ public unsafe class UnlocksTabUtils(
         ImGui.TableNextColumn(); // Icon
         ImGui.Image(icon.ImGuiHandle, ImGuiHelpers.ScaledVector2(40));
 
+        var isUnlocked = ItemService.IsUnlockable(item) && ItemService.IsUnlocked(item);
+        if (isUnlocked)
+        {
+            ImGui.SameLine(1 + ImGui.GetStyle().CellPadding.X + itemInnerSpacing.X, 0);
+
+            if (TextureProvider.GetFromGame("ui/uld/RecipeNoteBook_hr1.tex").TryGetWrap(out var checkTex, out _))
+            {
+                var pos = ImGui.GetCursorScreenPos() + new Vector2(40 * ImGuiHelpers.GlobalScale / 2f);
+                ImGui.GetWindowDrawList().AddImage(checkTex.ImGuiHandle, pos, pos + new Vector2(40 * ImGuiHelpers.GlobalScale / 1.5f), new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
+            }
+        }
+
         ImGui.TableNextColumn(); // Text
         using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
         using var indent = ImRaii.PushIndent(1);
 
         ImGui.TextUnformatted(title);
+
+        if (isUnlocked)
+            ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 40 * ImGuiHelpers.GlobalScale / 2f - 3); // wtf
 
         var category = item.ItemUICategory.IsValid ? item.ItemUICategory.Value.Name.ExtractText().StripSoftHypen() : null;
         if (!string.IsNullOrEmpty(category))
@@ -230,6 +255,26 @@ public unsafe class UnlocksTabUtils(
             if (ExcelService.TryGetRow<Emote>(item.ItemAction.Value!.Data[2], out var emote))
             {
                 TextureService.DrawIcon(emote.Icon, 80);
+            }
+        }
+        else if (item.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink && item.ItemAction.Value.Data[1] == 4659) // Hairstyles
+        {
+            var playerState = PlayerState.Instance();
+            if (playerState->IsLoaded == 1 &&
+                ExcelService.TryFindRow<CustomHairMakeType>(t => t.Tribe.RowId == playerState->Tribe && t.Gender == playerState->Sex, out var hairMakeType) &&
+                ExcelService.TryFindRow<CharaMakeCustomize>(row => row.IsPurchasable && row.Data == item.ItemAction.Value.Data[0] && hairMakeType.CharaMakeStruct[0].SubMenuParam.Any(id => id == row.RowId), out var charaMakeCustomize))
+            {
+                TextureService.DrawIcon(charaMakeCustomize.Icon, 80);
+            }
+        }
+        else if (item.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink && item.ItemAction.Value.Data[1] == 9390) // Face Paints
+        {
+            var playerState = PlayerState.Instance();
+            if (playerState->IsLoaded == 1 &&
+                ExcelService.TryFindRow<CustomHairMakeType>(t => t.Tribe.RowId == playerState->Tribe && t.Gender == playerState->Sex, out var hairMakeType) &&
+                ExcelService.TryFindRow<CharaMakeCustomize>(row => row.IsPurchasable && row.Data == item.ItemAction.Value.Data[0] && hairMakeType.CharaMakeStruct[7].SubMenuParam.Any(id => id == row.RowId), out var charaMakeCustomize))
+            {
+                TextureService.DrawIcon(charaMakeCustomize.Icon, 80);
             }
         }
         else if (item.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard)
@@ -351,5 +396,10 @@ public unsafe class UnlocksTabUtils(
 
             ImGuiHelpers.SafeTextWrapped(itemHelp.Description.ExtractText().StripSoftHypen());
         }
+    }
+
+    internal void DrawTooltip(uint iconId, string label, object description)
+    {
+        throw new NotImplementedException();
     }
 }

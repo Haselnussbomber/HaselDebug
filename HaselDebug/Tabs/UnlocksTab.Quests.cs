@@ -36,7 +36,7 @@ public unsafe class UnlocksTabQuests : DebugTab, IUnlockTab, IDisposable
     private readonly UnlocksTabUtils _unlocksTabUtils;
     private readonly TextureService _textureService;
     private readonly TripleTriadNumberFontManager _tripleTriadNumberFontManager;
-    private Quest[] _quests;
+    private Quest[] _quests = [];
     private TripleTriadCardTooltip? _tripleTriadCardTooltip;
 
     public UnlocksTabQuests(

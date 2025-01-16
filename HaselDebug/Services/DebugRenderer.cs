@@ -734,7 +734,7 @@ public unsafe partial class DebugRenderer
         }
     }
 
-    public void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Vector4? textColor = null, string? highligtedText = null)
+    public void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Vector4? textColor = null, string? highligtedText = null, bool noTooltip = false)
     {
         textCopy ??= text;
         textColor ??= (Vector4)Color.White;
@@ -773,7 +773,8 @@ public unsafe partial class DebugRenderer
         if (ImGui.IsItemHovered())
         {
             ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            ImGui.SetTooltip(tooltipText ?? textCopy);
+            if (!noTooltip)
+                ImGui.SetTooltip(tooltipText ?? textCopy);
         }
 
         if (ImGui.IsItemClicked())
@@ -922,7 +923,7 @@ public unsafe partial class DebugRenderer
     public string ToBitsString(uint byteIn)
         => ToBitsString(byteIn, 32);
 
-    public void DrawIcon(uint iconId, bool isHq = false, bool sameLine = true, DrawInfo drawInfo = default, bool canCopy = true)
+    public void DrawIcon(uint iconId, bool isHq = false, bool sameLine = true, DrawInfo drawInfo = default, bool canCopy = true, bool noTooltip = false)
     {
         drawInfo.DrawSize ??= new Vector2(ImGui.GetTextLineHeight());
 
@@ -950,12 +951,16 @@ public unsafe partial class DebugRenderer
             {
                 if (canCopy)
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                ImGui.BeginTooltip();
-                if (canCopy)
-                    ImGui.TextUnformatted("Click to copy IconId");
-                ImGui.TextUnformatted($"ID: {iconId} – Size: {texture.Width}x{texture.Height}");
-                ImGui.Image(texture.ImGuiHandle, new(texture.Width, texture.Height));
-                ImGui.EndTooltip();
+
+                if (!noTooltip)
+                {
+                    ImGui.BeginTooltip();
+                    if (canCopy)
+                        ImGui.TextUnformatted("Click to copy IconId");
+                    ImGui.TextUnformatted($"ID: {iconId} – Size: {texture.Width}x{texture.Height}");
+                    ImGui.Image(texture.ImGuiHandle, new(texture.Width, texture.Height));
+                    ImGui.EndTooltip();
+                }
             }
 
             if (canCopy && ImGui.IsItemClicked())
