@@ -69,7 +69,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.UnlockLink, out var names))
                     dict.Add(row.UnlockLink, names = []);
 
-                names.Add(new ($"GeneralAction#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
+                names.Add(new($"GeneralAction#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -80,7 +80,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.UnlockLink.RowId, out var names))
                     dict.Add(row.UnlockLink.RowId, names = []);
 
-                names.Add(new ($"Action#{row.RowId}", row.Icon, row.Name.ExtractText()));
+                names.Add(new($"Action#{row.RowId}", row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -91,7 +91,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.Reward, out var names))
                     dict.Add(row.Reward, names = []);
 
-                names.Add(new ($"BuddyAction#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
+                names.Add(new($"BuddyAction#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -102,7 +102,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.QuestRequirement.RowId, out var names))
                     dict.Add(row.QuestRequirement.RowId, names = []);
 
-                names.Add(new ($"CraftAction#{row.RowId}", row.Icon, row.Name.ExtractText()));
+                names.Add(new($"CraftAction#{row.RowId}", row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -113,7 +113,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.UnlockLink, out var names))
                     dict.Add(row.UnlockLink, names = []);
 
-                names.Add(new ($"Emote#{row.RowId}", row.Icon, row.Name.ExtractText()));
+                names.Add(new($"Emote#{row.RowId}", row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -124,7 +124,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.StopAnimation.RowId, out var names))
                     dict.Add(row.StopAnimation.RowId, names = []);
 
-                names.Add(new ($"Perform#{row.RowId}", 0, row.Name.ExtractText()));
+                names.Add(new($"Perform#{row.RowId}", 0, row.Name.ExtractText()));
             }
         }
 
@@ -140,28 +140,28 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
 
             foreach (var bgRow in _excelService.FindRows<BannerBg>(bgRow => bgRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(new ($"BannerBg#{bgRow.RowId}", (uint)bgRow.Icon, bgRow.Name.ExtractText()));
+                names.Add(new($"BannerBg#{bgRow.RowId}", (uint)bgRow.Icon, bgRow.Name.ExtractText()));
             }
 
             foreach (var frameRow in _excelService.FindRows<BannerFrame>(frameRow => frameRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(new ($"BannerFrame#{frameRow.RowId}", (uint)frameRow.Icon, frameRow.Name.ExtractText()));
+                names.Add(new($"BannerFrame#{frameRow.RowId}", (uint)frameRow.Icon, frameRow.Name.ExtractText()));
             }
 
             foreach (var decorationRow in _excelService.FindRows<BannerDecoration>(decorationRow => decorationRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(new ($"BannerDecoration#{decorationRow.RowId}", (uint)decorationRow.Icon, decorationRow.Name.ExtractText()));
+                names.Add(new($"BannerDecoration#{decorationRow.RowId}", (uint)decorationRow.Icon, decorationRow.Name.ExtractText()));
             }
 
             foreach (var facialRow in _excelService.FindRows<BannerFacial>(facialRow => facialRow.UnlockCondition.RowId == row.RowId))
             {
                 if (facialRow.Emote.IsValid)
-                    names.Add(new ($"BannerFacial#{facialRow.RowId}", facialRow.Emote.Value.Icon, facialRow.Emote.Value.Name.ExtractText()));
+                    names.Add(new($"BannerFacial#{facialRow.RowId}", facialRow.Emote.Value.Icon, facialRow.Emote.Value.Name.ExtractText()));
             }
 
             foreach (var timelineRow in _excelService.FindRows<BannerTimeline>(timelineRow => timelineRow.UnlockCondition.RowId == row.RowId))
             {
-                names.Add(new ($"BannerTimeline#{timelineRow.RowId}", (uint)timelineRow.Icon, timelineRow.Name.ExtractText()));
+                names.Add(new($"BannerTimeline#{timelineRow.RowId}", (uint)timelineRow.Icon, timelineRow.Name.ExtractText()));
             }
         }
 
@@ -190,7 +190,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 title = _seStringEvaluator.EvaluateFromLobby(row.Hint.RowId, new SeStringContext() { LocalParameters = [row.HintItem.RowId] }).ExtractText();
             }
 
-            names.Add(new ($"CharaMakeCustomize#{row.RowId} (FeatureID: {row.FeatureID})", row.Icon, title));
+            names.Add(new($"CharaMakeCustomize#{row.RowId} (FeatureID: {row.FeatureID})", row.Icon, title));
         }
 
         foreach (var row in _excelService.GetSheet<MJILandmark>())
@@ -201,7 +201,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
             if (!dict.TryGetValue(row.Unknown0, out var names))
                 dict.Add(row.Unknown0, names = []);
 
-            names.Add(new ($"MJILandmark#{row.RowId}", row.Icon, row.Name.Value.Text.ExtractText()));
+            names.Add(new($"MJILandmark#{row.RowId}", row.Icon, row.Name.Value.Text.ExtractText()));
         }
 
         foreach (var row in _excelService.GetSheet<CSBonusContentType>())
@@ -212,7 +212,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
             if (!dict.TryGetValue(row.Unknown11, out var names))
                 dict.Add(row.Unknown11, names = []);
 
-            names.Add(new ($"CSBonusContentType#{row.RowId}", row.ContentType.Value.Icon, row.ContentType.Value.Name.ExtractText()));
+            names.Add(new($"CSBonusContentType#{row.RowId}", row.ContentType.Value.Icon, row.ContentType.Value.Name.ExtractText()));
         }
 
         foreach (var row in _excelService.GetSheet<NotebookDivision>())
@@ -222,7 +222,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.QuestUnlock.RowId, out var names))
                     dict.Add(row.QuestUnlock.RowId, names = []);
 
-                names.Add(new ($"NotebookDivision#{row.RowId}", 0, row.Name.ExtractText()));
+                names.Add(new($"NotebookDivision#{row.RowId}", 0, row.Name.ExtractText()));
             }
         }
 
@@ -233,7 +233,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.Quest.RowId, out var names))
                     dict.Add(row.Quest.RowId, names = []);
 
-                names.Add(new ($"Trait#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
+                names.Add(new($"Trait#{row.RowId}", (uint)row.Icon, row.Name.ExtractText()));
             }
         }
 
@@ -244,7 +244,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.Requirement0.RowId, out var names))
                     dict.Add(row.Requirement0.RowId, names = []);
 
-                names.Add(new ($"QuestAcceptAdditionCondition#{row.RowId} (Requirement 0)", 0, _textService.GetQuestName(row.RowId)));
+                names.Add(new($"QuestAcceptAdditionCondition#{row.RowId} (Requirement 0)", 0, _textService.GetQuestName(row.RowId)));
             }
 
             if (row.Requirement1.RowId is > 0 and < 65536)
@@ -252,7 +252,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>
                 if (!dict.TryGetValue(row.Requirement1.RowId, out var names))
                     dict.Add(row.Requirement1.RowId, names = []);
 
-                names.Add(new ($"QuestAcceptAdditionCondition#{row.RowId} (Requirement 1)", 0, _textService.GetQuestName(row.RowId)));
+                names.Add(new($"QuestAcceptAdditionCondition#{row.RowId} (Requirement 1)", 0, _textService.GetQuestName(row.RowId)));
             }
         }
 

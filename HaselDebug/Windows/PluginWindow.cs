@@ -72,12 +72,7 @@ public class PluginWindow : SimpleWindow
             .OrderBy(t => t.Title)
         ];
 
-        SelectedTab = PinnedInstances.FirstOrDefault(tab => tab.InternalName == pluginConfig.LastSelectedTab)
-            ?? (IDrawableTab?)Tabs.FirstOrDefault(tab => tab.InternalName == pluginConfig.LastSelectedTab)
-            ?? Tabs
-                .Where(tab => tab.SubTabs?.Any(subTab => subTab.InternalName == pluginConfig.LastSelectedTab) == true)
-                .Select(tab => tab.SubTabs?.FirstOrDefault(subTab => subTab.InternalName == pluginConfig.LastSelectedTab))
-                .FirstOrDefault();
+        SelectTabWithoutSave(pluginConfig.LastSelectedTab);
     }
 
     public override void Dispose()
@@ -230,6 +225,21 @@ public class PluginWindow : SimpleWindow
                 }
             }
         }
+    }
+
+    public void SelectTab(string internalName)
+    {
+        SelectTabWithoutSave(internalName);
+    }
+
+    private void SelectTabWithoutSave(string internalName)
+    {
+        SelectedTab = PinnedInstances.FirstOrDefault(tab => tab.InternalName == internalName)
+            ?? (IDrawableTab?)Tabs.FirstOrDefault(tab => tab.InternalName == internalName)
+            ?? Tabs
+                .Where(tab => tab.SubTabs?.Any(subTab => subTab.InternalName == internalName) == true)
+                .Select(tab => tab.SubTabs?.FirstOrDefault(subTab => subTab.InternalName == internalName))
+                .FirstOrDefault();
     }
 
     private void SelectTab(IDrawableTab tab)

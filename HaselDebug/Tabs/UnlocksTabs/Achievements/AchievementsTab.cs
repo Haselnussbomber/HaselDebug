@@ -1,3 +1,4 @@
+using System.Linq;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselDebug.Abstracts;
@@ -7,12 +8,26 @@ using Achievement = FFXIVClientStructs.FFXIV.Client.Game.UI.Achievement;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Achievements;
 
-[RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class AchievementsTab(AchievementsTable table) : DebugTab, ISubTab<UnlocksTab>
+[RegisterSingleton<IUnlockTab>(Duplicate = DuplicateStrategy.Append)]
+public unsafe class AchievementsTab(AchievementsTable table) : DebugTab, IUnlockTab
 {
     private bool _achievementsRequested;
 
     public override string Title => "Achievements";
+
+    public UnlockProgress GetUnlockProgress()
+    {
+        if (table.Rows.Count == 0)
+            table.LoadRows();
+
+        return new UnlockProgress()
+        {
+            NeedsExtraData = true,
+            HasExtraData = Achievement.Instance()->IsLoaded(),
+            TotalUnlocks = table.Rows.Count,
+            NumUnlocked = table.Rows.Count(entry => entry.IsComplete),
+        };
+    }
 
     public override void Draw()
     {

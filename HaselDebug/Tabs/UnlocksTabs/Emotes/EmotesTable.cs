@@ -1,7 +1,5 @@
 using System.Linq;
 using Dalamud.Interface.Utility.Raii;
-using System.Xml.Linq;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;

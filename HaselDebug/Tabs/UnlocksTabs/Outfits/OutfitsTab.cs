@@ -3,14 +3,15 @@ using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Graphics;
+using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits;
 
-[RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class OutfitsTab(OutfitsTable table) : DebugTab, ISubTab<UnlocksTab>
+[RegisterSingleton<IUnlockTab>(Duplicate = DuplicateStrategy.Append)]
+public unsafe class OutfitsTab(OutfitsTable table, PrismBoxProvider prismBoxProvider) : DebugTab, IUnlockTab
 {
     private const float IconSize = 32;
     private readonly List<uint> _prismBoxItemIds = [];
@@ -18,6 +19,20 @@ public unsafe class OutfitsTab(OutfitsTable table) : DebugTab, ISubTab<UnlocksTa
     private DateTime _prismBoxLastCheck = DateTime.MinValue;
 
     public override string Title => "Outfits";
+
+    public UnlockProgress GetUnlockProgress()
+    {
+        if (table.Rows.Count == 0)
+            table.LoadRows();
+
+        return new UnlockProgress()
+        {
+            NeedsExtraData = true,
+            HasExtraData = MirageManager.Instance()->PrismBoxLoaded,
+            TotalUnlocks = table.Rows.Count,
+            NumUnlocked = table.Rows.Count(row => prismBoxProvider.ItemIds.Contains(row.RowId)),
+        };
+    }
 
     public override void Draw()
     {

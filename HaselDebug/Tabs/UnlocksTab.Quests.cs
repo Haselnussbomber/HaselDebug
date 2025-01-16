@@ -23,8 +23,8 @@ using InstanceContent = Lumina.Excel.Sheets.InstanceContent;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<ISubTab<UnlocksTab>>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposable
+[RegisterSingleton<IUnlockTab>(Duplicate = DuplicateStrategy.Append)]
+public unsafe class UnlocksTabQuests : DebugTab, IUnlockTab, IDisposable
 {
     private readonly DebugRenderer _debugRenderer;
     private readonly ExcelService _excelService;
@@ -73,6 +73,15 @@ public unsafe class UnlocksTabQuests : DebugTab, ISubTab<UnlocksTab>, IDisposabl
         _tripleTriadCardTooltip?.Dispose();
         _tripleTriadCardTooltip = null;
         GC.SuppressFinalize(this);
+    }
+
+    public UnlockProgress GetUnlockProgress()
+    {
+        return new UnlockProgress()
+        {
+            TotalUnlocks = _quests.Length,
+            NumUnlocked = _quests.Count(row => UIState.Instance()->IsUnlockLinkUnlockedOrQuestCompleted((ushort)row.RowId + 0x10000u)),
+        };
     }
 
     private void OnLanguageChanged(string langCode)
