@@ -35,11 +35,7 @@ public class QuestsTable : Table<Quest>, IDisposable
         _textService = textService;
 
         Columns = [
-            new RowIdColumn(debugRenderer) {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.DefaultSort,
-                Width = 60,
-            },
+            RowIdColumn<Quest>.Create(),
             new QuestIdColumn(debugRenderer) {
                 Label = "QuestId",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -71,15 +67,6 @@ public class QuestsTable : Table<Quest>, IDisposable
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<Quest>().Where(row => row.RowId != 0 && !string.IsNullOrEmpty(_textService.GetQuestName(row.RowId))).ToList();
-    }
-
-    private class RowIdColumn(DebugRenderer debugRenderer) : ColumnNumber<Quest>
-    {
-        public override int ToValue(Quest row)
-            => (int)row.RowId;
-
-        public override void DrawColumn(Quest row)
-            => debugRenderer.DrawCopyableText(ToName(row));
     }
 
     private class QuestIdColumn(DebugRenderer debugRenderer) : ColumnNumber<Quest>

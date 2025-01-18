@@ -22,24 +22,20 @@ public unsafe class FishTable : Table<FishParameter>
         DebugRenderer debugRenderer,
         TextService textService,
         UnlocksTabUtils unlocksTabUtils,
-        ImGuiContextMenuService imGuiContextMenuService,
+        ImGuiContextMenuService imGuiContextMenu,
         LanguageProvider languageProvider) : base("FishTable", languageProvider)
     {
         _excelService = excelService;
         _textService = textService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            RowIdColumn<FishParameter>.Create(),
             new CaughtColumn() {
                 Label = "Caught",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
                 Width = 75,
             },
-            new NameColumn(debugRenderer, textService, unlocksTabUtils, imGuiContextMenuService) {
+            new NameColumn(debugRenderer, textService, unlocksTabUtils, imGuiContextMenu) {
                 Label = "Name",
             }
         ];
@@ -50,15 +46,6 @@ public unsafe class FishTable : Table<FishParameter>
         Rows = _excelService.GetSheet<FishParameter>()
             .Where(row => row.RowId != 0 && !string.IsNullOrEmpty(_textService.GetItemName(row.Item.RowId)))
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<FishParameter>
-    {
-        public override string ToName(FishParameter row)
-            => row.RowId.ToString();
-
-        public override int ToValue(FishParameter row)
-            => (int)row.RowId;
     }
 
     private class CaughtColumn : ColumnBool<FishParameter>

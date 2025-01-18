@@ -27,11 +27,7 @@ public unsafe class SpearfishTable : Table<SpearfishingItem>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            RowIdColumn<SpearfishingItem>.Create(),
             new CaughtColumn() {
                 Label = "Caught",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -48,15 +44,6 @@ public unsafe class SpearfishTable : Table<SpearfishingItem>
         Rows = _excelService.GetSheet<SpearfishingItem>()
             .Where(row => row.Item.RowId != 0)
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<SpearfishingItem>
-    {
-        public override string ToName(SpearfishingItem row)
-            => row.RowId.ToString();
-
-        public override int ToValue(SpearfishingItem row)
-            => (int)row.RowId;
     }
 
     private class CaughtColumn : ColumnBool<SpearfishingItem>

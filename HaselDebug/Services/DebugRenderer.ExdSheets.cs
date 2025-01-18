@@ -21,6 +21,7 @@ public unsafe partial class DebugRenderer
         }
 
         nodeOptions = nodeOptions.WithAddress((sheetType.Name.GetHashCode(), (nint)rowId).GetHashCode());
+        nodeOptions.Language = LanguageProvider.ClientLanguage;
 
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"{sheetType.Name}#{rowId}###{nodeOptions.AddressPath}", nodeOptions.GetTreeNodeFlags());
@@ -37,7 +38,7 @@ public unsafe partial class DebugRenderer
             ImGui.SameLine();
             ImGui.TextColored(ColorFieldName, propInfo.Name);
             ImGui.SameLine();
-            DrawExdSheetColumnValue(sheetType, rowId, propInfo.Name, depth, nodeOptions);
+            DrawExdSheetColumnValue(sheetType, rowId, propInfo.Name, depth, nodeOptions.WithAddress(propInfo.Name.GetHashCode()));
         }
     }
 

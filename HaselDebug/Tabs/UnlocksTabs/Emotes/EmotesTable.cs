@@ -22,11 +22,7 @@ public unsafe class EmotesTable : Table<Emote>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            RowIdColumn<Emote>.Create(),
             new CanUseColumn() {
                 Label = "Can Use",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -43,15 +39,6 @@ public unsafe class EmotesTable : Table<Emote>
         Rows = _excelService.GetSheet<Emote>()
             .Where(row => row.RowId != 0 && !row.Name.IsEmpty)
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<Emote>
-    {
-        public override string ToName(Emote row)
-            => row.RowId.ToString();
-
-        public override int ToValue(Emote row)
-            => (int)row.RowId;
     }
 
     private class CanUseColumn : ColumnBool<Emote>

@@ -31,11 +31,7 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            EntryRowIdColumn<TripleTriadCardEntry, TripleTriadCard>.Create(),
             new UnlockedColumn() {
                 Label = "Unlocked",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -63,15 +59,6 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
             .Where(row => row.RowId != 0 && residentSheet.HasRow(row.RowId) && cardItems.ContainsKey(row.RowId))
             .Select(row => new TripleTriadCardEntry(row, residentSheet.GetRow(row.RowId), cardItems[row.RowId]))
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<TripleTriadCardEntry>
-    {
-        public override string ToName(TripleTriadCardEntry entry)
-            => entry.Row.RowId.ToString();
-
-        public override int ToValue(TripleTriadCardEntry entry)
-            => (int)entry.Row.RowId;
     }
 
     private class UnlockedColumn : ColumnBool<TripleTriadCardEntry>

@@ -31,6 +31,10 @@
     "en": "Copy text",
     "de": "Text kopieren"
   },
+  "ContextMenu.CopyRowId": {
+    "en": "Copy RowId",
+    "de": "RowId kopieren"
+  },
   "ContextMenu.CopyName": {
     "en": "Copy name",
     "de": "Name kopieren"

@@ -24,11 +24,7 @@ public unsafe class AchievementsTable : Table<AchievementEntry>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            EntryRowIdColumn<AchievementEntry, AchievementSheet>.Create(),
             new UnlockedColumn() {
                 Label = "Unlocked",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -54,15 +50,6 @@ public unsafe class AchievementsTable : Table<AchievementEntry>
             .Select(row => new AchievementEntry(this, row))
             .Where(entry => entry.CanShowAchievement)
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<AchievementEntry>
-    {
-        public override string ToName(AchievementEntry entry)
-            => entry.Row.RowId.ToString();
-
-        public override int ToValue(AchievementEntry row)
-            => (int)row.Row.RowId;
     }
 
     private class UnlockedColumn : ColumnBool<AchievementEntry>

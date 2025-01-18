@@ -29,11 +29,7 @@ public unsafe class MinionsTable : Table<Companion>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            RowIdColumn<Companion>.Create(),
             new UnlockedColumn() {
                 Label = "Unlocked",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -50,15 +46,6 @@ public unsafe class MinionsTable : Table<Companion>
         Rows = _excelService.GetSheet<Companion>()
             .Where(row => row.RowId != 0 && row.Order != 0)
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<Companion>
-    {
-        public override string ToName(Companion row)
-            => row.RowId.ToString();
-
-        public override int ToValue(Companion row)
-            => (int)row.RowId;
     }
 
     private class UnlockedColumn : ColumnBool<Companion>

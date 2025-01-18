@@ -4,10 +4,11 @@ using AchievementSheet = Lumina.Excel.Sheets.Achievement;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Achievements;
 
-public record AchievementEntry
+public record AchievementEntry : IUnlockEntry
 {
     private readonly AchievementsTable _table;
 
+    public uint RowId => Row.RowId;
     public AchievementSheet Row { get; init; }
 
     public unsafe bool IsComplete

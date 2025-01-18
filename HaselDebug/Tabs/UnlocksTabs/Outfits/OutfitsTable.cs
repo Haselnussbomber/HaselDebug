@@ -40,11 +40,7 @@ public class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
         itemsColumn.Flags = ImGuiTableColumnFlags.NoSort;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            RowIdColumn<CustomMirageStoreSetItem>.Create(),
             setColumn,
             itemsColumn,
         ];
@@ -106,17 +102,5 @@ public class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
             var pos = ImGui.GetWindowPos() + ImGui.GetCursorPos() - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY()) + ImGuiHelpers.ScaledVector2(IconSize / 2.5f + 4);
             ImGui.GetWindowDrawList().AddImage(tex.ImGuiHandle, pos, pos + ImGuiHelpers.ScaledVector2(IconSize) / 1.5f, new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
         }
-    }
-
-    private class RowIdColumn : ColumnNumber<CustomMirageStoreSetItem>
-    {
-        public override void DrawColumn(CustomMirageStoreSetItem row)
-        {
-            ImGuiUtils.PushCursorY(ImGui.GetTextLineHeight() / 2f);
-            ImGui.TextUnformatted(row.RowId.ToString());
-        }
-
-        public override int ToValue(CustomMirageStoreSetItem row)
-            => (int)row.RowId;
     }
 }

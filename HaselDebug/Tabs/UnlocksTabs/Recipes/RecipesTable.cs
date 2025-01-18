@@ -24,11 +24,7 @@ public unsafe class RecipesTable : Table<Recipe>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            RowIdColumn<Recipe>.Create(),
             new CompletedColumn() {
                 Label = "Completed",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -50,15 +46,6 @@ public unsafe class RecipesTable : Table<Recipe>
         Rows = _excelService.GetSheet<Recipe>()
             .Where(row => row.ItemResult.RowId > 0)
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<Recipe>
-    {
-        public override string ToName(Recipe row)
-            => row.RowId.ToString();
-
-        public override int ToValue(Recipe row)
-            => (int)row.RowId;
     }
 
     private class CompletedColumn : ColumnBool<Recipe>

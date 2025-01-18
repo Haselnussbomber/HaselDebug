@@ -29,11 +29,7 @@ public unsafe class FashionAccessoriesTable : Table<Ornament>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            RowIdColumn<Ornament>.Create(),
             new UnlockedColumn() {
                 Label = "Unlocked",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -50,15 +46,6 @@ public unsafe class FashionAccessoriesTable : Table<Ornament>
         Rows = _excelService.GetSheet<Ornament>()
             .Where(row => row.RowId is not (0 or 22 or 25 or 26 or 32) && row.Order != 0 && row.Model != 0 && row.Icon != 0) // see AgentOrnamentNoteBook_Show
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<Ornament>
-    {
-        public override string ToName(Ornament row)
-            => row.RowId.ToString();
-
-        public override int ToValue(Ornament row)
-            => (int)row.RowId;
     }
 
     private class UnlockedColumn : ColumnBool<Ornament>

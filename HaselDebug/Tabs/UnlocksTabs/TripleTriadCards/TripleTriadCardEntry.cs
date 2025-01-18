@@ -5,4 +5,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.TripleTriadCards;
 public record TripleTriadCardEntry(
     TripleTriadCard Row,
     TripleTriadCardResident ResidentRow,
-    Item? Item);
+    Item? Item) : IUnlockEntry
+{
+    public uint RowId => Row.RowId;
+}

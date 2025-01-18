@@ -22,11 +22,7 @@ public class TitlesTable : Table<Title>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            RowIdColumn<Title>.Create(),
             new UnlockedColumn() {
                 Label = "Unlocked",
                 Flags = ImGuiTableColumnFlags.WidthFixed,

@@ -25,11 +25,7 @@ public unsafe class OrchestrionRollsTable : Table<OrchestrionRollEntry>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            EntryRowIdColumn<OrchestrionRollEntry, Orchestrion>.Create(),
             new UnlockedColumn() {
                 Label = "Unlocked",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -65,15 +61,6 @@ public unsafe class OrchestrionRollsTable : Table<OrchestrionRollEntry>
             })
             .Where(entry => entry.UIParamRow.OrchestrionCategory.RowId != 0 && entry.UIParamRow.OrchestrionCategory.IsValid)
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<OrchestrionRollEntry>
-    {
-        public override string ToName(OrchestrionRollEntry entry)
-            => entry.Row.RowId.ToString();
-
-        public override int ToValue(OrchestrionRollEntry entry)
-            => (int)entry.Row.RowId;
     }
 
     private class UnlockedColumn : ColumnBool<OrchestrionRollEntry>

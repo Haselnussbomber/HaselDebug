@@ -21,11 +21,7 @@ public unsafe class BardingsTable : Table<BuddyEquip>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            RowIdColumn<BuddyEquip>.Create(),
             new UnlockedColumn() {
                 Label = "Unlocked",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -42,15 +38,6 @@ public unsafe class BardingsTable : Table<BuddyEquip>
         Rows = _excelService.GetSheet<BuddyEquip>()
             .Where(row => row.RowId != 0 && !row.Name.IsEmpty)
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<BuddyEquip>
-    {
-        public override string ToName(BuddyEquip row)
-            => row.RowId.ToString();
-
-        public override int ToValue(BuddyEquip row)
-            => (int)row.RowId;
     }
 
     private class UnlockedColumn : ColumnBool<BuddyEquip>

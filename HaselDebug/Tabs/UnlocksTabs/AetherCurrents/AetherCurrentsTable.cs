@@ -29,11 +29,7 @@ public unsafe class AetherCurrentsTable : Table<AetherCurrentEntry>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            EntryRowIdColumn<AetherCurrentEntry, AetherCurrent>.Create(),
             new CompletedColumn() {
                 Label = "Completed",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -76,15 +72,6 @@ public unsafe class AetherCurrentsTable : Table<AetherCurrentEntry>
                 Rows.Add(new AetherCurrentEntry(row, aetherCurrent.Value, currentNumber));
             }
         }
-    }
-
-    private class RowIdColumn : ColumnNumber<AetherCurrentEntry>
-    {
-        public override string ToName(AetherCurrentEntry entry)
-            => entry.Row.RowId.ToString();
-
-        public override int ToValue(AetherCurrentEntry row)
-            => (int)row.Row.RowId;
     }
 
     private class CompletedColumn : ColumnBool<AetherCurrentEntry>

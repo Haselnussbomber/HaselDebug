@@ -62,6 +62,7 @@ public unsafe partial class DebugRenderer
     private readonly TextureService TextureService;
     private readonly ExcelModule ExcelModule;
     private readonly IGameGui GameGui;
+    private readonly LanguageProvider LanguageProvider;
 
     public ImmutableSortedDictionary<string, Type> AddonTypes { get; }
     public ImmutableSortedDictionary<AgentId, Type> AgentTypes { get; }
@@ -76,7 +77,8 @@ public unsafe partial class DebugRenderer
         TextService textService,
         TextureService textureService,
         IDataManager dataManager,
-        IGameGui gameGui)
+        IGameGui gameGui,
+        LanguageProvider languageProvider)
     {
         Logger = logger;
         PluginInterface = pluginInterface;
@@ -88,7 +90,7 @@ public unsafe partial class DebugRenderer
         TextureService = textureService;
         ExcelModule = dataManager.Excel;
         GameGui = gameGui;
-
+        this.LanguageProvider = languageProvider;
         var csAssembly = typeof(AddonAttribute).Assembly;
 
         AddonTypes = csAssembly.GetTypes()

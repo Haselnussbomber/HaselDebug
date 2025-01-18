@@ -23,13 +23,9 @@ public unsafe class SightseeingLogTable : Table<AdventureEntry>
         _excelService = excelService;
 
         Columns = [
+            EntryRowIdColumn<AdventureEntry, Adventure>.Create(),
             new IndexColumn() {
                 Label = "Index",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
-            new RowIdColumn() {
-                Label = "RowId",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
                 Width = 60,
             },
@@ -58,15 +54,6 @@ public unsafe class SightseeingLogTable : Table<AdventureEntry>
 
         public override int ToValue(AdventureEntry entry)
             => entry.Index;
-    }
-
-    private class RowIdColumn : ColumnNumber<AdventureEntry>
-    {
-        public override string ToName(AdventureEntry entry)
-            => entry.Row.RowId.ToString();
-
-        public override int ToValue(AdventureEntry entry)
-            => (int)entry.Row.RowId;
     }
 
     private class CompletedColumn : ColumnBool<AdventureEntry>

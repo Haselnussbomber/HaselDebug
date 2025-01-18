@@ -32,11 +32,7 @@ public unsafe class MountsTable : Table<Mount>
         _textService = textService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            RowIdColumn<Mount>.Create(),
             new UnlockedColumn() {
                 Label = "Unlocked",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -53,15 +49,6 @@ public unsafe class MountsTable : Table<Mount>
         Rows = _excelService.GetSheet<Mount>()
             .Where(row => row.RowId != 0 && row.Order != 0 && row.Icon != 0 && !_textService.GetMountName(row.RowId).IsNullOrWhitespace())
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<Mount>
-    {
-        public override string ToName(Mount row)
-            => row.RowId.ToString();
-
-        public override int ToValue(Mount row)
-            => (int)row.RowId;
     }
 
     private class UnlockedColumn : ColumnBool<Mount>

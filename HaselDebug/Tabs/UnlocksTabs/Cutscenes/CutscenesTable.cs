@@ -21,6 +21,7 @@ public unsafe class CutscenesTable : Table<CutsceneEntry>
         _excelService = excelService;
 
         Columns = [
+            EntryRowIdColumn<CutsceneEntry, Cutscene>.Create(),
             new WorkIndexColumn() {
                 Label = "WorkIdx",
                 Flags = ImGuiTableColumnFlags.WidthFixed,

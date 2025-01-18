@@ -26,11 +26,7 @@ public unsafe class GlassesTable : Table<GlassesSheet>
         _excelService = excelService;
 
         Columns = [
-            new RowIdColumn() {
-                Label = "RowId",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
+            RowIdColumn<GlassesSheet>.Create(),
             new UnlockedColumn() {
                 Label = "Unlocked",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
@@ -47,15 +43,6 @@ public unsafe class GlassesTable : Table<GlassesSheet>
         Rows = _excelService.GetSheet<GlassesSheet>()
             .Skip(1)
             .ToList();
-    }
-
-    private class RowIdColumn : ColumnNumber<GlassesSheet>
-    {
-        public override string ToName(GlassesSheet row)
-            => row.RowId.ToString();
-
-        public override int ToValue(GlassesSheet row)
-            => (int)row.RowId;
     }
 
     private class UnlockedColumn : ColumnBool<GlassesSheet>

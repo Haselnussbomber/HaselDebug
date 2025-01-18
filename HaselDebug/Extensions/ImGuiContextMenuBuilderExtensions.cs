@@ -1,3 +1,4 @@
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -10,6 +11,16 @@ namespace HaselDebug.Extensions;
 
 public static unsafe class ImGuiContextMenuBuilderExtensions
 {
+    public static void AddCopyRowId(this ImGuiContextMenuBuilder builder, TextService textService, uint rowId)
+    {
+        builder.Add(new ImGuiContextMenuEntry()
+        {
+            Visible = rowId != 0,
+            Label = textService.Translate("ContextMenu.CopyRowId"),
+            ClickCallback = () => ImGui.SetClipboardText(rowId.ToString())
+        });
+    }
+
     public static void AddCopyName(this ImGuiContextMenuBuilder builder, TextService textService, string name)
     {
         builder.Add(new ImGuiContextMenuEntry()
