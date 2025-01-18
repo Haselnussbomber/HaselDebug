@@ -4,7 +4,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks;
 
 public class UnlockEntry
 {
-    public string SheetName { get; set; } = string.Empty;
+    public required Type RowType { get; set; }
     public uint RowId { get; set; }
     public string ExtraSheetText { get; set; } = string.Empty;
     public uint IconId { get; set; }

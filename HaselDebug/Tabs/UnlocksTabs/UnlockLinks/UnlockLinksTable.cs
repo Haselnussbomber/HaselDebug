@@ -7,8 +7,10 @@ using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
 using HaselCommon.Sheets;
+using HaselDebug.Extensions;
 using HaselDebug.Services;
 using HaselDebug.Utils;
+using HaselDebug.Windows;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
@@ -29,7 +31,9 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
         TextService textService,
         UnlocksTabUtils unlocksTabUtils,
         LanguageProvider languageProvider,
-        IClientState clientState) : base("UnlockLinksTable", languageProvider)
+        IClientState clientState,
+        WindowManager windowManager,
+        ImGuiContextMenuService imGuiContextMenu) : base("UnlockLinksTable", languageProvider)
     {
         _excelService = excelService;
         _seStringEvaluator = seStringEvaluator;
@@ -47,7 +51,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
                 Flags = ImGuiTableColumnFlags.WidthFixed,
                 Width = 75,
             },
-            new UnlocksColumn(debugRenderer) {
+            new UnlocksColumn(debugRenderer, windowManager, imGuiContextMenu, textService) {
                 Label = "Sheet/Row",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
                 Width = 300,
@@ -100,7 +104,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "GeneralAction",
+                    RowType = typeof(GeneralAction),
                     RowId = row.RowId,
                     IconId = (uint)row.Icon,
                     Label = row.Name.ExtractText(),
@@ -118,7 +122,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "Action",
+                    RowType = typeof(Lumina.Excel.Sheets.Action),
                     RowId = row.RowId,
                     IconId = row.Icon,
                     Label = row.Name.ExtractText(),
@@ -136,7 +140,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "BuddyAction",
+                    RowType = typeof(BuddyAction),
                     RowId = row.RowId,
                     IconId = (uint)row.Icon,
                     Label = row.Name.ExtractText(),
@@ -154,7 +158,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "CraftAction",
+                    RowType = typeof(CraftAction),
                     RowId = row.RowId,
                     IconId = row.Icon,
                     Label = row.Name.ExtractText(),
@@ -172,7 +176,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "Emote",
+                    RowType = typeof(Emote),
                     RowId = row.RowId,
                     IconId = row.Icon,
                     Label = row.Name.ExtractText()
@@ -189,7 +193,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "Perform",
+                    RowType = typeof(Perform),
                     RowId = row.RowId,
                     Label = row.Name.ExtractText()
                 });
@@ -210,7 +214,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
             {
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "BannerBg",
+                    RowType = typeof(BannerBg),
                     RowId = bgRow.RowId,
                     IconId = (uint)bgRow.Icon,
                     Label = bgRow.Name.ExtractText(),
@@ -222,7 +226,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
             {
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "BannerFrame",
+                    RowType = typeof(BannerFrame),
                     RowId = frameRow.RowId,
                     IconId = (uint)frameRow.Icon,
                     Label = frameRow.Name.ExtractText(),
@@ -234,7 +238,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
             {
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "BannerDecoration",
+                    RowType = typeof(BannerDecoration),
                     RowId = decorationRow.RowId,
                     IconId = (uint)decorationRow.Icon,
                     Label = decorationRow.Name.ExtractText(),
@@ -248,7 +252,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
                 {
                     names.Add(new UnlockEntry()
                     {
-                        SheetName = "BannerFacial",
+                        RowType = typeof(BannerFacial),
                         RowId = facialRow.RowId,
                         IconId = facialRow.Emote.Value.Icon,
                         Label = facialRow.Emote.Value.Name.ExtractText(),
@@ -261,7 +265,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
             {
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "BannerTimeline",
+                    RowType = typeof(BannerTimeline),
                     RowId = timelineRow.RowId,
                     IconId = (uint)timelineRow.Icon,
                     Label = timelineRow.Name.ExtractText(),
@@ -342,7 +346,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
             names.Add(new UnlockEntry()
             {
-                SheetName = "CharaMakeCustomize",
+                RowType = typeof(CharaMakeCustomize),
                 RowId = row.RowId,
                 ExtraSheetText = $" (FeatureID: {row.FeatureID})",
                 IconId = row.Icon,
@@ -361,7 +365,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
             names.Add(new UnlockEntry()
             {
-                SheetName = "MJILandmark",
+                RowType = typeof(MJILandmark),
                 RowId = row.RowId,
                 IconId = row.Icon,
                 Label = row.Name.Value.Text.ExtractText(),
@@ -379,7 +383,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
             names.Add(new UnlockEntry()
             {
-                SheetName = "CSBonusContentType",
+                RowType = typeof(CSBonusContentType),
                 RowId = row.RowId,
                 IconId = row.ContentType.Value.Icon,
                 Label = row.ContentType.Value.Name.ExtractText()
@@ -395,7 +399,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "NotebookDivision",
+                    RowType = typeof(NotebookDivision),
                     RowId = row.RowId,
                     Label = row.Name.ExtractText()
                 });
@@ -411,7 +415,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "Trait",
+                    RowType = typeof(Trait),
                     RowId = row.RowId,
                     IconId = (uint)row.Icon,
                     Label = row.Name.ExtractText(),
@@ -429,7 +433,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "QuestAcceptAdditionCondition",
+                    RowType = typeof(QuestAcceptAdditionCondition),
                     RowId = row.RowId,
                     ExtraSheetText = " (Requirement 0)",
                     Label = _textService.GetQuestName(row.RowId)
@@ -443,7 +447,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
                 names.Add(new UnlockEntry()
                 {
-                    SheetName = "QuestAcceptAdditionCondition",
+                    RowType = typeof(QuestAcceptAdditionCondition),
                     RowId = row.RowId,
                     ExtraSheetText = " (Requirement 1)",
                     Label = _textService.GetQuestName(row.RowId)
@@ -461,7 +465,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 
             names.Add(new UnlockEntry()
             {
-                SheetName = "Item",
+                RowType = typeof(Item),
                 RowId = row.RowId,
                 IconId = row.Icon,
                 Label = _textService.GetItemName(row.RowId)
@@ -488,16 +492,24 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
             => UIState.Instance()->IsUnlockLinkUnlocked((ushort)entry.Index);
     }
 
-    private class UnlocksColumn(DebugRenderer debugRenderer) : ColumnString<UnlockLinkEntry>
+    private class UnlocksColumn(DebugRenderer debugRenderer, WindowManager windowManager, ImGuiContextMenuService imGuiContextMenu, TextService textService) : ColumnString<UnlockLinkEntry>
     {
         public override string ToName(UnlockLinkEntry entry)
-            => string.Join(' ', entry.Unlocks.Select(unlock => $"{unlock.SheetName}#{unlock.RowId}"));
+            => string.Join(' ', entry.Unlocks.Select(unlock => $"{unlock.RowType.Name}#{unlock.RowId}"));
 
         public override unsafe void DrawColumn(UnlockLinkEntry entry)
         {
             foreach (var unlock in entry.Unlocks)
             {
-                debugRenderer.DrawCopyableText($"{unlock.SheetName}#{unlock.RowId}{unlock.ExtraSheetText}");
+                if (ImGui.Selectable($"{unlock.RowType.Name}#{unlock.RowId}{unlock.ExtraSheetText}"))
+                {
+                    windowManager.CreateOrOpen($"{unlock.RowType.Name}#{unlock.RowId}", () => new ExcelRowTab(windowManager, debugRenderer, unlock.RowType, unlock.RowId, $"{unlock.RowType.Name}#{unlock.RowId}"));
+                }
+
+                imGuiContextMenu.Draw($"Entry{entry.Index}_{unlock.RowType.Name}{unlock.RowId}_RowIdContextMenu", builder =>
+                {
+                    builder.AddCopyRowId(textService, unlock.RowId);
+                });
             }
         }
     }
@@ -511,7 +523,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
         {
             foreach (var unlock in entry.Unlocks)
             {
-                switch (unlock.SheetName)
+                switch (unlock.RowType.Name)
                 {
                     case "Item":
                         unlocksTabUtils.DrawSelectableItem(unlock.RowId, $"Unlock{entry.Index}Item{unlock.RowId}");
@@ -530,7 +542,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
                                 unlock.Label,
                                 !string.IsNullOrEmpty(unlock.Category)
                                     ? unlock.Category
-                                    : unlock.SheetName);
+                                    : unlock.RowType.Name);
                         }
 
                         break;
