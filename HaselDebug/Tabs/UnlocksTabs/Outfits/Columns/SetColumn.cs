@@ -28,6 +28,7 @@ public class SetColumn(
     {
         var isSetCollected = prismBoxProvider.ItemIds.Contains(row.RowId);
 
+        ImGui.BeginGroup();
         ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
         ImGui.SameLine(0, 0);
         ImGuiUtils.PushCursorX(-IconSize * ImGuiHelpers.GlobalScale);
@@ -58,21 +59,13 @@ public class SetColumn(
         if (isSetCollected)
             OutfitsTable.DrawCollectedCheckmark(textureProvider);
 
-        imGuiContextMenuService.Draw($"###Set_{row.RowId}_Icon_ItemContextMenu", builder =>
-        {
-            builder.AddTryOn(row.Set);
-            builder.AddItemFinder(row.Set.RowId);
-            builder.AddCopyItemName(row.Set.RowId);
-            builder.AddItemSearch(row.Set);
-            builder.AddOpenOnGarlandTools("item", row.Set.RowId);
-        });
-
         ImGui.SameLine();
         ImGui.Selectable($"###SetName_{row.RowId}", false, ImGuiSelectableFlags.None, new Vector2(ImGui.GetContentRegionAvail().X, IconSize * ImGuiHelpers.GlobalScale));
 
-        // TODO: preview whole set??
+        ImGui.EndGroup();
 
-        imGuiContextMenuService.Draw($"###Set_{row.RowId}_Name_ItemContextMenu", builder =>
+        // TODO: preview whole set??
+        imGuiContextMenuService.Draw($"###Set_{row.RowId}_ItemContextMenu", builder =>
         {
             builder.AddTryOn(row.Set);
             builder.AddItemFinder(row.Set.RowId);

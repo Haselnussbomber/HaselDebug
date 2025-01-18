@@ -16,6 +16,7 @@ using HaselCommon.Game.Enums;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
+using HaselCommon.Services.SeStringEvaluation;
 using HaselCommon.Sheets;
 using HaselDebug.Services;
 using HaselDebug.Windows.ItemTooltips;
@@ -165,7 +166,7 @@ public unsafe class UnlocksTabUtils(
             DrawEventItemTooltip(eventItem);
     }
 
-    public void DrawItemTooltip(Item item)
+    public void DrawItemTooltip(Item item, string? descriptionOverride = null)
     {
         if (!TextureProvider.TryGetFromGameIcon((uint)item.Icon, out var tex) || !tex.TryGetWrap(out var icon, out _))
             return;
@@ -216,15 +217,10 @@ public unsafe class UnlocksTabUtils(
                 ImGui.TextUnformatted(category);
         }
 
-        var description = !item.Description.IsEmpty ? item.Description.ExtractText().StripSoftHypen() : null;
+        var description = descriptionOverride ?? (!item.Description.IsEmpty ? item.Description.ExtractText().StripSoftHypen() : null);
         if (!string.IsNullOrEmpty(description))
         {
-            ImGuiUtils.PushCursorY(1 * ImGuiHelpers.GlobalScale);
-
-            // separator
-            var pos = ImGui.GetCursorScreenPos();
-            ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
-            ImGuiUtils.PushCursorY(4 * ImGuiHelpers.GlobalScale);
+            DrawSeparator(marginTop: 1, marginBottom: 4);
 
             ImGuiHelpers.SafeTextWrapped(description);
         }
@@ -279,10 +275,23 @@ public unsafe class UnlocksTabUtils(
         }
         else if (item.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard)
         {
-            ImGuiUtils.PushCursorY(2 * ImGuiHelpers.GlobalScale);
-            var pos = ImGui.GetCursorScreenPos();
-            ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
-            ImGuiUtils.PushCursorY(5 * ImGuiHelpers.GlobalScale);
+            if (ExcelService.TryGetRow<TripleTriadCardResident>(item.ItemAction.Value.Data[0], out var residentRow) &&
+                ExcelService.TryGetRow<TripleTriadCardObtain>(residentRow.AcquisitionType, out var obtainRow) &&
+                obtainRow.Unknown1 != 0)
+            {
+                DrawSeparator();
+                TextureService.DrawIcon(obtainRow.Unknown0, 40 * ImGuiHelpers.GlobalScale);
+                ImGui.SameLine();
+                ImGuiHelpers.SafeTextWrapped(SeStringEvaluator.EvaluateFromAddon(obtainRow.Unknown1, new SeStringContext()
+                {
+                    LocalParameters = [
+                        residentRow.Acquisition.RowId,
+                        residentRow.Location.RowId
+                    ]
+                }).ExtractText().StripSoftHypen());
+            }
+
+            DrawSeparator(marginTop: 3);
 
             TripleTriadCardTooltip ??= new TripleTriadCardTooltip(TextureService, ExcelService, SeStringEvaluator, TripleTriadNumberFontManager);
             TripleTriadCardTooltip.MarginTop = ImGui.GetCursorPosY();
@@ -387,19 +396,17 @@ public unsafe class UnlocksTabUtils(
 
         if (ExcelService.TryGetRow<EventItemHelp>(item.RowId, out var itemHelp) && !itemHelp.Description.IsEmpty)
         {
-            ImGuiUtils.PushCursorY(1 * ImGuiHelpers.GlobalScale);
-
-            // separator
-            var pos = ImGui.GetCursorScreenPos();
-            ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
-            ImGuiUtils.PushCursorY(4 * ImGuiHelpers.GlobalScale);
+            DrawSeparator(marginTop: 1, marginBottom: 4);
 
             ImGuiHelpers.SafeTextWrapped(itemHelp.Description.ExtractText().StripSoftHypen());
         }
     }
 
-    internal void DrawTooltip(uint iconId, string label, object description)
+    private static void DrawSeparator(float marginTop = 2, float marginBottom = 5)
     {
-        throw new NotImplementedException();
+        ImGuiUtils.PushCursorY(marginTop * ImGuiHelpers.GlobalScale);
+        var pos = ImGui.GetCursorScreenPos();
+        ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
+        ImGuiUtils.PushCursorY(marginBottom * ImGuiHelpers.GlobalScale);
     }
 }

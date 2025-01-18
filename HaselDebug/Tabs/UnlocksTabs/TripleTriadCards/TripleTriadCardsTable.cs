@@ -1,11 +1,13 @@
 using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Game.Enums;
 using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
+using HaselCommon.Services.SeStringEvaluation;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
@@ -44,7 +46,7 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
                 Flags = ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.DefaultSort,
                 Width = 75,
             },
-            new NameColumn(debugRenderer, mapService, unlocksTabUtils) {
+            new NameColumn(debugRenderer, excelService, seStringEvaluator, mapService, unlocksTabUtils) {
                 Label = "Name",
             }
         ];
@@ -97,10 +99,40 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
         }
     }
 
-    private class NameColumn(DebugRenderer debugRenderer, MapService mapService, UnlocksTabUtils unlocksTabUtils) : ColumnString<TripleTriadCardEntry>
+    private class NameColumn(DebugRenderer debugRenderer, ExcelService excelService, SeStringEvaluatorService seStringEvaluator, MapService mapService, UnlocksTabUtils unlocksTabUtils) : ColumnString<TripleTriadCardEntry>
     {
         public override string ToName(TripleTriadCardEntry entry)
             => entry.Row.Name.ExtractText().StripSoftHypen();
+
+        public string ToSearchName(TripleTriadCardEntry entry)
+        {
+            var str = ToName(entry);
+
+            if (entry.Item.HasValue &&
+                excelService.TryGetRow<TripleTriadCardResident>(entry.Item.Value.ItemAction.Value.Data[0], out var residentRow) &&
+                excelService.TryGetRow<TripleTriadCardObtain>(residentRow.AcquisitionType, out var obtainRow) &&
+                obtainRow.Unknown1 != 0)
+            {
+                str += "\n" + seStringEvaluator.EvaluateFromAddon(obtainRow.Unknown1, new SeStringContext()
+                {
+                    LocalParameters = [
+                        residentRow.Acquisition.RowId,
+                        residentRow.Location.RowId
+                    ]
+                }).ExtractText();
+            }
+
+            return str;
+        }
+
+        public override bool ShouldShow(TripleTriadCardEntry row)
+        {
+            var name = ToSearchName(row);
+            if (FilterValue.Length == 0)
+                return true;
+
+            return FilterRegex?.IsMatch(name) ?? name.Contains(FilterValue, StringComparison.OrdinalIgnoreCase);
+        }
 
         public override unsafe void DrawColumn(TripleTriadCardEntry entry)
         {
@@ -109,12 +141,28 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
             if (AgentLobby.Instance()->IsLoggedIn)
             {
                 var hasLevel = entry.ResidentRow.Location.TryGetValue<Level>(out var level);
-                using (Color.Transparent.Push(ImGuiCol.HeaderActive, !hasLevel))
-                using (Color.Transparent.Push(ImGuiCol.HeaderHovered, !hasLevel))
+                var hasCfcEntry = entry.ResidentRow.Acquisition.Is<ContentFinderCondition>();
+
+                using (Color.Transparent.Push(ImGuiCol.HeaderActive, !hasLevel && !hasCfcEntry))
+                using (Color.Transparent.Push(ImGuiCol.HeaderHovered, !hasLevel && !hasCfcEntry))
                 {
                     if (ImGui.Selectable(ToName(entry)))
                     {
-                        if (hasLevel)
+                        if (hasCfcEntry)
+                        {
+                            if (entry.ResidentRow.Acquisition.TryGetValue<ContentFinderCondition>(out var cfc))
+                            {
+                                if (cfc.ContentType.RowId == 30)
+                                {
+                                    UIModule.Instance()->ExecuteMainCommand(94); // can't open VVDFinder with the right instance :/
+                                }
+                                else
+                                {
+                                    AgentContentsFinder.Instance()->OpenRegularDuty(entry.ResidentRow.Acquisition.RowId);
+                                }
+                            }
+                        }
+                        else if (hasLevel)
                         {
                             mapService.OpenMap(level);
                         }
