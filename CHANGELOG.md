@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.13.0] (2025-01-18)
+
+- **Updated:** Completely reworked all Unlock tables.
+  - Added nice looking tooltips for Items, EventItems, Quests, Triple Triad Cards and other things.
+  - Added a useless progress overview on the Unlock category itself.
+  - RowIds are now clickable and open the Row in a new window.
+  - Removed rewards from Quest table.
+- **Added:** A Target tab.
+- **Added:** GameObject type overrides based on their ObjectKind.
+- **Added:** CS Docs now support simple lists.
+- **Changed:** Reworked dependency injection by using Injectio.
+- **Fixed:** CS Docs are no longer displayed twice when the field is inherited.
+- **Updated:** ClientStructs now at [71e803c](https://github.com/aers/FFXIVClientStructs/tree/71e803c) ([compare](https://github.com/aers/FFXIVClientStructs/compare/fb4dfc09..71e803c)).
+
+There is probably some change that I forgot to list. :)
+
 ## [1.12.2] (2025-01-08)
 
 - **Added:** Excel tab now also has support for AddonTransient sheet.
@@ -201,7 +217,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.0...main
+[1.13.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.2...v1.13.0
 [1.12.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.1...v1.12.2
 [1.12.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.0...v1.12.1
 [1.12.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.11.1...v1.12.0
