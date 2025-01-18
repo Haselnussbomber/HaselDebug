@@ -8,6 +8,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Extensions.Sheets;
@@ -19,11 +20,13 @@ using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
 using HaselCommon.Sheets;
 using HaselDebug.Services;
+using HaselDebug.Sheets;
 using HaselDebug.Windows.ItemTooltips;
 using ImGuiNET;
 using Lumina.Data.Files;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
+using Lumina.Extensions;
 using Companion = Lumina.Excel.Sheets.Companion;
 using Ornament = Lumina.Excel.Sheets.Ornament;
 
@@ -399,6 +402,86 @@ public unsafe class UnlocksTabUtils(
             DrawSeparator(marginTop: 1, marginBottom: 4);
 
             ImGuiHelpers.SafeTextWrapped(itemHelp.Description.ExtractText().StripSoftHypen());
+        }
+    }
+
+    public void DrawQuestTooltip(Quest quest)
+    {
+        using var id = ImRaii.PushId($"QuestTooltip{quest.RowId}");
+
+        using var tooltip = ImRaii.Tooltip();
+        if (!tooltip) return;
+
+        using var popuptable = ImRaii.Table("PopupTable", 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
+        if (!popuptable) return;
+
+        var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
+        var title = TextService.GetQuestName(quest.RowId);
+
+        ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale + itemInnerSpacing.X);
+        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
+
+        ImGui.TableNextColumn(); // Icon
+
+        var eventIconType = quest.EventIconType.IsValid
+            ? quest.EventIconType.Value
+            : ExcelService.GetSheet<EventIconType>().GetRow(1);
+
+        var iconOffset = 1u;
+        if (QuestManager.IsQuestComplete(quest.RowId))
+            iconOffset = 5u;
+        else if (quest.IsRepeatable)
+            iconOffset = 2u;
+
+        if (eventIconType.MapIconAvailable != 0 &&
+            TextureProvider.TryGetFromGameIcon(eventIconType.MapIconAvailable + iconOffset, out var tex) &&
+            tex.TryGetWrap(out var icon, out _))
+        {
+            ImGui.Image(icon.ImGuiHandle, ImGuiHelpers.ScaledVector2(40));
+        }
+
+        ImGui.TableNextColumn(); // Text
+        using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
+        using var indent = ImRaii.PushIndent(1);
+
+        ImGui.TextUnformatted(title);
+
+        var text = quest.JournalGenre.IsValid ? quest.JournalGenre.Value.Name.ExtractText() : null;
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
+            using (ImRaii.PushColor(ImGuiCol.Text, (uint)Color.Grey))
+                ImGui.TextUnformatted(text);
+        }
+
+        var iconId = quest.Icon;
+
+        var currentQuest = quest;
+        while (iconId == 0 && currentQuest.PreviousQuest[0].RowId != 0)
+        {
+            currentQuest = currentQuest.PreviousQuest[0].Value;
+            iconId = currentQuest.Icon;
+        }
+
+        if (iconId != 0 && TextureProvider.TryGetFromGameIcon(iconId, out var imageTex) && imageTex.TryGetWrap(out var image, out _))
+        {
+            DrawSeparator(marginTop: 1, marginBottom: 5);
+            var newWidth = ImGui.GetContentRegionAvail().X;
+            var ratio = newWidth / image.Width;
+            var newHeight = image.Height * ratio;
+            ImGui.Image(image.ImGuiHandle, new Vector2(newWidth, newHeight));
+        }
+
+        var questText = ExcelService.GetSheet<QuestText>(null, $"quest/{(quest.RowId - 0x10000) / 100:000}/{quest.Id.ExtractText()}");
+        var questSequence = QuestManager.GetQuestSequence((ushort)(quest.RowId - 0x10000));
+        if (questSequence == 0xFF) questSequence = 1;
+        for (var seq = questSequence == 0 ? 0 : 1; seq <= questSequence; seq++)
+        {
+            if (questText.TryGetFirst(kvRow => kvRow.LuaKey.ExtractText() == $"TEXT_{quest.Id.ExtractText().ToUpper()}_SEQ_{seq:00}", out var seqText) && !seqText.Text.IsEmpty)
+            {
+                DrawSeparator(marginTop: 1, marginBottom: 4);
+                ImGuiHelpers.SeStringWrapped(SeStringEvaluator.Evaluate(seqText.Text));
+            }
         }
     }
 

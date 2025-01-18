@@ -230,6 +230,8 @@ public class PluginWindow : SimpleWindow
     public void SelectTab(string internalName)
     {
         SelectTabWithoutSave(internalName);
+        PluginConfig.LastSelectedTab = SelectedTab?.InternalName ?? string.Empty;
+        PluginConfig.Save();
     }
 
     private void SelectTabWithoutSave(string internalName)
