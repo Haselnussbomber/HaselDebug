@@ -472,7 +472,7 @@ public unsafe class UnlocksTabUtils(
             ImGui.Image(image.ImGuiHandle, new Vector2(newWidth, newHeight));
         }
 
-        var questText = ExcelService.GetSheet<QuestText>(null, $"quest/{(quest.RowId - 0x10000) / 100:000}/{quest.Id.ExtractText()}");
+        var questText = ExcelService.GetSheet<QuestText>($"quest/{(quest.RowId - 0x10000) / 100:000}/{quest.Id.ExtractText()}");
         var questSequence = QuestManager.GetQuestSequence((ushort)(quest.RowId - 0x10000));
         if (questSequence == 0xFF) questSequence = 1;
         for (var seq = questSequence == 0 ? 0 : 1; seq <= questSequence; seq++)

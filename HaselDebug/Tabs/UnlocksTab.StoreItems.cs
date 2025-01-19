@@ -1,10 +1,9 @@
 /*
- * LuminaSupplemental not Lumina 5 compatible
- * 
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
@@ -12,35 +11,51 @@ using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
+using HaselDebug.Interfaces;
+using HaselDebug.Services;
+using HaselDebug.Utils;
 using ImGuiNET;
 using LuminaSupplemental.Excel.Model;
+using LuminaSupplemental.Excel.Services;
 using Cabinet = Lumina.Excel.Sheets.Cabinet;
 
 namespace HaselDebug.Tabs;
 
-public unsafe partial class UnlocksTab
+[RegisterSingleton<IUnlockTab>(Duplicate = DuplicateStrategy.Append)]
+public unsafe class StoreItemsTab(
+    IDataManager DataManager,
+    LanguageProvider LanguageProvider,
+    TextService TextService,
+    ExcelService ExcelService,
+    DebugRenderer DebugRenderer,
+    UnlocksTabUtils UnlocksTabUtils) : DebugTab, IUnlockTab
 {
     private List<StoreItem> StoreItemsList = [];
     private FrozenDictionary<uint, uint> CabinetItems = null!;
 
-    public void UpdateStoreItems()
+    public UnlockProgress GetUnlockProgress()
     {
-        StoreItemsList = CsvLoader.LoadResource<StoreItem>(CsvLoader.StoreItemResourceName, out _, DataManager.GameData, TextService.ClientLanguage.ToLumina())
-            .Where(row => row.RowId != 0 && row.Item.RowId is not (0 or 5827) && row.Item.Value != null)
-            .GroupBy(row => row.FittingShopItemSetId)
-            .SelectMany(group => group)
-            .DistinctBy(row => row.Item.Row)
-            .OrderBy(row => row.Item.Value!.ItemUICategory.Value?.Name.ExtractText())
-            .ThenBy(row => TextService.GetItemName(row.Item.Row))
-            .ToList();
-
-        CabinetItems = ExcelService.GetSheet<Cabinet>().DistinctBy(row => row.Item.RowId).ToFrozenDictionary(row => row.Item.Row, row => row.RowId);
+        return default;
     }
 
-    public void DrawStoreItems()
+    public void UpdateStoreItems()
     {
-        using var tab = ImRaii.TabItem("Store Items");
-        if (!tab) return;
+        StoreItemsList = CsvLoader.LoadResource<StoreItem>(CsvLoader.StoreItemResourceName, out _, out _, DataManager.GameData, LanguageProvider.ClientLanguage.ToLumina())
+            .Where(row => row.RowId != 0 && row.Item.RowId is not (0 or 5827) && row.Item.IsValid)
+            .GroupBy(row => row.FittingShopItemSetId)
+            .SelectMany(group => group)
+            .DistinctBy(row => row.Item.Value)
+            .OrderBy(row => row.Item.Value!.ItemUICategory.Value.Name.ExtractText())
+            .ThenBy(row => TextService.GetItemName(row.Item.RowId))
+            .ToList();
+
+        CabinetItems = ExcelService.GetSheet<Cabinet>().DistinctBy(row => row.Item.RowId).ToFrozenDictionary(row => row.Item.RowId, row => row.RowId);
+    }
+
+    public override void Draw()
+    {
+        if (StoreItemsList.Count == 0)
+            UpdateStoreItems();
 
         var cabinet = UIState.Instance()->Cabinet;
         var isCabinetLoaded = cabinet.IsCabinetLoaded();
@@ -76,8 +91,8 @@ public unsafe partial class UnlocksTab
                 0 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending => (int)(b.ItemId - a.ItemId),
                 1 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Ascending => (a.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty).CompareTo(b.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty),
                 1 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending => (b.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty).CompareTo(a.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty),
-                2 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Ascending => TextService.GetItemName(a.Item.Row).CompareTo(TextService.GetItemName(b.Item.Row)),
-                2 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending => TextService.GetItemName(b.Item.Row).CompareTo(TextService.GetItemName(a.Item.Row)),
+                2 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Ascending => TextService.GetItemName(a.Item.RowId).CompareTo(TextService.GetItemName(b.Item.RowId)),
+                2 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending => TextService.GetItemName(b.Item.RowId).CompareTo(TextService.GetItemName(a.Item.RowId)),
                 _ => 0,
             });
 
@@ -104,17 +119,20 @@ public unsafe partial class UnlocksTab
                 DebugRenderer.DrawCopyableText(row.ItemId.ToString());
 
                 ImGui.TableNextColumn(); // Item Category
-                DebugRenderer.DrawCopyableText(row.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty);
+                DebugRenderer.DrawCopyableText(row.Item.Value!.ItemUICategory.Value!.Name.ExtractText().StripSoftHypen() ?? string.Empty);
 
                 ImGui.TableNextColumn(); // Item
-                DrawSelectableItem(row.Item.Value, $"StoreItemsList{i}");
+                UnlocksTabUtils.DrawSelectableItem(row.Item.Value, $"StoreItemsList{i}");
+            }
+        }
+    }
+}
 
-                /* i'd love to link the store, but that information is not available
-                if (ImGui.Selectable(TextService.GetItemName(row.ItemId)))
-                {
-                    Util.OpenLink($"https://store.finalfantasyxiv.com/ffxivstore/product/{row.RowId}");
-                }
-                * /
+                // i'd love to link the store, but that information is not available
+                // if (ImGui.Selectable(TextService.GetItemName(row.ItemId)))
+                // {
+                //     Util.OpenLink($"https://store.finalfantasyxiv.com/ffxivstore/product/{row.RowId}");
+                // }
 
                 ImGui.TableNextColumn(); // Collected
 

@@ -1,10 +1,9 @@
 using System.Numerics;
 using System.Text;
 using Dalamud.Interface.Utility;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Gui.ImGuiTable;
@@ -20,9 +19,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 public class ItemsColumn(
     TextService textService,
     TextureService textureService,
-    ITextureProvider textureProvider,
     ImGuiContextMenuService imGuiContextMenuService,
-    PrismBoxProvider prismBoxProvider,
     ExcelService excelService,
     UnlocksTabUtils unlocksTabUtils) : ColumnString<CustomMirageStoreSetItem>
 {
@@ -39,9 +36,10 @@ public class ItemsColumn(
         return _stringBuilder.ToString();
     }
 
-    public override void DrawColumn(CustomMirageStoreSetItem row)
+    public override unsafe void DrawColumn(CustomMirageStoreSetItem row)
     {
-        var isSetCollected = prismBoxProvider.ItemIds.Contains(row.RowId);
+        var glamourDresserItemIds = ItemFinderModule.Instance()->GlamourDresserItemIds;
+        var isSetCollected = glamourDresserItemIds.Contains(row.RowId);
 
         for (var i = 1; i < row.Items.Count; i++)
         {
@@ -49,7 +47,7 @@ public class ItemsColumn(
             if (item.RowId == 0)
                 continue;
 
-            var isItemCollected = prismBoxProvider.ItemIds.Contains(item.RowId) || prismBoxProvider.ItemIds.Contains(item.RowId + 1_000_000);
+            var isItemCollected = glamourDresserItemIds.Contains(item.RowId) || glamourDresserItemIds.Contains(item.RowId + 1_000_000);
             var isItemInInventory = false;
             unsafe
             {

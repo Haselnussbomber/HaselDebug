@@ -2,6 +2,7 @@ using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Gui.ImGuiTable;
@@ -16,17 +17,16 @@ public class SetColumn(
     TextService textService,
     TextureService textureService,
     ITextureProvider textureProvider,
-    ImGuiContextMenuService imGuiContextMenuService,
-    PrismBoxProvider prismBoxProvider) : ColumnString<CustomMirageStoreSetItem>
+    ImGuiContextMenuService imGuiContextMenuService) : ColumnString<CustomMirageStoreSetItem>
 {
     private const float IconSize = OutfitsTable.IconSize;
 
     public override string ToName(CustomMirageStoreSetItem row)
         => textService.GetItemName(row.RowId);
 
-    public override void DrawColumn(CustomMirageStoreSetItem row)
+    public override unsafe void DrawColumn(CustomMirageStoreSetItem row)
     {
-        var isSetCollected = prismBoxProvider.ItemIds.Contains(row.RowId);
+        var isSetCollected = ItemFinderModule.Instance()->GlamourDresserItemIds.Contains(row.RowId);
 
         ImGui.BeginGroup();
         ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
