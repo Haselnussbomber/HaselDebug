@@ -4,7 +4,6 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Services;
 using HaselCommon.Utils;
-using HaselDebug.Structs;
 using ImGuiNET;
 
 namespace HaselDebug.Extensions;
