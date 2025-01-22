@@ -66,7 +66,8 @@ public class QuestsTable : Table<Quest>, IDisposable
 
     public override void LoadRows()
     {
-        Rows = _excelService.GetSheet<Quest>().Where(row => row.RowId != 0 && !string.IsNullOrEmpty(_textService.GetQuestName(row.RowId))).ToList();
+        Rows = _excelService.GetSheet<Quest>()
+            .Where(row => row.RowId != 0 && !row.Name.IsEmpty).ToList();
     }
 
     private class QuestIdColumn(DebugRenderer debugRenderer) : ColumnNumber<Quest>
