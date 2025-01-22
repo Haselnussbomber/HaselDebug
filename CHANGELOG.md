@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.1] (2025-01-22)
+
+Update for Patch 7.16.
+
+- **Changed:** Replaced the plugins glamour dresser cache with the games glamour dresser cache from ItemFinderModule for the Outfits tab.
+- **Updated:** ClientStructs now at [8a31ad5](https://github.com/aers/FFXIVClientStructs/tree/8a31ad5) ([compare](https://github.com/aers/FFXIVClientStructs/compare/71e803c..8a31ad5)).
+
 ## [1.13.0] (2025-01-18)
 
 - **Updated:** Completely reworked all Unlock tables.
@@ -217,7 +224,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.1...main
+[1.13.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.2...v1.13.0
 [1.12.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.1...v1.12.2
 [1.12.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.0...v1.12.1
