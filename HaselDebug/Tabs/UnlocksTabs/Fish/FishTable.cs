@@ -1,7 +1,6 @@
 using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Extensions.Sheets;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Services;
@@ -87,7 +86,7 @@ public unsafe class FishTable : Table<FishParameter>
                 {
                     builder.AddItemFinder(item.RowId);
                     builder.AddCopyItemName(item.RowId);
-                    builder.AddItemSearch(item.AsRef());
+                    builder.AddItemSearch(item);
                     builder.AddOpenOnGarlandTools("item", item.RowId);
                 }
                 else if (isEventItem)

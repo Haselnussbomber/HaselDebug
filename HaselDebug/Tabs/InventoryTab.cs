@@ -111,7 +111,7 @@ public unsafe class InventoryTab(
             var slot = container->GetInventorySlot(i);
             if (slot == null) continue;
 
-            var itemId = (ItemId)slot->GetItemId();
+            var itemId = (ExcelRowId<Item>)slot->GetItemId();
             var quantity = slot->GetQuantity();
 
             using var disableditem = ImRaii.Disabled(itemId == 0);
@@ -131,7 +131,7 @@ public unsafe class InventoryTab(
             {
                 var itemName = TextService.GetItemName(itemId);
 
-                if (itemId.IsHighQuality)
+                if (itemId.IsHighQuality())
                     itemName += " " + SeIconChar.HighQuality.ToIconString();
 
                 var itemNameSeStr = new SeStringBuilder()
@@ -140,7 +140,7 @@ public unsafe class InventoryTab(
                     .PopColorType()
                     .ToReadOnlySeString();
 
-                DebugRenderer.DrawIcon(ItemService.GetIconId(itemId), itemId.IsHighQuality);
+                DebugRenderer.DrawIcon(ItemService.GetIconId(itemId), itemId.IsHighQuality());
                 DebugRenderer.DrawPointerType(slot, typeof(InventoryItem), new NodeOptions()
                 {
                     AddressPath = new AddressPath([(nint)inventoryType, slot->Slot]),

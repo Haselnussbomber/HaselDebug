@@ -11,7 +11,6 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using HaselCommon.Extensions.Sheets;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Game.Enums;
 using HaselCommon.Graphics;
@@ -90,10 +89,10 @@ public unsafe class UnlocksTabUtils(
 
         ImGuiContextMenuService.Draw($"##{id}_ItemContextMenu{item.RowId}_IconTooltip", builder =>
         {
-            builder.AddTryOn(item.AsRef());
+            builder.AddTryOn(item);
             builder.AddItemFinder(item.RowId);
             builder.AddCopyItemName(item.RowId);
-            builder.AddItemSearch(item.AsRef());
+            builder.AddItemSearch(item);
             builder.AddOpenOnGarlandTools("item", item.RowId);
         });
 
