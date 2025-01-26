@@ -154,13 +154,27 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
 
                 case TextParameterType.ReferencedUtf8String:
                     if (item.ReferencedUtf8StringValue != null)
-                        _debugRenderer.DrawSeString(item.ReferencedUtf8StringValue->Utf8String.StringPtr, new NodeOptions { AddressPath = new AddressPath([(nint)i, (nint)item.ReferencedUtf8StringValue]), Indent = false });
+                    {
+                        _debugRenderer.DrawSeString(item.ReferencedUtf8StringValue->Utf8String.StringPtr, new NodeOptions
+                        {
+                            AddressPath = new AddressPath([(nint)i, (nint)item.ReferencedUtf8StringValue]),
+                            SeStringTitle = $"GlobalParameter {i}",
+                            Indent = false
+                        });
+                    }
                     else
+                    {
                         ImGui.TextUnformatted("null");
+                    }
+
                     break;
 
                 case TextParameterType.String:
-                    _debugRenderer.DrawSeString(item.StringValue, new NodeOptions { Indent = false });
+                    _debugRenderer.DrawSeString(item.StringValue, new NodeOptions
+                    {
+                        SeStringTitle = $"GlobalParameter {i}",
+                        Indent = false
+                    });
                     break;
             }
 
@@ -225,6 +239,7 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
                 97 => "Log Role Color - Healer (LogColorRoleHealer)",
                 99 => "Log Role Color - DPS (LogColorRoleDPS)",
                 101 => "Log Role Color - Other (LogColorOtherClass)",
+                102 => "Has Login Security Token (set in UIModule.HandlePacket case 0)",
                 _ => "",
             });
         }
