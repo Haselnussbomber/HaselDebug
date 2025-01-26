@@ -16,15 +16,38 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Windows;
 
-public class SeStringInspectorWindow(
-    WindowManager windowManager,
-    DebugRenderer DebugRenderer,
-    SeStringEvaluatorService SeStringEvaluator,
-    ReadOnlySeString SeString,
-    ClientLanguage Language,
-    string windowName = "SeString") : SimpleWindow(windowManager, windowName)
+public class SeStringInspectorWindow : SimpleWindow
 {
     private SeStringParameter[]? LocalParameters = null;
+    private ReadOnlySeString _string;
+    private readonly DebugRenderer _debugRenderer;
+    private readonly SeStringEvaluatorService _seStringEvaluator;
+
+    public ReadOnlySeString String
+    {
+        get => _string;
+        set
+        {
+            _string = value;
+            LocalParameters = null;
+        }
+    }
+
+    public ClientLanguage Language { get; set; }
+
+    public SeStringInspectorWindow(
+        WindowManager windowManager,
+        DebugRenderer debugRenderer,
+        SeStringEvaluatorService seStringEvaluator,
+        ReadOnlySeString str,
+        ClientLanguage language,
+        string windowName = "SeString") : base(windowManager, windowName)
+    {
+        _debugRenderer = debugRenderer;
+        _seStringEvaluator = seStringEvaluator;
+        Language = language;
+        String = str;
+    }
 
     public override void OnOpen()
     {
@@ -60,7 +83,7 @@ public class SeStringInspectorWindow(
 
     public override void Draw()
     {
-        LocalParameters ??= GetLocalParameters(SeString.AsSpan(), []);
+        LocalParameters ??= GetLocalParameters(String.AsSpan(), []);
 
         DrawPreview();
 
@@ -76,10 +99,10 @@ public class SeStringInspectorWindow(
 
     private void DrawPreview()
     {
-        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(1), Title = "Preview", TitleColor = Color.Green, DefaultOpen = true });
+        using var node = _debugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(1), Title = "Preview", TitleColor = Color.Green, DefaultOpen = true });
         if (!node) return;
 
-        var evaluated = SeStringEvaluator.Evaluate(SeString.AsSpan(), new()
+        var evaluated = _seStringEvaluator.Evaluate(String.AsSpan(), new()
         {
             LocalParameters = LocalParameters ?? [],
             Language = Language
@@ -95,7 +118,7 @@ public class SeStringInspectorWindow(
 
     private void DrawParameters()
     {
-        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(2), Title = "Parameters", TitleColor = Color.Green, DefaultOpen = true });
+        using var node = _debugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(2), Title = "Parameters", TitleColor = Color.Green, DefaultOpen = true });
         if (!node) return;
 
         for (var i = 0; i < LocalParameters!.Length; i++)
@@ -121,10 +144,10 @@ public class SeStringInspectorWindow(
 
     private void DrawPayloads()
     {
-        using var node = DebugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(3), Title = "Payloads", TitleColor = Color.Green, DefaultOpen = true });
+        using var node = _debugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(3), Title = "Payloads", TitleColor = Color.Green, DefaultOpen = true });
         if (!node) return;
 
-        DebugRenderer.DrawSeString(SeString.AsSpan(), false, new NodeOptions()
+        _debugRenderer.DrawSeString(String.AsSpan(), false, new NodeOptions()
         {
             RenderSeString = false,
             DefaultOpen = true

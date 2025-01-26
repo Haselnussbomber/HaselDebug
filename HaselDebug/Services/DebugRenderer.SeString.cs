@@ -6,6 +6,7 @@ using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using HaselCommon.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
@@ -92,6 +93,22 @@ public unsafe partial class DebugRenderer
         { LinkMacroPayloadType.PartyFinder, ["ListingId", string.Empty, "WorldId"] },
         { LinkMacroPayloadType.AkatsukiNote, ["AkatsukiNoteId"] },
         { DalamudLinkType, ["CommandId", "Extra1", "Extra2", "ExtraString"] }
+    };
+
+    private readonly Dictionary<uint, string[]> FixedExpressionNames = new()
+    {
+        { 1, ["Type0", "Type1", "WorldId"] },
+        { 2, ["Type0", "Type1", "ClassJobId", "Level"] },
+        { 3, ["Type0", "Type1", "TerritoryTypeId", "Instance & MapId", "RawX", "RawY", "RawZ", "PlaceNameIdOverride"] },
+        { 4, ["Type0", "Type1", "ItemId", "Rarity", string.Empty, string.Empty, "Item Name"] },
+        { 5, ["Type0", "Type1", "Sound Effect Id"] },
+        { 6, ["Type0", "Type1", "ObjStrId"] },
+        { 7, ["Type0", "Type1", "Text"] },
+        { 8, ["Type0", "Type1", "Seconds"] },
+        { 9, ["Type0", "Type1", string.Empty] },
+        { 10, ["Type0", "Type1", "StatusId", "HasOverride", "NameOverride", "DescriptionOverride"] },
+        { 11, ["Type0", "Type1", "ListingId", string.Empty, "WorldId", "CrossWorldFlag"] },
+        { 12, ["Type0", "Type1", "QuestId", string.Empty, string.Empty, string.Empty, "QuestName"] },
     };
 
     public void DrawUtf8String(nint address, NodeOptions nodeOptions)
@@ -243,14 +260,22 @@ public unsafe partial class DebugRenderer
             if (payload.ExpressionCount > 0)
             {
                 var exprIdx = 0;
-                LinkMacroPayloadType? linkType = null;
+                uint? subType = null;
+                uint? fixedType = null;
 
                 if (payload.MacroCode == MacroCode.Link && payload.TryGetExpression(out var linkExpr1) && linkExpr1.TryGetUInt(out var linkExpr1Val))
-                    linkType = (LinkMacroPayloadType)linkExpr1Val;
+                {
+                    subType = linkExpr1Val;
+                }
+                else if (payload.MacroCode == MacroCode.Fixed && payload.TryGetExpression(out var fixedTypeExpr, out var linkExpr2) && fixedTypeExpr.TryGetUInt(out var fixedTypeVal) && linkExpr2.TryGetUInt(out var linkExpr2Val))
+                {
+                    subType = linkExpr2Val;
+                    fixedType = fixedTypeVal;
+                }
 
                 foreach (var expr in payload)
                 {
-                    DrawExpression(payload.MacroCode, linkType, exprIdx++, expr, payloadNodeOptions with
+                    DrawExpression(payload.MacroCode, subType, fixedType, exprIdx++, expr, payloadNodeOptions with
                     {
                         SeStringTitle = null,
                         DefaultOpen = true,
@@ -261,12 +286,12 @@ public unsafe partial class DebugRenderer
         }
     }
 
-    private void DrawExpression(MacroCode macroCode, LinkMacroPayloadType? linkType, int idx, ReadOnlySeExpressionSpan expr, NodeOptions nodeOptions)
+    private void DrawExpression(MacroCode macroCode, uint? subType, uint? fixedType, int idx, ReadOnlySeExpressionSpan expr, NodeOptions nodeOptions)
     {
         ImGui.TableNextRow();
 
         ImGui.TableNextColumn();
-        var expressionName = GetExpressionName(macroCode, linkType, idx, expr);
+        var expressionName = GetExpressionName(macroCode, subType, idx, expr);
         ImGui.TextUnformatted($"[{idx}] " + (string.IsNullOrEmpty(expressionName) ? $"Expr {idx}" : expressionName));
 
         ImGui.TableNextColumn();
@@ -291,7 +316,10 @@ public unsafe partial class DebugRenderer
 
             if (macroCode == MacroCode.Link && idx == 0)
             {
-                var name = linkType == DalamudLinkType ? "Dalamud" : Enum.GetName((LinkMacroPayloadType)u32);
+                var name = subType != null && (LinkMacroPayloadType)subType == DalamudLinkType
+                    ? "Dalamud"
+                    : Enum.GetName((LinkMacroPayloadType)u32);
+
                 if (!string.IsNullOrEmpty(name))
                 {
                     ImGui.SameLine();
@@ -317,6 +345,15 @@ public unsafe partial class DebugRenderer
                 };
                 ImGui.SameLine();
                 ImGui.TextUnformatted(Enum.GetName(articleTypeEnumType, u32));
+            }
+
+            if (macroCode is MacroCode.Fixed && subType != null && fixedType != null && fixedType is 100 or 200 && subType == 5 && idx == 2)
+            {
+                ImGui.SameLine();
+                if (ImGui.SmallButton("Play"))
+                {
+                    UIGlobals.PlayChatSoundEffect(u32 + 1);
+                }
             }
 
             // TODO: clickable link to open row in new window :O
@@ -374,7 +411,7 @@ public unsafe partial class DebugRenderer
         ImGui.TextUnformatted(sb.ToString());
     }
 
-    private string GetExpressionName(MacroCode macroCode, LinkMacroPayloadType? linkType, int idx, ReadOnlySeExpressionSpan expr)
+    private string GetExpressionName(MacroCode macroCode, uint? subType, int idx, ReadOnlySeExpressionSpan expr)
     {
         if (ExpressionNames.TryGetValue(macroCode, out var names) && idx < names.Length)
             return names[idx];
@@ -382,8 +419,11 @@ public unsafe partial class DebugRenderer
         if (macroCode == MacroCode.Switch)
             return $"Case {idx - 1}";
 
-        if (macroCode == MacroCode.Link && linkType != null && LinkExpressionNames.TryGetValue((LinkMacroPayloadType)linkType, out var linkNames) && idx - 1 < linkNames.Length)
+        if (macroCode == MacroCode.Link && subType != null && LinkExpressionNames.TryGetValue((LinkMacroPayloadType)subType, out var linkNames) && idx - 1 < linkNames.Length)
             return linkNames[idx - 1];
+
+        if (macroCode == MacroCode.Fixed && subType != null && FixedExpressionNames.TryGetValue((uint)subType, out var fixedNames) && idx < fixedNames.Length)
+            return fixedNames[idx];
 
         if (macroCode == MacroCode.Link && idx == 4)
             return "Copy String";
