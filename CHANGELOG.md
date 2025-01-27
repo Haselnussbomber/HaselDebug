@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+- **Added:** An Utf8String Sanitize tab to see which characters are filtered with which flags.
+- **Added:** StringMaker now has a Preview window, which uses my SeStringEvaluator and allows you to test local parameters, if there are any.
+- **Added:** StringMaker now has a Print Evaluated button, which prints the string that went through my SeStringEvaluator (as seen in the Preview window) instead of the games MacroEncoder/TextModule/PronounModule whatever.
+- **Added:** The SeStringEvaluator now supports Fixed macros, except for the auto-translate/completion feature (I will add that another time).
+- **Changed:** For now, the SeStringEvaluator will simply pass through NonBreakingSpace, Hyphen and SoftHyphen payloads instead of converting them to their Unicode counterparts. I might revisit this decision in the future.
+- **Fixed:** In the SeStringEvaluator. the Sheet macro will now correctly generate strings for numeric columns.
+- **Fixed:** In the SeStringEvaluator, sheet name redirects passed to the Sheet macro will now be resolved.
+- **Fixed:** In the SeStringEvaluator, LevelPos macros now use the language that was defined with the context.
 - **Updated:** ClientStructs now at [70ac7923](https://github.com/aers/FFXIVClientStructs/tree/70ac7923) ([compare](https://github.com/aers/FFXIVClientStructs/compare/8a31ad5..70ac7923)).
 
 ## [1.13.1] (2025-01-22)
