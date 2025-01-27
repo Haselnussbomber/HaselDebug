@@ -7,6 +7,7 @@
 - **Added:** StringMaker now has a Print Evaluated button, which prints the string that went through my SeStringEvaluator (as seen in the Preview window) instead of the games MacroEncoder/TextModule/PronounModule whatever.
 - **Added:** The SeStringEvaluator now supports Fixed macros, except for the auto-translate/completion feature (I will add that another time).
 - **Changed:** For now, the SeStringEvaluator will simply pass through NonBreakingSpace, Hyphen and SoftHyphen payloads instead of converting them to their Unicode counterparts. I might revisit this decision in the future.
+- **Removed:** StringMaker no longer shows the output of each entry due to the addition of the preview window.
 - **Fixed:** In the SeStringEvaluator. the Sheet macro will now correctly generate strings for numeric columns.
 - **Fixed:** In the SeStringEvaluator, sheet name redirects passed to the Sheet macro will now be resolved.
 - **Fixed:** In the SeStringEvaluator, LevelPos macros now use the language that was defined with the context.
