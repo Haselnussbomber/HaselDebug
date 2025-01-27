@@ -85,28 +85,28 @@ public class SeStringInspectorWindow : SimpleWindow
     {
         LocalParameters ??= GetLocalParameters(String.AsSpan(), []);
 
-        DrawPreview();
+        var evaluated = _seStringEvaluator.Evaluate(String.AsSpan(), new()
+        {
+            LocalParameters = LocalParameters ?? [],
+            Language = Language
+        });
 
-        if (LocalParameters.Length != 0)
+        DrawPreview(evaluated);
+
+        if (LocalParameters!.Length != 0)
         {
             ImGui.Spacing();
             DrawParameters();
         }
 
         ImGui.Spacing();
-        DrawPayloads();
+        DrawPayloads(evaluated);
     }
 
-    private void DrawPreview()
+    private void DrawPreview(ReadOnlySeString evaluated)
     {
         using var node = _debugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(1), Title = "Preview", TitleColor = Color.Green, DefaultOpen = true });
         if (!node) return;
-
-        var evaluated = _seStringEvaluator.Evaluate(String.AsSpan(), new()
-        {
-            LocalParameters = LocalParameters ?? [],
-            Language = Language
-        });
 
         ImGui.Dummy(new Vector2(0, ImGui.GetTextLineHeight()));
         ImGui.SameLine(0, 0);
@@ -142,12 +142,26 @@ public class SeStringInspectorWindow : SimpleWindow
         }
     }
 
-    private void DrawPayloads()
+    private void DrawPayloads(ReadOnlySeString evaluated)
     {
         using var node = _debugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(3), Title = "Payloads", TitleColor = Color.Green, DefaultOpen = true });
-        if (!node) return;
+        if (node)
+        {
+            _debugRenderer.DrawSeString(String.AsSpan(), false, new NodeOptions()
+            {
+                RenderSeString = false,
+                DefaultOpen = true
+            });
+        }
+        node.Dispose();
 
-        _debugRenderer.DrawSeString(String.AsSpan(), false, new NodeOptions()
+        if (String.Equals(evaluated))
+            return;
+
+        using var node2 = _debugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(4), Title = "Payloads (Evaluated)", TitleColor = Color.Green, DefaultOpen = true });
+        if (!node2) return;
+
+        _debugRenderer.DrawSeString(evaluated.AsSpan(), false, new NodeOptions()
         {
             RenderSeString = false,
             DefaultOpen = true
