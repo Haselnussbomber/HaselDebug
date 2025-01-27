@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.14.0] (2025-01-27)
 
 - **Added:** An Utf8String Sanitize tab to see which characters are filtered with which flags.
 - **Added:** StringMaker now has a Preview window, which uses my SeStringEvaluator and allows you to test local parameters, if there are any.
@@ -10,6 +10,7 @@
 - **Fixed:** In the SeStringEvaluator. the Sheet macro will now correctly generate strings for numeric columns.
 - **Fixed:** In the SeStringEvaluator, sheet name redirects passed to the Sheet macro will now be resolved.
 - **Fixed:** In the SeStringEvaluator, LevelPos macros now use the language that was defined with the context.
+- **Updated:** SeStrings rendered with the DebugRenderer will now display names for expressions of Fixed macros.
 - **Updated:** ClientStructs now at [70ac7923](https://github.com/aers/FFXIVClientStructs/tree/70ac7923) ([compare](https://github.com/aers/FFXIVClientStructs/compare/8a31ad5..70ac7923)).
 
 ## [1.13.1] (2025-01-22)
@@ -236,7 +237,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.14.0...main
+[1.14.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.1...v1.14.0
 [1.13.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.2...v1.13.0
 [1.12.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.1...v1.12.2
