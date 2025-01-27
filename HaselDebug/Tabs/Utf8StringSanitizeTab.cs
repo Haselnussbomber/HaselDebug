@@ -217,7 +217,7 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
     {
         foreach (var entry in list)
         {
-            using var node = ImRaii.TreeNode($"{entry.Name} (U+{entry.Range.FirstCodePoint:X4}-U+{entry.Range.FirstCodePoint + entry.Range.Length - 1:X4})###{entry.Name}", ImGuiTreeNodeFlags.SpanFullWidth);
+            using var node = ImRaii.TreeNode($"U+{entry.Range.FirstCodePoint:X4}-U+{entry.Range.FirstCodePoint + entry.Range.Length - 1:X4} - {entry.Name}###{entry.Name}", ImGuiTreeNodeFlags.SpanFullWidth);
             if (!node) continue;
 
             ImGui.TextUnformatted("Input:");
