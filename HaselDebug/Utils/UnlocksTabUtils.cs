@@ -484,6 +484,69 @@ public unsafe class UnlocksTabUtils(
         }
     }
 
+    // kinda meh, lol
+    public void DrawAdventureTooltip(int index, Adventure adventure)
+    {
+        using var id = ImRaii.PushId($"AdventureTooltip{adventure.RowId}");
+
+        using var tooltip = ImRaii.Tooltip();
+        if (!tooltip) return;
+
+        using var outerpopuptable = ImRaii.Table("OuterPopupTable", 1, ImGuiTableFlags.NoPadOuterX | ImGuiTableFlags.NoPadInnerX | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
+        if (!outerpopuptable) return;
+
+        var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
+        var indexStr = $"#{index:000}";
+        var title = adventure.Name.ExtractText();
+
+        var leftColumnWidth = ImGui.CalcTextSize(indexStr).X + itemInnerSpacing.X;
+        var rightColumnWidth = Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale);
+
+        ImGui.TableSetupColumn("Table", ImGuiTableColumnFlags.WidthFixed, leftColumnWidth + rightColumnWidth + ImGui.GetStyle().CellPadding.X * 2); // ???
+
+        ImGui.TableNextColumn(); // Table
+
+        using var popuptable = ImRaii.Table("PopupTable", 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
+        if (!popuptable) return;
+
+        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, leftColumnWidth);
+        ImGui.TableSetupColumn("Title", ImGuiTableColumnFlags.WidthFixed, rightColumnWidth);
+
+        ImGui.TableNextColumn(); // Index
+        ImGui.TextUnformatted(indexStr);
+
+        ImGui.TableNextColumn(); // Title
+        using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
+        using var indent = ImRaii.PushIndent(1);
+        ImGui.TextUnformatted(title);
+
+        var text = TextService.GetPlaceName(adventure.PlaceName.RowId);
+        ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
+        using (ImRaii.PushColor(ImGuiCol.Text, (uint)Color.Grey))
+            ImGui.TextUnformatted(text);
+
+        indent.Dispose();
+        indentSpacing.Dispose();
+        popuptable.Dispose();
+
+        var iconId = adventure.IconDiscovered;
+        var iconDrawn = false;
+        if (iconId != 0 && TextureProvider.TryGetFromGameIcon(iconId, out var imageTex) && imageTex.TryGetWrap(out var image, out _))
+        {
+            ImGuiUtils.PushCursorY(5 * ImGuiHelpers.GlobalScale);
+            var newWidth = ImGui.GetContentRegionAvail().X;
+            var ratio = newWidth / image.Width;
+            var newHeight = image.Height * ratio;
+            ImGui.Image(image.ImGuiHandle, new Vector2(newWidth, newHeight));
+            iconDrawn = true;
+        }
+
+        ImGuiUtils.PushCursorY((iconDrawn ? -10 : 1) * ImGuiHelpers.GlobalScale);
+        using var indentSpacing2 = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
+        using var indent2 = ImRaii.PushIndent(1);
+        ImGuiHelpers.SeStringWrapped(SeStringEvaluator.Evaluate(adventure.Description));
+    }
+
     private static void DrawSeparator(float marginTop = 2, float marginBottom = 5)
     {
         ImGuiUtils.PushCursorY(marginTop * ImGuiHelpers.GlobalScale);
