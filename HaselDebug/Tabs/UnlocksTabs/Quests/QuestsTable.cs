@@ -160,6 +160,19 @@ public class QuestsTable : Table<Quest>, IDisposable
                 builder.AddOpenOnGarlandTools("quest", row.RowId);
             });
 
+            var iconId = row.Icon;
+            var currentQuest = row;
+            while (iconId == 0 && currentQuest.PreviousQuest[0].RowId != 0)
+            {
+                currentQuest = currentQuest.PreviousQuest[0].Value;
+                iconId = currentQuest.Icon;
+            }
+
+            if (iconId != 0 && textureProvider.TryGetFromGameIcon(iconId, out var imageTex) && imageTex.TryGetWrap(out var image, out _))
+            {
+                // cool, image preloaded! now the tooltips don't flicker...
+            }
+
             if (ImGui.IsItemHovered())
             {
                 unlocksTabUtils.DrawQuestTooltip(row);

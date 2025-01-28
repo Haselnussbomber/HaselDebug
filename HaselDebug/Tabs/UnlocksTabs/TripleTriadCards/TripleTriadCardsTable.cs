@@ -1,4 +1,5 @@
 using System.Linq;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -26,6 +27,7 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
         MapService mapService,
         UnlocksTabUtils unlocksTabUtils,
         SeStringEvaluatorService seStringEvaluator,
+        ITextureProvider textureProvider,
         LanguageProvider languageProvider) : base("OrchestrionRollsTable", languageProvider)
     {
         _excelService = excelService;
@@ -42,7 +44,7 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
                 Flags = ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.DefaultSort,
                 Width = 75,
             },
-            new NameColumn(debugRenderer, excelService, seStringEvaluator, mapService, unlocksTabUtils) {
+            new NameColumn(debugRenderer, excelService, seStringEvaluator, mapService, unlocksTabUtils, textureProvider) {
                 Label = "Name",
             }
         ];
@@ -51,13 +53,19 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
     public override void LoadRows()
     {
         var residentSheet = _excelService.GetSheet<TripleTriadCardResident>();
+        var obtainSheet = _excelService.GetSheet<TripleTriadCardObtain>();
+
         var cardItems = _excelService.GetSheet<Item>()
             .Where(itemRow => itemRow.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard)
             .ToDictionary(itemRow => (uint)itemRow.ItemAction.Value!.Data[0]);
 
         Rows = _excelService.GetSheet<TripleTriadCard>()
             .Where(row => row.RowId != 0 && residentSheet.HasRow(row.RowId) && cardItems.ContainsKey(row.RowId))
-            .Select(row => new TripleTriadCardEntry(row, residentSheet.GetRow(row.RowId), cardItems[row.RowId]))
+            .Select(row => {
+                var residentRow = residentSheet.GetRow(row.RowId);
+                var obtainRow = obtainSheet.GetRow(residentRow.AcquisitionType);
+                return new TripleTriadCardEntry(row, residentRow, obtainRow.Unknown0, cardItems[row.RowId]);
+            })
             .ToList();
     }
 
@@ -86,7 +94,13 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
         }
     }
 
-    private class NameColumn(DebugRenderer debugRenderer, ExcelService excelService, SeStringEvaluatorService seStringEvaluator, MapService mapService, UnlocksTabUtils unlocksTabUtils) : ColumnString<TripleTriadCardEntry>
+    private class NameColumn(
+        DebugRenderer debugRenderer,
+        ExcelService excelService,
+        SeStringEvaluatorService seStringEvaluator,
+        MapService mapService,
+        UnlocksTabUtils unlocksTabUtils,
+        ITextureProvider textureProvider) : ColumnString<TripleTriadCardEntry>
     {
         public override string ToName(TripleTriadCardEntry entry)
             => entry.Row.Name.ExtractText().StripSoftHypen();
@@ -162,6 +176,16 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
             else
             {
                 ImGui.TextUnformatted(ToName(entry));
+            }
+
+            if (textureProvider.TryGetFromGameIcon(entry.UnlockIcon, out var iconTex) && iconTex.TryGetWrap(out _, out _))
+            {
+                // cool, icon preloaded! now the tooltips don't flicker...
+            }
+
+            if (textureProvider.TryGetFromGameIcon(87000 + entry.RowId, out var imageTex) && imageTex.TryGetWrap(out _, out _))
+            {
+                // cool, image preloaded! now the tooltips don't flicker...
             }
         }
     }
