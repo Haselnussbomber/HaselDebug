@@ -231,6 +231,11 @@ public unsafe partial class DebugRenderer
             DrawAtkValue(address, nodeOptions);
             return;
         }
+        else if (type == typeof(CString))
+        {
+            DrawSeString(*(byte**)address, nodeOptions);
+            return;
+        }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdVector<>))
         {
             DrawStdVector(address, type.GenericTypeArguments[0], nodeOptions);
