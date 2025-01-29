@@ -61,7 +61,19 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
         new TextEntry(TextEntryType.Macro, "<br>"),
         new TextEntry(TextEntryType.Fixed, "<fixed(200,12,70058,0,0,0,The Ultimate Weapon)>"),
         new TextEntry(TextEntryType.Macro, "<br>"),
-        new TextEntry(TextEntryType.Macro, "<fixed(1,105)>"), // auto-translate needs to be evaluated as macro
+        new TextEntry(TextEntryType.Macro, "<fixed(48,209)>"), // Mount
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<fixed(49,28)>"), // ClassJob
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<fixed(50,2957)>"), // PlaceName
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<fixed(51,4)>"), // Race
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<fixed(52,7)>"), // Tribe
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<fixed(64,13)>"), // Companion
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<fixed(60,21)>"), // MainCommand
     ];
 
     private readonly DebugRenderer _debugRenderer;
