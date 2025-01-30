@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.15.0] (2025-01-30)
 
 - **Added:** A Zone column was added to the Sightseeing Log table.
 - **Added:** A tooltip was added to the name column of the Sightseeing Log table.
@@ -249,7 +249,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.14.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.15.0...main
+[1.15.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.1...v1.14.0
 [1.13.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.12.2...v1.13.0
