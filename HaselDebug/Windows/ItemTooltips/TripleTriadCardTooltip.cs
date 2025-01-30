@@ -1,5 +1,5 @@
-using HaselCommon.Gui.Yoga;
 using HaselCommon.Services;
+using HaselCommon.Yoga;
 using HaselDebug.Services;
 using HaselDebug.Windows.ItemTooltips.Components;
 using Lumina.Excel.Sheets;

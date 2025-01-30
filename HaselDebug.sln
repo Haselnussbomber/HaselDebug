@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFXIVClientStructs", "FFXIV
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFXIVClientStructs.Generators", "FFXIVClientStructs\FFXIVClientStructs.Generators\FFXIVClientStructs.Generators.csproj", "{4A4E42E1-D93C-4356-93CB-801166EF94DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HaselCommon.Yoga", "HaselCommon\HaselCommon.Yoga\HaselCommon.Yoga.csproj", "{F2DF1299-E0D0-4832-8F59-6F4C47C2147E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +72,14 @@ Global
 		{4A4E42E1-D93C-4356-93CB-801166EF94DC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4A4E42E1-D93C-4356-93CB-801166EF94DC}.Release|x64.ActiveCfg = Release|Any CPU
 		{4A4E42E1-D93C-4356-93CB-801166EF94DC}.Release|x64.Build.0 = Release|Any CPU
+		{F2DF1299-E0D0-4832-8F59-6F4C47C2147E}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{F2DF1299-E0D0-4832-8F59-6F4C47C2147E}.Debug|Any CPU.Build.0 = Debug|x64
+		{F2DF1299-E0D0-4832-8F59-6F4C47C2147E}.Debug|x64.ActiveCfg = Debug|x64
+		{F2DF1299-E0D0-4832-8F59-6F4C47C2147E}.Debug|x64.Build.0 = Debug|x64
+		{F2DF1299-E0D0-4832-8F59-6F4C47C2147E}.Release|Any CPU.ActiveCfg = Release|x64
+		{F2DF1299-E0D0-4832-8F59-6F4C47C2147E}.Release|Any CPU.Build.0 = Release|x64
+		{F2DF1299-E0D0-4832-8F59-6F4C47C2147E}.Release|x64.ActiveCfg = Release|x64
+		{F2DF1299-E0D0-4832-8F59-6F4C47C2147E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

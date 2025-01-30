@@ -4,7 +4,7 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Gui.Yoga;
+using HaselCommon.Yoga;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Windows;
@@ -68,7 +68,7 @@ public class UnlocksTabSummary : Node
     public UnlocksTabSummary(IUnlockTab[] unlockTabs)
     {
         // flex box? in my imgui? kinda. though i'm struggling with it. but maybe i'm just using it wrong.
-        
+
         MarginTop = 20;
         MaxWidth = 650;
         FlexWrap = YGWrap.Wrap;

@@ -1,7 +1,7 @@
 using System.Numerics;
 using Dalamud.Interface.Utility;
-using HaselCommon.Gui.Yoga;
 using HaselCommon.Services;
+using HaselCommon.Yoga;
 using ImGuiNET;
 
 namespace HaselDebug.Windows.ItemTooltips.Components;

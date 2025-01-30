@@ -1,7 +1,7 @@
 using Dalamud.Interface.Utility;
-using HaselCommon.Gui.Yoga;
-using HaselCommon.Gui.Yoga.Components;
 using HaselCommon.Services;
+using HaselCommon.Yoga;
+using HaselCommon.Yoga.Components;
 using HaselDebug.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;

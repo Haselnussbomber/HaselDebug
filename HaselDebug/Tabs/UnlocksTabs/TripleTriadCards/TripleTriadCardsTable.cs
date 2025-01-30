@@ -61,7 +61,8 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
 
         Rows = _excelService.GetSheet<TripleTriadCard>()
             .Where(row => row.RowId != 0 && residentSheet.HasRow(row.RowId) && cardItems.ContainsKey(row.RowId))
-            .Select(row => {
+            .Select(row =>
+            {
                 var residentRow = residentSheet.GetRow(row.RowId);
                 var obtainRow = obtainSheet.GetRow(residentRow.AcquisitionType);
                 return new TripleTriadCardEntry(row, residentRow, obtainRow.Unknown0, cardItems[row.RowId]);
