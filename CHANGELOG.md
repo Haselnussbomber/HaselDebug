@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** A Zone column was added to the Sightseeing Log table.
+- **Added:** A tooltip was added to the name column of the Sightseeing Log table.
+- **Added:** The SeString inspector window now also shows the payloads that are the result of evaluation by the SeStringEvaluator.
+- **Added:** The new StringPointer type in CS is now handled as SeString.
+- **Changed:** In the Utf8String Sanitize tab, the Unicode range has been moved to the front for better readability.
+- **Fixed:** Sheet macros have an optional fourth parameter that was treated as a required parameter by the SeStringEvaluator.
+- **Fixed:** Images in tooltips of the Quests, Tiple Triad Cards, and Sightseeing Log tables are now pre-loaded, so they don't flicker.
+- **Updated:** ClientStructs now at [ee4144e0](https://github.com/aers/FFXIVClientStructs/tree/ee4144e0) ([compare](https://github.com/aers/FFXIVClientStructs/compare/70ac7923..ee4144e0)).
+
 ## [1.14.0] (2025-01-27)
 
 - **Added:** An Utf8String Sanitize tab to see which characters are filtered with which flags.
