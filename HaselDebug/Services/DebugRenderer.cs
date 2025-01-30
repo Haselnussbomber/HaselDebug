@@ -231,7 +231,7 @@ public unsafe partial class DebugRenderer
             DrawAtkValue(address, nodeOptions);
             return;
         }
-        else if (type == typeof(CString))
+        else if (type == typeof(StringPointer))
         {
             DrawSeString(*(byte**)address, nodeOptions);
             return;
