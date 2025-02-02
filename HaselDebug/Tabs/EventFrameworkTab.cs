@@ -5,8 +5,6 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.STD;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
@@ -116,7 +114,7 @@ public unsafe class EventFrameworkTab : DebugTab, IDisposable
 
             ReadOnlySeString? title = null;
             if (!director->Title.IsEmpty)
-                title = new ReadOnlySeString(director->Title.AsSpan().ToArray());
+                title = new ReadOnlySeString(director->Title.AsSpan());
 
             _debugRenderer.DrawPointerType(director, typeof(Director), new NodeOptions()
             {
@@ -144,38 +142,10 @@ public unsafe class EventFrameworkTab : DebugTab, IDisposable
             ImGui.TextUnformatted(kv.Item1.ToString("X4"));
             ImGui.SameLine(155);
 
-            string? title = null;
-
-            if (type == EventHandlerType.Quest)
-            {
-                var questId = kv.Item2.Value->Info.EventId.Id;
-
-                // i don't think that's accurate
-                /*
-                var isQuestComplete = QuestManager.IsQuestComplete(questId);
-                var iconId = ExcelService.GetRow<Quest>(questId)!.EventIconType.Value!.MapIconAvailable + (isQuestComplete ? 5u : 1u);
-                DebugUtils.DrawIcon(TextureProvider, iconId);
-                */
-
-                title = $"{type} {questId} ({_textService.GetQuestName(questId)})";
-            }
-            else
-            {
-                if (eventHandler->IconId != 0)
-                    _debugRenderer.DrawIcon(eventHandler->IconId);
-            }
-
-            if (title == null)
-                title = $"{type} {kv.Item2.Value->Info.EventId.Id}";
-
-            _debugRenderer.DrawPointerType(eventHandler, typeof(EventHandler), new NodeOptions()
-            {
-                Title = title
-            });
+            _debugRenderer.DrawPointerType(eventHandler, typeof(EventHandler), new NodeOptions() { UseSimpleEventHandlerName = true });
 
             using var indent = ImRaii.PushIndent();
             DrawEventObjects(eventHandler);
-            DrawCustomTalkTexts(eventHandler);
         }
     }
 
@@ -247,49 +217,4 @@ public unsafe class EventFrameworkTab : DebugTab, IDisposable
             i++;
         }
     }
-
-    private void DrawCustomTalkTexts(EventHandler* eventHandler)
-    {
-        if (eventHandler->Info.EventId.ContentId != EventHandlerType.CustomTalk)
-            return;
-
-        var texts = *(StdMap<uint, LuaText>*)((nint)eventHandler + 0x310); // TODO: contribute, StdPair?
-        if (texts.Count == 0)
-            return;
-
-        using var treenode = ImRaii.TreeNode($"Texts ({texts.Count})###CustomTalkTexts_{(nint)eventHandler:X}", ImGuiTreeNodeFlags.SpanAvailWidth);
-        if (!treenode)
-            return;
-
-        using var table = ImRaii.Table($"CustomTalkTextsTable_{(nint)eventHandler:X}", 3, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new Vector2(-1, 500));
-        if (!table)
-            return;
-
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Key", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch, 2);
-        ImGui.TableSetupScrollFreeze(3, 1);
-        ImGui.TableHeadersRow();
-
-        foreach (var text in texts)
-        {
-            ImGui.TableNextRow();
-
-            ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted(text.Item1.ToString());
-
-            ImGui.TableNextColumn(); // Key
-            _debugRenderer.DrawUtf8String((nint)(&text.Item2.Key), new NodeOptions());
-
-            ImGui.TableNextColumn(); // Value
-            _debugRenderer.DrawUtf8String((nint)(&text.Item2.Value), new NodeOptions());
-        }
-    }
-}
-
-[StructLayout(LayoutKind.Explicit)]
-public struct LuaText
-{
-    [FieldOffset(0)] public Utf8String Key;
-    [FieldOffset(0x68)] public Utf8String Value;
 }

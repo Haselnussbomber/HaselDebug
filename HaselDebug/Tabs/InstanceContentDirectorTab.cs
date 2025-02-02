@@ -43,7 +43,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
             else
                 ImGui.TextUnformatted($"[{directorPtr.Value->EventHandlerInfo->EventId.ContentId}]");
             ImGui.SameLine();
-            DebugRenderer.DrawPointerType(directorPtr.Value, GetDirectorType(directorPtr), new NodeOptions() { AddressPath = new([1, (nint)directorPtr.Value]) });
+            DebugRenderer.DrawPointerType(directorPtr.Value, typeof(Director), new NodeOptions() { AddressPath = new([1, (nint)directorPtr.Value]) });
         }
 
         ImGui.TextUnformatted("ContentDirector:");
@@ -83,7 +83,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         }
         else
         {
-            DebugRenderer.DrawPointerType(publicContentDirector, GetPublicContentDirectorType((Director*)publicContentDirector), new NodeOptions() { AddressPath = new([4, (nint)publicContentDirector]) });
+            DebugRenderer.DrawPointerType(publicContentDirector, typeof(EventHandler), new NodeOptions() { AddressPath = new([4, (nint)publicContentDirector]) });
         }
 
         ImGui.Separator();
@@ -105,48 +105,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
                 InstanceContentTypeVtables.Add(key, *(nint*)instanceContentDirector);
             }
 
-            DebugRenderer.DrawPointerType(instanceContentDirector, GetInstanceContentDirectorType((Director*)instanceContentDirector), new NodeOptions() { AddressPath = new([5, (nint)instanceContentDirector]) });
+            DebugRenderer.DrawPointerType(instanceContentDirector, typeof(EventHandler), new NodeOptions() { AddressPath = new([5, (nint)instanceContentDirector]) });
         }
-    }
-
-    private Type GetDirectorType(Director* director)
-    {
-        if (director == null || director->EventHandlerInfo == null)
-            return typeof(Director);
-
-        return director->EventHandlerInfo->EventId.ContentId switch
-        {
-            EventHandlerType.InstanceContentDirector => typeof(InstanceContentDirector),
-            EventHandlerType.PublicContentDirector => GetPublicContentDirectorType(director),
-            _ => typeof(Director),
-        };
-    }
-
-    private Type GetInstanceContentDirectorType(Director* director)
-    {
-        var instanceContentDirector = (InstanceContentDirector*)director;
-        if (instanceContentDirector == null)
-            return typeof(InstanceContentDirector);
-
-        return instanceContentDirector->InstanceContentType switch
-        {
-            InstanceContentType.DeepDungeon => typeof(InstanceContentDeepDungeon),
-            InstanceContentType.OceanFishing => typeof(InstanceContentOceanFishing),
-            _ => typeof(InstanceContentDirector)
-        };
-    }
-
-    private Type GetPublicContentDirectorType(Director* director)
-    {
-        var publicContentDirector = (PublicContentDirector*)director;
-        if (publicContentDirector == null)
-            return typeof(PublicContentDirector);
-
-        return publicContentDirector->Type switch
-        {
-            PublicContentDirectorType.Bozja => typeof(PublicContentBozja),
-            PublicContentDirectorType.Eureka => typeof(PublicContentEureka),
-            _ => typeof(PublicContentDirector)
-        };
     }
 }

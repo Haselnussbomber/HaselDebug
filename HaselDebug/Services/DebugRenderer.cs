@@ -14,6 +14,8 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.Attributes;
+using FFXIVClientStructs.FFXIV.Client.Game.Event;
+using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine.Group;
@@ -30,7 +32,9 @@ using HaselDebug.Utils;
 using ImGuiNET;
 using InteropGenerator.Runtime.Attributes;
 using Lumina.Excel;
+using Lumina.Text.ReadOnly;
 using Microsoft.Extensions.Logging;
+using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
 namespace HaselDebug.Services;
@@ -90,7 +94,8 @@ public unsafe partial class DebugRenderer
         TextureService = textureService;
         ExcelModule = dataManager.Excel;
         GameGui = gameGui;
-        this.LanguageProvider = languageProvider;
+        LanguageProvider = languageProvider;
+
         var csAssembly = typeof(AddonAttribute).Assembly;
 
         AddonTypes = csAssembly.GetTypes()
@@ -150,7 +155,7 @@ public unsafe partial class DebugRenderer
             ImGui.TextUnformatted($"0x{address:X}"); // TODO: what did I do here?
             return;
         }
-        else if (type == typeof(ILayoutInstance))
+        else if (Inherits<ILayoutInstance>(type))
         {
             switch (((ILayoutInstance*)address)->Id.Type)
             {
@@ -159,7 +164,7 @@ public unsafe partial class DebugRenderer
                     break;
             }
         }
-        else if (type == typeof(GameObject))
+        else if (Inherits<GameObject>(type))
         {
             switch (((GameObject*)address)->ObjectKind)
             {
@@ -191,6 +196,73 @@ public unsafe partial class DebugRenderer
                 case ObjectKind.Ornament:
                     type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Ornament);
                     break;
+            }
+        }
+        else if (Inherits<EventHandler>(type))
+        {
+            var eventId = ((EventHandler*)address)->Info.EventId;
+            string? additionalName = null;
+
+            switch (eventId.ContentId)
+            {
+                case EventHandlerType.Quest:
+                    type = typeof(QuestEventHandler);
+                    additionalName = TextService.GetQuestName(eventId.Id);
+                    break;
+
+                case EventHandlerType.GatheringPoint:
+                    type = typeof(GatheringPointEventHandler);
+                    break;
+
+                case EventHandlerType.Shop:
+                    type = typeof(ShopEventHandler);
+                    additionalName = new ReadOnlySeStringSpan(((ShopEventHandler*)address)->ShopName.AsSpan()).ExtractText();
+                    break;
+
+                case EventHandlerType.Aetheryte:
+                    type = typeof(AetheryteEventHandler);
+                    break;
+
+                case EventHandlerType.Craft:
+                    type = typeof(CraftEventHandler);
+                    break;
+
+                case EventHandlerType.CustomTalk:
+                    type = typeof(CustomTalkEventHandler);
+                    additionalName = new ReadOnlySeStringSpan(((CustomTalkEventHandler*)address)->LuaClass.AsSpan()).ExtractText();
+                    break;
+
+                case EventHandlerType.InstanceContentDirector:
+                    type = ((InstanceContentDirector*)address)->InstanceContentType switch
+                    {
+                        InstanceContentType.DeepDungeon => typeof(InstanceContentDeepDungeon),
+                        InstanceContentType.OceanFishing => typeof(InstanceContentOceanFishing),
+                        _ => typeof(InstanceContentDirector)
+                    };
+                    break;
+
+                case EventHandlerType.PublicContentDirector:
+                    type = ((PublicContentDirector*)address)->Type switch
+                    {
+                        PublicContentDirectorType.Bozja => typeof(PublicContentBozja),
+                        PublicContentDirectorType.Eureka => typeof(PublicContentEureka),
+                        _ => typeof(PublicContentDirector)
+                    };
+                    break;
+
+                case EventHandlerType.GoldSaucerDirector:
+                    type = typeof(GoldSaucerDirector);
+                    break;
+            }
+
+            if (nodeOptions.UseSimpleEventHandlerName && string.IsNullOrEmpty(nodeOptions.Title))
+            {
+                nodeOptions = nodeOptions with
+                {
+                    Title = string.IsNullOrEmpty(additionalName)
+                    ? $"{eventId.ContentId} {eventId.Id}"
+                    : $"{eventId.ContentId} {eventId.Id} ({additionalName})"
+                };
             }
         }
 
