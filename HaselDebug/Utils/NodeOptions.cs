@@ -20,6 +20,7 @@ public record struct NodeOptions
     public Action<NodeOptions, ImGuiContextMenuBuilder>? DrawContextMenu { get; set; }
     public bool DrawSeStringTreeNode { get; set; } = true;
     public bool RenderSeString { get; set; } = true;
+    public AddressPath ResolvedInheritedTypeAddresses { get; set; } = new();
     public bool UseSimpleEventHandlerName { get; set; } = false;
     public ClientLanguage Language { get; set; } = ClientLanguage.English;
 

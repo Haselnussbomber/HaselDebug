@@ -155,116 +155,128 @@ public unsafe partial class DebugRenderer
             ImGui.TextUnformatted($"0x{address:X}"); // TODO: what did I do here?
             return;
         }
-        else if (Inherits<ILayoutInstance>(type))
+
+        if (!nodeOptions.ResolvedInheritedTypeAddresses.Path.Contains(address))
         {
-            switch (((ILayoutInstance*)address)->Id.Type)
+            if (Inherits<ILayoutInstance>(type))
             {
-                case InstanceType.SharedGroup:
-                    type = typeof(SharedGroupLayoutInstance);
-                    break;
-            }
-        }
-        else if (Inherits<GameObject>(type))
-        {
-            switch (((GameObject*)address)->ObjectKind)
-            {
-                case ObjectKind.Pc:
-                case ObjectKind.BattleNpc:
-                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara);
-                    break;
-                case ObjectKind.EventNpc:
-                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Character);
-                    break;
-                case ObjectKind.Treasure:
-                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.Treasure);
-                    break;
-                case ObjectKind.Aetheryte:
-                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.Aetheryte);
-                    break;
-                case ObjectKind.GatheringPoint:
-                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.GatheringPointObject);
-                    break;
-                case ObjectKind.EventObj:
-                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.EventObject);
-                    break;
-                case ObjectKind.HousingEventObject:
-                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.HousingObject);
-                    break;
-                case ObjectKind.MjiObject:
-                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.MJIObject);
-                    break;
-                case ObjectKind.Ornament:
-                    type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Ornament);
-                    break;
-            }
-        }
-        else if (Inherits<EventHandler>(type))
-        {
-            var eventId = ((EventHandler*)address)->Info.EventId;
-            string? additionalName = null;
-
-            switch (eventId.ContentId)
-            {
-                case EventHandlerType.Quest:
-                    type = typeof(QuestEventHandler);
-                    additionalName = TextService.GetQuestName(eventId.Id);
-                    break;
-
-                case EventHandlerType.GatheringPoint:
-                    type = typeof(GatheringPointEventHandler);
-                    break;
-
-                case EventHandlerType.Shop:
-                    type = typeof(ShopEventHandler);
-                    additionalName = new ReadOnlySeStringSpan(((ShopEventHandler*)address)->ShopName.AsSpan()).ExtractText();
-                    break;
-
-                case EventHandlerType.Aetheryte:
-                    type = typeof(AetheryteEventHandler);
-                    break;
-
-                case EventHandlerType.Craft:
-                    type = typeof(CraftEventHandler);
-                    break;
-
-                case EventHandlerType.CustomTalk:
-                    // TODO: add when https://github.com/aers/FFXIVClientStructs/pull/1298 is merged
-                    // type = typeof(CustomTalkEventHandler);
-                    additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ExtractText();
-                    break;
-
-                case EventHandlerType.InstanceContentDirector:
-                    type = ((InstanceContentDirector*)address)->InstanceContentType switch
-                    {
-                        InstanceContentType.DeepDungeon => typeof(InstanceContentDeepDungeon),
-                        InstanceContentType.OceanFishing => typeof(InstanceContentOceanFishing),
-                        _ => typeof(InstanceContentDirector)
-                    };
-                    break;
-
-                case EventHandlerType.PublicContentDirector:
-                    type = ((PublicContentDirector*)address)->Type switch
-                    {
-                        PublicContentDirectorType.Bozja => typeof(PublicContentBozja),
-                        PublicContentDirectorType.Eureka => typeof(PublicContentEureka),
-                        _ => typeof(PublicContentDirector)
-                    };
-                    break;
-
-                case EventHandlerType.GoldSaucerDirector:
-                    type = typeof(GoldSaucerDirector);
-                    break;
-            }
-
-            if (nodeOptions.UseSimpleEventHandlerName && string.IsNullOrEmpty(nodeOptions.Title))
-            {
-                nodeOptions = nodeOptions with
+                switch (((ILayoutInstance*)address)->Id.Type)
                 {
-                    Title = string.IsNullOrEmpty(additionalName)
-                    ? $"{eventId.ContentId} {eventId.Id}"
-                    : $"{eventId.ContentId} {eventId.Id} ({additionalName})"
-                };
+                    case InstanceType.SharedGroup:
+                        type = typeof(SharedGroupLayoutInstance);
+                        break;
+                }
             }
+            else if (Inherits<GameObject>(type))
+            {
+                switch (((GameObject*)address)->ObjectKind)
+                {
+                    case ObjectKind.Pc:
+                    case ObjectKind.BattleNpc:
+                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara);
+                        break;
+                    case ObjectKind.EventNpc:
+                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Character);
+                        break;
+                    case ObjectKind.Treasure:
+                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.Treasure);
+                        break;
+                    case ObjectKind.Aetheryte:
+                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.Aetheryte);
+                        break;
+                    case ObjectKind.GatheringPoint:
+                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.GatheringPointObject);
+                        break;
+                    case ObjectKind.EventObj:
+                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.EventObject);
+                        break;
+                    case ObjectKind.HousingEventObject:
+                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.HousingObject);
+                        break;
+                    case ObjectKind.MjiObject:
+                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.MJIObject);
+                        break;
+                    case ObjectKind.Ornament:
+                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Ornament);
+                        break;
+                }
+            }
+            else if (Inherits<EventHandler>(type))
+            {
+                var eventId = ((EventHandler*)address)->Info.EventId;
+                string? additionalName = null;
+
+                switch (eventId.ContentId)
+                {
+                    case EventHandlerType.Quest:
+                        type = typeof(QuestEventHandler);
+                        additionalName = TextService.GetQuestName(eventId.Id);
+                        break;
+
+                    case EventHandlerType.GatheringPoint:
+                        type = typeof(GatheringPointEventHandler);
+                        break;
+
+                    case EventHandlerType.Shop:
+                        type = typeof(ShopEventHandler);
+                        additionalName = new ReadOnlySeStringSpan(((ShopEventHandler*)address)->ShopName.AsSpan()).ExtractText();
+                        break;
+
+                    case EventHandlerType.Aetheryte:
+                        type = typeof(AetheryteEventHandler);
+                        break;
+
+                    case EventHandlerType.Craft:
+                        type = typeof(CraftEventHandler);
+                        break;
+
+                    case EventHandlerType.CustomTalk:
+                        // TODO: add when https://github.com/aers/FFXIVClientStructs/pull/1298 is merged
+                        // type = typeof(CustomTalkEventHandler);
+                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ExtractText();
+                        break;
+
+                    case EventHandlerType.InstanceContentDirector:
+                        type = ((InstanceContentDirector*)address)->InstanceContentType switch
+                        {
+                            InstanceContentType.DeepDungeon => typeof(InstanceContentDeepDungeon),
+                            InstanceContentType.OceanFishing => typeof(InstanceContentOceanFishing),
+                            _ => typeof(InstanceContentDirector)
+                        };
+                        additionalName = ((InstanceContentDirector*)address)->InstanceContentType.ToString();
+                        break;
+
+                    case EventHandlerType.PublicContentDirector:
+                        type = ((PublicContentDirector*)address)->Type switch
+                        {
+                            PublicContentDirectorType.Bozja => typeof(PublicContentBozja),
+                            PublicContentDirectorType.Eureka => typeof(PublicContentEureka),
+                            _ => typeof(PublicContentDirector)
+                        };
+                        additionalName = ((PublicContentDirector*)address)->Type.ToString();
+                        break;
+
+                    case EventHandlerType.GoldSaucerDirector:
+                        type = typeof(GoldSaucerDirector);
+                        break;
+                }
+
+                if (nodeOptions.UseSimpleEventHandlerName && string.IsNullOrEmpty(nodeOptions.Title))
+                {
+                    nodeOptions = nodeOptions with
+                    {
+                        UseSimpleEventHandlerName = false,
+                        Title = string.IsNullOrEmpty(additionalName)
+                        ? $"{eventId.ContentId} {eventId.Id}"
+                        : $"{eventId.ContentId} {eventId.Id} ({additionalName})"
+                    };
+                }
+            }
+
+            nodeOptions = nodeOptions with
+            {
+                ResolvedInheritedTypeAddresses = nodeOptions.ResolvedInheritedTypeAddresses.With(address)
+            };
         }
 
         if (type.IsPointer)

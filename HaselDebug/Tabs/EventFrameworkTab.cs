@@ -11,7 +11,6 @@ using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
-using Lumina.Text.ReadOnly;
 using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
 
 namespace HaselDebug.Tabs;
@@ -106,20 +105,10 @@ public unsafe class EventFrameworkTab : DebugTab, IDisposable
             _debugRenderer.DrawAddress(director);
             ImGui.SameLine();
 
-            ImGui.TextUnformatted(director->EventHandlerInfo->EventId.ContentId.ToString());
-            ImGui.SameLine();
-
             if (director->IconId != 0)
                 _debugRenderer.DrawIcon(director->IconId);
 
-            ReadOnlySeString? title = null;
-            if (!director->Title.IsEmpty)
-                title = new ReadOnlySeString(director->Title.AsSpan());
-
-            _debugRenderer.DrawPointerType(director, typeof(Director), new NodeOptions()
-            {
-                SeStringTitle = title
-            });
+            _debugRenderer.DrawPointerType(director, typeof(EventHandler), new NodeOptions() { UseSimpleEventHandlerName = true });
         }
     }
 
