@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [11ddcc83](https://github.com/aers/FFXIVClientStructs/tree/11ddcc83) ([compare](https://github.com/aers/FFXIVClientStructs/compare/ee4144e0..11ddcc83)).
+
 ## [1.15.0] (2025-01-30)
 
 - **Added:** A Zone column was added to the Sightseeing Log table.
