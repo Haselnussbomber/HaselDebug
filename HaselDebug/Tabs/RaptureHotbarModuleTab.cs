@@ -2,6 +2,7 @@ using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using HaselCommon.Extensions.Strings;
 using HaselCommon.Services;
 using HaselCommon.Services.SeStringEvaluation;
 using HaselDebug.Abstracts;
@@ -150,9 +151,8 @@ public unsafe class RaptureHotbarModuleTab(
 
         return SeStringEvaluatorService.EvaluateFromAddon(1442, new SeStringContext()
         {
-            LocalParameters = [slot->RecipeItemId, slot->RecipeCraftType + 8],
-            StripSoftHypen = true
-        }).ExtractText();
+            LocalParameters = [slot->RecipeItemId, slot->RecipeCraftType + 8]
+        }).ExtractText().StripSoftHypen();
     }
 
     private void DrawHotbarSlotIcon(RaptureHotbarModule.HotbarSlot slot)
