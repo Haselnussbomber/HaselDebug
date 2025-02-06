@@ -23,8 +23,15 @@ public unsafe partial class DebugRenderer
         nodeOptions = nodeOptions.WithAddress((sheetType.Name.GetHashCode(), (nint)rowId).GetHashCode());
         nodeOptions.Language = LanguageProvider.ClientLanguage;
 
+        var title = $"{sheetType.Name}#{rowId}";
+        if (!string.IsNullOrEmpty(nodeOptions.Title))
+        {
+            title = nodeOptions.Title;
+            nodeOptions = nodeOptions with { Title = null };
+        }
+
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
-        using var node = ImRaii.TreeNode($"{sheetType.Name}#{rowId}###{nodeOptions.AddressPath}", nodeOptions.GetTreeNodeFlags());
+        using var node = ImRaii.TreeNode($"{title}###{nodeOptions.AddressPath}", nodeOptions.GetTreeNodeFlags());
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
         if (!node) return;
         titleColor.Dispose();

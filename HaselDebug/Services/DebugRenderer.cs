@@ -826,41 +826,41 @@ public unsafe partial class DebugRenderer
         }
     }
 
-    public void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Vector4? textColor = null, string? highligtedText = null, bool noTooltip = false)
+    public void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Color? textColor = null, string? highligtedText = null, bool noTooltip = false)
     {
         textCopy ??= text;
-        textColor ??= (Vector4)Color.White;
 
-        using (ImRaii.PushColor(ImGuiCol.Text, ImGui.ColorConvertFloat4ToU32((Vector4)textColor)))
+        using var color = textColor?.Push(ImGuiCol.Text);
+
+        if (asSelectable)
         {
-            if (asSelectable)
+            ImGui.Selectable(text);
+        }
+        else if (!string.IsNullOrEmpty(highligtedText))
+        {
+            var pos = text.IndexOf(highligtedText, StringComparison.InvariantCultureIgnoreCase);
+            if (pos != -1)
             {
-                ImGui.Selectable(text);
-            }
-            else if (!string.IsNullOrEmpty(highligtedText))
-            {
-                var pos = text.IndexOf(highligtedText, StringComparison.InvariantCultureIgnoreCase);
-                if (pos != -1)
-                {
-                    ImGui.TextUnformatted(text[..pos]);
-                    ImGui.SameLine(0, 0);
+                ImGui.TextUnformatted(text[..pos]);
+                ImGui.SameLine(0, 0);
 
-                    using (Color.Yellow.Push(ImGuiCol.Text))
-                        ImGui.TextUnformatted(text[pos..(pos + highligtedText.Length)]);
+                using (Color.Yellow.Push(ImGuiCol.Text))
+                    ImGui.TextUnformatted(text[pos..(pos + highligtedText.Length)]);
 
-                    ImGui.SameLine(0, 0);
-                    ImGui.TextUnformatted(text[(pos + highligtedText.Length)..]);
-                }
-                else
-                {
-                    ImGui.TextUnformatted(text);
-                }
+                ImGui.SameLine(0, 0);
+                ImGui.TextUnformatted(text[(pos + highligtedText.Length)..]);
             }
             else
             {
                 ImGui.TextUnformatted(text);
             }
         }
+        else
+        {
+            ImGui.TextUnformatted(text);
+        }
+
+        color?.Pop();
 
         if (ImGui.IsItemHovered())
         {
