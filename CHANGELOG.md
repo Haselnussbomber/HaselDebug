@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- **Added:** An Addon Names tab that lists addon names used by the `RaptureAtkModule.OpenAddon` function.
+- **Added:** A Territory Intended Use tab to debug the enum I added to my HaselCommon lib.
+- **Added:** A Pad Button Mapping tab to display the icon2 macro icons, which are different from the icon macro since they are based on the controller button mappings.
+- **Added:** EventHandler type redirects.
 - **Updated:** ClientStructs now at [5c7517e](https://github.com/aers/FFXIVClientStructs/tree/5c7517e) ([compare](https://github.com/aers/FFXIVClientStructs/compare/ee4144e0..5c7517e)).
 
 ## [1.15.0] (2025-01-30)
