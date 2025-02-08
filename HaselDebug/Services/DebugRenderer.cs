@@ -231,8 +231,7 @@ public unsafe partial class DebugRenderer
                         break;
 
                     case EventHandlerType.CustomTalk:
-                        // TODO: add when https://github.com/aers/FFXIVClientStructs/pull/1298 is merged
-                        // type = typeof(CustomTalkEventHandler);
+                        type = typeof(CustomTalkEventHandler);
                         additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ExtractText();
                         break;
 
