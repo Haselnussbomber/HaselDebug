@@ -7,9 +7,27 @@ using ImGuiNET;
 
 namespace HaselDebug.Windows;
 
-public class PointerTypeWindow(WindowManager WindowManager, DebugRenderer DebugRenderer, nint Address, Type Type, string? Name = null) : SimpleWindow(WindowManager, Name ?? Type.Name)
+public class PointerTypeWindow : SimpleWindow
 {
     private NodeOptions? NodeOptions;
+    private readonly DebugRenderer debugRenderer;
+    private readonly nint address;
+    private readonly Type type;
+
+    public PointerTypeWindow(
+        WindowManager windowManager,
+        TextService textService,
+        LanguageProvider languageProvider,
+        DebugRenderer debugRenderer,
+        nint address,
+        Type type,
+        string? name = null) : base(windowManager, textService, languageProvider)
+    {
+        this.debugRenderer = debugRenderer;
+        this.address = address;
+        this.type = type;
+        WindowName = name ?? type.Name;
+    }
 
     public override void OnOpen()
     {
@@ -26,9 +44,9 @@ public class PointerTypeWindow(WindowManager WindowManager, DebugRenderer DebugR
 
     public override void Draw()
     {
-        DebugRenderer.DrawPointerType(Address, Type, NodeOptions ??= new NodeOptions()
+        debugRenderer.DrawPointerType(address, type, NodeOptions ??= new NodeOptions()
         {
-            AddressPath = new AddressPath(Address),
+            AddressPath = new AddressPath(address),
             DefaultOpen = true,
         });
     }

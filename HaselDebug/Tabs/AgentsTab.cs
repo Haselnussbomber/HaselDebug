@@ -21,6 +21,7 @@ namespace HaselDebug.Tabs;
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class AgentsTab(
     TextService TextService,
+    LanguageProvider LanguageProvider,
     DebugRenderer DebugRenderer,
     ImGuiContextMenuService ImGuiContextMenu,
     PinnedInstancesService PinnedInstances,
@@ -104,9 +105,9 @@ public unsafe class AgentsTab(
 
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = !WindowManager.Contains(agentType.Name),
+                    Visible = !WindowManager.Contains(win => win.WindowName == agentType.Name),
                     Label = TextService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, (nint)agent.Value, agentType))
+                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, TextService, LanguageProvider, DebugRenderer, (nint)agent.Value, agentType))
                 });
 
                 builder.Add(new ImGuiContextMenuEntry()
@@ -159,9 +160,9 @@ public unsafe class AgentsTab(
 
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = !WindowManager.Contains(agentType.Name),
+                    Visible = !WindowManager.Contains(win => win.WindowName == agentType.Name),
                     Label = TextService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, (nint)agent, agentType))
+                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, TextService, LanguageProvider, DebugRenderer, (nint)agent, agentType))
                 });
 
                 builder.Add(new ImGuiContextMenuEntry()

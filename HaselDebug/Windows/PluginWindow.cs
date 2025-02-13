@@ -19,9 +19,10 @@ public class PluginWindow : SimpleWindow
 {
     private const uint SidebarWidth = 250;
     private readonly IDebugTab[] Tabs;
-
+    private readonly WindowManager WindowManager;
     private readonly PluginConfig PluginConfig;
     private readonly TextService TextService;
+    private readonly LanguageProvider LanguageProvider;
     private readonly PinnedInstancesService PinnedInstances;
     private readonly ImGuiContextMenuService ImGuiContextMenu;
     private readonly DebugRenderer DebugRenderer;
@@ -32,14 +33,17 @@ public class PluginWindow : SimpleWindow
         WindowManager windowManager,
         IEnumerable<IDebugTab> tabs,
         TextService textService,
+        LanguageProvider languageProvider,
         ConfigWindow configWindow,
         PinnedInstancesService pinnedInstances,
         ImGuiContextMenuService imGuiContextMenuService,
         DebugRenderer debugRenderer)
-        : base(windowManager, "HaselDebug")
+        : base(windowManager, textService, languageProvider)
     {
+        WindowManager = windowManager;
         PluginConfig = pluginConfig;
         TextService = textService;
+        LanguageProvider = languageProvider;
         PinnedInstances = pinnedInstances;
         ImGuiContextMenu = imGuiContextMenuService;
         DebugRenderer = debugRenderer;
@@ -62,7 +66,7 @@ public class PluginWindow : SimpleWindow
             ShowTooltip = () =>
             {
                 using var tooltip = ImRaii.Tooltip();
-                textService.Draw($"TitleBarButton.ToggleConfig.Tooltip.{(configWindow.IsOpen ? "Close" : "Open")}Config");
+                ImGui.TextUnformatted(textService.Translate($"TitleBarButton.ToggleConfig.Tooltip.{(configWindow.IsOpen ? "Close" : "Open")}Config"));
             },
             Click = (button) => configWindow.Toggle()
         });
@@ -132,9 +136,9 @@ public class PluginWindow : SimpleWindow
                 {
                     builder.Add(new ImGuiContextMenuEntry()
                     {
-                        Visible = tab.CanPopOut && !WindowManager.Contains(tab.Title),
+                        Visible = tab.CanPopOut && !WindowManager.Contains(win => win.WindowName == tab.Title),
                         Label = TextService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, tab))
+                        ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, TextService, LanguageProvider, tab))
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()
@@ -180,9 +184,9 @@ public class PluginWindow : SimpleWindow
             {
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = tab.CanPopOut && !WindowManager.Contains(tab.Title),
+                    Visible = tab.CanPopOut && !WindowManager.Contains(win => win.WindowName == tab.Title),
                     Label = TextService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, tab))
+                    ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, TextService, LanguageProvider, tab))
                 });
             });
 
@@ -207,9 +211,9 @@ public class PluginWindow : SimpleWindow
                     {
                         builder.Add(new ImGuiContextMenuEntry()
                         {
-                            Visible = subTab.CanPopOut && !WindowManager.Contains(subTab.Title),
+                            Visible = subTab.CanPopOut && !WindowManager.Contains(win => win.WindowName == subTab.Title),
                             Label = TextService.Translate("ContextMenu.TabPopout"),
-                            ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, subTab))
+                            ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, TextService, LanguageProvider, subTab))
                         });
                     });
 

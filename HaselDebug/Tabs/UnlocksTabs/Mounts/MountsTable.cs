@@ -26,7 +26,7 @@ public unsafe class MountsTable : Table<Mount>
         DebugRenderer debugRenderer,
         TextService textService,
         UnlocksTabUtils unlocksTabUtils,
-        LanguageProvider languageProvider) : base("MountsTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
         _textService = textService;

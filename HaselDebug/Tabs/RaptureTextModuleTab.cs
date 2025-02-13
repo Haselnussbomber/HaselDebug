@@ -79,6 +79,7 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
     private readonly DebugRenderer _debugRenderer;
     private readonly WindowManager _windowManager;
     private readonly SeStringEvaluatorService _seStringEvaluator;
+    private readonly TextService _textService;
     private readonly LanguageProvider _languageProvider;
 
     private SeStringInspectorWindow? _inspectorWindow;
@@ -89,11 +90,13 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
         DebugRenderer debugRenderer,
         WindowManager windowManager,
         SeStringEvaluatorService seStringEvaluator,
+        TextService textService,
         LanguageProvider languageProvider)
     {
         _debugRenderer = debugRenderer;
         _windowManager = windowManager;
         _seStringEvaluator = seStringEvaluator;
+        _textService = textService;
         _languageProvider = languageProvider;
 
         _languageProvider.LanguageChanged += OnLanguageChanged;
@@ -312,7 +315,7 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
 
         if (_inspectorWindow == null)
         {
-            _inspectorWindow = _windowManager.CreateOrOpen("StringMaker Preview", () => new SeStringInspectorWindow(_windowManager, _debugRenderer, _seStringEvaluator, "", _languageProvider.ClientLanguage, "StringMaker Preview"));
+            _inspectorWindow = _windowManager.CreateOrOpen("StringMaker Preview", () => new SeStringInspectorWindow(_windowManager, _textService, _languageProvider, _debugRenderer, _seStringEvaluator, "", _languageProvider.ClientLanguage, "StringMaker Preview"));
             UpdateInspectorString();
         }
 

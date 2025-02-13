@@ -33,7 +33,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
         LanguageProvider languageProvider,
         IClientState clientState,
         WindowManager windowManager,
-        ImGuiContextMenuService imGuiContextMenu) : base("UnlockLinksTable", languageProvider)
+        ImGuiContextMenuService imGuiContextMenu) : base(languageProvider)
     {
         _excelService = excelService;
         _seStringEvaluator = seStringEvaluator;
@@ -51,7 +51,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
                 Flags = ImGuiTableColumnFlags.WidthFixed,
                 Width = 75,
             },
-            new UnlocksColumn(debugRenderer, windowManager, imGuiContextMenu, textService) {
+            new UnlocksColumn(debugRenderer, windowManager, imGuiContextMenu, textService, languageProvider) {
                 Label = "Sheet/Row",
                 Flags = ImGuiTableColumnFlags.WidthFixed,
                 Width = 300,
@@ -492,7 +492,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
             => UIState.Instance()->IsUnlockLinkUnlocked((ushort)entry.Index);
     }
 
-    private class UnlocksColumn(DebugRenderer debugRenderer, WindowManager windowManager, ImGuiContextMenuService imGuiContextMenu, TextService textService) : ColumnString<UnlockLinkEntry>
+    private class UnlocksColumn(DebugRenderer debugRenderer, WindowManager windowManager, ImGuiContextMenuService imGuiContextMenu, TextService textService, LanguageProvider languageProvider) : ColumnString<UnlockLinkEntry>
     {
         public override string ToName(UnlockLinkEntry entry)
             => string.Join(' ', entry.Unlocks.Select(unlock => $"{unlock.RowType.Name}#{unlock.RowId}"));
@@ -503,7 +503,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
             {
                 if (ImGui.Selectable($"{unlock.RowType.Name}#{unlock.RowId}{unlock.ExtraSheetText}"))
                 {
-                    windowManager.CreateOrOpen($"{unlock.RowType.Name}#{unlock.RowId}", () => new ExcelRowTab(windowManager, debugRenderer, unlock.RowType, unlock.RowId, $"{unlock.RowType.Name}#{unlock.RowId}"));
+                    windowManager.CreateOrOpen($"{unlock.RowType.Name}#{unlock.RowId}", () => new ExcelRowTab(windowManager, textService, languageProvider, debugRenderer, unlock.RowType, unlock.RowId, $"{unlock.RowType.Name}#{unlock.RowId}"));
                 }
 
                 imGuiContextMenu.Draw($"Entry{entry.Index}_{unlock.RowType.Name}{unlock.RowId}_RowIdContextMenu", builder =>

@@ -17,7 +17,7 @@ public class TitlesTable : Table<Title>
 {
     private readonly ExcelService _excelService;
 
-    public TitlesTable(ExcelService excelService, LanguageProvider languageProvider) : base("TitlesTable", languageProvider)
+    public TitlesTable(ExcelService excelService, LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

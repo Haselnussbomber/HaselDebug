@@ -7,13 +7,27 @@ using ImGuiNET;
 
 namespace HaselDebug.Windows;
 
-public class ExcelRowTab(
-    WindowManager windowManager,
-    DebugRenderer debugRenderer,
-    Type rowType,
-    uint rowId,
-    string windowName = "Excel Row") : SimpleWindow(windowManager, windowName)
+public class ExcelRowTab : SimpleWindow
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly Type _rowType;
+    private readonly uint _rowId;
+
+    public ExcelRowTab(
+        WindowManager windowManager,
+        TextService textService,
+        LanguageProvider languageProvider,
+        DebugRenderer debugRenderer,
+        Type rowType,
+        uint rowId,
+        string windowName = "Excel Row") : base(windowManager, textService, languageProvider)
+    {
+        _debugRenderer = debugRenderer;
+        _rowType = rowType;
+        _rowId = rowId;
+        WindowName = windowName;
+    }
+
     public override void OnOpen()
     {
         base.OnOpen();
@@ -40,6 +54,6 @@ public class ExcelRowTab(
 
     public override void Draw()
     {
-        debugRenderer.DrawExdSheet(rowType, rowId, 0, new NodeOptions() { DefaultOpen = true });
+        _debugRenderer.DrawExdSheet(_rowType, _rowId, 0, new NodeOptions() { DefaultOpen = true });
     }
 }

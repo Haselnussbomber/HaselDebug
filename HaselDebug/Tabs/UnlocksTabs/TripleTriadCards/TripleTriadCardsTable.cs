@@ -28,7 +28,7 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
         UnlocksTabUtils unlocksTabUtils,
         SeStringEvaluatorService seStringEvaluator,
         ITextureProvider textureProvider,
-        LanguageProvider languageProvider) : base("OrchestrionRollsTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

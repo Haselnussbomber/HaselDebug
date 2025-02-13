@@ -20,7 +20,7 @@ public unsafe class OrchestrionRollsTable : Table<OrchestrionRollEntry>
         ExcelService excelService,
         DebugRenderer debugRenderer,
         UnlocksTabUtils unlocksTabUtils,
-        LanguageProvider languageProvider) : base("OrchestrionRollsTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

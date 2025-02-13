@@ -15,7 +15,8 @@ public class ConfigWindow : SimpleWindow
     public ConfigWindow(
         WindowManager windowManager,
         PluginConfig pluginConfig,
-        TextService textService) : base(windowManager, textService.Translate("Config.WindowTitle"))
+        TextService textService,
+        LanguageProvider languageProvider) : base(windowManager, textService, languageProvider)
     {
         PluginConfig = pluginConfig;
         TextService = textService;

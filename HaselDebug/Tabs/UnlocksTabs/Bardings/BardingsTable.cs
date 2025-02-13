@@ -16,7 +16,7 @@ public unsafe class BardingsTable : Table<BuddyEquip>
     public BardingsTable(
         ExcelService excelService,
         DebugRenderer debugRenderer,
-        LanguageProvider languageProvider) : base("BardingsTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

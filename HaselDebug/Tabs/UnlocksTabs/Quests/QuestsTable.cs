@@ -29,7 +29,7 @@ public class QuestsTable : Table<Quest>, IDisposable
         TextService textService,
         ITextureProvider textureProvider,
         UnlocksTabUtils unlocksTabUtils,
-        ImGuiContextMenuService imGuiContextMenu) : base("QuestsTable", languageProvider)
+        ImGuiContextMenuService imGuiContextMenu) : base(languageProvider)
     {
         _excelService = excelService;
         _textService = textService;

@@ -15,6 +15,7 @@ namespace HaselDebug.Tabs;
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public class InstancesTab(
     TextService TextService,
+    LanguageProvider LanguageProvider,
     DebugRenderer DebugRenderer,
     WindowManager WindowManager,
     InstancesService InstancesService,
@@ -48,9 +49,9 @@ public class InstancesTab(
 
                     builder.Add(new ImGuiContextMenuEntry()
                     {
-                        Visible = !WindowManager.Contains(windowName),
+                        Visible = !WindowManager.Contains(win => win.WindowName == windowName),
                         Label = TextService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, DebugRenderer, ptr, type))
+                        ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, TextService, LanguageProvider, DebugRenderer, ptr, type))
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()

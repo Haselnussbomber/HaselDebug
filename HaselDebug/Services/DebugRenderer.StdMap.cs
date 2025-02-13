@@ -29,9 +29,9 @@ public unsafe partial class DebugRenderer
                 builder.AddSeparator();
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = !WindowManager.Contains("0x" + address.ToString("X")),
+                    Visible = !WindowManager.Contains(win => win.WindowName == "0x" + address.ToString("X")),
                     Label = TextService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, this, address, typeof(StdMap<,>).MakeGenericType(keyType, valueType), "0x" + address.ToString("X")))
+                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, TextService, LanguageProvider, this, address, typeof(StdMap<,>).MakeGenericType(keyType, valueType), "0x" + address.ToString("X")))
                 });
             }
         });

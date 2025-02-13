@@ -26,7 +26,7 @@ public class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
         ItemService itemService,
         GlobalScaleObserver globalScaleObserver,
         SetColumn setColumn,
-        ItemsColumn itemsColumn) : base("OutfitsTable", languageProvider)
+        ItemsColumn itemsColumn) : base(languageProvider)
     {
         _excelService = excelService;
         _itemService = itemService;

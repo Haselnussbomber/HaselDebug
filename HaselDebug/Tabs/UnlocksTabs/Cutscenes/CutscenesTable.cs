@@ -16,7 +16,7 @@ public unsafe class CutscenesTable : Table<CutsceneEntry>
     internal readonly ExcelService _excelService;
     private readonly Dictionary<uint, CutsceneEntry> _cutscenes = [];
 
-    public CutscenesTable(ExcelService excelService, LanguageProvider languageProvider) : base("CutscenesTable", languageProvider)
+    public CutscenesTable(ExcelService excelService, LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

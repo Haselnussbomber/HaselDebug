@@ -19,7 +19,7 @@ public unsafe class AchievementsTable : Table<AchievementEntry>
         DebugRenderer debugRenderer,
         ExcelService excelService,
         UnlocksTabUtils unlocksTabUtils,
-        LanguageProvider languageProvider) : base("AchievementsTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

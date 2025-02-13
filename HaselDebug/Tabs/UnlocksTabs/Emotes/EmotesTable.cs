@@ -17,7 +17,7 @@ public unsafe class EmotesTable : Table<Emote>
     public EmotesTable(
         ExcelService excelService,
         DebugRenderer debugRenderer,
-        LanguageProvider languageProvider) : base("EmotesTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

@@ -24,7 +24,7 @@ public unsafe class MinionsTable : Table<Companion>
         DebugRenderer debugRenderer,
         TextService textService,
         UnlocksTabUtils unlocksTabUtils,
-        LanguageProvider languageProvider) : base("MinionsTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

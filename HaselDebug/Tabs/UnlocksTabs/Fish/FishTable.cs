@@ -22,7 +22,7 @@ public unsafe class FishTable : Table<FishParameter>
         TextService textService,
         UnlocksTabUtils unlocksTabUtils,
         ImGuiContextMenuService imGuiContextMenu,
-        LanguageProvider languageProvider) : base("FishTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
         _textService = textService;

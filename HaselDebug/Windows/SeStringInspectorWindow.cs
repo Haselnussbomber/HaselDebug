@@ -18,10 +18,12 @@ namespace HaselDebug.Windows;
 
 public class SeStringInspectorWindow : SimpleWindow
 {
-    private SeStringParameter[]? LocalParameters = null;
-    private ReadOnlySeString _string;
+    private readonly WindowManager _windowManager;
     private readonly DebugRenderer _debugRenderer;
     private readonly SeStringEvaluatorService _seStringEvaluator;
+
+    private SeStringParameter[]? LocalParameters = null;
+    private ReadOnlySeString _string;
 
     public ReadOnlySeString String
     {
@@ -37,12 +39,15 @@ public class SeStringInspectorWindow : SimpleWindow
 
     public SeStringInspectorWindow(
         WindowManager windowManager,
+        TextService textService,
+        LanguageProvider languageProvider,
         DebugRenderer debugRenderer,
         SeStringEvaluatorService seStringEvaluator,
         ReadOnlySeString str,
         ClientLanguage language,
-        string windowName = "SeString") : base(windowManager, windowName)
+        string windowName = "SeString") : base(windowManager, textService, languageProvider)
     {
+        _windowManager = windowManager;
         _debugRenderer = debugRenderer;
         _seStringEvaluator = seStringEvaluator;
         Language = language;
@@ -73,7 +78,7 @@ public class SeStringInspectorWindow : SimpleWindow
         base.OnClose();
 
         if (ImGui.IsKeyDown(ImGuiKey.LeftShift))
-            WindowManager.Close<SeStringInspectorWindow>();
+            _windowManager.Close<SeStringInspectorWindow>();
     }
 
     public override bool DrawConditions()

@@ -24,7 +24,7 @@ public unsafe class AetherCurrentsTable : Table<AetherCurrentEntry>
         DebugRenderer debugRenderer,
         MapService mapService,
         TextService textService,
-        LanguageProvider languageProvider) : base("AetherCurrentsTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

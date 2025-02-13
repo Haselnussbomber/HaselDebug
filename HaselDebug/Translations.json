@@ -13,7 +13,10 @@
     "de": "Konfiguration schließen"
   },
 
-  "Config.WindowTitle": {
+  "PluginWindow.Title": {
+    "en": "HaselDebug"
+  },
+  "ConfigWindow.Title": {
     "en": "HaselDebug Configuration",
     "de": "HaselDebug-Konfiguration"
   },

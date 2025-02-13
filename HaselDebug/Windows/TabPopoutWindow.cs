@@ -6,8 +6,16 @@ using ImGuiNET;
 
 namespace HaselDebug.Windows;
 
-public class TabPopoutWindow(WindowManager wm, IDrawableTab tab) : SimpleWindow(wm, tab.Title)
+public class TabPopoutWindow : SimpleWindow
 {
+    private readonly IDrawableTab _tab;
+
+    public TabPopoutWindow(WindowManager wm, TextService textService, LanguageProvider languageProvider, IDrawableTab tab) : base(wm, textService, languageProvider)
+    {
+        _tab = tab;
+        WindowName = tab.Title;
+    }
+
     public override void OnOpen()
     {
         base.OnOpen();
@@ -28,6 +36,6 @@ public class TabPopoutWindow(WindowManager wm, IDrawableTab tab) : SimpleWindow(
 
     public override void Draw()
     {
-        tab.Draw();
+        _tab.Draw();
     }
 }

@@ -10,9 +10,10 @@ namespace HaselDebug.Tabs.UnlocksTabs;
 
 public class EntryRowIdColumn<T, TRow>(
     WindowManager windowManager,
+    TextService textService,
+    LanguageProvider languageProvider,
     DebugRenderer debugRenderer,
     ImGuiContextMenuService imGuiContextMenu,
-    TextService textService,
     Type rowType) : ColumnNumber<T>
     where T : IUnlockEntry
     where TRow : struct, IExcelRow<TRow>
@@ -24,7 +25,7 @@ public class EntryRowIdColumn<T, TRow>(
     {
         if (ImGui.Selectable(ToName(entry)))
         {
-            windowManager.CreateOrOpen($"{rowType.Name}#{entry.RowId}", () => new ExcelRowTab(windowManager, debugRenderer, rowType, entry.RowId, $"{rowType.Name}#{entry.RowId}"));
+            windowManager.CreateOrOpen($"{rowType.Name}#{entry.RowId}", () => new ExcelRowTab(windowManager, textService, languageProvider, debugRenderer, rowType, entry.RowId, $"{rowType.Name}#{entry.RowId}"));
         }
 
         imGuiContextMenu.Draw($"{rowType.Name}{entry.RowId}RowIdContextMenu", builder =>
@@ -37,9 +38,10 @@ public class EntryRowIdColumn<T, TRow>(
     {
         return new(
             Service.Get<WindowManager>(),
+            Service.Get<TextService>(),
+            Service.Get<LanguageProvider>(),
             Service.Get<DebugRenderer>(),
             Service.Get<ImGuiContextMenuService>(),
-            Service.Get<TextService>(),
             typeof(TRow)
         )
         {

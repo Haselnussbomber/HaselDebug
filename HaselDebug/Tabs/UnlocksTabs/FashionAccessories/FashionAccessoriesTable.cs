@@ -24,7 +24,7 @@ public unsafe class FashionAccessoriesTable : Table<Ornament>
         DebugRenderer debugRenderer,
         TextService textService,
         UnlocksTabUtils unlocksTabUtils,
-        LanguageProvider languageProvider) : base("FashionAccessoriesTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

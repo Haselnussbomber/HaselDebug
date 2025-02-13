@@ -24,7 +24,7 @@ public unsafe class SightseeingLogTable : Table<AdventureEntry>
         IClientState clientState,
         UnlocksTabUtils unlocksTabUtils,
         ITextureProvider textureProvider,
-        LanguageProvider languageProvider) : base("SightseeingLogTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

@@ -19,7 +19,7 @@ public unsafe class RecipesTable : Table<Recipe>
         ExcelService excelService,
         TextService textService,
         UnlocksTabUtils unlocksTabUtils,
-        LanguageProvider languageProvider) : base("RecipesTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

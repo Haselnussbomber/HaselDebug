@@ -24,7 +24,7 @@ public record AddonNameEntry(int Index, string Name);
 [RegisterSingleton]
 public class AddonNameTable : Table<AddonNameEntry>, IDisposable
 {
-    public AddonNameTable(LanguageProvider languageProvider, DebugRenderer debugRenderer) : base("AddonNameTable", languageProvider)
+    public AddonNameTable(LanguageProvider languageProvider, DebugRenderer debugRenderer) : base(languageProvider)
     {
         Columns = [
             new IndexColumn(debugRenderer) {

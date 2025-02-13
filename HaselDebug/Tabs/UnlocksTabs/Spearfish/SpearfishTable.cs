@@ -21,7 +21,7 @@ public unsafe class SpearfishTable : Table<SpearfishingItem>
         TextService textService,
         UnlocksTabUtils unlocksTabUtils,
         ImGuiContextMenuService imGuiContextMenuService,
-        LanguageProvider languageProvider) : base("SpearfishTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 

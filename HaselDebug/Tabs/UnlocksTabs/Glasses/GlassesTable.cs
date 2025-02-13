@@ -21,7 +21,7 @@ public unsafe class GlassesTable : Table<GlassesSheet>
         DebugRenderer debugRenderer,
         TextService textService,
         UnlocksTabUtils unlocksTabUtils,
-        LanguageProvider languageProvider) : base("GlassesTable", languageProvider)
+        LanguageProvider languageProvider) : base(languageProvider)
     {
         _excelService = excelService;
 
