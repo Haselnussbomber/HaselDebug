@@ -6,7 +6,7 @@
 - **Added:** A Territory Intended Use tab to debug the enum I added to my HaselCommon lib.
 - **Added:** A Pad Button Mapping tab to display the icon2 macro icons, which are different from the icon macro since they are based on the controller button mappings.
 - **Added:** EventHandler type redirects.
-- **Updated:** ClientStructs now at [5c7517e](https://github.com/aers/FFXIVClientStructs/tree/5c7517e) ([compare](https://github.com/aers/FFXIVClientStructs/compare/ee4144e0..5c7517e)).
+- **Updated:** ClientStructs now at [723c19d4](https://github.com/aers/FFXIVClientStructs/tree/723c19d4) ([compare](https://github.com/aers/FFXIVClientStructs/compare/ee4144e0..723c19d4)).
 
 ## [1.15.0] (2025-01-30)
 
