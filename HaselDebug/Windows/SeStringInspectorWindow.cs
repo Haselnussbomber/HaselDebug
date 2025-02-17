@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Xml.Linq;
 using Dalamud.Game;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
@@ -52,6 +53,7 @@ public class SeStringInspectorWindow : SimpleWindow
         _seStringEvaluator = seStringEvaluator;
         Language = language;
         String = str;
+        WindowName = $"{windowName}##{GetType().Name}";
     }
 
     public override void OnOpen()
@@ -90,11 +92,7 @@ public class SeStringInspectorWindow : SimpleWindow
     {
         LocalParameters ??= GetLocalParameters(String.AsSpan(), []);
 
-        var evaluated = _seStringEvaluator.Evaluate(String.AsSpan(), new()
-        {
-            LocalParameters = LocalParameters ?? [],
-            Language = Language
-        });
+        var evaluated = _seStringEvaluator.Evaluate(String.AsSpan(), LocalParameters, Language);
 
         DrawPreview(evaluated);
 

@@ -341,7 +341,7 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
             }
             else if (row.Hint.RowId != 0 && row.Hint.IsValid)
             {
-                title = _seStringEvaluator.EvaluateFromLobby(row.Hint.RowId, new SeStringContext() { LocalParameters = [row.HintItem.RowId] }).ExtractText();
+                title = _seStringEvaluator.EvaluateFromLobby(row.Hint.RowId, [row.HintItem.RowId]).ExtractText();
             }
 
             names.Add(new UnlockEntry()

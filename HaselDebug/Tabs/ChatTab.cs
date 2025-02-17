@@ -74,7 +74,7 @@ public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelServi
                     var senderEvaluated = SeStringEvaluator.Evaluate(sender);
                     var messageEvaluated = SeStringEvaluator.Evaluate(message);
                     var format = ExcelService.TryGetRow<LogKind>((uint)logKind, out var logKindRow) ? logKindRow.Format : new();
-                    var formatted = SeStringEvaluator.Evaluate(format, new SeStringContext() { LocalParameters = [senderEvaluated, messageEvaluated] }).AsSpan();
+                    var formatted = SeStringEvaluator.Evaluate(format, [senderEvaluated, messageEvaluated]).AsSpan();
 
                     if (!formatted.IsEmpty)
                     {

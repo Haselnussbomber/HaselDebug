@@ -26,7 +26,7 @@ public class PointerTypeWindow : SimpleWindow
         this.debugRenderer = debugRenderer;
         this.address = address;
         this.type = type;
-        WindowName = name ?? type.Name;
+        WindowName = $"{name ?? string.Empty}##{type.Name}";
     }
 
     public override void OnOpen()

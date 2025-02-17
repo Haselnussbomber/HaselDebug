@@ -149,10 +149,7 @@ public unsafe class RaptureHotbarModuleTab(
         if (slot->RecipeValid == 0)
             return TextService.GetAddonText(1449); // Deleted Recipes
 
-        return SeStringEvaluatorService.EvaluateFromAddon(1442, new SeStringContext()
-        {
-            LocalParameters = [slot->RecipeItemId, slot->RecipeCraftType + 8]
-        }).ExtractText().StripSoftHypen();
+        return SeStringEvaluatorService.EvaluateFromAddon(1442, [slot->RecipeItemId, slot->RecipeCraftType + 8]).ExtractText().StripSoftHypen();
     }
 
     private void DrawHotbarSlotIcon(RaptureHotbarModule.HotbarSlot slot)

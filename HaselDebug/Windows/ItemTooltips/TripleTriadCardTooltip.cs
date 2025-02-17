@@ -56,7 +56,7 @@ public class TripleTriadCardTooltip : Node
         var order = (uint)cardResident.Order;
         var addonRowId = isEx ? 9773u : 9772;
 
-        _infoLine.Text = $"{_seStringEvaluator.EvaluateFromAddon(addonRowId, new() { LocalParameters = [order] }).ExtractText()} - {cardRow.Name}";
+        _infoLine.Text = $"{_seStringEvaluator.EvaluateFromAddon(addonRowId, [order]).ExtractText()} - {cardRow.Name}";
         _card.SetCard(_cardRowId, cardResident);
     }
 }

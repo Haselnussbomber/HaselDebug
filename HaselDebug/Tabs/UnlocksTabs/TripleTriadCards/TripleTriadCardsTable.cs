@@ -83,7 +83,7 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
             var isEx = entry.ResidentRow.UIPriority == 5;
             var order = (uint)entry.ResidentRow.Order;
             var addonRowId = isEx ? 9773u : 9772;
-            return seStringEvaluator.EvaluateFromAddon(addonRowId, new() { LocalParameters = [order] }).ExtractText();
+            return seStringEvaluator.EvaluateFromAddon(addonRowId, [order]).ExtractText();
         }
 
         public override int Compare(TripleTriadCardEntry lhs, TripleTriadCardEntry rhs)
@@ -115,13 +115,10 @@ public unsafe class TripleTriadCardsTable : Table<TripleTriadCardEntry>
                 excelService.TryGetRow<TripleTriadCardObtain>(residentRow.AcquisitionType, out var obtainRow) &&
                 obtainRow.Unknown1 != 0)
             {
-                str += "\n" + seStringEvaluator.EvaluateFromAddon(obtainRow.Unknown1, new SeStringContext()
-                {
-                    LocalParameters = [
-                        residentRow.Acquisition.RowId,
-                        residentRow.Location.RowId
-                    ]
-                }).ExtractText();
+                str += "\n" + seStringEvaluator.EvaluateFromAddon(obtainRow.Unknown1, [
+                    residentRow.Acquisition.RowId,
+                    residentRow.Location.RowId
+                ]).ExtractText();
             }
 
             return str;

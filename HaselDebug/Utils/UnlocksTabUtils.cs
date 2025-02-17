@@ -284,13 +284,10 @@ public unsafe class UnlocksTabUtils(
                 DrawSeparator();
                 TextureService.DrawIcon(obtainRow.Unknown0, 40 * ImGuiHelpers.GlobalScale);
                 ImGui.SameLine();
-                ImGuiHelpers.SafeTextWrapped(SeStringEvaluator.EvaluateFromAddon(obtainRow.Unknown1, new SeStringContext()
-                {
-                    LocalParameters = [
-                        residentRow.Acquisition.RowId,
-                        residentRow.Location.RowId
-                    ]
-                }).ExtractText().StripSoftHypen());
+                ImGuiHelpers.SafeTextWrapped(SeStringEvaluator.EvaluateFromAddon(obtainRow.Unknown1, [
+                    residentRow.Acquisition.RowId,
+                    residentRow.Location.RowId
+                ]).ExtractText().StripSoftHypen());
             }
 
             DrawSeparator(marginTop: 3);
@@ -381,10 +378,7 @@ public unsafe class UnlocksTabUtils(
         {
             var text = itemCategoy.RowId switch
             {
-                1 when item.Quest.IsValid && !item.Quest.Value.Name.IsEmpty => SeStringEvaluator.Evaluate(itemCategoy.Unknown0, new()
-                {
-                    LocalParameters = [TextService.GetQuestName(item.Quest.RowId)]
-                }),
+                1 when item.Quest.IsValid && !item.Quest.Value.Name.IsEmpty => SeStringEvaluator.Evaluate(itemCategoy.Unknown0, [TextService.GetQuestName(item.Quest.RowId)]),
                 _ => itemCategoy.Unknown0
             };
 

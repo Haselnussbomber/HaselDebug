@@ -48,7 +48,7 @@ public unsafe class ObjectTableTab(
             var title = objectName;
             if (objectKind == ObjectKind.EventNpc && ExcelService.TryGetRow<ENpcResident>(gameObject->BaseId, out var resident) && !resident.Title.IsEmpty)
             {
-                var evaluated = SeStringEvaluator.EvaluateFromAddon(37, new SeStringContext() { LocalParameters = [resident.Title] }).ExtractText();
+                var evaluated = SeStringEvaluator.EvaluateFromAddon(37, [resident.Title]).ExtractText();
                 if (!string.IsNullOrWhiteSpace(evaluated))
                 {
                     if (!string.IsNullOrEmpty(evaluated))

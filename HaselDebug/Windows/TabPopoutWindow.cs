@@ -13,7 +13,7 @@ public class TabPopoutWindow : SimpleWindow
     public TabPopoutWindow(WindowManager wm, TextService textService, LanguageProvider languageProvider, IDrawableTab tab) : base(wm, textService, languageProvider)
     {
         _tab = tab;
-        WindowName = tab.Title;
+        WindowName = $"{tab.Title}##{GetType().Name}";
     }
 
     public override void OnOpen()
