@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.16.0] (2025-02-18)
 
 - **Added:** An Addon Names tab that lists addon names used by the `RaptureAtkModule.OpenAddon` function.
 - **Added:** A Territory Intended Use tab to debug the enum I added to my HaselCommon lib.
@@ -272,7 +272,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.15.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.16.0...main
+[1.16.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.15.0...v1.16.0
 [1.15.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.1...v1.14.0
 [1.13.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.0...v1.13.1
