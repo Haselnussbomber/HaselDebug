@@ -4,9 +4,24 @@
 
 - **Added:** An Addon Names tab that lists addon names used by the `RaptureAtkModule.OpenAddon` function.
 - **Added:** A Territory Intended Use tab to debug the enum I added to my HaselCommon lib.
-- **Added:** A Pad Button Mapping tab to display the icon2 macro icons, which are different from the icon macro since they are based on the controller button mappings.
-- **Added:** EventHandler type redirects.
-- **Updated:** ClientStructs now at [723c19d4](https://github.com/aers/FFXIVClientStructs/tree/723c19d4) ([compare](https://github.com/aers/FFXIVClientStructs/compare/ee4144e0..723c19d4)).
+- **Added:** EventHandler type redirects based on the ContentId for:
+  - QuestEventHandler
+  - GatheringPointEventHandler
+  - ShopEventHandler
+  - AetheryteEventHandler
+  - CraftEventHandler
+  - CustomTalkEventHandler
+  - InstanceContentDirector
+    - InstanceContentDeepDungeon
+    - InstanceContentOceanFishing
+  - PublicContentDirector
+    - PublicContentBozja
+    - PublicContentEureka
+  - GoldSaucerDirector
+- **Added:** Rapture Text Module: A new Icon2 Mapping tab, which displays the Icon2 macros remapped icons based on the controller button mappings.
+- **Updated:** Rapture Text Module: Reversed some more global parameters.
+- **Updated:** SeStringEvaluator now supports MacroCodes LowerHead, Lower, PcName, IfPcGender, IfPcName and IfSelf. Icon2 now respects controller button mappings, as written above.
+- **Updated:** ClientStructs now at [1c32fa48](https://github.com/aers/FFXIVClientStructs/tree/1c32fa48) ([compare](https://github.com/aers/FFXIVClientStructs/compare/ee4144e0..1c32fa48)).
 
 ## [1.15.0] (2025-01-30)
 

@@ -3,6 +3,7 @@ using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.Text;
 using HaselCommon.Gui;
@@ -81,7 +82,7 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
     private readonly SeStringEvaluatorService _seStringEvaluator;
     private readonly TextService _textService;
     private readonly LanguageProvider _languageProvider;
-
+    private readonly TextureService _textureService;
     private SeStringInspectorWindow? _inspectorWindow;
 
     public override bool DrawInChild => false;
@@ -91,13 +92,15 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
         WindowManager windowManager,
         SeStringEvaluatorService seStringEvaluator,
         TextService textService,
-        LanguageProvider languageProvider)
+        LanguageProvider languageProvider,
+        TextureService textureService)
     {
         _debugRenderer = debugRenderer;
         _windowManager = windowManager;
         _seStringEvaluator = seStringEvaluator;
         _textService = textService;
         _languageProvider = languageProvider;
+        _textureService = textureService;
 
         _languageProvider.LanguageChanged += OnLanguageChanged;
     }
@@ -124,6 +127,7 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
 
         DrawGlobalParameters();
         DrawDefinitions();
+        DrawIcon2Mapping();
         DrawStringMaker();
     }
 
@@ -330,6 +334,39 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
                 ImGui.TableNextColumn();
                 ImGui.TextUnformatted(((char)item.Item2.ParamTypes[i]).ToString());
             }
+        }
+    }
+
+    private void DrawIcon2Mapping()
+    {
+        using var tab = ImRaii.TabItem("Icon2 Mapping");
+        if (!tab) return;
+
+        using var table = ImRaii.Table("PadButtonMappingTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        if (!table) return;
+
+        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 60);
+        ImGui.TableSetupColumn("Requested Icon", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Displayed Icon", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupScrollFreeze(0, 1);
+        ImGui.TableHeadersRow();
+
+        var iconMapping = RaptureAtkModule.Instance()->AtkFontManager.Icon2RemapTable;
+        for (var i = 0; i < 30; i++)
+        {
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{i}");
+
+            ImGui.TableNextColumn();
+            _textureService.DrawGfd(iconMapping[i].IconId, ImGui.GetTextLineHeightWithSpacing());
+            ImGui.SameLine();
+            ImGui.TextUnformatted($"{iconMapping[i].IconId}");
+
+            ImGui.TableNextColumn();
+            _textureService.DrawGfd(iconMapping[i].RemappedIconId, ImGui.GetTextLineHeightWithSpacing());
+            ImGui.SameLine();
+            ImGui.TextUnformatted($"{iconMapping[i].RemappedIconId}");
         }
     }
 
