@@ -1,26 +1,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Interface.GameFonts;
-using Dalamud.Interface.ManagedFontAtlas;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Game.Enums;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
-using HaselCommon.Services.SeStringEvaluation;
 using HaselCommon.Sheets;
 using HaselDebug.Services;
 using HaselDebug.Sheets;
-using HaselDebug.Windows.ItemTooltips;
 using ImGuiNET;
 using Lumina.Data.Files;
 using Lumina.Excel;
@@ -40,25 +34,11 @@ public unsafe class UnlocksTabUtils(
     ImGuiContextMenuService ImGuiContextMenuService,
     IDataManager DataManager,
     ITextureProvider TextureProvider,
-    IDalamudPluginInterface PluginInterface,
-    TripleTriadNumberFontManager TripleTriadNumberFontManager,
-    SeStringEvaluatorService SeStringEvaluator) : IDisposable
+    TripleTriadNumberFont TripleTriadNumberFont,
+    SeStringEvaluatorService SeStringEvaluator)
 {
-    private readonly Dictionary<uint, Vector2?> _iconSizeCache = [];
-    private readonly Lazy<IFontHandle> _tripleTriadNumberFont = new(() => PluginInterface.UiBuilder.FontAtlas.NewGameFontHandle(new GameFontStyle(GameFontFamily.MiedingerMid, 208f / 10f)));
-
-    private TripleTriadCardTooltip? TripleTriadCardTooltip;
-
-    public void Dispose()
-    {
-        if (_tripleTriadNumberFont.IsValueCreated)
-            _tripleTriadNumberFont.Value.Dispose();
-
-        TripleTriadCardTooltip?.Dispose();
-        TripleTriadCardTooltip = null;
-
-        GC.SuppressFinalize(this);
-    }
+    private readonly Dictionary<uint, Vector2> _iconSizeCache = [];
+    private readonly Dictionary<ushort, uint> _facePaintIconCache = [];
 
     public bool DrawSelectableItem(uint itemId, ImGuiId id, bool drawIcon = true, bool isHq = false, float? iconSize = null)
     {
@@ -227,123 +207,281 @@ public unsafe class UnlocksTabUtils(
             ImGuiHelpers.SafeTextWrapped(description);
         }
 
-        if (item.ItemAction.Value.Type == (uint)ItemActionType.Mount)
+        switch ((ItemActionType)item.ItemAction.Value.Type)
         {
-            if (ExcelService.TryGetRow<Mount>(item.ItemAction.Value!.Data[0], out var mount))
-            {
-                TextureService.DrawIcon(64000 + mount.Icon, 192);
-            }
-        }
-        else if (item.ItemAction.Value.Type == (uint)ItemActionType.Companion)
-        {
-            if (ExcelService.TryGetRow<Companion>(item.ItemAction.Value!.Data[0], out var companion))
-            {
-                TextureService.DrawIcon(64000 + companion.Icon, 192);
-            }
-        }
-        else if (item.ItemAction.Value.Type == (uint)ItemActionType.Ornament)
-        {
-            if (ExcelService.TryGetRow<Ornament>(item.ItemAction.Value!.Data[0], out var ornament))
-            {
-                TextureService.DrawIcon(59000 + ornament.Icon, 192);
-            }
-        }
-        else if (item.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink && item.ItemAction.Value.Data[1] == 5211) // Emotes
-        {
-            if (ExcelService.TryGetRow<Emote>(item.ItemAction.Value!.Data[2], out var emote))
-            {
-                TextureService.DrawIcon(emote.Icon, 80);
-            }
-        }
-        else if (item.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink && item.ItemAction.Value.Data[1] == 4659) // Hairstyles
-        {
-            var playerState = PlayerState.Instance();
-            if (playerState->IsLoaded == 1 &&
-                ExcelService.TryFindRow<CustomHairMakeType>(t => t.Tribe.RowId == playerState->Tribe && t.Gender == playerState->Sex, out var hairMakeType) &&
-                ExcelService.TryFindRow<CharaMakeCustomize>(row => row.IsPurchasable && row.Data == item.ItemAction.Value.Data[0] && hairMakeType.CharaMakeStruct[0].SubMenuParam.Any(id => id == row.RowId), out var charaMakeCustomize))
-            {
-                TextureService.DrawIcon(charaMakeCustomize.Icon, 80);
-            }
-        }
-        else if (item.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink && item.ItemAction.Value.Data[1] == 9390) // Face Paints
-        {
-            var playerState = PlayerState.Instance();
-            if (playerState->IsLoaded == 1 &&
-                ExcelService.TryFindRow<CustomHairMakeType>(t => t.Tribe.RowId == playerState->Tribe && t.Gender == playerState->Sex, out var hairMakeType) &&
-                ExcelService.TryFindRow<CharaMakeCustomize>(row => row.IsPurchasable && row.Data == item.ItemAction.Value.Data[0] && hairMakeType.CharaMakeStruct[7].SubMenuParam.Any(id => id == row.RowId), out var charaMakeCustomize))
-            {
-                TextureService.DrawIcon(charaMakeCustomize.Icon, 80);
-            }
-        }
-        else if (item.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard)
-        {
-            if (ExcelService.TryGetRow<TripleTriadCardResident>(item.ItemAction.Value.Data[0], out var residentRow) &&
-                ExcelService.TryGetRow<TripleTriadCardObtain>(residentRow.AcquisitionType, out var obtainRow) &&
-                obtainRow.Unknown1 != 0)
-            {
-                DrawSeparator();
-                TextureService.DrawIcon(obtainRow.Unknown0, 40 * ImGuiHelpers.GlobalScale);
-                ImGui.SameLine();
-                ImGuiHelpers.SafeTextWrapped(SeStringEvaluator.EvaluateFromAddon(obtainRow.Unknown1, [
-                    residentRow.Acquisition.RowId,
+            case ItemActionType.Mount when ExcelService.TryGetRow<Mount>(item.ItemAction.Value.Data[0], out var mount):
+                TextureService.DrawIcon(64000 + mount.Icon, new DrawInfo() { Scale = 0.5f * ImGuiHelpers.GlobalScale });
+                break;
+
+            case ItemActionType.Companion when ExcelService.TryGetRow<Companion>(item.ItemAction.Value.Data[0], out var companion):
+                TextureService.DrawIcon(64000 + companion.Icon, new DrawInfo() { Scale = 0.5f * ImGuiHelpers.GlobalScale });
+                break;
+
+            case ItemActionType.Ornament when ExcelService.TryGetRow<Ornament>(item.ItemAction.Value.Data[0], out var ornament):
+                TextureService.DrawIcon(59000 + ornament.Icon, new DrawInfo() { Scale = 0.5f * ImGuiHelpers.GlobalScale });
+                break;
+
+            case ItemActionType.UnlockLink when item.ItemAction.Value.Data[1] == 5211 && ExcelService.TryGetRow<Emote>(item.ItemAction.Value.Data[2], out var emote):
+                TextureService.DrawIcon(emote.Icon, new DrawInfo() { Scale = 0.5f * ImGuiHelpers.GlobalScale });
+                break;
+
+            case ItemActionType.UnlockLink when item.ItemAction.Value.Data[1] == 4659 && ItemService.GetHairstyleIconId(item.RowId) is { } hairStyleIconId && hairStyleIconId != 0:
+                TextureService.DrawIcon(hairStyleIconId, new DrawInfo() { Scale = ImGuiHelpers.GlobalScale });
+                break;
+
+            case ItemActionType.UnlockLink when item.ItemAction.Value.Data[1] == 9390 && TryGetFacePaintIconId(item.ItemAction.Value.Data[0], out var facePaintIconId):
+                TextureService.DrawIcon(facePaintIconId, new DrawInfo() { Scale = ImGuiHelpers.GlobalScale });
+                break;
+
+            case ItemActionType.TripleTriadCard:
+                if (ExcelService.TryGetRow<TripleTriadCardResident>(item.ItemAction.Value.Data[0], out var residentRow) &&
+                    ExcelService.TryGetRow<TripleTriadCardObtain>(residentRow.AcquisitionType, out var obtainRow) &&
+                    obtainRow.Unknown1 != 0)
+                {
+                    DrawSeparator();
+                    TextureService.DrawIcon(obtainRow.Unknown0, 40 * ImGuiHelpers.GlobalScale);
+                    ImGui.SameLine();
+                    ImGuiHelpers.SafeTextWrapped(SeStringEvaluator.EvaluateFromAddon(obtainRow.Unknown1, [
+                        residentRow.Acquisition.RowId,
                     residentRow.Location.RowId
-                ]).ExtractText().StripSoftHypen());
-            }
+                    ]).ExtractText().StripSoftHypen());
+                }
 
-            DrawSeparator(marginTop: 3);
+                DrawTripleTriadCard(item);
+                break;
 
-            TripleTriadCardTooltip ??= new TripleTriadCardTooltip(TextureService, ExcelService, SeStringEvaluator, TripleTriadNumberFontManager);
-            TripleTriadCardTooltip.MarginTop = ImGui.GetCursorPosY();
-            TripleTriadCardTooltip.MarginLeft = ImGui.GetContentRegionAvail().X / 2f - 208 * ImGuiHelpers.GlobalScale / 2f + ImGui.GetCursorPosX() - itemInnerSpacing.X;
-            TripleTriadCardTooltip?.SetItem(item);
-            TripleTriadCardTooltip?.CalculateLayout();
-            TripleTriadCardTooltip?.Update();
-            TripleTriadCardTooltip?.Draw();
+            default:
+                if (item.ItemUICategory.RowId == 95 && ExcelService.TryGetRow<Picture>(item.AdditionalData.RowId, out var picture)) // Paintings
+                {
+                    TextureService.DrawIcon(picture.Image, ResizeToFit(GetIconSize((uint)picture.Image), ImGui.GetContentRegionAvail().X));
+                }
+                break;
         }
-        else if (item.ItemUICategory.RowId == 95) // Paintings
+    }
+
+    private void DrawTripleTriadCard(Item item)
+    {
+        if (item.ItemAction.IsValid)
+            DrawTripleTriadCard(item.ItemAction.Value.Data[0]);
+    }
+
+    private void DrawTripleTriadCard(uint cardId)
+    {
+        if (!ExcelService.TryGetRow<TripleTriadCard>(cardId, out var card))
+            return;
+
+        if (!ExcelService.TryGetRow<TripleTriadCardResident>(cardId, out var cardResident))
+            return;
+
+        DrawSeparator(marginTop: 3);
+
+        var isEx = cardResident.UIPriority == 5;
+        var order = (uint)cardResident.Order;
+        var addonRowId = isEx ? 9773u : 9772;
+
+        var infoText = $"{SeStringEvaluator.EvaluateFromAddon(addonRowId, [order]).ExtractText()} - {card.Name}";
+        ImGui.SetCursorPosX(ImGui.GetCursorPosX() - ImGui.GetStyle().IndentSpacing + ImGui.GetContentRegionAvail().X / 2f - ImGui.CalcTextSize(infoText).X / 2f);
+        ImGui.TextUnformatted(infoText);
+
+        var cardSizeScaled = ImGuiHelpers.ScaledVector2(208, 256);
+        var cardStartPosX = ImGui.GetCursorPosX() - ImGui.GetStyle().IndentSpacing + ImGui.GetContentRegionAvail().X / 2f - cardSizeScaled.X / 2f;
+        var cardStartPos = new Vector2(cardStartPosX, ImGui.GetCursorPosY());
+
+        // draw background
+        ImGui.SetCursorPosX(cardStartPosX);
+        TextureService.DrawPart("CardTripleTriad", 1, 0, cardSizeScaled);
+
+        // draw card
+        ImGui.SetCursorPos(cardStartPos);
+        TextureService.DrawIcon(87000 + cardId, cardSizeScaled);
+
+        // draw numbers
+        using var font = TripleTriadNumberFont.Push();
+
+        var letterSize = ImGui.CalcTextSize("A");
+        var scaledLetterSize = letterSize / 2f;
+        var pos = cardStartPos + new Vector2(cardSizeScaled.X / 2f, cardSizeScaled.Y - letterSize.Y * 1.5f) - letterSize;
+
+        var positionTop = pos + new Vector2(scaledLetterSize.X, -scaledLetterSize.Y);
+        var positionBottom = pos + new Vector2(scaledLetterSize.X, scaledLetterSize.Y);
+        var positionRight = pos + new Vector2(letterSize.X * 1.1f + scaledLetterSize.X, 0);
+        var positionLeft = pos + new Vector2(-(letterSize.X * 0.1f + scaledLetterSize.X), 0);
+
+        var textTop = $"{cardResident.Top:X}";
+        var textBottom = $"{cardResident.Bottom:X}";
+        var textRight = $"{cardResident.Right:X}";
+        var textLeft = $"{cardResident.Left:X}";
+
+        DrawTextShadow(positionTop, textTop);
+        DrawTextShadow(positionBottom, textBottom);
+        DrawTextShadow(positionRight, textRight);
+        DrawTextShadow(positionLeft, textLeft);
+
+        DrawText(positionTop, textTop);
+        DrawText(positionBottom, textBottom);
+        DrawText(positionRight, textRight);
+        DrawText(positionLeft, textLeft);
+
+        // draw stars
+        var cardRarity = cardResident.TripleTriadCardRarity.Value!;
+
+        var starSize = 32 * 0.75f * ImGuiHelpers.GlobalScale;
+        var starRadius = starSize / 1.666f;
+        var starCenter = cardStartPos + ImGuiHelpers.ScaledVector2(14) + new Vector2(starSize) / 2f;
+
+        if (cardRarity.Stars >= 1)
         {
-            if (ExcelService.TryGetRow<Picture>(item.AdditionalData.RowId, out var picture))
-            {
-                var pictureId = (uint)picture.Image;
+            DrawStar(StarPosition.Top);
 
-                if (!_iconSizeCache.TryGetValue(pictureId, out var size))
-                {
-                    var iconPath = TextureProvider.GetIconPath(pictureId);
-                    if (string.IsNullOrEmpty(iconPath))
-                    {
-                        _iconSizeCache.Add(pictureId, null);
-                    }
-                    else
-                    {
-                        var file = DataManager.GetFile<TexFile>(iconPath);
-                        _iconSizeCache.Add(pictureId, size = file != null ? new(file.Header.Width, file.Header.Height) : null);
-                    }
-                }
-
-                if (size != null)
-                {
-                    TextureService.DrawIcon(pictureId, (Vector2)size * 0.5f);
-                }
-            }
+            if (cardRarity.Stars >= 2)
+                DrawStar(StarPosition.Left);
+            if (cardRarity.Stars >= 3)
+                DrawStar(StarPosition.Right);
+            if (cardRarity.Stars >= 4)
+                DrawStar(StarPosition.BottomLeft);
+            if (cardRarity.Stars >= 5)
+                DrawStar(StarPosition.BottomRight);
         }
-        else if (item.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink && ExcelService.TryFindRow<CharaMakeCustomize>(row => row.HintItem.RowId == item.RowId, out _)) // Hairstyles etc.
+
+        // draw type
+        if (cardResident.TripleTriadCardType.RowId != 0)
         {
-            byte tribeId = 1;
-            byte sex = 1;
-            unsafe
-            {
-                var character = Control.GetLocalPlayer();
-                if (character != null)
-                {
-                    tribeId = character->DrawData.CustomizeData.Tribe;
-                    sex = character->DrawData.CustomizeData.Sex;
-                }
-            }
+            var typeSize = 32 * ImGuiHelpers.GlobalScale;
 
-            var hairStyleIconId = ItemService.GetHairstyleIconId(item.RowId, tribeId, sex);
-            if (hairStyleIconId != 0)
-                TextureService.DrawIcon(hairStyleIconId, 192);
+            var partIndex = cardResident.TripleTriadCardType.RowId switch
+            {
+                4 => 2u,
+                _ => cardResident.TripleTriadCardType.RowId + 2
+            };
+
+            ImGui.SetCursorPos(cardStartPos + new Vector2(cardSizeScaled.X - typeSize * 1.5f, typeSize / 2.5f));
+            TextureService.DrawPart("CardTripleTriad", 1, partIndex, typeSize);
         }
+
+        // functions
+
+        void DrawStar(StarPosition pos)
+        {
+            var angleIncrement = 2 * MathF.PI / 5; // 5 = amount of stars
+            var angle = (int)pos * angleIncrement - MathF.PI / 2;
+
+            ImGui.SetCursorPos(starCenter + new Vector2(starRadius * MathF.Cos(angle), starRadius * MathF.Sin(angle)));
+            TextureService.DrawPart("CardTripleTriad", 1, 1, starSize);
+        }
+    }
+
+    private static void DrawTextShadow(Vector2 position, string text)
+    {
+        DrawShadow(position, ImGui.CalcTextSize(text), 8, Color.Black with { A = 0.1f });
+    }
+
+    private static void DrawText(Vector2 position, string text)
+    {
+        var outlineColor = Color.Black with { A = 0.5f };
+
+        // outline
+        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(-1));
+        using (outlineColor.Push(ImGuiCol.Text))
+            ImGui.TextUnformatted(text);
+
+        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(1));
+        using (outlineColor.Push(ImGuiCol.Text))
+            ImGui.TextUnformatted(text);
+
+        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(1, -1));
+        using (outlineColor.Push(ImGuiCol.Text))
+            ImGui.TextUnformatted(text);
+
+        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(-1, 1));
+        using (outlineColor.Push(ImGuiCol.Text))
+            ImGui.TextUnformatted(text);
+
+        // text
+        ImGui.SetCursorPos(position);
+        ImGui.TextUnformatted(text);
+    }
+
+    private static void DrawShadow(Vector2 pos, Vector2 size, int layers, Vector4 shadowColor)
+    {
+        var drawList = ImGui.GetWindowDrawList();
+
+        for (var i = 0; i < layers; i++)
+        {
+            var shadowOffset = i * 2.0f;
+            var transparency = shadowColor.W * (1.0f - (float)i / layers);
+            var currentShadowColor = new Vector4(shadowColor.X, shadowColor.Y, shadowColor.Z, transparency);
+
+            drawList.AddRectFilled(
+                pos - new Vector2(shadowOffset, shadowOffset),
+                pos + size + new Vector2(shadowOffset, shadowOffset),
+                ImGui.ColorConvertFloat4ToU32(currentShadowColor),
+                50
+            );
+        }
+    }
+
+    private enum StarPosition
+    {
+        Top = 0,
+        Right = 1,
+        Left = 4,
+        BottomLeft = 3,
+        BottomRight = 2
+    }
+
+    private unsafe bool TryGetFacePaintIconId(ushort dataId, out uint iconId)
+    {
+        if (_facePaintIconCache.TryGetValue(dataId, out iconId))
+            return true;
+
+        var playerState = PlayerState.Instance();
+        if (playerState == null || playerState->IsLoaded == 0)
+        {
+            _facePaintIconCache.Add(dataId, iconId = 0);
+            return false;
+        }
+
+        if (!ExcelService.TryFindRow<CustomHairMakeType>(t => t.Tribe.RowId == playerState->Tribe && t.Gender == playerState->Sex, out var hairMakeType))
+        {
+            _facePaintIconCache.Add(dataId, iconId = 0);
+            return false;
+        }
+
+        if (!ExcelService.TryFindRow<CharaMakeCustomize>(row => row.IsPurchasable && row.Data == dataId && hairMakeType.CharaMakeStruct[7].SubMenuParam.Any(id => id == row.RowId), out var charaMakeCustomize))
+        {
+            _facePaintIconCache.Add(dataId, iconId = 0);
+            return false;
+        }
+
+        _facePaintIconCache.Add(dataId, iconId = charaMakeCustomize.Icon);
+        return true;
+    }
+
+    // TODO: move to TextureService?
+    private Vector2 GetIconSize(uint iconId)
+    {
+        if (_iconSizeCache.TryGetValue(iconId, out var size))
+            return size;
+
+        var iconPath = TextureProvider.GetIconPath(iconId);
+        if (string.IsNullOrEmpty(iconPath))
+        {
+            _iconSizeCache.Add(iconId, size = Vector2.Zero);
+            return size;
+        }
+
+        var file = DataManager.GetFile<TexFile>(iconPath);
+        _iconSizeCache.Add(iconId, size = file != null ? new Vector2(file.Header.Width, file.Header.Height) : Vector2.Zero);
+        return size;
+    }
+
+    private static Vector2 ResizeToFit(Vector2 imageSize, float outerWidth)
+    {
+        if (imageSize.X <= outerWidth)
+            return new Vector2(imageSize.X, imageSize.Y);
+
+        var aspectRatio = imageSize.Y / imageSize.X;
+        return new Vector2(outerWidth, outerWidth * aspectRatio);
     }
 
     public void DrawEventItemTooltip(EventItem item)

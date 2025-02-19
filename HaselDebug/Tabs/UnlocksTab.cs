@@ -1,23 +1,15 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Numerics;
-using Dalamud.Interface.Utility.Raii;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Yoga;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using HaselDebug.Windows;
-using ImGuiNET;
-using YogaSharp;
-using static HaselCommon.Globals.ColorHelpers;
 
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public class UnlocksTab : DebugTab, IDisposable
 {
-    private readonly UnlocksTabSummaryWrapper _summaryNode;
+    //private readonly UnlocksTabSummaryWrapper _summaryNode;
 
     public override bool IsPinnable => false;
     public override bool CanPopOut => false;
@@ -25,24 +17,27 @@ public class UnlocksTab : DebugTab, IDisposable
     public UnlocksTab(IEnumerable<IUnlockTab> subTabs)
     {
         var unlockTabs = subTabs.OrderBy(t => t.Title).ToArray();
-        _summaryNode = new UnlocksTabSummaryWrapper(unlockTabs);
+        //_summaryNode = new UnlocksTabSummaryWrapper(unlockTabs);
         SubTabs = unlockTabs.Cast<ISubTab<UnlocksTab>>().ToImmutableArray();
     }
 
     public void Dispose()
     {
-        _summaryNode.Dispose();
+        //_summaryNode.Dispose();
         GC.SuppressFinalize(this);
     }
 
     public override void Draw()
     {
+        /*
         _summaryNode.CalculateLayout(ImGui.GetContentRegionAvail());
         _summaryNode.Update();
         _summaryNode.Draw();
+        */
     }
 }
 
+/*
 public class UnlocksTabSummaryWrapper : Node
 {
     public UnlocksTabSummaryWrapper(IUnlockTab[] unlockTabs)
@@ -166,3 +161,5 @@ public class UnlocksTabCard : Node
         }
     }
 }
+
+*/

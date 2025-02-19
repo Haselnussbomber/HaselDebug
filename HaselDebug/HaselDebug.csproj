@@ -41,7 +41,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\HaselCommon\HaselCommon.Yoga\HaselCommon.Yoga.csproj" />
     <ProjectReference Include="..\HaselCommon\HaselCommon\HaselCommon.csproj" />
   </ItemGroup>
 </Project>
