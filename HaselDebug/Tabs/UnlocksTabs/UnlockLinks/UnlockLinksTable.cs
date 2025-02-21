@@ -5,60 +5,33 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Game.Enums;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
-using HaselCommon.Services.SeStringEvaluation;
 using HaselCommon.Sheets;
-using HaselDebug.Extensions;
-using HaselDebug.Services;
-using HaselDebug.Utils;
-using HaselDebug.Windows;
-using ImGuiNET;
+using HaselDebug.Tabs.UnlocksTabs.UnlockLinks.Columns;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks;
 
-[RegisterSingleton]
-public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
+[RegisterSingleton, AutoConstruct]
+public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 {
     internal readonly ExcelService _excelService;
     private readonly SeStringEvaluatorService _seStringEvaluator;
     private readonly TextService _textService;
     private readonly IClientState _clientState;
 
-    public UnlockLinksTable(
-        ExcelService excelService,
-        DebugRenderer debugRenderer,
-        SeStringEvaluatorService seStringEvaluator,
-        TextService textService,
-        UnlocksTabUtils unlocksTabUtils,
-        LanguageProvider languageProvider,
-        IClientState clientState,
-        WindowManager windowManager,
-        ImGuiContextMenuService imGuiContextMenu) : base(languageProvider)
-    {
-        _excelService = excelService;
-        _seStringEvaluator = seStringEvaluator;
-        _textService = textService;
-        _clientState = clientState;
+    private readonly IndexColumn _indexColumn;
+    private readonly UnlockedColumn _unlockedColumn;
+    private readonly UnlocksColumn _unlocksColumn;
+    private readonly UnlocksNameColumn _unlocksNameColumn;
 
+    [AutoPostConstruct]
+    public void Initialize()
+    {
         Columns = [
-            new IndexColumn() {
-                Label = "Index",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
-            new UnlockedColumn() {
-                Label = "Unlocked",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 75,
-            },
-            new UnlocksColumn(debugRenderer, windowManager, imGuiContextMenu, textService, languageProvider) {
-                Label = "Sheet/Row",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 300,
-            },
-            new UnlocksNameColumn(debugRenderer, unlocksTabUtils) {
-                Label = "Name",
-            }
+            _indexColumn,
+            _unlockedColumn,
+            _unlocksColumn,
+            _unlocksNameColumn,
         ];
 
         LineHeight = 0;
@@ -474,79 +447,5 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
         Rows = dict
             .Select(kv => new UnlockLinkEntry(kv.Key, [.. kv.Value]))
             .ToList();
-    }
-
-    private class IndexColumn : ColumnNumber<UnlockLinkEntry>
-    {
-        public override string ToName(UnlockLinkEntry entry)
-            => entry.Index.ToString();
-
-        public override int ToValue(UnlockLinkEntry entry)
-            => (int)entry.Index;
-    }
-
-    private class UnlockedColumn : ColumnBool<UnlockLinkEntry>
-    {
-        public override unsafe bool ToBool(UnlockLinkEntry entry)
-            => UIState.Instance()->IsUnlockLinkUnlocked((ushort)entry.Index);
-    }
-
-    private class UnlocksColumn(DebugRenderer debugRenderer, WindowManager windowManager, ImGuiContextMenuService imGuiContextMenu, TextService textService, LanguageProvider languageProvider) : ColumnString<UnlockLinkEntry>
-    {
-        public override string ToName(UnlockLinkEntry entry)
-            => string.Join(' ', entry.Unlocks.Select(unlock => $"{unlock.RowType.Name}#{unlock.RowId}"));
-
-        public override unsafe void DrawColumn(UnlockLinkEntry entry)
-        {
-            foreach (var unlock in entry.Unlocks)
-            {
-                if (ImGui.Selectable($"{unlock.RowType.Name}#{unlock.RowId}{unlock.ExtraSheetText}"))
-                {
-                    windowManager.CreateOrOpen($"{unlock.RowType.Name}#{unlock.RowId}", () => new ExcelRowTab(windowManager, textService, languageProvider, debugRenderer, unlock.RowType, unlock.RowId, $"{unlock.RowType.Name}#{unlock.RowId}"));
-                }
-
-                imGuiContextMenu.Draw($"Entry{entry.Index}_{unlock.RowType.Name}{unlock.RowId}_RowIdContextMenu", builder =>
-                {
-                    builder.AddCopyRowId(textService, unlock.RowId);
-                });
-            }
-        }
-    }
-
-    private class UnlocksNameColumn(DebugRenderer debugRenderer, UnlocksTabUtils unlocksTabUtils) : ColumnString<UnlockLinkEntry>
-    {
-        public override string ToName(UnlockLinkEntry entry)
-            => string.Join(' ', entry.Unlocks.Select(unlock => unlock.Label));
-
-        public override unsafe void DrawColumn(UnlockLinkEntry entry)
-        {
-            foreach (var unlock in entry.Unlocks)
-            {
-                switch (unlock.RowType.Name)
-                {
-                    case "Item":
-                        unlocksTabUtils.DrawSelectableItem(unlock.RowId, $"Unlock{entry.Index}Item{unlock.RowId}");
-                        break;
-
-                    default:
-                        ImGui.BeginGroup();
-                        debugRenderer.DrawIcon(unlock.IconId, noTooltip: true);
-                        debugRenderer.DrawCopyableText(unlock.Label, noTooltip: true);
-                        ImGui.EndGroup();
-
-                        if (ImGui.IsItemHovered())
-                        {
-                            unlocksTabUtils.DrawTooltip(
-                                unlock.IconId,
-                                unlock.Label,
-                                !string.IsNullOrEmpty(unlock.Category)
-                                    ? unlock.Category
-                                    : unlock.RowType.Name);
-                        }
-
-                        break;
-                }
-            }
-        }
     }
 }

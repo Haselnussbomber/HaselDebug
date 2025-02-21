@@ -9,9 +9,11 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class CharaSelectCharacterListTab(DebugRenderer DebugRenderer) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class CharaSelectCharacterListTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+
     public override void Draw()
     {
         var list = CharaSelectCharacterList.Instance();
@@ -31,7 +33,7 @@ public unsafe class CharaSelectCharacterListTab(DebugRenderer DebugRenderer) : D
                 continue;
 
             ImGui.SameLine();
-            DebugRenderer.DrawPointerType(obj, typeof(BattleChara), new NodeOptions());
+            _debugRenderer.DrawPointerType(obj, typeof(BattleChara), new NodeOptions());
         }
     }
 }

@@ -39,7 +39,7 @@ using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
 namespace HaselDebug.Services;
 
-[RegisterSingleton]
+[RegisterSingleton, AutoConstruct]
 public unsafe partial class DebugRenderer
 {
     public Color ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1);
@@ -49,53 +49,31 @@ public unsafe partial class DebugRenderer
     public Color ColorObsolete { get; } = new(1, 1, 0, 1);
     public Color ColorObsoleteError { get; } = new(1, 0, 0, 1);
 
-    private readonly Dictionary<Type, string[]> KnownStringPointers = new() {
+    private readonly Dictionary<Type, string[]> _knownStringPointers = new() {
         { typeof(FFXIVClientStructs.FFXIV.Client.UI.Agent.MapMarkerBase), ["Subtext"] },
         { typeof(FFXIVClientStructs.FFXIV.Common.Component.Excel.ExcelSheet), ["SheetName"] },
         { typeof(WorldHelper.World), ["Name"] },
         { typeof(AtkTextNode), ["OriginalTextPointer"] }
     };
 
-    private readonly ILogger<DebugRenderer> Logger;
-    private readonly IDalamudPluginInterface PluginInterface;
-    private readonly WindowManager WindowManager;
-    private readonly ITextureProvider TextureProvider;
-    private readonly ImGuiContextMenuService ImGuiContextMenu;
-    private readonly SeStringEvaluatorService SeStringEvaluator;
-    private readonly TextService TextService;
-    private readonly TextureService TextureService;
-    private readonly ExcelModule ExcelModule;
-    private readonly IGameGui GameGui;
-    private readonly LanguageProvider LanguageProvider;
+    private readonly ILogger<DebugRenderer> _logger;
+    private readonly IDalamudPluginInterface _pluginInterface;
+    private readonly WindowManager _windowManager;
+    private readonly ITextureProvider _textureProvider;
+    private readonly ImGuiContextMenuService _imGuiContextMenu;
+    private readonly SeStringEvaluatorService _seStringEvaluator;
+    private readonly TextService _textService;
+    private readonly TextureService _textureService;
+    private readonly IDataManager _dataManager;
+    private readonly IGameGui _gameGui;
+    private readonly LanguageProvider _languageProvider;
 
-    public ImmutableSortedDictionary<string, Type> AddonTypes { get; }
-    public ImmutableSortedDictionary<AgentId, Type> AgentTypes { get; }
+    public ImmutableSortedDictionary<string, Type> AddonTypes { get; private set; }
+    public ImmutableSortedDictionary<AgentId, Type> AgentTypes { get; private set; }
 
-    public DebugRenderer(
-        ILogger<DebugRenderer> logger,
-        IDalamudPluginInterface pluginInterface,
-        WindowManager windowManager,
-        ITextureProvider textureProvider,
-        ImGuiContextMenuService imGuiContextMenuService,
-        SeStringEvaluatorService seStringEvaluator,
-        TextService textService,
-        TextureService textureService,
-        IDataManager dataManager,
-        IGameGui gameGui,
-        LanguageProvider languageProvider)
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        Logger = logger;
-        PluginInterface = pluginInterface;
-        WindowManager = windowManager;
-        TextureProvider = textureProvider;
-        ImGuiContextMenu = imGuiContextMenuService;
-        SeStringEvaluator = seStringEvaluator;
-        TextService = textService;
-        TextureService = textureService;
-        ExcelModule = dataManager.Excel;
-        GameGui = gameGui;
-        LanguageProvider = languageProvider;
-
         var csAssembly = typeof(AddonAttribute).Assembly;
 
         AddonTypes = csAssembly.GetTypes()
@@ -210,7 +188,7 @@ public unsafe partial class DebugRenderer
                 {
                     case EventHandlerType.Quest:
                         type = typeof(QuestEventHandler);
-                        additionalName = TextService.GetQuestName(eventId.Id);
+                        additionalName = _textService.GetQuestName(eventId.Id);
                         break;
 
                     case EventHandlerType.GatheringPoint:
@@ -425,7 +403,7 @@ public unsafe partial class DebugRenderer
             nodeOptions.OnHovered();
 
         if (nodeOptions.DrawContextMenu != null)
-            ImGuiContextMenu.Draw(nodeOptions.GetKey("ContextMenu"), builder => nodeOptions.DrawContextMenu(nodeOptions, builder));
+            _imGuiContextMenu.Draw(nodeOptions.GetKey("ContextMenu"), builder => nodeOptions.DrawContextMenu(nodeOptions, builder));
 
         if (nodeOptions.DrawSeStringTreeNode && nodeOptions.SeStringTitle != null)
         {
@@ -481,7 +459,7 @@ public unsafe partial class DebugRenderer
 
             void DrawLine(Vector3 pos)
             {
-                if (GameGui.WorldToScreen(pos, out var screenPos))
+                if (_gameGui.WorldToScreen(pos, out var screenPos))
                 {
                     ImGui.GetForegroundDrawList().AddLine(ImGui.GetMousePos(), screenPos, Color.Orange);
                     ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Color.Orange);
@@ -607,7 +585,7 @@ public unsafe partial class DebugRenderer
             }
 
             // byte* that are strings
-            if (fieldType.IsPointer && KnownStringPointers.TryGetValue(type, out var fieldNames) && fieldNames.Contains(fieldInfo.Name))
+            if (fieldType.IsPointer && _knownStringPointers.TryGetValue(type, out var fieldNames) && fieldNames.Contains(fieldInfo.Name))
             {
                 DrawFieldName(fieldInfo);
                 DrawSeString(*(byte**)fieldAddress, fieldNodeOptions);
@@ -704,7 +682,7 @@ public unsafe partial class DebugRenderer
 
             if (hasDoc)
             {
-                using var font = PluginInterface.UiBuilder.MonoFontHandle.Push();
+                using var font = _pluginInterface.UiBuilder.MonoFontHandle.Push();
                 var doc = GetDocumentation(fullName);
                 if (doc != null)
                 {
@@ -1034,7 +1012,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (TextureProvider.TryGetFromGameIcon(new GameIconLookup(iconId, isHq), out var tex) && tex.TryGetWrap(out var texture, out _))
+        if (_textureProvider.TryGetFromGameIcon(new GameIconLookup(iconId, isHq), out var tex) && tex.TryGetWrap(out var texture, out _))
         {
             ImGui.Image(texture.ImGuiHandle, drawInfo.DrawSize.Value);
 

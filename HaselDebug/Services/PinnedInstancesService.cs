@@ -6,29 +6,28 @@ using HaselDebug.Utils;
 
 namespace HaselDebug.Services;
 
-[RegisterSingleton]
-public class PinnedInstancesService : IReadOnlyCollection<PinnedInstanceTab>
+[RegisterSingleton, AutoConstruct]
+public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstanceTab>
 {
-    private readonly PluginConfig PluginConfig;
-    private readonly DebugRenderer DebugRenderer;
-    private readonly List<PinnedInstanceTab> Tabs = [];
+    private readonly PluginConfig _pluginConfig;
+    private readonly DebugRenderer _debugRenderer;
+    private readonly InstancesService _instancesService;
+    private readonly List<PinnedInstanceTab> _tabs = [];
 
-    public PinnedInstancesService(PluginConfig pluginConfig, InstancesService InstancesService, DebugRenderer debugRenderer)
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        PluginConfig = pluginConfig;
-        DebugRenderer = debugRenderer;
-
         // make sure the types of pinned instances exist
-        PluginConfig.PinnedInstances = PluginConfig.PinnedInstances
-            .Where(name => InstancesService.Instances.Any(inst => inst.Type.FullName == name))
+        _pluginConfig.PinnedInstances = _pluginConfig.PinnedInstances
+            .Where(name => _instancesService.Instances.Any(inst => inst.Type.FullName == name))
             .ToArray();
 
         // restore saved pinned instances
-        foreach (var name in PluginConfig.PinnedInstances)
+        foreach (var name in _pluginConfig.PinnedInstances)
         {
-            var inst = InstancesService.Instances.FirstOrDefault(inst => inst.Type.FullName == name);
+            var inst = _instancesService.Instances.FirstOrDefault(inst => inst.Type.FullName == name);
             if (inst == null) continue;
-            Tabs.Add(new PinnedInstanceTab(DebugRenderer, inst.Address, inst.Type));
+            _tabs.Add(new PinnedInstanceTab(_debugRenderer, inst.Address, inst.Type));
         }
 
         Sort();
@@ -36,41 +35,41 @@ public class PinnedInstancesService : IReadOnlyCollection<PinnedInstanceTab>
 
     private void Sort()
     {
-        Tabs.Sort((a, b) => a.InternalName.CompareTo(b.InternalName));
+        _tabs.Sort((a, b) => a.InternalName.CompareTo(b.InternalName));
     }
 
     public void Add(nint address, Type type)
     {
-        Tabs.Add(new PinnedInstanceTab(DebugRenderer, address, type));
+        _tabs.Add(new PinnedInstanceTab(_debugRenderer, address, type));
         Sort();
 
-        var nameList = new List<string>(PluginConfig.PinnedInstances)
+        var nameList = new List<string>(_pluginConfig.PinnedInstances)
         {
             type.FullName!
         };
 
         nameList.Sort();
 
-        PluginConfig.PinnedInstances = [.. nameList];
-        PluginConfig.Save();
+        _pluginConfig.PinnedInstances = [.. nameList];
+        _pluginConfig.Save();
     }
 
     public void Remove(PinnedInstanceTab tab)
     {
-        Tabs.Remove(tab);
+        _tabs.Remove(tab);
         Sort();
 
-        PluginConfig.PinnedInstances = PluginConfig.PinnedInstances
+        _pluginConfig.PinnedInstances = _pluginConfig.PinnedInstances
             .Where(name => name != tab.Type.FullName!)
             .Order()
             .ToArray();
 
-        PluginConfig.Save();
+        _pluginConfig.Save();
     }
 
     public void Remove(Type type)
     {
-        var tab = Tabs.FirstOrDefault(tab => tab.Type == type);
+        var tab = _tabs.FirstOrDefault(tab => tab.Type == type);
         if (tab == null)
             return;
 
@@ -79,18 +78,18 @@ public class PinnedInstancesService : IReadOnlyCollection<PinnedInstanceTab>
 
     public void Remove(Type type, nint address)
     {
-        var tab = Tabs.FirstOrDefault(tab => tab.Type == type && tab.Address == address);
+        var tab = _tabs.FirstOrDefault(tab => tab.Type == type && tab.Address == address);
         if (tab == null)
             return;
 
         Remove(tab);
     }
 
-    public bool Contains(string fullName) => Tabs.Any(tab => tab.InternalName == fullName);
-    public bool Contains(Type type) => Tabs.Any(tab => tab.Type == type);
+    public bool Contains(string fullName) => _tabs.Any(tab => tab.InternalName == fullName);
+    public bool Contains(Type type) => _tabs.Any(tab => tab.Type == type);
 
-    public int Count => Tabs.Count;
+    public int Count => _tabs.Count;
 
-    public IEnumerator<PinnedInstanceTab> GetEnumerator() => Tabs.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => Tabs.GetEnumerator();
+    public IEnumerator<PinnedInstanceTab> GetEnumerator() => _tabs.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => _tabs.GetEnumerator();
 }

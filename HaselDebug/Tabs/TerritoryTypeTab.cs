@@ -8,18 +8,19 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class TerritoryTypeTab(
-    DebugRenderer DebugRenderer,
-    IClientState ClientState,
-    LanguageProvider LanguageProvider) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class TerritoryTypeTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly IClientState _clientState;
+    private readonly LanguageProvider _languageProvider;
+
     public override void Draw()
     {
-        DebugRenderer.DrawExdSheet(typeof(TerritoryType), ClientState.TerritoryType, 0, new NodeOptions()
+        _debugRenderer.DrawExdSheet(typeof(TerritoryType), _clientState.TerritoryType, 0, new NodeOptions()
         {
             DefaultOpen = true,
-            Language = LanguageProvider.ClientLanguage
+            Language = _languageProvider.ClientLanguage
         });
     }
 }

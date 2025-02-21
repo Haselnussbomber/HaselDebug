@@ -21,7 +21,7 @@ public unsafe partial class DebugRenderer
         }
 
         nodeOptions = nodeOptions.WithAddress((sheetType.Name.GetHashCode(), (nint)rowId).GetHashCode());
-        nodeOptions.Language = LanguageProvider.ClientLanguage;
+        nodeOptions.Language = _languageProvider.ClientLanguage;
 
         var title = $"{sheetType.Name}#{rowId}";
         if (!string.IsNullOrEmpty(nodeOptions.Title))
@@ -51,9 +51,9 @@ public unsafe partial class DebugRenderer
 
     public void DrawExdSheetColumnValue(Type sheetType, uint rowId, string propName, uint depth, NodeOptions nodeOptions)
     {
-        var getSheet = ExcelModule.GetType().GetMethod("GetSheet", BindingFlags.Instance | BindingFlags.Public)!;
+        var getSheet = _dataManager.Excel.GetType().GetMethod("GetSheet", BindingFlags.Instance | BindingFlags.Public)!;
         var genericGetSheet = getSheet.MakeGenericMethod(sheetType);
-        var sheet = genericGetSheet.Invoke(ExcelModule, [nodeOptions.Language.ToLumina(), sheetType.GetCustomAttribute<SheetAttribute>()?.Name ?? sheetType.Name]);
+        var sheet = genericGetSheet.Invoke(_dataManager.Excel, [nodeOptions.Language.ToLumina(), sheetType.GetCustomAttribute<SheetAttribute>()?.Name ?? sheetType.Name]);
         if (sheet == null)
         {
             ImGui.TextUnformatted("sheet is null");

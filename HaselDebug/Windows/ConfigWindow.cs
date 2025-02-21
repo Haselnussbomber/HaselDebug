@@ -6,21 +6,15 @@ using ImGuiNET;
 
 namespace HaselDebug.Windows;
 
-[RegisterSingleton]
-public class ConfigWindow : SimpleWindow
+[RegisterSingleton, AutoConstruct]
+public partial class ConfigWindow : SimpleWindow
 {
-    private readonly PluginConfig PluginConfig;
-    private readonly TextService TextService;
+    private readonly PluginConfig _pluginConfig;
+    private readonly TextService _textService;
 
-    public ConfigWindow(
-        WindowManager windowManager,
-        PluginConfig pluginConfig,
-        TextService textService,
-        LanguageProvider languageProvider) : base(windowManager, textService, languageProvider)
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        PluginConfig = pluginConfig;
-        TextService = textService;
-
         AllowClickthrough = false;
         AllowPinning = false;
 
@@ -40,9 +34,9 @@ public class ConfigWindow : SimpleWindow
         var configChanged = false;
 
         // AutoOpenPluginWindow
-        configChanged |= ImGui.Checkbox($"{TextService.Translate("Config.AutoOpenPluginWindow.Label")}##AutoOpenPluginWindow", ref PluginConfig.AutoOpenPluginWindow);
+        configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.AutoOpenPluginWindow.Label")}##AutoOpenPluginWindow", ref _pluginConfig.AutoOpenPluginWindow);
 
         if (configChanged)
-            PluginConfig.Save();
+            _pluginConfig.Save();
     }
 }

@@ -7,9 +7,11 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class AgentMapEventMarkersTab(ITextureProvider TextureProvider) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class AgentMapEventMarkersTab : DebugTab
 {
+    private readonly ITextureProvider _textureProvider;
+
     public override bool DrawInChild => false;
 
     public override void Draw()
@@ -33,7 +35,7 @@ public unsafe class AgentMapEventMarkersTab(ITextureProvider TextureProvider) : 
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Icon
-            if (TextureProvider.GetFromGameIcon(marker.IconId).TryGetWrap(out var tex, out var _))
+            if (_textureProvider.GetFromGameIcon(marker.IconId).TryGetWrap(out var tex, out var _))
                 ImGui.Image(tex.ImGuiHandle, new(ImGui.GetTextLineHeight()));
             ImGui.SameLine();
             ImGui.TextUnformatted(marker.IconId.ToString());

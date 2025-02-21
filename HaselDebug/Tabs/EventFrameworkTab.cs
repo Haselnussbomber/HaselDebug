@@ -15,24 +15,24 @@ using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class EventFrameworkTab : DebugTab, IDisposable
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
 {
     private readonly DebugRenderer _debugRenderer;
     private readonly TextService _textService;
-    private readonly Hook<EventSceneModuleTaskManager.Delegates.AddTask> _addTaskHook;
+    private readonly IGameInteropProvider _gameInteropProvider;
+
     private readonly List<(DateTime, nint, EventSceneTaskInterface)> _taskTypeHistory = [];
+    private Hook<EventSceneModuleTaskManager.Delegates.AddTask> _addTaskHook;
     private bool _logEnabled;
 
     public override string Title => "EventFramework";
     public override bool DrawInChild => false;
 
-    public EventFrameworkTab(DebugRenderer DebugRenderer, TextService TextService, IGameInteropProvider GameInteropProvider)
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        _debugRenderer = DebugRenderer;
-        _textService = TextService;
-
-        _addTaskHook = GameInteropProvider.HookFromAddress<EventSceneModuleTaskManager.Delegates.AddTask>(
+        _addTaskHook = _gameInteropProvider.HookFromAddress<EventSceneModuleTaskManager.Delegates.AddTask>(
             EventSceneModuleTaskManager.MemberFunctionPointers.AddTask,
             AddTaskDetour);
 

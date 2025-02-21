@@ -8,9 +8,11 @@ using InteropGenerator.Runtime.Attributes;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class InclusionShopTab(DebugRenderer DebugRenderer) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class InclusionShopTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+
     public override void Draw()
     {
         if (!TryGetAddon<AtkUnitBase>("InclusionShop", out var addon))
@@ -19,7 +21,7 @@ public unsafe class InclusionShopTab(DebugRenderer DebugRenderer) : DebugTab
             return;
         }
 
-        DebugRenderer.DrawPointerType(addon->AtkValues, typeof(InclusionShopAtkValues), new NodeOptions());
+        _debugRenderer.DrawPointerType(addon->AtkValues, typeof(InclusionShopAtkValues), new NodeOptions());
     }
 }
 

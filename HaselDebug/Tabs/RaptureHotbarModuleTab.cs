@@ -4,7 +4,6 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Extensions.Strings;
 using HaselCommon.Services;
-using HaselCommon.Services.SeStringEvaluation;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -14,19 +13,20 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class RaptureHotbarModuleTab(
-    DebugRenderer DebugRenderer,
-    ExcelService ExcelService,
-    TextService TextService,
-    SeStringEvaluatorService SeStringEvaluatorService,
-    ITextureProvider TextureProvider) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class RaptureHotbarModuleTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly ExcelService _excelService;
+    private readonly TextService _textService;
+    private readonly SeStringEvaluatorService _seStringEvaluatorService;
+    private readonly ITextureProvider _textureProvider;
+
     public override void Draw()
     {
         var raptureHotbarModule = RaptureHotbarModule.Instance();
 
-        DebugRenderer.DrawPointerType(raptureHotbarModule, typeof(RaptureHotbarModule), new NodeOptions());
+        _debugRenderer.DrawPointerType(raptureHotbarModule, typeof(RaptureHotbarModule), new NodeOptions());
 
         ImGui.Spacing();
         ImGui.Separator();
@@ -83,38 +83,38 @@ public unsafe class RaptureHotbarModuleTab(
                 ImGui.TableNextColumn(); // Name
                 if (!slot->IsEmpty)
                 {
-                    DebugRenderer.DrawIcon(slot->IconId);
-                    DebugRenderer.DrawPointerType(slot, typeof(RaptureHotbarModule.HotbarSlot), new NodeOptions()
+                    _debugRenderer.DrawIcon(slot->IconId);
+                    _debugRenderer.DrawPointerType(slot, typeof(RaptureHotbarModule.HotbarSlot), new NodeOptions()
                     {
                         Title = slot->CommandType switch
                         {
-                            RaptureHotbarModule.HotbarSlotType.Action => TextService.GetActionName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.Item => TextService.GetItemName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.EventItem => TextService.GetItemName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.Emote => TextService.GetEmoteName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.Action => _textService.GetActionName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.Item => _textService.GetItemName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.EventItem => _textService.GetItemName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.Emote => _textService.GetEmoteName(slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.Macro => GetMacroName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.Marker => ExcelService.TryGetRow<Marker>(slot->CommandId, out var marker) ? marker.Name.ExtractText() : $"Marker#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.CraftAction => TextService.GetCraftActionName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.GeneralAction => TextService.GetGeneralActionName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.BuddyAction => TextService.GetBuddyActionName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.MainCommand => TextService.GetMainCommandName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.Companion => TextService.GetCompanionName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.Marker => _excelService.TryGetRow<Marker>(slot->CommandId, out var marker) ? marker.Name.ExtractText() : $"Marker#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.CraftAction => _textService.GetCraftActionName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.GeneralAction => _textService.GetGeneralActionName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.BuddyAction => _textService.GetBuddyActionName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.MainCommand => _textService.GetMainCommandName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.Companion => _textService.GetCompanionName(slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.GearSet => GetGearsetName((int)slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.PetAction => TextService.GetPetActionName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.Mount => TextService.GetMountName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.FieldMarker => ExcelService.TryGetRow<FieldMarker>(slot->CommandId, out var fieldMarker) ? fieldMarker.Name.ExtractText() : $"FieldMarker#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.PetAction => _textService.GetPetActionName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.Mount => _textService.GetMountName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.FieldMarker => _excelService.TryGetRow<FieldMarker>(slot->CommandId, out var fieldMarker) ? fieldMarker.Name.ExtractText() : $"FieldMarker#{slot->CommandId}",
                             RaptureHotbarModule.HotbarSlotType.Recipe => GetRecipeName(slot),
-                            RaptureHotbarModule.HotbarSlotType.ChocoboRaceAbility => ExcelService.TryGetRow<ChocoboRaceAbility>(slot->CommandId, out var chocoboRaceAbility) ? chocoboRaceAbility.Name.ExtractText() : $"ChocoboRaceAbility#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.ChocoboRaceItem => ExcelService.TryGetRow<ChocoboRaceItem>(slot->CommandId, out var chocoboRaceItem) ? chocoboRaceItem.Name.ExtractText() : $"ChocoboRaceItem#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.ExtraCommand => ExcelService.TryGetRow<ExtraCommand>(slot->CommandId, out var extraCommand) ? extraCommand.Name.ExtractText() : $"ExtraCommand#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.PvPQuickChat => ExcelService.TryGetRow<QuickChat>(slot->CommandId, out var quickChat) ? quickChat.NameAction.ExtractText() : $"QuickChat#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.PvPCombo => ExcelService.TryGetRow<ActionComboRoute>(slot->CommandId, out var actionComboRoute) ? actionComboRoute.Name.ExtractText() : $"ActionComboRoute#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.BgcArmyAction => ExcelService.TryGetRow<BgcArmyAction>(slot->CommandId, out var bgcArmyAction) ? bgcArmyAction.Unknown0.ExtractText() : $"BgcArmyAction#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.PerformanceInstrument => ExcelService.TryGetRow<Perform>(slot->CommandId, out var perform) ? perform.Instrument.ExtractText() : $"Perform#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.McGuffin => ExcelService.TryGetRow<McGuffinUIData>(ExcelService.TryGetRow<McGuffin>(slot->CommandId, out var mcGuffin) ? mcGuffin.UIData.RowId : 0, out var mcGuffinUIData) ? mcGuffinUIData.Name.ExtractText() : $"McGuffin#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.Ornament => TextService.GetOrnamentName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.ChocoboRaceAbility => _excelService.TryGetRow<ChocoboRaceAbility>(slot->CommandId, out var chocoboRaceAbility) ? chocoboRaceAbility.Name.ExtractText() : $"ChocoboRaceAbility#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.ChocoboRaceItem => _excelService.TryGetRow<ChocoboRaceItem>(slot->CommandId, out var chocoboRaceItem) ? chocoboRaceItem.Name.ExtractText() : $"ChocoboRaceItem#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.ExtraCommand => _excelService.TryGetRow<ExtraCommand>(slot->CommandId, out var extraCommand) ? extraCommand.Name.ExtractText() : $"ExtraCommand#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.PvPQuickChat => _excelService.TryGetRow<QuickChat>(slot->CommandId, out var quickChat) ? quickChat.NameAction.ExtractText() : $"QuickChat#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.PvPCombo => _excelService.TryGetRow<ActionComboRoute>(slot->CommandId, out var actionComboRoute) ? actionComboRoute.Name.ExtractText() : $"ActionComboRoute#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.BgcArmyAction => _excelService.TryGetRow<BgcArmyAction>(slot->CommandId, out var bgcArmyAction) ? bgcArmyAction.Unknown0.ExtractText() : $"BgcArmyAction#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.PerformanceInstrument => _excelService.TryGetRow<Perform>(slot->CommandId, out var perform) ? perform.Instrument.ExtractText() : $"Perform#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.McGuffin => _excelService.TryGetRow<McGuffinUIData>(_excelService.TryGetRow<McGuffin>(slot->CommandId, out var mcGuffin) ? mcGuffin.UIData.RowId : 0, out var mcGuffinUIData) ? mcGuffinUIData.Name.ExtractText() : $"McGuffin#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.Ornament => _textService.GetOrnamentName(slot->CommandId),
                             // LostFindsItem
-                            RaptureHotbarModule.HotbarSlotType.Glasses => TextService.GetGlassesName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.Glasses => _textService.GetGlassesName(slot->CommandId),
                             _ => string.Empty
                         }
                     });
@@ -147,14 +147,14 @@ public unsafe class RaptureHotbarModuleTab(
     private string GetRecipeName(RaptureHotbarModule.HotbarSlot* slot)
     {
         if (slot->RecipeValid == 0)
-            return TextService.GetAddonText(1449); // Deleted Recipes
+            return _textService.GetAddonText(1449); // Deleted Recipes
 
-        return SeStringEvaluatorService.EvaluateFromAddon(1442, [slot->RecipeItemId, slot->RecipeCraftType + 8]).ExtractText().StripSoftHypen();
+        return _seStringEvaluatorService.EvaluateFromAddon(1442, [slot->RecipeItemId, slot->RecipeCraftType + 8]).ExtractText().StripSoftHypen();
     }
 
     private void DrawHotbarSlotIcon(RaptureHotbarModule.HotbarSlot slot)
     {
-        if (TextureProvider.TryGetFromGameIcon(slot.IconId, out var tex) && tex.TryGetWrap(out var texture, out _))
+        if (_textureProvider.TryGetFromGameIcon(slot.IconId, out var tex) && tex.TryGetWrap(out var texture, out _))
         {
             ImGui.Image(texture.ImGuiHandle, new Vector2(ImGui.GetTextLineHeight()));
         }

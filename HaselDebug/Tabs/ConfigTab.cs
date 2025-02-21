@@ -12,9 +12,12 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRenderer) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class ConfigTab : DebugTab
 {
+    private readonly TextService _textService;
+    private readonly DebugRenderer _debugRenderer;
+
     private string _searchTerm = string.Empty;
 
     public override void Draw()
@@ -51,7 +54,7 @@ public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRender
         ImGui.Separator();
 
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
 
         using var tabBar = ImRaii.TabBar("ConfigTabs");
         if (!tabBar) return;
@@ -120,7 +123,7 @@ public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRender
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Index
-            DebugRenderer.DrawCopyableText(option->Index.ToString());
+            _debugRenderer.DrawCopyableText(option->Index.ToString());
 
             ImGui.TableNextColumn(); // Type
             switch (option->Type)
@@ -150,7 +153,7 @@ public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRender
             }
 
             ImGui.TableNextColumn(); // Name
-            DebugRenderer.DrawCopyableText(optionName, highligtedText: hasSearchTerm ? _searchTerm : null);
+            _debugRenderer.DrawCopyableText(optionName, highligtedText: hasSearchTerm ? _searchTerm : null);
 
             switch (option->Type)
             {
@@ -160,35 +163,35 @@ public unsafe class ConfigTab(TextService TextService, DebugRenderer DebugRender
 
                 case 2: // UInt
                     ImGui.TableNextColumn(); // Value
-                    DebugRenderer.DrawNumeric((nint)(&option->Value.UInt), typeof(uint), default);
+                    _debugRenderer.DrawNumeric((nint)(&option->Value.UInt), typeof(uint), default);
 
                     ImGui.TableNextColumn(); // Default
-                    DebugRenderer.DrawNumeric((nint)(&option->Properties.UInt.DefaultValue), typeof(uint), default);
+                    _debugRenderer.DrawNumeric((nint)(&option->Properties.UInt.DefaultValue), typeof(uint), default);
 
                     ImGui.TableNextColumn(); // Min
-                    DebugRenderer.DrawNumeric((nint)(&option->Properties.UInt.MinValue), typeof(uint), default);
+                    _debugRenderer.DrawNumeric((nint)(&option->Properties.UInt.MinValue), typeof(uint), default);
 
                     ImGui.TableNextColumn(); // Max
-                    DebugRenderer.DrawNumeric((nint)(&option->Properties.UInt.MaxValue), typeof(uint), default);
+                    _debugRenderer.DrawNumeric((nint)(&option->Properties.UInt.MaxValue), typeof(uint), default);
                     break;
 
                 case 3: // Float
                     ImGui.TableNextColumn(); // Value
-                    DebugRenderer.DrawNumeric((nint)(&option->Value.Float), typeof(float), default);
+                    _debugRenderer.DrawNumeric((nint)(&option->Value.Float), typeof(float), default);
 
                     ImGui.TableNextColumn(); // Default
-                    DebugRenderer.DrawNumeric((nint)(&option->Properties.Float.DefaultValue), typeof(float), default);
+                    _debugRenderer.DrawNumeric((nint)(&option->Properties.Float.DefaultValue), typeof(float), default);
 
                     ImGui.TableNextColumn(); // Min
-                    DebugRenderer.DrawNumeric((nint)(&option->Properties.Float.MinValue), typeof(float), default);
+                    _debugRenderer.DrawNumeric((nint)(&option->Properties.Float.MinValue), typeof(float), default);
 
                     ImGui.TableNextColumn(); // Max
-                    DebugRenderer.DrawNumeric((nint)(&option->Properties.Float.MaxValue), typeof(float), default);
+                    _debugRenderer.DrawNumeric((nint)(&option->Properties.Float.MaxValue), typeof(float), default);
                     break;
 
                 case 4: // String
                     ImGui.TableNextColumn(); // Value
-                    DebugRenderer.DrawCopyableText(option->Properties.String.DefaultValue->ToString());
+                    _debugRenderer.DrawCopyableText(option->Properties.String.DefaultValue->ToString());
 
                     ImGui.TableNextColumn(); // Default
                     ImGui.TableNextColumn(); // Min

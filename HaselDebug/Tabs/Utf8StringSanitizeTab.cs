@@ -12,7 +12,7 @@ namespace HaselDebug.Tabs;
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
 public unsafe class Utf8StringSanitizeTab : DebugTab
 {
-    private readonly List<Entry> list =
+    private readonly List<Entry> _list =
     [
         new ("BasicLatin", UnicodeRanges.BasicLatin),
         new ("Latin1Supplement", UnicodeRanges.Latin1Supplement),
@@ -186,7 +186,7 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
 
         var str = Utf8String.CreateEmpty();
 
-        foreach (var entry in list)
+        foreach (var entry in _list)
         {
             var range = entry.Range;
             var teststring = string.Empty;
@@ -215,7 +215,7 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
 
     public override void Draw()
     {
-        foreach (var entry in list)
+        foreach (var entry in _list)
         {
             using var node = ImRaii.TreeNode($"U+{entry.Range.FirstCodePoint:X4}-U+{entry.Range.FirstCodePoint + entry.Range.Length - 1:X4} - {entry.Name}###{entry.Name}", ImGuiTreeNodeFlags.SpanFullWidth);
             if (!node) continue;

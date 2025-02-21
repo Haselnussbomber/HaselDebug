@@ -14,21 +14,21 @@ using TerritoryIntendedUseEnum = HaselCommon.Game.Enums.TerritoryIntendedUse;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class TerritoryIntendedUseTab : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class TerritoryIntendedUseTab : DebugTab
 {
-    private readonly ImmutableSortedDictionary<uint, List<(TerritoryType, ContentFinderCondition[])>> Dict;
+    private readonly ExcelService _excelService;
     private readonly TextService _textService;
     private readonly DebugRenderer _debugRenderer;
 
-    public TerritoryIntendedUseTab(ExcelService excelService, TextService textService, DebugRenderer debugRenderer)
-    {
-        _textService = textService;
-        _debugRenderer = debugRenderer;
+    private ImmutableSortedDictionary<uint, List<(TerritoryType, ContentFinderCondition[])>> _dict;
 
+    [AutoPostConstruct]
+    public void Initialize()
+    {
         var dict = new Dictionary<uint, List<(TerritoryType, ContentFinderCondition[])>>();
 
-        foreach (var territoryTypes in excelService.GetSheet<TerritoryType>().GroupBy(row => row.TerritoryIntendedUse.RowId))
+        foreach (var territoryTypes in _excelService.GetSheet<TerritoryType>().GroupBy(row => row.TerritoryIntendedUse.RowId))
         {
             var list = new List<(TerritoryType, ContentFinderCondition[])>();
 
@@ -36,20 +36,20 @@ public unsafe class TerritoryIntendedUseTab : DebugTab
             {
                 list.Add((
                     territoryType,
-                    excelService.FindRows<ContentFinderCondition>(cfcRow => cfcRow.TerritoryType.RowId == territoryType.RowId)));
+                    _excelService.FindRows<ContentFinderCondition>(cfcRow => cfcRow.TerritoryType.RowId == territoryType.RowId)));
             }
 
             dict[territoryTypes.Key] = list;
         }
 
-        Dict = dict.ToImmutableSortedDictionary();
+        _dict = dict.ToImmutableSortedDictionary();
     }
 
     public override void Draw()
     {
         foreach (var territoryIntendedUse in Enum.GetValues<TerritoryIntendedUseEnum>())
         {
-            if (!Dict.TryGetValue((uint)territoryIntendedUse, out var entries))
+            if (!_dict.TryGetValue((uint)territoryIntendedUse, out var entries))
             {
                 using (ImRaii.Disabled())
                 {

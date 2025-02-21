@@ -10,9 +10,12 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class HousingTab(DebugRenderer DebugRenderer, LanguageProvider LanguageProvider) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class HousingTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly LanguageProvider _languageProvider;
+
     public override void Draw()
     {
         var housingManager = HousingManager.Instance();
@@ -41,9 +44,9 @@ public unsafe class HousingTab(DebugRenderer DebugRenderer, LanguageProvider Lan
         {
             ImGui.TextUnformatted($"Current HouseId ({housingManager->GetCurrentHousingTerritoryType()})");
             ImGui.SameLine();
-            DebugRenderer.DrawCopyableText($"{houseId}");
+            _debugRenderer.DrawCopyableText($"{houseId}");
             ImGui.SameLine();
-            DebugRenderer.DrawCopyableText($"0x{houseId:X}");
+            _debugRenderer.DrawCopyableText($"0x{houseId:X}");
         }
 
         using (var node = ImRaii.TreeNode("Owned HouseIds", ImGuiTreeNodeFlags.SpanAvailWidth))
@@ -62,65 +65,65 @@ public unsafe class HousingTab(DebugRenderer DebugRenderer, LanguageProvider Lan
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted("FreeCompanyEstate");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.FreeCompanyEstate)}");
+                    _debugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.FreeCompanyEstate)}");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.FreeCompanyEstate):X}");
+                    _debugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.FreeCompanyEstate):X}");
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted("PersonalChambers");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.PersonalChambers)}");
+                    _debugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.PersonalChambers)}");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.PersonalChambers):X}");
+                    _debugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.PersonalChambers):X}");
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted("PersonalEstate");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.PersonalEstate)}");
+                    _debugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.PersonalEstate)}");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.PersonalEstate):X}");
+                    _debugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.PersonalEstate):X}");
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted("Unknown3");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.Unknown3)}");
+                    _debugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.Unknown3)}");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.Unknown3):X}");
+                    _debugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.Unknown3):X}");
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted("SharedEstate 0");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 0)}");
+                    _debugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 0)}");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 0):X}");
+                    _debugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 0):X}");
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted("SharedEstate 1");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 1)}");
+                    _debugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 1)}");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 1):X}");
+                    _debugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 1):X}");
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted("ApartmentBuilding");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.ApartmentBuilding)}");
+                    _debugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.ApartmentBuilding)}");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.ApartmentBuilding):X}");
+                    _debugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.ApartmentBuilding):X}");
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted("ApartmentRoom");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.ApartmentRoom)}");
+                    _debugRenderer.DrawCopyableText($"{HousingManager.GetOwnedHouseId(EstateType.ApartmentRoom)}");
                     ImGui.TableNextColumn();
-                    DebugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.ApartmentRoom):X}");
+                    _debugRenderer.DrawCopyableText($"0x{HousingManager.GetOwnedHouseId(EstateType.ApartmentRoom):X}");
                 }
             }
         }
@@ -128,12 +131,12 @@ public unsafe class HousingTab(DebugRenderer DebugRenderer, LanguageProvider Lan
         var territoryTypeId = HousingManager.GetOriginalHouseTerritoryTypeId();
         ImGui.TextUnformatted($"OriginalHouseTerritoryTypeId:");
         ImGui.SameLine();
-        DebugRenderer.DrawExdSheet(typeof(TerritoryType), territoryTypeId, 0, new NodeOptions()
+        _debugRenderer.DrawExdSheet(typeof(TerritoryType), territoryTypeId, 0, new NodeOptions()
         {
-            Language = LanguageProvider.ClientLanguage
+            Language = _languageProvider.ClientLanguage
         });
         ImGui.Separator();
 
-        DebugRenderer.DrawPointerType(housingManager, typeof(HousingManager), new NodeOptions() { DefaultOpen = true });
+        _debugRenderer.DrawPointerType(housingManager, typeof(HousingManager), new NodeOptions() { DefaultOpen = true });
     }
 }

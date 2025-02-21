@@ -15,9 +15,13 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextureService TextureService) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class MainCommandsTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly ExcelService _excelService;
+    private readonly TextureService _textureService;
+
     public override bool DrawInChild => false;
 
     public override void Draw()
@@ -32,7 +36,7 @@ public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService Ex
         ImGui.TableSetupScrollFreeze(2, 1);
         ImGui.TableHeadersRow();
 
-        foreach (var row in ExcelService.GetSheet<MainCommand>())
+        foreach (var row in _excelService.GetSheet<MainCommand>())
         {
             if (row.RowId == 0 || row.Icon == 0) continue;
 
@@ -43,7 +47,7 @@ public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService Ex
             ImGui.TextUnformatted(row.RowId.ToString());
 
             ImGui.TableNextColumn(); // Name
-            DebugRenderer.DrawIcon((uint)row.Icon);
+            _debugRenderer.DrawIcon((uint)row.Icon);
             ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X * 2); // idk why this bugs
 
             using (ImRaii.PushColor(ImGuiCol.Text, ImGui.GetColorU32(ImGuiCol.TextDisabled), !isEnabled))
@@ -73,7 +77,7 @@ public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService Ex
                 ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, 300);
 
                 ImGui.TableNextColumn(); // Icon
-                TextureService.DrawIcon(row.Icon, 40);
+                _textureService.DrawIcon(row.Icon, 40);
 
                 ImGui.TableNextColumn(); // Text
                 using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, ImGui.GetStyle().ItemInnerSpacing.X);
@@ -81,7 +85,7 @@ public unsafe class MainCommandsTab(DebugRenderer DebugRenderer, ExcelService Ex
 
                 ImGui.TextUnformatted(row.Name.ExtractText().StripSoftHypen());
 
-                var categoryName = ExcelService.TryGetRow<MainCommandCategory>(row.MainCommandCategory.RowId, out var category) ? category.Name.ExtractText().StripSoftHypen() : string.Empty;
+                var categoryName = _excelService.TryGetRow<MainCommandCategory>(row.MainCommandCategory.RowId, out var category) ? category.Name.ExtractText().StripSoftHypen() : string.Empty;
                 if (!string.IsNullOrEmpty(categoryName))
                 {
                     ImGuiUtils.PushCursorY(-3);

@@ -1,45 +1,31 @@
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using Dalamud.Utility;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
-using ImGuiNET;
+using HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Cutscenes;
 
-[RegisterSingleton]
-public unsafe class CutscenesTable : Table<CutsceneEntry>
+[RegisterSingleton, AutoConstruct]
+public unsafe partial class CutscenesTable : Table<CutsceneEntry>
 {
-    internal readonly ExcelService _excelService;
+    private readonly ExcelService _excelService;
+    private readonly WorkIndexColumn _workIndexColumn;
+    private readonly SeenColumn _seenColumn;
+    private readonly PathColumn _pathColumn;
+    private readonly UsesColumn _usesColumn;
+
     private readonly Dictionary<uint, CutsceneEntry> _cutscenes = [];
 
-    public CutscenesTable(ExcelService excelService, LanguageProvider languageProvider) : base(languageProvider)
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        _excelService = excelService;
-
         Columns = [
             EntryRowIdColumn<CutsceneEntry, Cutscene>.Create(),
-            new WorkIndexColumn() {
-                Label = "WorkIdx",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
-            new SeenColumn() {
-                Label = "Seen",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 75,
-            },
-            new PathColumn() {
-                Label = "Path",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 315,
-            },
-            new UsesColumn {
-                Label = "Uses",
-            }
+            _workIndexColumn,
+            _seenColumn,
+            _pathColumn,
+            _usesColumn,
         ];
 
         LineHeight = 0;
@@ -127,32 +113,5 @@ public unsafe class CutscenesTable : Table<CutsceneEntry>
         }
 
         Rows = [.. _cutscenes.Values];
-    }
-
-    private class WorkIndexColumn : ColumnNumber<CutsceneEntry>
-    {
-        public override string ToName(CutsceneEntry entry)
-            => entry.WorkIndexRow.WorkIndex.ToString();
-
-        public override int ToValue(CutsceneEntry entry)
-            => entry.WorkIndexRow.WorkIndex;
-    }
-
-    private class SeenColumn : ColumnBool<CutsceneEntry>
-    {
-        public override unsafe bool ToBool(CutsceneEntry entry)
-            => UIState.Instance()->IsCutsceneSeen((uint)entry.Index);
-    }
-
-    private class PathColumn : ColumnString<CutsceneEntry>
-    {
-        public override string ToName(CutsceneEntry entry)
-            => entry.Row.Path.ExtractText();
-    }
-
-    private class UsesColumn : ColumnString<CutsceneEntry>
-    {
-        public override string ToName(CutsceneEntry entry)
-            => string.Join('\n', entry.Uses.Select(e => $"{e.SheetType.Name}#{e.RowId}{(e.Label.IsNullOrEmpty() ? string.Empty : $" ({e.Label})")}"));
     }
 }

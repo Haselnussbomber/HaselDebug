@@ -10,9 +10,11 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class ContentsFinderDutyListTab(DebugRenderer DebugRenderer) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class ContentsFinderDutyListTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+
     public override void Draw()
     {
         if (!TryGetAddon<AddonContentsFinder>("ContentsFinder", out var addon))
@@ -61,7 +63,7 @@ public unsafe class ContentsFinderDutyListTab(DebugRenderer DebugRenderer) : Deb
             var item = addon->DutyList->Items[i].Value;
             ImGui.TextUnformatted($"{i}:");
             ImGui.SameLine();
-            DebugRenderer.DrawCopyableText($"{(nint)item:X}");
+            _debugRenderer.DrawCopyableText($"{(nint)item:X}");
 
             using (ImRaii.PushIndent())
             {

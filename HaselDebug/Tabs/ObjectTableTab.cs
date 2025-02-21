@@ -3,7 +3,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using HaselCommon.Gui;
 using HaselCommon.Services;
-using HaselCommon.Services.SeStringEvaluation;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -15,13 +14,14 @@ using ObjectKind = FFXIVClientStructs.FFXIV.Client.Game.Object.ObjectKind;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class ObjectTableTab(
-    DebugRenderer DebugRenderer,
-    SeStringEvaluatorService SeStringEvaluator,
-    TextService TextService,
-    ExcelService ExcelService) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class ObjectTableTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly SeStringEvaluatorService _seStringEvaluator;
+    private readonly TextService _textService;
+    private readonly ExcelService _excelService;
+
     public override bool DrawInChild => false;
 
     public override void Draw()
@@ -46,9 +46,9 @@ public unsafe class ObjectTableTab(
             var objectName = new ReadOnlySeStringSpan(gameObject->GetName()).ExtractText();
 
             var title = objectName;
-            if (objectKind == ObjectKind.EventNpc && ExcelService.TryGetRow<ENpcResident>(gameObject->BaseId, out var resident) && !resident.Title.IsEmpty)
+            if (objectKind == ObjectKind.EventNpc && _excelService.TryGetRow<ENpcResident>(gameObject->BaseId, out var resident) && !resident.Title.IsEmpty)
             {
-                var evaluated = SeStringEvaluator.EvaluateFromAddon(37, [resident.Title]).ExtractText();
+                var evaluated = _seStringEvaluator.EvaluateFromAddon(37, [resident.Title]).ExtractText();
                 if (!string.IsNullOrWhiteSpace(evaluated))
                 {
                     if (!string.IsNullOrEmpty(evaluated))
@@ -66,13 +66,13 @@ public unsafe class ObjectTableTab(
             ImGui.TextUnformatted(i.ToString());
 
             ImGui.TableNextColumn(); // Address
-            DebugRenderer.DrawAddress(gameObject);
+            _debugRenderer.DrawAddress(gameObject);
 
             ImGui.TableNextColumn(); // ObjectKind
             ImGui.TextUnformatted(objectKind.ToString());
 
             ImGui.TableNextColumn(); // Name
-            DebugRenderer.DrawPointerType(
+            _debugRenderer.DrawPointerType(
                 gameObject,
                 typeof(GameObject),
                 new NodeOptions()
@@ -84,13 +84,13 @@ public unsafe class ObjectTableTab(
                         builder.Add(new ImGuiContextMenuEntry()
                         {
                             Visible = ((byte)gameObject->TargetableStatus & 1 << 7) != 0,
-                            Label = TextService.Translate("ContextMenu.GameObject.DisableDraw"),
+                            Label = _textService.Translate("ContextMenu.GameObject.DisableDraw"),
                             ClickCallback = () => gameObject->DisableDraw()
                         });
                         builder.Add(new ImGuiContextMenuEntry()
                         {
                             Visible = ((byte)gameObject->TargetableStatus & 1 << 7) == 0,
-                            Label = TextService.Translate("ContextMenu.GameObject.EnableDraw"),
+                            Label = _textService.Translate("ContextMenu.GameObject.EnableDraw"),
                             ClickCallback = () => gameObject->EnableDraw()
                         });
                     }
@@ -105,7 +105,7 @@ public unsafe class ObjectTableTab(
                     case EventHandlerType.Adventure:
                         ImGui.TextUnformatted($"Adventure#{gameObject->EventHandler->Info.EventId.Id}");
 
-                        if (ExcelService.TryGetRow<Adventure>(gameObject->EventHandler->Info.EventId.Id, out var adventure) && !adventure.Name.IsEmpty)
+                        if (_excelService.TryGetRow<Adventure>(gameObject->EventHandler->Info.EventId.Id, out var adventure) && !adventure.Name.IsEmpty)
                         {
                             ImGuiUtils.SameLineSpace();
                             ImGui.TextUnformatted($"({adventure.Name})");
@@ -115,7 +115,7 @@ public unsafe class ObjectTableTab(
                     case EventHandlerType.Quest:
                         ImGui.TextUnformatted($"Quest#{gameObject->EventHandler->Info.EventId.EntryId + 0x10000u}");
 
-                        if (ExcelService.TryGetRow<Quest>(gameObject->EventHandler->Info.EventId.EntryId + 0x10000u, out var quest) && !quest.Name.IsEmpty)
+                        if (_excelService.TryGetRow<Quest>(gameObject->EventHandler->Info.EventId.EntryId + 0x10000u, out var quest) && !quest.Name.IsEmpty)
                         {
                             ImGuiUtils.SameLineSpace();
                             ImGui.TextUnformatted($"({quest.Name})");
@@ -125,7 +125,7 @@ public unsafe class ObjectTableTab(
                     case EventHandlerType.CustomTalk:
                         ImGui.TextUnformatted($"CustomTalk#{gameObject->EventHandler->Info.EventId.Id}");
 
-                        if (ExcelService.TryGetRow<CustomTalk>(gameObject->EventHandler->Info.EventId.Id, out var customTalk) && !customTalk.Name.IsEmpty)
+                        if (_excelService.TryGetRow<CustomTalk>(gameObject->EventHandler->Info.EventId.Id, out var customTalk) && !customTalk.Name.IsEmpty)
                         {
                             ImGuiUtils.SameLineSpace();
                             ImGui.TextUnformatted($"({customTalk.Name})");

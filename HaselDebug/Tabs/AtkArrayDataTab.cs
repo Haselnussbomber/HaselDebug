@@ -14,9 +14,12 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer DebugRenderer) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class AtkArrayDataTab : DebugTab
 {
+    private readonly TextService _textService;
+    private readonly DebugRenderer _debugRenderer;
+
     private readonly Type _numberType = typeof(NumberArrayType);
     private readonly Type _stringType = typeof(StringArrayType);
     private readonly Type _extendType = typeof(ExtendArrayType);
@@ -258,7 +261,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
             if (sidebarchild)
             {
                 ImGui.SetNextItemWidth(-1);
-                ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+                ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
 
                 DrawArrayList(
                     _stringType,
@@ -344,7 +347,7 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
                 }
                 else
                 {
-                    DebugRenderer.DrawSeString(array->StringArray[i], new NodeOptions() { AddressPath = new AddressPath([(nint)array, (nint)array->StringArray[i]]) });
+                    _debugRenderer.DrawSeString(array->StringArray[i], new NodeOptions() { AddressPath = new AddressPath([(nint)array, (nint)array->StringArray[i]]) });
                 }
             }
         }
@@ -403,8 +406,8 @@ public unsafe class AtkArrayDataTab(TextService TextService, DebugRenderer Debug
             if (!isNull)
             {
                 var marker = (MapMarkerBase*)array->DataArray[i];
-                DebugRenderer.DrawIcon(marker->IconId);
-                DebugRenderer.DrawPointerType(array->DataArray[i], typeof(MapMarkerBase), new NodeOptions()
+                _debugRenderer.DrawIcon(marker->IconId);
+                _debugRenderer.DrawPointerType(array->DataArray[i], typeof(MapMarkerBase), new NodeOptions()
                 {
                     SeStringTitle = new ReadOnlySeString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(marker->Subtext)),
                     AddressPath = new AddressPath([(nint)array, (nint)array->DataArray[i]])

@@ -27,7 +27,7 @@ public partial class DebugRenderer
         if (MemberDocs.Count != 0)
             return;
 
-        var csXmlPath = Path.Join(PluginInterface.AssemblyLocation.Directory!.FullName, "FFXIVClientStructs.xml");
+        var csXmlPath = Path.Join(_pluginInterface.AssemblyLocation.Directory!.FullName, "FFXIVClientStructs.xml");
         if (!File.Exists(csXmlPath))
             return;
 
@@ -117,7 +117,7 @@ public partial class DebugRenderer
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not parse FFXIVClientStructs.xml");
+            _logger.LogError(ex, "Could not parse FFXIVClientStructs.xml");
         }
     }
 

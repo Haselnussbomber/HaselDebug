@@ -12,37 +12,23 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits;
 
-[RegisterSingleton]
-public class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
+[RegisterSingleton, AutoConstruct]
+public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
 {
     public const float IconSize = 32;
     private readonly ExcelService _excelService;
     private readonly ItemService _itemService;
     private readonly GlobalScaleObserver _globalScaleObserver;
+    private readonly SetColumn _setColumn;
+    private readonly ItemsColumn _itemsColumn;
 
-    public OutfitsTable(
-        LanguageProvider languageProvider,
-        ExcelService excelService,
-        ItemService itemService,
-        GlobalScaleObserver globalScaleObserver,
-        SetColumn setColumn,
-        ItemsColumn itemsColumn) : base(languageProvider)
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        _excelService = excelService;
-        _itemService = itemService;
-        _globalScaleObserver = globalScaleObserver;
-
-        setColumn.Label = "Set";
-        setColumn.Flags = ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.DefaultSort;
-        setColumn.Width = 300;
-
-        itemsColumn.Label = "Items";
-        itemsColumn.Flags = ImGuiTableColumnFlags.NoSort;
-
         Columns = [
             RowIdColumn<CustomMirageStoreSetItem>.Create(),
-            setColumn,
-            itemsColumn,
+            _setColumn,
+            _itemsColumn,
         ];
 
         Flags |= ImGuiTableFlags.SortTristate;

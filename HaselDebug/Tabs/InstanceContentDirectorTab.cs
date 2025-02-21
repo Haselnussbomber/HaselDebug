@@ -15,9 +15,12 @@ using InstanceContentType = FFXIVClientStructs.FFXIV.Client.Game.InstanceContent
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISigScanner SigScanner, ExcelService ExcelService) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class InstanceContentDirectorTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly ISigScanner _sigScanner;
+    private readonly ExcelService _excelService;
 
     private static readonly Dictionary<(ReadOnlySeString, InstanceContentType), nint> InstanceContentTypeVtables = [];
 
@@ -27,9 +30,9 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         {
             foreach (var ((name, type), vtableAddr) in InstanceContentTypeVtables)
             {
-                DebugRenderer.DrawCopyableText($"{type}: {name} @", $"+0x{vtableAddr - SigScanner.Module.BaseAddress:X} - {name}");
+                _debugRenderer.DrawCopyableText($"{type}: {name} @", $"+0x{vtableAddr - _sigScanner.Module.BaseAddress:X} - {name}");
                 ImGui.SameLine();
-                DebugRenderer.DrawAddress(vtableAddr);
+                _debugRenderer.DrawAddress(vtableAddr);
             }
 
             ImGui.Separator();
@@ -43,7 +46,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
             else
                 ImGui.TextUnformatted($"[{directorPtr.Value->EventHandlerInfo->EventId.ContentId}]");
             ImGui.SameLine();
-            DebugRenderer.DrawPointerType(directorPtr.Value, typeof(Director), new NodeOptions() { AddressPath = new([1, (nint)directorPtr.Value]) });
+            _debugRenderer.DrawPointerType(directorPtr.Value, typeof(Director), new NodeOptions() { AddressPath = new([1, (nint)directorPtr.Value]) });
         }
 
         ImGui.TextUnformatted("ContentDirector:");
@@ -55,7 +58,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         }
         else
         {
-            DebugRenderer.DrawPointerType(contentDirector, typeof(ContentDirector), new NodeOptions() { AddressPath = new([2, (nint)contentDirector]) });
+            _debugRenderer.DrawPointerType(contentDirector, typeof(ContentDirector), new NodeOptions() { AddressPath = new([2, (nint)contentDirector]) });
         }
 
         ImGui.Separator();
@@ -69,7 +72,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         }
         else
         {
-            DebugRenderer.DrawPointerType(craftLeveEventHandler, typeof(EventHandler), new NodeOptions() { AddressPath = new([3, (nint)craftLeveEventHandler]) });
+            _debugRenderer.DrawPointerType(craftLeveEventHandler, typeof(EventHandler), new NodeOptions() { AddressPath = new([3, (nint)craftLeveEventHandler]) });
         }
 
         ImGui.Separator();
@@ -83,7 +86,7 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         }
         else
         {
-            DebugRenderer.DrawPointerType(publicContentDirector, typeof(EventHandler), new NodeOptions() { AddressPath = new([4, (nint)publicContentDirector]) });
+            _debugRenderer.DrawPointerType(publicContentDirector, typeof(EventHandler), new NodeOptions() { AddressPath = new([4, (nint)publicContentDirector]) });
         }
 
         ImGui.Separator();
@@ -97,15 +100,15 @@ public unsafe class InstanceContentDirectorTab(DebugRenderer DebugRenderer, ISig
         }
         else
         {
-            var ic = ExcelService.GetSheet<InstanceContent>().GetRow(instanceContentDirector->ContentDirector.Director.ContentId);
-            var cfc = ExcelService.GetSheet<ContentFinderCondition>(ClientLanguage.English).GetRow(ic.Order);
+            var ic = _excelService.GetSheet<InstanceContent>().GetRow(instanceContentDirector->ContentDirector.Director.ContentId);
+            var cfc = _excelService.GetSheet<ContentFinderCondition>(ClientLanguage.English).GetRow(ic.Order);
             var key = (!cfc.Name.IsEmpty ? cfc.Name : instanceContentDirector->ContentDirector.Director.UnkString0.ToString(), instanceContentDirector->InstanceContentType);
             if (!InstanceContentTypeVtables.ContainsKey(key))
             {
                 InstanceContentTypeVtables.Add(key, *(nint*)instanceContentDirector);
             }
 
-            DebugRenderer.DrawPointerType(instanceContentDirector, typeof(EventHandler), new NodeOptions() { AddressPath = new([5, (nint)instanceContentDirector]) });
+            _debugRenderer.DrawPointerType(instanceContentDirector, typeof(EventHandler), new NodeOptions() { AddressPath = new([5, (nint)instanceContentDirector]) });
         }
     }
 }

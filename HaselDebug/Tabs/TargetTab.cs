@@ -8,9 +8,11 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class TargetTab(DebugRenderer DebugRenderer) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class TargetTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+
     public override void Draw()
     {
         var target = TargetSystem.Instance()->GetTargetObject();
@@ -20,6 +22,6 @@ public unsafe class TargetTab(DebugRenderer DebugRenderer) : DebugTab
             return;
         }
 
-        DebugRenderer.DrawPointerType(target, typeof(GameObject), new NodeOptions() { DefaultOpen = true });
+        _debugRenderer.DrawPointerType(target, typeof(GameObject), new NodeOptions() { DefaultOpen = true });
     }
 }

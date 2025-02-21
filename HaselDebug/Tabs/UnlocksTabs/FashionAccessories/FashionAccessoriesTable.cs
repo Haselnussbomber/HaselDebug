@@ -1,43 +1,25 @@
 using System.Linq;
-using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Control;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Extensions.Strings;
-using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
-using HaselDebug.Services;
-using HaselDebug.Utils;
-using ImGuiNET;
+using HaselDebug.Tabs.UnlocksTabs.FashionAccessories.Columns;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.FashionAccessories;
 
-[RegisterSingleton]
-public unsafe class FashionAccessoriesTable : Table<Ornament>
+[RegisterSingleton, AutoConstruct]
+public unsafe partial class FashionAccessoriesTable : Table<Ornament>
 {
-    internal readonly ExcelService _excelService;
+    private readonly ExcelService _excelService;
+    private readonly UnlockedColumn _unlockedColumn;
+    private readonly NameColumn _nameColumn;
 
-    public FashionAccessoriesTable(
-        ExcelService excelService,
-        DebugRenderer debugRenderer,
-        TextService textService,
-        UnlocksTabUtils unlocksTabUtils,
-        LanguageProvider languageProvider) : base(languageProvider)
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        _excelService = excelService;
-
         Columns = [
             RowIdColumn<Ornament>.Create(),
-            new UnlockedColumn() {
-                Label = "Unlocked",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 75,
-            },
-            new NameColumn(debugRenderer, textService, excelService, unlocksTabUtils) {
-                Label = "Name",
-            }
+            _unlockedColumn,
+            _nameColumn,
         ];
     }
 
@@ -46,66 +28,5 @@ public unsafe class FashionAccessoriesTable : Table<Ornament>
         Rows = _excelService.GetSheet<Ornament>()
             .Where(row => row.RowId is not (0 or 22 or 25 or 26 or 32) && row.Order != 0 && row.Model != 0 && row.Icon != 0) // see AgentOrnamentNoteBook_Show
             .ToList();
-    }
-
-    private class UnlockedColumn : ColumnBool<Ornament>
-    {
-        public override unsafe bool ToBool(Ornament row)
-            => PlayerState.Instance()->IsOrnamentUnlocked(row.RowId);
-    }
-
-    private class NameColumn(
-        DebugRenderer debugRenderer,
-        TextService textService,
-        ExcelService excelService,
-        UnlocksTabUtils unlocksTabUtils) : ColumnString<Ornament>
-    {
-        public override string ToName(Ornament row)
-            => textService.GetOrnamentName(row.RowId);
-
-        public override unsafe void DrawColumn(Ornament row)
-        {
-            var isLoggedIn = AgentLobby.Instance()->IsLoggedIn;
-            var player = Control.GetLocalPlayer();
-            var currentId = 0u;
-            if (isLoggedIn && player != null)
-                currentId = player->OrnamentData.OrnamentId;
-
-            debugRenderer.DrawIcon(row.Icon);
-            var name = ToName(row);
-            var isUnlocked = isLoggedIn && PlayerState.Instance()->IsOrnamentUnlocked(row.RowId);
-            var canUse = isUnlocked && ActionManager.Instance()->GetActionStatus(ActionType.Ornament, row.RowId) == 0;
-            using (Color.Transparent.Push(ImGuiCol.HeaderActive, !canUse))
-            using (Color.Transparent.Push(ImGuiCol.HeaderHovered, !canUse))
-            {
-                if (canUse)
-                {
-                    if (ImGui.Selectable(name, currentId == row.RowId))
-                    {
-                        ActionManager.Instance()->UseAction(ActionType.Ornament, row.RowId);
-                    }
-                }
-                else
-                {
-                    ImGui.TextUnformatted(name);
-                }
-            }
-
-            if (ImGui.IsItemHovered())
-            {
-                if (canUse)
-                {
-                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                }
-
-                unlocksTabUtils.DrawTooltip(
-                    row.Icon,
-                    name,
-                    null,
-                    excelService.TryGetRow<OrnamentTransient>(row.RowId, out var transient) && !transient.Unknown0.IsEmpty
-                        ? transient.Unknown0.ExtractText().StripSoftHypen()
-                        : null);
-            }
-        }
     }
 }

@@ -10,15 +10,18 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, TextService TextService) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class CurrencyManagerTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly TextService _textService;
+
     public override string Title => "CurrencyManager";
 
     public override void Draw()
     {
         var currencyManager = CurrencyManager.Instance();
-        DebugRenderer.DrawPointerType(currencyManager, typeof(CurrencyManager), new NodeOptions());
+        _debugRenderer.DrawPointerType(currencyManager, typeof(CurrencyManager), new NodeOptions());
 
         using (var node = ImRaii.TreeNode(nameof(CurrencyManager.SpecialItemBucket), ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.SpanAvailWidth))
         {
@@ -38,7 +41,7 @@ public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, TextService 
                     {
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
-                        DebugRenderer.DrawCopyableText(itemId.ToString());
+                        _debugRenderer.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted(item.SpecialId.ToString());
                         ImGui.TableNextColumn();
@@ -47,7 +50,7 @@ public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, TextService 
                         if (currencyManager->IsItemLimited(itemId))
                             ImGui.TextUnformatted(currencyManager->GetItemCountRemaining(itemId).ToString());
                         ImGui.TableNextColumn();
-                        DebugRenderer.DrawCopyableText(TextService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
+                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
                     }
                 }
             }
@@ -71,7 +74,7 @@ public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, TextService 
                     {
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
-                        DebugRenderer.DrawCopyableText(itemId.ToString());
+                        _debugRenderer.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
                         ImGui.TableNextColumn();
@@ -80,7 +83,7 @@ public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, TextService 
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
-                        DebugRenderer.DrawCopyableText(TextService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
+                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
                     }
                 }
             }
@@ -104,7 +107,7 @@ public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, TextService 
                     {
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
-                        DebugRenderer.DrawCopyableText(itemId.ToString());
+                        _debugRenderer.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
                         ImGui.TableNextColumn();
@@ -113,7 +116,7 @@ public unsafe class CurrencyManagerTab(DebugRenderer DebugRenderer, TextService 
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
-                        DebugRenderer.DrawCopyableText(TextService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
+                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
                     }
                 }
             }

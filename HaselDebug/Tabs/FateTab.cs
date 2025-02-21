@@ -8,13 +8,16 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public class FateTab(IFateTable FateTable, ITextureProvider TextureProvider) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public partial class FateTab : DebugTab
 {
+    private readonly IFateTable _fateTable;
+    private readonly ITextureProvider _textureProvider;
+
     public override void Draw()
     {
-        var fateTable = FateTable;
-        var textureManager = TextureProvider;
+        var fateTable = _fateTable;
+        var textureManager = _textureProvider;
 
         if (fateTable.Length == 0)
         {

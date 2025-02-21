@@ -2,6 +2,12 @@
   "version": 1,
   "dependencies": {
     "net8.0-windows7.0": {
+      "AutoCtor": {
+        "type": "Direct",
+        "requested": "[2.5.0, )",
+        "resolved": "2.5.0",
+        "contentHash": "RpVKYLs6CDNI0EAQA786+ZxM3Jj7L3oE72K1MBj1bgKnFSuZSEWhsEjQrCAca3UZvvU7CSxG8V5E8AI6pvBHfg=="
+      },
       "DalamudPackager": {
         "type": "Direct",
         "requested": "[11.0.0, )",
@@ -16,17 +22,12 @@
       },
       "Injectio": {
         "type": "Direct",
-        "requested": "[4.0.0, )",
-        "resolved": "4.0.0",
-        "contentHash": "XJ+b4OcXgp+5df8mu/b2RKUvhcy7wkhvTjGfdY8qT1OUf5/XpIXppf1hk3+ADK2HcYqRnKhEkY1muBDRtW76Ag==",
+        "requested": "[4.1.0, )",
+        "resolved": "4.1.0",
+        "contentHash": "GBxpmh/LOKkN6NK6jdI/1XGtQ/ZzuWAb7tBftT4tcrKuhJO6ybaYKmmsXXTrTspJsJKI4eN/vUYcHYLuMaVDYw==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection": "9.0.0"
+          "Microsoft.Extensions.DependencyInjection": "9.0.2"
         }
-      },
-      "Haselnussbomber.YogaSharp": {
-        "type": "Transitive",
-        "resolved": "1.1.3",
-        "contentHash": "Sz0emN5J9uuiwqbHbxrkvziufa+OBrKaEjoem80wYOm+OBJ+5WaEcTEe2OKFHKrfmqPnP3Ao05r5BFOfOIO/aA=="
       },
       "JetBrains.Annotations": {
         "type": "Transitive",
@@ -97,13 +98,6 @@
           "FFXIVClientStructs": "[1.0.0, )",
           "Microsoft.Extensions.DependencyInjection": "[9.0.2, )",
           "Microsoft.Extensions.Logging": "[9.0.2, )"
-        }
-      },
-      "haselcommon.yoga": {
-        "type": "Project",
-        "dependencies": {
-          "HaselCommon": "[1.0.0, )",
-          "Haselnussbomber.YogaSharp": "[1.1.3, )"
         }
       },
       "interopgenerator.runtime": {

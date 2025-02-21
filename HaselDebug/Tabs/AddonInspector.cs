@@ -22,15 +22,16 @@ using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class AddonInspectorTab(
-    TextService TextService,
-    LanguageProvider LanguageProvider,
-    DebugRenderer DebugRenderer,
-    ImGuiContextMenuService ImGuiContextMenu,
-    PinnedInstancesService PinnedInstances,
-    WindowManager WindowManager) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class AddonInspectorTab : DebugTab
 {
+    private readonly TextService _textService;
+    private readonly LanguageProvider _languageProvider;
+    private readonly DebugRenderer _debugRenderer;
+    private readonly ImGuiContextMenuService _imGuiContextMenu;
+    private readonly PinnedInstancesService _pinnedInstances;
+    private readonly WindowManager _windowManager;
+
     private ushort _selectedAddonId = 0;
     private string _selectedAddonName = string.Empty;
     private bool _sortDirty = true;
@@ -60,7 +61,7 @@ public unsafe class AddonInspectorTab(
         if (!sidebarchild) return;
 
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - ImGuiUtils.GetIconButtonSize(FontAwesomeIcon.ObjectUngroup).X - ImGui.GetStyle().ItemSpacing.X);
-        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", TextService.Translate("SearchBar.Hint"), ref _addonNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _addonNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         var hasSearchTerm = !string.IsNullOrWhiteSpace(_addonNameSearchTerm);
         var hasSearchTermAutoSelected = false;
 
@@ -171,25 +172,25 @@ public unsafe class AddonInspectorTab(
                 }
             }
 
-            ImGuiContextMenu.Draw($"##Addon_{addonId}_{addonName}_Context", builder =>
+            _imGuiContextMenu.Draw($"##Addon_{addonId}_{addonName}_Context", builder =>
             {
-                if (!DebugRenderer.AddonTypes.TryGetValue(addonName, out var type))
+                if (!_debugRenderer.AddonTypes.TryGetValue(addonName, out var type))
                     type = typeof(AtkUnitBase);
 
-                var isPinned = PinnedInstances.Contains(addonName);
+                var isPinned = _pinnedInstances.Contains(addonName);
 
-                builder.AddCopyName(TextService, addonName);
-                builder.AddCopyAddress(TextService, (nint)unitBase);
+                builder.AddCopyName(_textService, addonName);
+                builder.AddCopyAddress(_textService, (nint)unitBase);
 
                 builder.AddSeparator();
 
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = !WindowManager.Contains(win => win.WindowName == addonName),
-                    Label = TextService.Translate("ContextMenu.TabPopout"),
+                    Visible = !_windowManager.Contains(win => win.WindowName == addonName),
+                    Label = _textService.Translate("ContextMenu.TabPopout"),
                     ClickCallback = () =>
                     {
-                        WindowManager.Open(new PointerTypeWindow(WindowManager, TextService, LanguageProvider, DebugRenderer, (nint)unitBase, type));
+                        _windowManager.Open(new PointerTypeWindow(_windowManager, _textService, _languageProvider, _debugRenderer, (nint)unitBase, type));
                     }
                 });
             });
@@ -225,10 +226,10 @@ public unsafe class AddonInspectorTab(
 
         var addonName = unitBase->NameString;
 
-        if (!DebugRenderer.AddonTypes.TryGetValue(addonName, out var type))
+        if (!_debugRenderer.AddonTypes.TryGetValue(addonName, out var type))
             type = typeof(AtkUnitBase);
 
-        DebugRenderer.DrawCopyableText(addonName);
+        _debugRenderer.DrawCopyableText(addonName);
 
         ImGui.SameLine();
 
@@ -251,7 +252,7 @@ public unsafe class AddonInspectorTab(
 
         PrintFieldValuePair("Address", ((nint)unitBase).ToString("X"));
         ImGui.SameLine();
-        DebugRenderer.DrawPointerType((nint)unitBase, type, nodeOptions with { DefaultOpen = false });
+        _debugRenderer.DrawPointerType((nint)unitBase, type, nodeOptions with { DefaultOpen = false });
 
         // Agent
         var agentModule = AgentModule.Instance();
@@ -264,10 +265,10 @@ public unsafe class AddonInspectorTab(
             ImGui.TextUnformatted($"Used by Agent{agentId}");
             ImGui.SameLine();
 
-            if (!DebugRenderer.AgentTypes.TryGetValue(agentId, out var agentType))
+            if (!_debugRenderer.AgentTypes.TryGetValue(agentId, out var agentType))
                 agentType = typeof(AgentInterface);
 
-            DebugRenderer.DrawPointerType(agent, agentType, nodeOptions.WithAddress((nint)agent) with
+            _debugRenderer.DrawPointerType(agent, agentType, nodeOptions.WithAddress((nint)agent) with
             {
                 DefaultOpen = false,
                 DrawContextMenu = (nodeOptions, builder) =>
@@ -275,29 +276,29 @@ public unsafe class AddonInspectorTab(
                     var pinnedInstances = Service.Get<PinnedInstancesService>();
                     var isPinned = pinnedInstances.Contains(agentType);
 
-                    builder.AddCopyName(TextService, agentId.ToString());
-                    builder.AddCopyAddress(TextService, (nint)agent);
+                    builder.AddCopyName(_textService, agentId.ToString());
+                    builder.AddCopyAddress(_textService, (nint)agent);
 
                     builder.AddSeparator();
 
                     builder.Add(new ImGuiContextMenuEntry()
                     {
-                        Visible = !WindowManager.Contains(win => win.WindowName == agentType.Name),
-                        Label = TextService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, TextService, LanguageProvider, DebugRenderer, (nint)agent, agentType))
+                        Visible = !_windowManager.Contains(win => win.WindowName == agentType.Name),
+                        Label = _textService.Translate("ContextMenu.TabPopout"),
+                        ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_windowManager, _textService, _languageProvider, _debugRenderer, (nint)agent, agentType))
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()
                     {
                         Visible = !isPinned,
-                        Label = TextService.Translate("ContextMenu.PinnedInstances.Pin"),
+                        Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
                         ClickCallback = () => pinnedInstances.Add((nint)agent, agentType)
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()
                     {
                         Visible = isPinned,
-                        Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
+                        Label = _textService.Translate("ContextMenu.PinnedInstances.Unpin"),
                         ClickCallback = () => pinnedInstances.Remove(agentType)
                     });
                 }
@@ -313,10 +314,10 @@ public unsafe class AddonInspectorTab(
                 ImGui.TextUnformatted($"Embedded by Addon{host->NameString}");
                 ImGui.SameLine();
 
-                if (!DebugRenderer.AddonTypes.TryGetValue(host->NameString, out var hostType))
+                if (!_debugRenderer.AddonTypes.TryGetValue(host->NameString, out var hostType))
                     hostType = typeof(AgentInterface);
 
-                DebugRenderer.DrawPointerType((nint)host, hostType, nodeOptions.WithAddress((nint)host) with
+                _debugRenderer.DrawPointerType((nint)host, hostType, nodeOptions.WithAddress((nint)host) with
                 {
                     DefaultOpen = false,
                     DrawContextMenu = (nodeOptions, builder) =>
@@ -324,16 +325,16 @@ public unsafe class AddonInspectorTab(
                         var pinnedInstances = Service.Get<PinnedInstancesService>();
                         var isPinned = pinnedInstances.Contains(hostType);
 
-                        builder.AddCopyName(TextService, host->NameString);
-                        builder.AddCopyAddress(TextService, (nint)host);
+                        builder.AddCopyName(_textService, host->NameString);
+                        builder.AddCopyAddress(_textService, (nint)host);
 
                         builder.AddSeparator();
 
                         builder.Add(new ImGuiContextMenuEntry()
                         {
-                            Visible = !WindowManager.Contains(win => win.WindowName == hostType.Name),
-                            Label = TextService.Translate("ContextMenu.TabPopout"),
-                            ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, TextService, LanguageProvider, DebugRenderer, (nint)host, hostType))
+                            Visible = !_windowManager.Contains(win => win.WindowName == hostType.Name),
+                            Label = _textService.Translate("ContextMenu.TabPopout"),
+                            ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_windowManager, _textService, _languageProvider, _debugRenderer, (nint)host, hostType))
                         });
                     }
                 });
@@ -435,9 +436,9 @@ public unsafe class AddonInspectorTab(
     {
         //var isVisible = node->NodeFlags.HasFlag(NodeFlags.Visible);
 
-        DebugRenderer.HighlightNode((nint)(&node), typeof(AtkResNode*), ref nodeOptions);
+        _debugRenderer.HighlightNode((nint)(&node), typeof(AtkResNode*), ref nodeOptions);
 
-        using var treeNode = DebugRenderer.DrawTreeNode(nodeOptions with
+        using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
             Title = $"{treePrefix}{node->Type} Node (ptr = {(nint)node:X})",
             TitleColor = Color.Green
@@ -449,7 +450,7 @@ public unsafe class AddonInspectorTab(
 
         ImGui.TextUnformatted("Node: ");
         ImGui.SameLine();
-        DebugRenderer.DrawAddress(node);
+        _debugRenderer.DrawAddress(node);
         ImGui.SameLine();
         var nodeType = node->Type switch
         {
@@ -461,7 +462,7 @@ public unsafe class AddonInspectorTab(
             NodeType.Counter => typeof(AtkCounterNode),
             _ => typeof(AtkResNode)
         };
-        DebugRenderer.DrawPointerType((nint)node, nodeType, nodeOptions);
+        _debugRenderer.DrawPointerType((nint)node, nodeType, nodeOptions);
 
         PrintResNode(node);
 
@@ -474,7 +475,7 @@ public unsafe class AddonInspectorTab(
                 var textNode = (AtkTextNode*)node;
                 ImGui.TextUnformatted("text: ");
                 ImGui.SameLine();
-                DebugRenderer.DrawUtf8String((nint)(&textNode->NodeText), nodeOptions);
+                _debugRenderer.DrawUtf8String((nint)(&textNode->NodeText), nodeOptions);
 
                 ImGui.InputText($"Replace Text##{(ulong)textNode:X}", new nint(textNode->NodeText.StringPtr), (uint)textNode->NodeText.BufSize);
 
@@ -600,7 +601,7 @@ public unsafe class AddonInspectorTab(
         var nodeOpen = ImGui.TreeNodeEx($"{treePrefix}{objectInfo->ComponentType} Component Node (ptr = {(nint)node:X}, component ptr = {(nint)compNode->Component:X}) child count = {childCount}###{nodeOptions.GetKey("ComponentNode")}", ImGuiTreeNodeFlags.SpanAvailWidth);
 
         if (ImGui.IsItemHovered())
-            DebugRenderer.HighlightNode(node);
+            _debugRenderer.HighlightNode(node);
 
         if (nodeOpen)
         {
@@ -612,13 +613,13 @@ public unsafe class AddonInspectorTab(
 
             ImGui.TextUnformatted("Node: ");
             ImGui.SameLine();
-            DebugRenderer.DrawAddress(node);
+            _debugRenderer.DrawAddress(node);
             ImGui.SameLine();
-            DebugRenderer.DrawPointerType((nint)compNode, typeof(AtkComponentNode), nodeOptions.WithAddress(1));
+            _debugRenderer.DrawPointerType((nint)compNode, typeof(AtkComponentNode), nodeOptions.WithAddress(1));
 
             ImGui.TextUnformatted("Component: ");
             ImGui.SameLine();
-            DebugRenderer.DrawAddress(compNode->Component);
+            _debugRenderer.DrawAddress(compNode->Component);
             ImGui.SameLine();
             var componentType = objectInfo->ComponentType switch
             {
@@ -632,7 +633,7 @@ public unsafe class AddonInspectorTab(
                 ComponentType.Icon => typeof(AtkComponentIcon),
                 _ => typeof(AtkComponentBase)
             };
-            DebugRenderer.DrawPointerType((nint)compNode->Component, componentType, nodeOptions.WithAddress(2));
+            _debugRenderer.DrawPointerType((nint)compNode->Component, componentType, nodeOptions.WithAddress(2));
 
             PrintResNode(node);
             PrintNode(componentInfo.RootNode, true, string.Empty, nodeOptions);
@@ -865,7 +866,7 @@ public unsafe class AddonInspectorTab(
         ImGui.TextUnformatted(fieldName + ":");
         ImGuiUtils.SameLineSpace();
         if (copy)
-            DebugRenderer.DrawCopyableText(value);
+            _debugRenderer.DrawCopyableText(value);
         else
             ImGui.TextUnformatted(value);
     }

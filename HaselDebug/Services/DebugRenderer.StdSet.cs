@@ -25,13 +25,13 @@ public unsafe partial class DebugRenderer
         {
             DrawContextMenu = (nodeOptions, builder) =>
             {
-                builder.AddCopyAddress(TextService, address);
+                builder.AddCopyAddress(_textService, address);
                 builder.AddSeparator();
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = !WindowManager.Contains(win => win.WindowName == "0x" + address.ToString("X")),
-                    Label = TextService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => WindowManager.Open(new PointerTypeWindow(WindowManager, TextService, LanguageProvider, this, address, typeof(StdSet<>).MakeGenericType(valueType), "0x" + address.ToString("X")))
+                    Visible = !_windowManager.Contains(win => win.WindowName == "0x" + address.ToString("X")),
+                    Label = _textService.Translate("ContextMenu.TabPopout"),
+                    ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_windowManager, _textService, _languageProvider, this, address, typeof(StdSet<>).MakeGenericType(valueType), "0x" + address.ToString("X")))
                 });
             }
         });

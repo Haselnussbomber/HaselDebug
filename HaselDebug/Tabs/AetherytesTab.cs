@@ -9,13 +9,14 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public class AetherytesTab(
-    IAetheryteList AetheryteList,
-    TextService TextService,
-    ExcelService ExcelService,
-    TextureService TextureService) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public partial class AetherytesTab : DebugTab
 {
+    private readonly IAetheryteList _aetheryteList;
+    private readonly TextService _textService;
+    private readonly ExcelService _excelService;
+    private readonly TextureService _textureService;
+
     public override bool DrawInChild => false;
 
     public override void Draw()
@@ -35,7 +36,7 @@ public class AetherytesTab(
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
-        foreach (var aetheryte in AetheryteList)
+        foreach (var aetheryte in _aetheryteList)
         {
             if (!aetheryte.AetheryteData.IsValid)
                 continue;
@@ -60,7 +61,7 @@ public class AetherytesTab(
             ImGui.TextUnformatted($"#{aetheryte.AetheryteId}");
 
             ImGui.TableNextColumn();
-            TextureService.DrawPart("Teleport", 16, GetPartId(GetTimelineId(regionType, territory.RowId)), 40 / 2f);
+            _textureService.DrawPart("Teleport", 16, GetPartId(GetTimelineId(regionType, territory.RowId)), 40 / 2f);
 
             ImGui.TableNextColumn();
             ImGui.TextUnformatted(GetRegionName(regionType));
@@ -121,16 +122,16 @@ public class AetherytesTab(
     {
         return region switch
         {
-            AetheryteRegion.LaNoscea => ExcelService.TryGetRow<PlaceName>(22, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // La Noscea
-            AetheryteRegion.TheBlackShroud => ExcelService.TryGetRow<PlaceName>(23, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // The Black Shroud
-            AetheryteRegion.Thanalan => ExcelService.TryGetRow<PlaceName>(24, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // Thanalan
-            AetheryteRegion.Coerthas or AetheryteRegion.Dravania or AetheryteRegion.AbalathiasSpine => TextService.GetAddonText(8486), // Ishgard and Surrounding Areas
-            AetheryteRegion.GyrAbania => TextService.GetAddonText(8488), // Gyr Abania
-            AetheryteRegion.Hingashi or AetheryteRegion.Othard => TextService.GetAddonText(8489), // Othard
-            AetheryteRegion.Norvrandt => TextService.GetAddonText(8497), // Norvrandt
-            AetheryteRegion.Ilsabard => TextService.GetAddonText(8498), // Ilsabard
-            AetheryteRegion.YokTural or AetheryteRegion.XakTural => TextService.GetAddonText(8559), // Tural
-            _ => TextService.GetAddonText(8484), // Others
+            AetheryteRegion.LaNoscea => _excelService.TryGetRow<PlaceName>(22, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // La Noscea
+            AetheryteRegion.TheBlackShroud => _excelService.TryGetRow<PlaceName>(23, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // The Black Shroud
+            AetheryteRegion.Thanalan => _excelService.TryGetRow<PlaceName>(24, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // Thanalan
+            AetheryteRegion.Coerthas or AetheryteRegion.Dravania or AetheryteRegion.AbalathiasSpine => _textService.GetAddonText(8486), // Ishgard and Surrounding Areas
+            AetheryteRegion.GyrAbania => _textService.GetAddonText(8488), // Gyr Abania
+            AetheryteRegion.Hingashi or AetheryteRegion.Othard => _textService.GetAddonText(8489), // Othard
+            AetheryteRegion.Norvrandt => _textService.GetAddonText(8497), // Norvrandt
+            AetheryteRegion.Ilsabard => _textService.GetAddonText(8498), // Ilsabard
+            AetheryteRegion.YokTural or AetheryteRegion.XakTural => _textService.GetAddonText(8559), // Tural
+            _ => _textService.GetAddonText(8484), // Others
         };
     }
 

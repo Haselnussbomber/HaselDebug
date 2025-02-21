@@ -18,8 +18,8 @@ namespace HaselDebug.Tabs;
 // TODO: display current SheetHashes and compare
 // https://github.com/NotAdam/Lumina/blob/master/src/Lumina/Data/Files/Excel/ExcelHeaderFile.cs#L59
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public class NounProcessorTab : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public partial class NounProcessorTab : DebugTab
 {
     private readonly Dictionary<Type, uint> _sheets = new() {
         { typeof(Attributive), 0xECF11B18 },
@@ -54,9 +54,11 @@ public class NounProcessorTab : DebugTab
     private readonly NounProcessor _nounProcessor;
     private readonly IDataManager _dataManager;
     private readonly DebugRenderer _debugRenderer;
-    private readonly ClientLanguage[] _languages;
-    private readonly string[] _sheetNames;
-    private readonly string[] _languageNames;
+    private readonly IClientState _clientState;
+
+    private ClientLanguage[] _languages = [];
+    private string[] _sheetNames = [];
+    private string[] _languageNames = [];
 
     private int _selectedSheetNameIndex = 0;
     private int _selectedLanguageIndex = 0;
@@ -64,15 +66,11 @@ public class NounProcessorTab : DebugTab
     private int _amount = 1;
     private static readonly string[] GermanCases = ["Nominative", "Genitive", "Dative", "Accusative"];
 
-    public NounProcessorTab(NounProcessor nounProcessor, IDataManager dataManager, IClientState clientState, DebugRenderer debugRenderer)
+    public void Initialize()
     {
-        _nounProcessor = nounProcessor;
-        _dataManager = dataManager;
-        _debugRenderer = debugRenderer;
-
         _languages = Enum.GetValues<ClientLanguage>();
         _languageNames = Enum.GetNames<ClientLanguage>();
-        _selectedLanguageIndex = (int)clientState.ClientLanguage;
+        _selectedLanguageIndex = (int)_clientState.ClientLanguage;
         _sheetNames = _sheets.Select(kv => kv.Key.Name).Where(name => name != "Attributive").ToArray();
     }
 

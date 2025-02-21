@@ -2,7 +2,6 @@ using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -21,20 +20,18 @@ public unsafe class AddonNamesTab(AddonNameTable table) : DebugTab
 
 public record AddonNameEntry(int Index, string Name);
 
-[RegisterSingleton]
-public class AddonNameTable : Table<AddonNameEntry>, IDisposable
+[RegisterSingleton, AutoConstruct]
+public partial class AddonNameTable : Table<AddonNameEntry>, IDisposable
 {
-    public AddonNameTable(LanguageProvider languageProvider, DebugRenderer debugRenderer) : base(languageProvider)
+    private readonly IndexColumn _indexColumn;
+    private readonly NameColumn _nameColumn;
+
+    [AutoPostConstruct]
+    public void Initialize()
     {
         Columns = [
-            new IndexColumn(debugRenderer) {
-                Label = "Index",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 60,
-            },
-            new NameColumn(debugRenderer) {
-                Label = "Name",
-            },
+            _indexColumn,
+            _nameColumn,
         ];
     }
 
@@ -43,8 +40,19 @@ public class AddonNameTable : Table<AddonNameEntry>, IDisposable
         Rows = RaptureAtkModule.Instance()->AddonNames.Select((name, index) => new AddonNameEntry(index, name.ToString())).ToList();
     }
 
-    private class IndexColumn(DebugRenderer debugRenderer) : ColumnNumber<AddonNameEntry>
+    [RegisterTransient, AutoConstruct]
+    public partial class IndexColumn : ColumnNumber<AddonNameEntry>
     {
+        private readonly DebugRenderer _debugRenderer;
+
+        [AutoPostConstruct]
+        public void Initialize()
+        {
+            Label = "Index";
+            Flags = ImGuiTableColumnFlags.WidthFixed;
+            Width = 60;
+        }
+
         public override int ToValue(AddonNameEntry row)
         {
             return row.Index;
@@ -52,12 +60,21 @@ public class AddonNameTable : Table<AddonNameEntry>, IDisposable
 
         public override void DrawColumn(AddonNameEntry row)
         {
-            debugRenderer.DrawCopyableText(ToName(row));
+            _debugRenderer.DrawCopyableText(ToName(row));
         }
     }
 
-    private class NameColumn(DebugRenderer debugRenderer) : ColumnString<AddonNameEntry>
+    [RegisterTransient, AutoConstruct]
+    public partial class NameColumn : ColumnString<AddonNameEntry>
     {
+        private readonly DebugRenderer _debugRenderer;
+
+        [AutoPostConstruct]
+        public void Initialize()
+        {
+            Label = "Name";
+        }
+
         public override string ToName(AddonNameEntry row)
         {
             return row.Name;
@@ -65,7 +82,7 @@ public class AddonNameTable : Table<AddonNameEntry>, IDisposable
 
         public override unsafe void DrawColumn(AddonNameEntry row)
         {
-            debugRenderer.DrawCopyableText(ToName(row));
+            _debugRenderer.DrawCopyableText(ToName(row));
 
             if (ImGui.IsItemClicked())
             {

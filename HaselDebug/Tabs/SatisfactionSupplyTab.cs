@@ -10,13 +10,14 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class SatisfactionSupplyTab(
-    DebugRenderer DebugRenderer,
-    ExcelService ExcelService,
-    TextService TextService,
-    TeleportService TeleportService) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class SatisfactionSupplyTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly ExcelService _excelService;
+    private readonly TextService _textService;
+    private readonly TeleportService _teleportService;
+
     public override bool DrawInChild => false;
 
     public override void Draw()
@@ -33,7 +34,7 @@ public unsafe class SatisfactionSupplyTab(
         ImGui.TableSetupColumn("Used Allowance", ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableHeadersRow();
 
-        foreach (var row in ExcelService.GetSheet<SatisfactionNpc>())
+        foreach (var row in _excelService.GetSheet<SatisfactionNpc>())
         {
             if (row.RowId == 0)
                 continue;
@@ -46,13 +47,13 @@ public unsafe class SatisfactionSupplyTab(
             ImGui.TextUnformatted(row.RowId.ToString());
 
             ImGui.TableNextColumn(); // Name
-            DebugRenderer.DrawIcon((uint)row.RankParams[rank].ImageId);
+            _debugRenderer.DrawIcon((uint)row.RankParams[rank].ImageId);
 
-            if (ExcelService.TryGetRow<Level>(row.Unknown0, out var level) &&
-                TeleportService.TryGetClosestAetheryte(level, out var aetheryte) &&
-                ExcelService.TryGetRow<PlaceName>(aetheryte.Value.PlaceName.RowId, out var placeName))
+            if (_excelService.TryGetRow<Level>(row.Unknown0, out var level) &&
+                _teleportService.TryGetClosestAetheryte(level, out var aetheryte) &&
+                _excelService.TryGetRow<PlaceName>(aetheryte.Value.PlaceName.RowId, out var placeName))
             {
-                var clicked = ImGui.Selectable(TextService.GetENpcResidentName(row.Npc.RowId));
+                var clicked = ImGui.Selectable(_textService.GetENpcResidentName(row.Npc.RowId));
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -66,7 +67,7 @@ public unsafe class SatisfactionSupplyTab(
             }
             else
             {
-                ImGui.TextUnformatted(TextService.GetENpcResidentName(row.Npc.RowId));
+                ImGui.TextUnformatted(_textService.GetENpcResidentName(row.Npc.RowId));
             }
 
             ImGui.TableNextColumn(); // Satisfaction

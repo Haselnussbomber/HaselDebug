@@ -18,8 +18,8 @@ using Lumina.Text;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 {
     private readonly List<TextEntry> _entries = [
         new TextEntry(TextEntryType.String, "Test1 "),
@@ -83,25 +83,14 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
     private readonly TextService _textService;
     private readonly LanguageProvider _languageProvider;
     private readonly TextureService _textureService;
+
     private SeStringInspectorWindow? _inspectorWindow;
 
     public override bool DrawInChild => false;
 
-    public RaptureTextModuleTab(
-        DebugRenderer debugRenderer,
-        WindowManager windowManager,
-        SeStringEvaluatorService seStringEvaluator,
-        TextService textService,
-        LanguageProvider languageProvider,
-        TextureService textureService)
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        _debugRenderer = debugRenderer;
-        _windowManager = windowManager;
-        _seStringEvaluator = seStringEvaluator;
-        _textService = textService;
-        _languageProvider = languageProvider;
-        _textureService = textureService;
-
         _languageProvider.LanguageChanged += OnLanguageChanged;
     }
 

@@ -15,23 +15,31 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
-[RegisterSingleton]
-public class ItemsColumn(
-    TextService textService,
-    TextureService textureService,
-    ImGuiContextMenuService imGuiContextMenuService,
-    ExcelService excelService,
-    UnlocksTabUtils unlocksTabUtils) : ColumnString<CustomMirageStoreSetItem>
+[RegisterSingleton, AutoConstruct]
+public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
 {
     private const float IconSize = OutfitsTable.IconSize;
+
+    private readonly TextService _textService;
+    private readonly TextureService _textureService;
+    private readonly ImGuiContextMenuService _imGuiContextMenuService;
+    private readonly ExcelService _excelService;
+    private readonly UnlocksTabUtils _unlocksTabUtils;
+
     private readonly StringBuilder _stringBuilder = new();
+
+    [AutoPostConstruct]
+    public void Initialize()
+    {
+        Flags |= ImGuiTableColumnFlags.NoSort;
+    }
 
     public override string ToName(CustomMirageStoreSetItem row)
     {
         _stringBuilder.Clear();
 
         for (var i = 1; i < row.Items.Count; i++)
-            _stringBuilder.AppendLine(textService.GetItemName(row.Items[i].RowId));
+            _stringBuilder.AppendLine(_textService.GetItemName(row.Items[i].RowId));
 
         return _stringBuilder.ToString();
     }
@@ -68,7 +76,7 @@ public class ItemsColumn(
             var afterIconPos = ImGui.GetCursorPos();
             ImGui.SameLine(0, 0);
             ImGuiUtils.PushCursorX(-IconSize * ImGuiHelpers.GlobalScale);
-            textureService.DrawIcon(
+            _textureService.DrawIcon(
                 item.Value.Icon,
                 false,
                 new(IconSize * ImGuiHelpers.GlobalScale)
@@ -86,7 +94,7 @@ public class ItemsColumn(
             if (ImGui.IsItemHovered())
             {
                 ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                unlocksTabUtils.DrawItemTooltip(item.Value,
+                _unlocksTabUtils.DrawItemTooltip(item.Value,
                     descriptionOverride: isItemCollected
                         ? "In Glamour Dresser"
                         : isItemInInventory
@@ -94,10 +102,10 @@ public class ItemsColumn(
                             : null);
             }
 
-            imGuiContextMenuService.Draw($"###SetItem_{row.RowId}_{item.RowId}_ItemContextMenu", builder =>
+            _imGuiContextMenuService.Draw($"###SetItem_{row.RowId}_{item.RowId}_ItemContextMenu", builder =>
             {
-                builder.AddRestoreItem(textService, item.RowId);
-                builder.AddViewOutfitGlamourReadyItems(textService, excelService, item.RowId);
+                builder.AddRestoreItem(_textService, item.RowId);
+                builder.AddViewOutfitGlamourReadyItems(_textService, _excelService, item.RowId);
                 builder.AddTryOn(item);
                 builder.AddItemFinder(item.RowId);
                 builder.AddCopyItemName(item.RowId);

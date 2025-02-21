@@ -16,14 +16,15 @@ using Lumina.Text;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class InventoryTab(
-    DebugRenderer DebugRenderer,
-    TextService TextService,
-    ExcelService ExcelService,
-    ItemService ItemService,
-    ImGuiContextMenuService ImGuiContextMenu) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class InventoryTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly TextService _textService;
+    private readonly ExcelService _excelService;
+    private readonly ItemService _itemService;
+    private readonly ImGuiContextMenuService _imGuiContextMenu;
+
     private InventoryType? _selectedInventoryType = InventoryType.Inventory1;
 
     public override bool DrawInChild => false;
@@ -79,12 +80,12 @@ public unsafe class InventoryTab(
             {
                 _selectedInventoryType = inventoryType;
             }
-            ImGuiContextMenu.Draw($"##InventoryContext{inventoryType}", builder =>
+            _imGuiContextMenu.Draw($"##InventoryContext{inventoryType}", builder =>
             {
                 var container = InventoryManager.Instance()->GetInventoryContainer(inventoryType);
 
-                builder.AddCopyName(TextService, inventoryType.ToString());
-                builder.AddCopyAddress(TextService, (nint)container);
+                builder.AddCopyName(_textService, inventoryType.ToString());
+                builder.AddCopyAddress(_textService, (nint)container);
             });
 
             ImGui.TableNextColumn(); // Size
@@ -129,19 +130,19 @@ public unsafe class InventoryTab(
             ImGui.TableNextColumn(); // Item
             if (itemId != 0 && quantity != 0)
             {
-                var itemName = TextService.GetItemName(itemId);
+                var itemName = _textService.GetItemName(itemId);
 
                 if (itemId.IsHighQuality())
                     itemName += " " + SeIconChar.HighQuality.ToIconString();
 
                 var itemNameSeStr = new SeStringBuilder()
-                    .PushColorType(ItemService.GetItemRarityColorType(itemId))
+                    .PushColorType(_itemService.GetItemRarityColorType(itemId))
                     .Append(itemName)
                     .PopColorType()
                     .ToReadOnlySeString();
 
-                DebugRenderer.DrawIcon(ItemService.GetIconId(itemId), itemId.IsHighQuality());
-                DebugRenderer.DrawPointerType(slot, typeof(InventoryItem), new NodeOptions()
+                _debugRenderer.DrawIcon(_itemService.GetIconId(itemId), itemId.IsHighQuality());
+                _debugRenderer.DrawPointerType(slot, typeof(InventoryItem), new NodeOptions()
                 {
                     AddressPath = new AddressPath([(nint)inventoryType, slot->Slot]),
                     SeStringTitle = itemNameSeStr
@@ -166,7 +167,7 @@ public unsafe class InventoryTab(
         ImGui.TextUnformatted($"CompanySeals: {inventoryManager->GetCompanySeals(PlayerState.Instance()->GrandCompany):N0}");
         ImGui.TextUnformatted($"MaxCompanySeals: {inventoryManager->GetMaxCompanySeals(PlayerState.Instance()->GrandCompany):N0}");
 
-        foreach (var row in ExcelService.GetSheet<TomestonesItem>()!)
+        foreach (var row in _excelService.GetSheet<TomestonesItem>()!)
         {
             ImGui.TextUnformatted($"TomestoneItem #{row.RowId} ({row.Item.Value.Name}): {inventoryManager->GetTomestoneCount(row.Item.RowId):N0}");
         }

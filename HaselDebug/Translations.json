@@ -69,6 +69,94 @@
     "en": "Enable draw"
   },
 
+  "UnlockedColumn.Label": {
+    "en": "Unlocked"
+  },
+  "CategoryColumn.Label": {
+    "en": "Category"
+  },
+  "NameColumn.Label": {
+    "en": "Name"
+  },
+  "CompletedColumn.Label": {
+    "en": "Completed"
+  },
+  "IndexColumn.Label": {
+    "en": "Index"
+  },
+  "ZoneColumn.Label": {
+    "en": "Zone"
+  },
+  "RowIdColumn.Label": {
+    "en": "RowId"
+  },
+  "CaughtColumn.Label": {
+    "en": "Caught"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.AetherCurrents.Columns.LocationColumn.Label": {
+    "en": "Location"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Bardings.Columns.ItemColumn.Label": {
+    "en": "Item"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns.PathColumn.Label": {
+    "en": "Path"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns.SeenColumn.Label": {
+    "en": "Seen"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns.UsesColumn.Label": {
+    "en": "Uses"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns.WorkIndexColumn.Label": {
+    "en": "WorkIndex"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.OrchestrionRolls.Columns.NumberColumn.Label": {
+    "en": "Number"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Emotes.Columns.CanUseColumn.Label": {
+    "en": "Can use"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Emotes.Columns.ItemColumn.Label": {
+    "en": "Item"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Outfits.Columns.ItemsColumn.Label": {
+    "en": "Items"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Outfits.Columns.SetColumn.Label": {
+    "en": "Set"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Quests.Columns.QuestIdColumn.Label": {
+    "en": "Id"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Quests.Columns.QuestStatusColumn.Label": {
+    "en": "Status"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Quests.Columns.RepeatableColumn.Label": {
+    "en": "Repeatable"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Recipes.Columns.ItemCategoryColumn.Label": {
+    "en": "Item Category"
+  },
+  "FeminineTitle.Label": {
+    "en": "Feminine"
+  },
+  "MasculineTitle.Label": {
+    "en": "Masculine"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.Titles.Columns.PrefixColumn.Label": {
+    "en": "Prefix"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.TripleTriadCards.Columns.NumberColumn.Label": {
+    "en": "Number"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.UnlockLinks.Columns.UnlocksColumn.Label": {
+    "en": "Sheet/Row"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.UnlockLinks.Columns.UnlocksNameColumn.Label": {
+    "en": "Name"
+  },
+
   "UnlocksTab.CabinetNotLoaded": {
     "en": "Armoire not loaded",
     "de": "Kostbarkeitenkabinett nicht geladen"

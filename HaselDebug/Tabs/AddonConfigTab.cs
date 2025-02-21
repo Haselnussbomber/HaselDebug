@@ -24,16 +24,15 @@ public unsafe partial struct AddonConfigFunctions
     public static partial uint GetNameHash(byte* name);
 }
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class AddonConfigTab : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class AddonConfigTab : DebugTab
 {
     private readonly DebugRenderer _debugRenderer;
     private readonly Dictionary<uint, string> _addonNames = [];
 
-    public AddonConfigTab(DebugRenderer DebugRenderer)
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        _debugRenderer = DebugRenderer;
-
         for (var i = 0u; i < 99; i++)
         {
             var namePtr = AddonConfigFunctions.GetNameByIndex(i);

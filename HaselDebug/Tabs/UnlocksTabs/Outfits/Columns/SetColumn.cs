@@ -12,17 +12,25 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
-[RegisterSingleton]
-public class SetColumn(
-    TextService textService,
-    TextureService textureService,
-    ITextureProvider textureProvider,
-    ImGuiContextMenuService imGuiContextMenuService) : ColumnString<CustomMirageStoreSetItem>
+[RegisterSingleton, AutoConstruct]
+public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
 {
     private const float IconSize = OutfitsTable.IconSize;
 
+    private readonly TextService _textService;
+    private readonly TextureService _textureService;
+    private readonly ITextureProvider _textureProvider;
+    private readonly ImGuiContextMenuService _imGuiContextMenuService;
+
+    [AutoPostConstruct]
+    public void Initialize()
+    {
+        SetFixedWidth(300);
+        Flags |= ImGuiTableColumnFlags.DefaultSort;
+    }
+
     public override string ToName(CustomMirageStoreSetItem row)
-        => textService.GetItemName(row.RowId);
+        => _textService.GetItemName(row.RowId);
 
     public override unsafe void DrawColumn(CustomMirageStoreSetItem row)
     {
@@ -32,7 +40,7 @@ public class SetColumn(
         ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
         ImGui.SameLine(0, 0);
         ImGuiUtils.PushCursorX(-IconSize * ImGuiHelpers.GlobalScale);
-        textureService.DrawIcon(
+        _textureService.DrawIcon(
             row.Set.Value.Icon,
             false,
             new(IconSize * ImGuiHelpers.GlobalScale)
@@ -47,7 +55,7 @@ public class SetColumn(
         if (ImGui.IsItemHovered())
         {
             using var tooltip = ImRaii.Tooltip();
-            if (textureProvider.TryGetFromGameIcon(new(row.Set.Value.Icon), out var texture) && texture.TryGetWrap(out var textureWrap, out _))
+            if (_textureProvider.TryGetFromGameIcon(new(row.Set.Value.Icon), out var texture) && texture.TryGetWrap(out var textureWrap, out _))
             {
                 ImGui.Image(textureWrap.ImGuiHandle, new(textureWrap.Width, textureWrap.Height));
                 ImGui.SameLine();
@@ -57,7 +65,7 @@ public class SetColumn(
         }
 
         if (isSetCollected)
-            OutfitsTable.DrawCollectedCheckmark(textureProvider);
+            OutfitsTable.DrawCollectedCheckmark(_textureProvider);
 
         ImGui.SameLine();
         ImGui.Selectable($"###SetName_{row.RowId}", false, ImGuiSelectableFlags.None, new Vector2(ImGui.GetContentRegionAvail().X, IconSize * ImGuiHelpers.GlobalScale));
@@ -65,7 +73,7 @@ public class SetColumn(
         ImGui.EndGroup();
 
         // TODO: preview whole set??
-        imGuiContextMenuService.Draw($"###Set_{row.RowId}_ItemContextMenu", builder =>
+        _imGuiContextMenuService.Draw($"###Set_{row.RowId}_ItemContextMenu", builder =>
         {
             builder.AddTryOn(row.Set);
             builder.AddItemFinder(row.Set.RowId);
@@ -76,6 +84,6 @@ public class SetColumn(
 
         ImGui.SameLine(IconSize * ImGuiHelpers.GlobalScale + ImGui.GetStyle().ItemSpacing.X, 0);
         ImGuiUtils.PushCursorY(IconSize * ImGuiHelpers.GlobalScale / 2f - ImGui.GetTextLineHeight() / 2f);
-        ImGui.TextUnformatted(textService.GetItemName(row.RowId));
+        ImGui.TextUnformatted(_textService.GetItemName(row.RowId));
     }
 }

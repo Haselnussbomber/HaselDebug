@@ -10,9 +10,11 @@ using InteropGenerator.Runtime.Attributes;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe partial class SheetRedirectTestTab(SeStringEvaluatorService seStringEvaluator) : DebugTab, IDisposable
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class SheetRedirectTestTab : DebugTab, IDisposable
 {
+    private readonly SeStringEvaluatorService _seStringEvaluator;
+
     private string _inputSheetName = "Item";
     private int _inputRowId = 0;
     private Utf8String* _sheetName = Utf8String.CreateEmpty();
@@ -46,7 +48,7 @@ public unsafe partial class SheetRedirectTestTab(SeStringEvaluatorService seStri
 
             var sheetName2 = _inputSheetName;
             var rowId2 = (uint)_inputRowId;
-            seStringEvaluator.ResolveSheetRedirect(ref sheetName2, ref rowId2);
+            _seStringEvaluator.ResolveSheetRedirect(ref sheetName2, ref rowId2);
             ImGui.TextUnformatted($"{sheetName2}#{rowId2}");
 
             ImGui.SameLine();
@@ -138,7 +140,7 @@ public unsafe partial class SheetRedirectTestTab(SeStringEvaluatorService seStri
         ImGui.TableNextColumn();
         var sheetName2 = sheetName;
         var rowId2 = rowId;
-        seStringEvaluator.ResolveSheetRedirect(ref sheetName2, ref rowId2);
+        _seStringEvaluator.ResolveSheetRedirect(ref sheetName2, ref rowId2);
         ImGui.TextUnformatted($"{sheetName2}#{rowId2}");
 
         ImGui.TableNextColumn();

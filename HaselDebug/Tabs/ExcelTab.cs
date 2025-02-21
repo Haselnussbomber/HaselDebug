@@ -19,20 +19,20 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class ExcelTab : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class ExcelTab : DebugTab
 {
     private const int LanguageSelectorWidth = 90;
 
     private readonly LanguageProvider _languageProvider;
     private readonly TextService _textService;
-    private readonly ExcelModule _excelModule;
+    private readonly IDataManager _dataManager;
     private readonly DebugRenderer _debugRenderer;
 
-    private Addon[] _addonRows;
-    private AddonTransient[] _addonTransientRows;
-    private Lobby[] _lobbyRows;
-    private LogMessage[] _logMessageRows;
+    private Addon[] _addonRows = null!;
+    private AddonTransient[] _addonTransientRows = null!;
+    private Lobby[] _lobbyRows = null!;
+    private LogMessage[] _logMessageRows = null!;
 
     private Addon[]? _filteredAddonRows;
     private AddonTransient[]? _filteredAddonTransientRows;
@@ -43,22 +43,14 @@ public unsafe class ExcelTab : DebugTab
     private string _searchTerm = string.Empty;
     private ClientLanguage _selectedLanguage;
 
-    public ExcelTab(
-        LanguageProvider languageProvider,
-        TextService textService,
-        IDataManager dataManager,
-        DebugRenderer debugRenderer)
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        _languageProvider = languageProvider;
-        _textService = textService;
-        _excelModule = dataManager.Excel;
-        _debugRenderer = debugRenderer;
-
         _selectedLanguage = _languageProvider.ClientLanguage;
-        _addonRows = _excelModule.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
-        _addonTransientRows = _excelModule.GetSheet<AddonTransient>(_selectedLanguage.ToLumina()).ToArray();
-        _lobbyRows = _excelModule.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
-        _logMessageRows = _excelModule.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
+        _addonRows = _dataManager.Excel.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
+        _addonTransientRows = _dataManager.Excel.GetSheet<AddonTransient>(_selectedLanguage.ToLumina()).ToArray();
+        _lobbyRows = _dataManager.Excel.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
+        _logMessageRows = _dataManager.Excel.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
     }
 
     public override bool DrawInChild => false;
@@ -80,10 +72,10 @@ public unsafe class ExcelTab : DebugTab
                     if (ImGui.Selectable(Enum.GetName(value), value == _selectedLanguage))
                     {
                         _selectedLanguage = value;
-                        _addonRows = _excelModule.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
-                        _addonTransientRows = _excelModule.GetSheet<AddonTransient>(_selectedLanguage.ToLumina()).ToArray();
-                        _lobbyRows = _excelModule.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
-                        _logMessageRows = _excelModule.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
+                        _addonRows = _dataManager.Excel.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
+                        _addonTransientRows = _dataManager.Excel.GetSheet<AddonTransient>(_selectedLanguage.ToLumina()).ToArray();
+                        _lobbyRows = _dataManager.Excel.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
+                        _logMessageRows = _dataManager.Excel.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
                         listDirty |= true;
                     }
                 }

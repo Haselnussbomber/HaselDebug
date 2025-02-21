@@ -1,7 +1,6 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Services;
-using HaselCommon.Services.SeStringEvaluation;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -11,9 +10,14 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelService, TextService TextService, SeStringEvaluatorService SeStringEvaluator) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class ChatTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+    private readonly ExcelService _excelService;
+    private readonly TextService _textService;
+    private readonly SeStringEvaluatorService _seStringEvaluator;
+
     public override void Draw()
     {
         var raptureLogModule = RaptureLogModule.Instance();
@@ -71,14 +75,14 @@ public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelServi
                     ImGui.TextUnformatted(GetLabel(targetKind));
 
                     ImGui.TableNextColumn(); // Formatted Message
-                    var senderEvaluated = SeStringEvaluator.Evaluate(sender);
-                    var messageEvaluated = SeStringEvaluator.Evaluate(message);
-                    var format = ExcelService.TryGetRow<LogKind>((uint)logKind, out var logKindRow) ? logKindRow.Format : new();
-                    var formatted = SeStringEvaluator.Evaluate(format, [senderEvaluated, messageEvaluated]).AsSpan();
+                    var senderEvaluated = _seStringEvaluator.Evaluate(sender);
+                    var messageEvaluated = _seStringEvaluator.Evaluate(message);
+                    var format = _excelService.TryGetRow<LogKind>((uint)logKind, out var logKindRow) ? logKindRow.Format : new();
+                    var formatted = _seStringEvaluator.Evaluate(format, [senderEvaluated, messageEvaluated]).AsSpan();
 
                     if (!formatted.IsEmpty)
                     {
-                        DebugRenderer.DrawSeString(formatted, new NodeOptions()
+                        _debugRenderer.DrawSeString(formatted, new NodeOptions()
                         {
                             AddressPath = new AddressPath(i),
                             Indent = false,
@@ -97,17 +101,17 @@ public unsafe class ChatTab(DebugRenderer DebugRenderer, ExcelService ExcelServi
     {
         return index switch
         {
-            0 => TextService.GetAddonText(1227), // You
-            1 => TextService.GetAddonText(1228), // Party Member
-            2 => TextService.GetAddonText(1229), // Alliance Member
-            3 => TextService.GetAddonText(1230), // Other PC
-            4 => TextService.GetAddonText(1231), // Engaged Enemy
-            5 => TextService.GetAddonText(1232), // Unengaged Enemy
-            6 => TextService.GetAddonText(1283), // Friendly NPCs
-            7 => TextService.GetAddonText(1276), // Pets/Companions
-            8 => TextService.GetAddonText(1277), // Pets/Companions (Party)
-            9 => TextService.GetAddonText(1278), // Pets/Companions (Alliance)
-            10 => TextService.GetAddonText(1279), // Pets/Companions (Other PC)
+            0 => _textService.GetAddonText(1227), // You
+            1 => _textService.GetAddonText(1228), // Party Member
+            2 => _textService.GetAddonText(1229), // Alliance Member
+            3 => _textService.GetAddonText(1230), // Other PC
+            4 => _textService.GetAddonText(1231), // Engaged Enemy
+            5 => _textService.GetAddonText(1232), // Unengaged Enemy
+            6 => _textService.GetAddonText(1283), // Friendly NPCs
+            7 => _textService.GetAddonText(1276), // Pets/Companions
+            8 => _textService.GetAddonText(1277), // Pets/Companions (Party)
+            9 => _textService.GetAddonText(1278), // Pets/Companions (Alliance)
+            10 => _textService.GetAddonText(1279), // Pets/Companions (Other PC)
             _ => string.Empty,
         };
     }

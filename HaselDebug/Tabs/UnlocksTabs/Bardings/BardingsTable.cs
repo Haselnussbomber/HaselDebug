@@ -1,35 +1,25 @@
 using System.Linq;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
-using HaselDebug.Services;
-using ImGuiNET;
+using HaselDebug.Tabs.UnlocksTabs.Bardings.Columns;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Bardings;
 
-[RegisterSingleton]
-public unsafe class BardingsTable : Table<BuddyEquip>
+[RegisterSingleton, AutoConstruct]
+public unsafe partial class BardingsTable : Table<BuddyEquip>
 {
-    internal readonly ExcelService _excelService;
+    private readonly ExcelService _excelService;
+    private readonly UnlockedColumn _unlockedColumn;
+    private readonly ItemColumn _itemColumn;
 
-    public BardingsTable(
-        ExcelService excelService,
-        DebugRenderer debugRenderer,
-        LanguageProvider languageProvider) : base(languageProvider)
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        _excelService = excelService;
-
         Columns = [
             RowIdColumn<BuddyEquip>.Create(),
-            new UnlockedColumn() {
-                Label = "Unlocked",
-                Flags = ImGuiTableColumnFlags.WidthFixed,
-                Width = 75,
-            },
-            new ItemColumn(debugRenderer) {
-                Label = "Items",
-            }
+            _unlockedColumn,
+            _itemColumn,
         ];
     }
 
@@ -38,27 +28,5 @@ public unsafe class BardingsTable : Table<BuddyEquip>
         Rows = _excelService.GetSheet<BuddyEquip>()
             .Where(row => row.RowId != 0 && !row.Name.IsEmpty)
             .ToList();
-    }
-
-    private class UnlockedColumn : ColumnBool<BuddyEquip>
-    {
-        public override unsafe bool ToBool(BuddyEquip row)
-            => UIState.Instance()->Buddy.CompanionInfo.IsBuddyEquipUnlocked(row.RowId);
-    }
-
-    private class ItemColumn(DebugRenderer debugRenderer) : ColumnString<BuddyEquip>
-    {
-        public override string ToName(BuddyEquip row)
-            => row.Name.ExtractText();
-
-        public override unsafe void DrawColumn(BuddyEquip row)
-        {
-            debugRenderer.DrawIcon(row.IconBody != 0
-                ? row.IconBody
-                : row.IconHead != 0
-                    ? row.IconHead
-                    : row.IconLegs);
-            ImGui.TextUnformatted(row.Name.ExtractText());
-        }
     }
 }

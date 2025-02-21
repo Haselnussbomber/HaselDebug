@@ -6,9 +6,11 @@ using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class ShopTab(DebugRenderer DebugRenderer) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class ShopTab : DebugTab
 {
+    private readonly DebugRenderer _debugRenderer;
+
     [StructLayout(LayoutKind.Explicit)]
     public struct AddonShop
     {
@@ -30,7 +32,7 @@ public unsafe class ShopTab(DebugRenderer DebugRenderer) : DebugTab
             var listItemRenderer = &addon->List->ItemRendererList[i];
             ImGui.TextUnformatted($"{i}:");
             ImGui.SameLine();
-            DebugRenderer.DrawCopyableText($"{(nint)listItemRenderer:X}");
+            _debugRenderer.DrawCopyableText($"{(nint)listItemRenderer:X}");
             ImGui.SameLine();
 
             if (addon->List->ItemRendererList[i].IsDisabled)

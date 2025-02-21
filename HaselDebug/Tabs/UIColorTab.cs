@@ -9,9 +9,12 @@ using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class UIColorTab(ExcelService ExcelService, TextService TextService) : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class UIColorTab : DebugTab
 {
+    private readonly ExcelService _excelService;
+    private readonly TextService _textService;
+
     public override string Title => "UIColor";
     public override bool DrawInChild => false;
 
@@ -21,14 +24,14 @@ public unsafe class UIColorTab(ExcelService ExcelService, TextService TextServic
         if (!table) return;
 
         ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 30);
-        ImGui.TableSetupColumn(TextService.GetAddonText(4232)); // Dark
-        ImGui.TableSetupColumn(TextService.GetAddonText(4233)); // Light
-        ImGui.TableSetupColumn(TextService.GetAddonText(4234)); // Classic FF
-        ImGui.TableSetupColumn(TextService.GetAddonText(4235)); // Clear Blue
+        ImGui.TableSetupColumn(_textService.GetAddonText(4232)); // Dark
+        ImGui.TableSetupColumn(_textService.GetAddonText(4233)); // Light
+        ImGui.TableSetupColumn(_textService.GetAddonText(4234)); // Classic FF
+        ImGui.TableSetupColumn(_textService.GetAddonText(4235)); // Clear Blue
         ImGui.TableSetupScrollFreeze(5, 1);
         ImGui.TableHeadersRow();
 
-        foreach (var row in ExcelService.GetSheet<UIColor>())
+        foreach (var row in _excelService.GetSheet<UIColor>())
         {
             ImGui.TableNextRow();
 

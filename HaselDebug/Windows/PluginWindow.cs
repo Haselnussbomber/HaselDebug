@@ -14,40 +14,26 @@ using ImGuiNET;
 
 namespace HaselDebug.Windows;
 
-[RegisterSingleton]
-public class PluginWindow : SimpleWindow
+[RegisterSingleton, AutoConstruct]
+public partial class PluginWindow : SimpleWindow
 {
     private const uint SidebarWidth = 250;
-    private readonly IDebugTab[] Tabs;
-    private readonly WindowManager WindowManager;
-    private readonly PluginConfig PluginConfig;
-    private readonly TextService TextService;
-    private readonly LanguageProvider LanguageProvider;
-    private readonly PinnedInstancesService PinnedInstances;
-    private readonly ImGuiContextMenuService ImGuiContextMenu;
-    private readonly DebugRenderer DebugRenderer;
-    private IDrawableTab? SelectedTab;
+    private readonly WindowManager _windowManager;
+    private readonly PluginConfig _pluginConfig;
+    private readonly TextService _textService;
+    private readonly LanguageProvider _languageProvider;
+    private readonly PinnedInstancesService _pinnedInstances;
+    private readonly ImGuiContextMenuService _imGuiContextMenu;
+    private readonly DebugRenderer _debugRenderer;
+    private readonly ConfigWindow _configWindow;
+    private readonly IEnumerable<IDebugTab> _debugTabs;
 
-    public PluginWindow(
-        PluginConfig pluginConfig,
-        WindowManager windowManager,
-        IEnumerable<IDebugTab> tabs,
-        TextService textService,
-        LanguageProvider languageProvider,
-        ConfigWindow configWindow,
-        PinnedInstancesService pinnedInstances,
-        ImGuiContextMenuService imGuiContextMenuService,
-        DebugRenderer debugRenderer)
-        : base(windowManager, textService, languageProvider)
+    private IDebugTab[] _tabs;
+    private IDrawableTab? _selectedTab;
+
+    [AutoPostConstruct]
+    public void Initialize()
     {
-        WindowManager = windowManager;
-        PluginConfig = pluginConfig;
-        TextService = textService;
-        LanguageProvider = languageProvider;
-        PinnedInstances = pinnedInstances;
-        ImGuiContextMenu = imGuiContextMenuService;
-        DebugRenderer = debugRenderer;
-
         Size = new Vector2(1440, 880);
         SizeConstraints = new()
         {
@@ -66,22 +52,22 @@ public class PluginWindow : SimpleWindow
             ShowTooltip = () =>
             {
                 using var tooltip = ImRaii.Tooltip();
-                ImGui.TextUnformatted(textService.Translate($"TitleBarButton.ToggleConfig.Tooltip.{(configWindow.IsOpen ? "Close" : "Open")}Config"));
+                ImGui.TextUnformatted(_textService.Translate($"TitleBarButton.ToggleConfig.Tooltip.{(_configWindow.IsOpen ? "Close" : "Open")}Config"));
             },
-            Click = (button) => configWindow.Toggle()
+            Click = (button) => _configWindow.Toggle()
         });
 
-        Tabs = [.. tabs
+        _tabs = [.. _debugTabs
             .Where(t => !t.GetType().GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition().IsAssignableTo(typeof(ISubTab<>)))) // no sub tabs
             .OrderBy(t => t.Title)
         ];
 
-        SelectTabWithoutSave(pluginConfig.LastSelectedTab);
+        SelectTabWithoutSave(_pluginConfig.LastSelectedTab);
     }
 
     public override void Dispose()
     {
-        foreach (var tab in Tabs.OfType<IDisposable>())
+        foreach (var tab in _tabs.OfType<IDisposable>())
             tab.Dispose();
 
         base.Dispose();
@@ -90,7 +76,7 @@ public class PluginWindow : SimpleWindow
     public override void OnOpen()
     {
         base.OnOpen();
-        DebugRenderer.ParseCSDocs();
+        _debugRenderer.ParseCSDocs();
     }
 
     public override bool DrawConditions()
@@ -121,72 +107,72 @@ public class PluginWindow : SimpleWindow
 
         ImGui.TableSetupColumn("Tab Name", ImGuiTableColumnFlags.WidthStretch);
 
-        if (PinnedInstances.Count > 0)
+        if (_pinnedInstances.Count > 0)
         {
             PinnedInstanceTab? removeTab = null;
 
-            foreach (var tab in PinnedInstances)
+            foreach (var tab in _pinnedInstances)
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
 
-                var selected = ImGui.Selectable($"{tab.Title}##Selectable_{tab.InternalName}", SelectedTab == tab);
+                var selected = ImGui.Selectable($"{tab.Title}##Selectable_{tab.InternalName}", _selectedTab == tab);
 
-                ImGuiContextMenu.Draw($"{tab.InternalName}ContextMenu", builder =>
+                _imGuiContextMenu.Draw($"{tab.InternalName}ContextMenu", builder =>
                 {
                     builder.Add(new ImGuiContextMenuEntry()
                     {
-                        Visible = tab.CanPopOut && !WindowManager.Contains(win => win.WindowName == tab.Title),
-                        Label = TextService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, TextService, LanguageProvider, tab))
+                        Visible = tab.CanPopOut && !_windowManager.Contains(win => win.WindowName == tab.Title),
+                        Label = _textService.Translate("ContextMenu.TabPopout"),
+                        ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, _languageProvider, tab))
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()
                     {
-                        Label = TextService.Translate("ContextMenu.PinnedInstances.Unpin"),
+                        Label = _textService.Translate("ContextMenu.PinnedInstances.Unpin"),
                         ClickCallback = () => removeTab = tab
                     });
                 });
 
                 if (selected)
                 {
-                    SelectedTab = SelectedTab != tab ? tab : null;
-                    PluginConfig.LastSelectedTab = SelectedTab != null ? tab.InternalName : string.Empty;
-                    PluginConfig.Save();
+                    _selectedTab = _selectedTab != tab ? tab : null;
+                    _pluginConfig.LastSelectedTab = _selectedTab != null ? tab.InternalName : string.Empty;
+                    _pluginConfig.Save();
                 }
             }
 
             if (removeTab != null)
             {
-                SelectedTab = null;
-                PluginConfig.LastSelectedTab = string.Empty;
-                PinnedInstances.Remove(removeTab);
+                _selectedTab = null;
+                _pluginConfig.LastSelectedTab = string.Empty;
+                _pinnedInstances.Remove(removeTab);
             }
 
             ImGui.Separator();
         }
 
-        foreach (var tab in Tabs)
+        foreach (var tab in _tabs)
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
 
             using var disabled = Color.From(ImGuiCol.TextDisabled).Push(ImGuiCol.Text, !tab.IsEnabled);
 
-            if (ImGui.Selectable($"{tab.Title}###Selectable_{tab.InternalName}", SelectedTab == tab))
+            if (ImGui.Selectable($"{tab.Title}###Selectable_{tab.InternalName}", _selectedTab == tab))
             {
                 SelectTab(tab);
             }
 
             disabled.Pop();
 
-            ImGuiContextMenu.Draw($"{tab.InternalName}ContextMenu", builder =>
+            _imGuiContextMenu.Draw($"{tab.InternalName}ContextMenu", builder =>
             {
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = tab.CanPopOut && !WindowManager.Contains(win => win.WindowName == tab.Title),
-                    Label = TextService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, TextService, LanguageProvider, tab))
+                    Visible = tab.CanPopOut && !_windowManager.Contains(win => win.WindowName == tab.Title),
+                    Label = _textService.Translate("ContextMenu.TabPopout"),
+                    ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, _languageProvider, tab))
                 });
             });
 
@@ -200,20 +186,20 @@ public class PluginWindow : SimpleWindow
                     using var subTabDisabled = Color.From(ImGuiCol.TextDisabled).Push(ImGuiCol.Text, !tab.IsEnabled || !subTab.IsEnabled);
                     var pos = ImGui.GetCursorPos();
 
-                    if (ImGui.Selectable($"###Selectable_{subTab.InternalName}", SelectedTab == subTab))
+                    if (ImGui.Selectable($"###Selectable_{subTab.InternalName}", _selectedTab == subTab))
                     {
                         SelectTab(subTab);
                     }
 
                     subTabDisabled.Pop();
 
-                    ImGuiContextMenu.Draw($"{subTab.InternalName}ContextMenu", builder =>
+                    _imGuiContextMenu.Draw($"{subTab.InternalName}ContextMenu", builder =>
                     {
                         builder.Add(new ImGuiContextMenuEntry()
                         {
-                            Visible = subTab.CanPopOut && !WindowManager.Contains(win => win.WindowName == subTab.Title),
-                            Label = TextService.Translate("ContextMenu.TabPopout"),
-                            ClickCallback = () => WindowManager.Open(new TabPopoutWindow(WindowManager, TextService, LanguageProvider, subTab))
+                            Visible = subTab.CanPopOut && !_windowManager.Contains(win => win.WindowName == subTab.Title),
+                            Label = _textService.Translate("ContextMenu.TabPopout"),
+                            ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, _languageProvider, subTab))
                         });
                     });
 
@@ -234,15 +220,15 @@ public class PluginWindow : SimpleWindow
     public void SelectTab(string internalName)
     {
         SelectTabWithoutSave(internalName);
-        PluginConfig.LastSelectedTab = SelectedTab?.InternalName ?? string.Empty;
-        PluginConfig.Save();
+        _pluginConfig.LastSelectedTab = _selectedTab?.InternalName ?? string.Empty;
+        _pluginConfig.Save();
     }
 
     private void SelectTabWithoutSave(string internalName)
     {
-        SelectedTab = PinnedInstances.FirstOrDefault(tab => tab.InternalName == internalName)
-            ?? (IDrawableTab?)Tabs.FirstOrDefault(tab => tab.InternalName == internalName)
-            ?? Tabs
+        _selectedTab = _pinnedInstances.FirstOrDefault(tab => tab.InternalName == internalName)
+            ?? (IDrawableTab?)_tabs.FirstOrDefault(tab => tab.InternalName == internalName)
+            ?? _tabs
                 .Where(tab => tab.SubTabs?.Any(subTab => subTab.InternalName == internalName) == true)
                 .Select(tab => tab.SubTabs?.FirstOrDefault(subTab => subTab.InternalName == internalName))
                 .FirstOrDefault();
@@ -250,26 +236,26 @@ public class PluginWindow : SimpleWindow
 
     private void SelectTab(IDrawableTab tab)
     {
-        SelectedTab = tab;
-        PluginConfig.LastSelectedTab = tab.InternalName;
-        PluginConfig.Save();
+        _selectedTab = tab;
+        _pluginConfig.LastSelectedTab = tab.InternalName;
+        _pluginConfig.Save();
     }
 
     private unsafe void DrawTab()
     {
-        if (SelectedTab == null)
+        if (_selectedTab == null)
         {
             ImGui.Dummy(Vector2.Zero);
             return;
         }
 
-        using var child = SelectedTab.DrawInChild
-            ? ImRaii.Child($"###{SelectedTab.InternalName}_Child", new Vector2(-1), true)
+        using var child = _selectedTab.DrawInChild
+            ? ImRaii.Child($"###{_selectedTab.InternalName}_Child", new Vector2(-1), true)
             : null;
 
         try
         {
-            SelectedTab.Draw();
+            _selectedTab.Draw();
         }
         catch { }
     }
