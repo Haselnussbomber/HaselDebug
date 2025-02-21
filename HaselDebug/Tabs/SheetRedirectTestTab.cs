@@ -24,8 +24,6 @@ public unsafe partial class SheetRedirectTestTab(SeStringEvaluatorService seStri
             _sheetName->Dtor(true);
             _sheetName = null;
         }
-
-        GC.SuppressFinalize(this);
     }
 
     public override void Draw()

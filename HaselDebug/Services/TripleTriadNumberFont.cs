@@ -15,6 +15,5 @@ public class TripleTriadNumberFont(IDalamudPluginInterface pluginInterface) : ID
     public void Dispose()
     {
         _fontHandle?.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

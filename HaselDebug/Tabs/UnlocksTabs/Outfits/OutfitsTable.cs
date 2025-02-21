@@ -55,7 +55,6 @@ public class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
     {
         _globalScaleObserver.ScaleChange -= OnScaleChange;
         base.Dispose();
-        GC.SuppressFinalize(this);
     }
 
     private void OnScaleChange(float scale)

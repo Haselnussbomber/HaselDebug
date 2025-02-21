@@ -108,7 +108,6 @@ public unsafe class RaptureTextModuleTab : DebugTab, IDisposable
     public void Dispose()
     {
         _languageProvider.LanguageChanged -= OnLanguageChanged;
-        GC.SuppressFinalize(this);
     }
 
     private void OnLanguageChanged(string langCode)

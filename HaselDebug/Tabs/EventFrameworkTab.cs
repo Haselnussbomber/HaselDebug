@@ -42,7 +42,6 @@ public unsafe class EventFrameworkTab : DebugTab, IDisposable
     public void Dispose()
     {
         _addTaskHook.Dispose();
-        GC.SuppressFinalize(this);
     }
 
     private void AddTaskDetour(EventSceneModuleTaskManager* thisPtr, EventSceneTaskInterface* task)

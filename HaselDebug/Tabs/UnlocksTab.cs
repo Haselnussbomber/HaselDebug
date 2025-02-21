@@ -24,7 +24,6 @@ public class UnlocksTab : DebugTab, IDisposable
     public void Dispose()
     {
         //_summaryNode.Dispose();
-        GC.SuppressFinalize(this);
     }
 
     public override void Draw()

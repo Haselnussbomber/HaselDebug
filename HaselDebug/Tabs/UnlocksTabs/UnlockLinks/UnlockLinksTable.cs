@@ -72,7 +72,6 @@ public unsafe class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
         _clientState.Logout -= OnLogout;
         _clientState.Login -= OnLogin;
         base.Dispose();
-        GC.SuppressFinalize(this);
     }
 
     private void OnLogin()
