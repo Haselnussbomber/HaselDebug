@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
@@ -75,6 +76,12 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
         new TextEntry(TextEntryType.Macro, "<fixed(64,13)>"), // Companion
         new TextEntry(TextEntryType.Macro, "<br>"),
         new TextEntry(TextEntryType.Macro, "<fixed(60,21)>"), // MainCommand
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<ordinal(501)>"), // 501st
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<split(Hello World, ,1)>"), // Hello
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<split(Hello World, ,2)>"), // World
     ];
 
     private readonly DebugRenderer _debugRenderer;
@@ -285,43 +292,46 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
         using var table = ImRaii.Table("DefinitionsTable", 13, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Code", ImGuiTableColumnFlags.WidthFixed, 200);
         ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("Code", ImGuiTableColumnFlags.WidthFixed, 200);
         ImGui.TableSetupColumn("TotalParamCount", ImGuiTableColumnFlags.WidthFixed, 60);
         ImGui.TableSetupColumn("ParamCount", ImGuiTableColumnFlags.WidthFixed, 60);
         ImGui.TableSetupColumn("IsTerminated", ImGuiTableColumnFlags.WidthFixed, 60);
         for (var i = 0; i < 7; i++)
             ImGui.TableSetupColumn($"{i}", ImGuiTableColumnFlags.WidthFixed, 20);
+        ImGui.TableSetupColumn("DecoderFunc", ImGuiTableColumnFlags.WidthFixed, 100);
 
-        ImGui.TableSetupScrollFreeze(13, 1);
+        ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
         var raptureTextModule = RaptureTextModule.Instance();
 
-        foreach (var item in raptureTextModule->TextModule.MacroEncoder.MacroCodeMap)
+        foreach (var item in raptureTextModule->TextModule.MacroEncoder.MacroCodeMap.OrderBy(item => item.Value.Id))
         {
             ImGui.TableNextRow();
-            ImGui.TableNextColumn(); // Code
-            ImGui.TextUnformatted(item.Item1.ToString());
-
             ImGui.TableNextColumn(); // Id
-            ImGui.TextUnformatted($"0x{item.Item2.Id:X}");
+            ImGui.TextUnformatted($"0x{item.Value.Id:X}");
+
+            ImGui.TableNextColumn(); // Code
+            ImGui.TextUnformatted(item.Key.ToString());
 
             ImGui.TableNextColumn(); // TotalParamCount
-            ImGui.TextUnformatted(item.Item2.TotalParamCount.ToString());
+            ImGui.TextUnformatted(item.Value.TotalParamCount.ToString());
 
             ImGui.TableNextColumn(); // ParamCount
-            ImGui.TextUnformatted(item.Item2.ParamCount.ToString());
+            ImGui.TextUnformatted(item.Value.ParamCount.ToString());
 
             ImGui.TableNextColumn(); // IsTerminated
-            ImGui.TextUnformatted(item.Item2.IsTerminated.ToString());
+            ImGui.TextUnformatted(item.Value.IsTerminated.ToString());
 
-            ImGui.TableNextColumn();
             for (var i = 0; i < 7; i++)
             {
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted(((char)item.Item2.ParamTypes[i]).ToString());
+                ImGui.TextUnformatted(((char)item.Value.ParamTypes[i]).ToString());
             }
+
+            ImGui.TableNextColumn();
+            _debugRenderer.DrawAddress(raptureTextModule->DecoderFuncs[item.Value.Id]);
         }
     }
 
