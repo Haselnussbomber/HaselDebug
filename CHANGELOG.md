@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.17.0] (2025-02-23)
+
+- **Added:** Rapture Text Module/Definitions: The address of the decoder function was added, including the address of the resolved vfunc (since they are just small functions that jump to there).
+- **Updated:** Rapture Text Module/Definitions: The table is now sorted by macro code id.
+- **Updated:** SeStringEvaluator now supports Ordinal and Split macros.
+- **Changed:** SeStringEvaluator now passes through payloads that were not evaluated.
+- **Changed:** Lots of code was rewritten to use the Injectio and AutoCtor generators.
+- **Fixed:** Rapture Text Module/Definitions: The parameter columns were shifted because of a leftover `ImGui.TableNextColumn` call.
+- **Fixed:** Unlocks: The unlock progress for Emotes was incorrectly using the "Can use" state.
+- **Removed:** The plugin no longer depends on the Yoga layout engine, therefore the Unlocks overview is now a boring table and the Triple Triad Card preview in the tooltip was also replaced with "normal" ImGui code.
+
 ## [1.16.0] (2025-02-18)
 
 - **Added:** An Addon Names tab that lists addon names used by the `RaptureAtkModule.OpenAddon` function.
@@ -272,7 +283,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.16.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.17.0...main
+[1.17.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.16.0...v1.17.0
 [1.16.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.15.0...v1.16.0
 [1.15.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.13.1...v1.14.0
