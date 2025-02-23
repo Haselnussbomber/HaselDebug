@@ -299,7 +299,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
         ImGui.TableSetupColumn("IsTerminated", ImGuiTableColumnFlags.WidthFixed, 60);
         for (var i = 0; i < 7; i++)
             ImGui.TableSetupColumn($"{i}", ImGuiTableColumnFlags.WidthFixed, 20);
-        ImGui.TableSetupColumn("DecoderFunc", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("DecoderFunc", ImGuiTableColumnFlags.WidthStretch);
 
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
@@ -331,7 +331,34 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
             }
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawAddress(raptureTextModule->DecoderFuncs[item.Value.Id]);
+            if (raptureTextModule->DecoderFuncs[item.Value.Id] != 0)
+            {
+                // resolve jmp [eax+offset]
+
+                var span = new Span<byte>((byte*)raptureTextModule->DecoderFuncs[item.Value.Id], 9);
+                var resolvedVf = nint.Zero;
+
+                if (span.StartsWith((ReadOnlySpan<byte>)[0x48, 0x8B, 0x01, 0xFF, 0x60])) // 8-bit displacement
+                {
+                    var vfOffset = span[5];
+                    resolvedVf = *(nint*)(*(nint*)&raptureTextModule->TextModule.MacroDecoder + vfOffset);
+                }
+                else if (span.StartsWith((ReadOnlySpan<byte>)[0x48, 0x8B, 0x01, 0xFF, 0xA0])) // 32-bit displacement
+                {
+                    var vfOffset = *(int*)span.GetPointer(5);
+                    resolvedVf = *(nint*)(*(nint*)&raptureTextModule->TextModule.MacroDecoder + vfOffset);
+                }
+
+                _debugRenderer.DrawAddress(raptureTextModule->DecoderFuncs[item.Value.Id]);
+
+                if (resolvedVf != 0)
+                {
+                    ImGui.SameLine();
+                    ImGui.TextUnformatted("->");
+                    ImGui.SameLine();
+                    _debugRenderer.DrawAddress(resolvedVf);
+                }
+            }
         }
     }
 
