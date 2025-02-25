@@ -131,7 +131,7 @@ public unsafe partial class HousingTab : DebugTab
         var territoryTypeId = HousingManager.GetOriginalHouseTerritoryTypeId();
         ImGui.TextUnformatted($"OriginalHouseTerritoryTypeId:");
         ImGui.SameLine();
-        _debugRenderer.DrawExdSheet(typeof(TerritoryType), territoryTypeId, 0, new NodeOptions()
+        _debugRenderer.DrawExdRow(typeof(TerritoryType), territoryTypeId, 0, new NodeOptions()
         {
             Language = _languageProvider.ClientLanguage
         });

@@ -52,7 +52,7 @@ public class SeStringInspectorWindow : SimpleWindow
         _seStringEvaluator = seStringEvaluator;
         Language = language;
         String = str;
-        WindowName = $"{windowName}##{GetType().Name}";
+        WindowName = $"{windowName.Replace("\n", "")}##{GetType().Name}";
     }
 
     public override void OnOpen()

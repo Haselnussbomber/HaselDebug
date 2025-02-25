@@ -17,7 +17,7 @@ public unsafe partial class TerritoryTypeTab : DebugTab
 
     public override void Draw()
     {
-        _debugRenderer.DrawExdSheet(typeof(TerritoryType), _clientState.TerritoryType, 0, new NodeOptions()
+        _debugRenderer.DrawExdRow(typeof(TerritoryType), _clientState.TerritoryType, 0, new NodeOptions()
         {
             DefaultOpen = true,
             Language = _languageProvider.ClientLanguage

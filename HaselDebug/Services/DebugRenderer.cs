@@ -31,7 +31,6 @@ using HaselCommon.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using InteropGenerator.Runtime.Attributes;
-using Lumina.Excel;
 using Lumina.Text.ReadOnly;
 using Microsoft.Extensions.Logging;
 using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;

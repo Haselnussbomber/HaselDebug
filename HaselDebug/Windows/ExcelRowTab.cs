@@ -54,6 +54,6 @@ public class ExcelRowTab : SimpleWindow
 
     public override void Draw()
     {
-        _debugRenderer.DrawExdSheet(_rowType, _rowId, 0, new NodeOptions() { DefaultOpen = true });
+        _debugRenderer.DrawExdRow(_rowType, _rowId, 0, new NodeOptions() { DefaultOpen = true });
     }
 }

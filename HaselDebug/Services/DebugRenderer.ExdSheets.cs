@@ -12,7 +12,7 @@ namespace HaselDebug.Services;
 
 public unsafe partial class DebugRenderer
 {
-    public void DrawExdSheet(Type sheetType, uint rowId, uint depth, NodeOptions nodeOptions)
+    public void DrawExdRow(Type sheetType, uint rowId, uint depth, NodeOptions nodeOptions)
     {
         if (depth > 10)
         {
@@ -30,7 +30,7 @@ public unsafe partial class DebugRenderer
             nodeOptions = nodeOptions with { Title = null };
         }
 
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, nodeOptions.TitleColor ?? (uint)ColorTreeNode);
         using var node = ImRaii.TreeNode($"{title}###{nodeOptions.AddressPath}", nodeOptions.GetTreeNodeFlags());
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
         if (!node) return;
@@ -117,7 +117,7 @@ public unsafe partial class DebugRenderer
 
             var columnRowType = propType.GenericTypeArguments[0];
             var columnRowId = (uint)propType.GetProperty("RowId")?.GetValue(value)!;
-            DrawExdSheet(columnRowType, columnRowId, depth + 1, new NodeOptions()
+            DrawExdRow(columnRowType, columnRowId, depth + 1, new NodeOptions()
             {
                 RenderSeString = nodeOptions.RenderSeString,
                 Language = nodeOptions.Language,
@@ -196,7 +196,7 @@ public unsafe partial class DebugRenderer
                     var columnRowType = collectionType.GenericTypeArguments[0];
                     var columnRowId = (uint)collectionType.GetProperty("RowId")?.GetValue(colValue)!;
 
-                    DrawExdSheet(columnRowType, columnRowId, depth + 1, new NodeOptions()
+                    DrawExdRow(columnRowType, columnRowId, depth + 1, new NodeOptions()
                     {
                         RenderSeString = nodeOptions.RenderSeString,
                         Language = nodeOptions.Language,

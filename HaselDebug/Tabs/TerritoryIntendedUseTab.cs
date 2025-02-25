@@ -70,7 +70,7 @@ public unsafe partial class TerritoryIntendedUseTab : DebugTab
                     ? $" ({_textService.GetPlaceName(kv2.Item1.PlaceNameZone.RowId)})"
                     : string.Empty;
 
-                _debugRenderer.DrawExdSheet(typeof(TerritoryType), kv2.Item1.RowId, 0, new NodeOptions()
+                _debugRenderer.DrawExdRow(typeof(TerritoryType), kv2.Item1.RowId, 0, new NodeOptions()
                 {
                     AddressPath = new AddressPath([(nint)territoryIntendedUse]),
                     Title = $"[TerritoryType#{kv2.Item1.RowId}]{placeName}{zoneName}"
@@ -83,7 +83,7 @@ public unsafe partial class TerritoryIntendedUseTab : DebugTab
 
                 foreach (var cfc in kv2.Item2)
                 {
-                    _debugRenderer.DrawExdSheet(typeof(ContentFinderCondition), cfc.RowId, 0, new NodeOptions()
+                    _debugRenderer.DrawExdRow(typeof(ContentFinderCondition), cfc.RowId, 0, new NodeOptions()
                     {
                         AddressPath = new AddressPath([(nint)territoryIntendedUse]),
                         Title = $"[ContentFinderCondition#{cfc.RowId}] {cfc.Name.ExtractText().FirstCharToUpper().StripSoftHypen()}"
