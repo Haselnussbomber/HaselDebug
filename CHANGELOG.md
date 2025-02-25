@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.18.0] (2025-02-25)
+
+- **Added:** A very simple Special Shops tab to explore the sheet.
+- **Updated:** ClientStructs now at [4a727b4](https://github.com/aers/FFXIVClientStructs/tree/4a727b4) ([compare](https://github.com/aers/FFXIVClientStructs/compare/1c32fa48..4a727b4)).
+
 ## [1.17.0] (2025-02-23)
 
 - **Added:** Rapture Text Module/Definitions: The address of the decoder function was added, including the address of the resolved vfunc (since they are just small functions that jump to there).
@@ -283,7 +288,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.17.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.0...main
+[1.18.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.17.0...v1.18.0
 [1.17.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.16.0...v1.17.0
 [1.16.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.15.0...v1.16.0
 [1.15.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.14.0...v1.15.0
