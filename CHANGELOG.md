@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.18.1] (2025-03-06)
+
+- **Updated:** ClientStructs now at [977a8fd](https://github.com/aers/FFXIVClientStructs/tree/977a8fd) ([compare](https://github.com/aers/FFXIVClientStructs/compare/4a727b4..977a8fd)).
+
 ## [1.18.0] (2025-02-25)
 
 - **Added:** A very simple Special Shops tab to explore the sheet.
@@ -288,7 +292,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.1...main
+[1.18.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.0...v1.18.1
 [1.18.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.17.0...v1.18.0
 [1.17.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.16.0...v1.17.0
 [1.16.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.15.0...v1.16.0
