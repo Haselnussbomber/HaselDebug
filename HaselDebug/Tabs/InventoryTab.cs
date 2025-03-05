@@ -72,7 +72,7 @@ public unsafe partial class InventoryTab : DebugTab
             var listContainer = inventoryManager->GetInventoryContainer(inventoryType);
             if (listContainer == null) continue;
 
-            using var itemDisabled = ImRaii.Disabled(listContainer->Loaded == 0);
+            using var itemDisabled = ImRaii.Disabled(!listContainer->IsLoaded);
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Type
@@ -96,7 +96,7 @@ public unsafe partial class InventoryTab : DebugTab
     private void DrawInventoryType(InventoryType inventoryType)
     {
         var container = InventoryManager.Instance()->GetInventoryContainer(inventoryType);
-        using var disabled = ImRaii.Disabled(container->Loaded == 0);
+        using var disabled = ImRaii.Disabled(!container->IsLoaded);
 
         using var itemTable = ImRaii.Table("InventoryItemTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!itemTable) return;
