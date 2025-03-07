@@ -22,7 +22,7 @@ public class SeStringInspectorWindow : SimpleWindow
     private readonly DebugRenderer _debugRenderer;
     private readonly SeStringEvaluatorService _seStringEvaluator;
 
-    private SeStringParameter[]? LocalParameters = null;
+    private SeStringParameter[]? _localParameters = null;
     private ReadOnlySeString _string;
 
     public ReadOnlySeString String
@@ -31,7 +31,7 @@ public class SeStringInspectorWindow : SimpleWindow
         set
         {
             _string = value;
-            LocalParameters = null;
+            _localParameters = null;
         }
     }
 
@@ -89,13 +89,13 @@ public class SeStringInspectorWindow : SimpleWindow
 
     public override void Draw()
     {
-        LocalParameters ??= GetLocalParameters(String.AsSpan(), []);
+        _localParameters ??= GetLocalParameters(String.AsSpan(), []);
 
-        var evaluated = _seStringEvaluator.Evaluate(String.AsSpan(), LocalParameters, Language);
+        var evaluated = _seStringEvaluator.Evaluate(String.AsSpan(), _localParameters, Language);
 
         DrawPreview(evaluated);
 
-        if (LocalParameters!.Length != 0)
+        if (_localParameters!.Length != 0)
         {
             ImGui.Spacing();
             DrawParameters();
@@ -123,22 +123,22 @@ public class SeStringInspectorWindow : SimpleWindow
         using var node = _debugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(2), Title = "Parameters", TitleColor = Color.Green, DefaultOpen = true });
         if (!node) return;
 
-        for (var i = 0; i < LocalParameters!.Length; i++)
+        for (var i = 0; i < _localParameters!.Length; i++)
         {
-            if (LocalParameters[i].IsString)
+            if (_localParameters[i].IsString)
             {
-                var str = LocalParameters[i].StringValue.ExtractText();
+                var str = _localParameters[i].StringValue.ExtractText();
                 if (ImGui.InputText($"lstr({i + 1})", ref str, 255))
                 {
-                    LocalParameters[i] = new(str);
+                    _localParameters[i] = new(str);
                 }
             }
             else
             {
-                var num = (int)LocalParameters[i].UIntValue;
+                var num = (int)_localParameters[i].UIntValue;
                 if (ImGui.InputInt($"lnum({i + 1})", ref num))
                 {
-                    LocalParameters[i] = new((uint)num);
+                    _localParameters[i] = new((uint)num);
                 }
             }
         }

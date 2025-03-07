@@ -48,7 +48,7 @@ public unsafe partial class DebugRenderer
         // { MacroCode.NonBreakingSpace, [] },
         { MacroCode.Icon2, ["IconId"] },
         // { MacroCode.Hyphen, [] },
-        // { MacroCode.Num, [] },
+        { MacroCode.Num, ["Value"] },
         { MacroCode.Hex, ["Value"] },
         { MacroCode.Kilo, ["Value", "Separator"] },
         { MacroCode.Byte, ["Value"] },
@@ -57,10 +57,10 @@ public unsafe partial class DebugRenderer
         { MacroCode.Float, ["Value", "Radix", "Separator"] },
         { MacroCode.Link, ["Type"] },
         { MacroCode.Sheet, ["SheetName", "RowId", "ColumnIndex", "ColumnParam"] },
-        // { MacroCode.String, [] },
-        // { MacroCode.Caps, [] },
+        { MacroCode.String, ["String"] },
+        { MacroCode.Caps, ["String"] },
         { MacroCode.Head, ["String"] },
-        // { MacroCode.Split, [] },
+        { MacroCode.Split, ["String", "Separator"] },
         { MacroCode.HeadAll, ["String"] },
         // { MacroCode.Fixed, [] },
         { MacroCode.Lower, ["String"] },
@@ -75,7 +75,7 @@ public unsafe partial class DebugRenderer
         { MacroCode.Digit, ["Value", "TargetLength"] },
         { MacroCode.Ordinal, ["Value"] },
         { MacroCode.Sound, ["IsJingle", "SoundId"] },
-        // { MacroCode.LevelPos, [] },
+        { MacroCode.LevelPos, ["LevelId"] },
     };
 
     private const LinkMacroPayloadType DalamudLinkType = (LinkMacroPayloadType)Payload.EmbeddedInfoType.DalamudLink - 1;
@@ -84,7 +84,7 @@ public unsafe partial class DebugRenderer
     {
         { LinkMacroPayloadType.Character, ["Flags", "WorldId"] },
         { LinkMacroPayloadType.Item, ["ItemId", "Rarity"] },
-        { LinkMacroPayloadType.MapPosition, ["TerritoryType/MapId", "Raw X", "Raw Y"] },
+        { LinkMacroPayloadType.MapPosition, ["TerritoryType/MapId", "RawX", "RawY"] },
         { LinkMacroPayloadType.Quest, ["QuestId"] },
         { LinkMacroPayloadType.Achievement, ["AchievementId"] },
         { LinkMacroPayloadType.HowTo, ["HowToId"] },
