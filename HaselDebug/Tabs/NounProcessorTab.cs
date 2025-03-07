@@ -66,6 +66,7 @@ public partial class NounProcessorTab : DebugTab
     private int _amount = 1;
     private static readonly string[] GermanCases = ["Nominative", "Genitive", "Dative", "Accusative"];
 
+    [AutoPostConstruct]
     public void Initialize()
     {
         _languages = Enum.GetValues<ClientLanguage>();
