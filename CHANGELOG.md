@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.18.2] (2025-03-27)
+
+- **Updated:** Added expression names for macro codes Num, String, Caps, Split, LevelPos.
+- **Fixed:** NounProcessor tab didn't initialize.
+
 ## [1.18.1] (2025-03-06)
 
 - **Updated:** ClientStructs now at [977a8fd](https://github.com/aers/FFXIVClientStructs/tree/977a8fd) ([compare](https://github.com/aers/FFXIVClientStructs/compare/4a727b4..977a8fd)).
@@ -292,7 +297,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.2...main
+[1.18.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.1...v1.18.2
 [1.18.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.0...v1.18.1
 [1.18.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.17.0...v1.18.0
 [1.17.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.16.0...v1.17.0
