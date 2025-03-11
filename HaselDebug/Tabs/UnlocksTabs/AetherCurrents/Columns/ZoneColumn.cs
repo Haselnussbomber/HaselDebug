@@ -13,5 +13,5 @@ public class ZoneColumn : ColumnString<AetherCurrentEntry>
     }
 
     public override string ToName(AetherCurrentEntry entry)
-        => entry.CompFlgSet.Territory.Value.Map.Value.PlaceName.Value.Name.ExtractText().StripSoftHypen();
+        => entry.CompFlgSet.Territory.Value.Map.Value.PlaceName.Value.Name.ExtractText().StripSoftHyphen();
 }

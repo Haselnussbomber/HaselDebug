@@ -67,7 +67,7 @@ public partial class NameColumn : ColumnString<Mount>
                 name,
                 null,
                 _excelService.TryGetRow<MountTransient>(row.RowId, out var transient) && !transient.DescriptionEnhanced.IsEmpty
-                    ? transient.DescriptionEnhanced.ExtractText().StripSoftHypen()
+                    ? transient.DescriptionEnhanced.ExtractText().StripSoftHyphen()
                     : null);
         }
     }

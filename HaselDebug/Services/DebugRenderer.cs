@@ -60,7 +60,7 @@ public unsafe partial class DebugRenderer
     private readonly WindowManager _windowManager;
     private readonly ITextureProvider _textureProvider;
     private readonly ImGuiContextMenuService _imGuiContextMenu;
-    private readonly SeStringEvaluatorService _seStringEvaluator;
+    private readonly SeStringEvaluator _seStringEvaluator;
     private readonly TextService _textService;
     private readonly TextureService _textureService;
     private readonly IDataManager _dataManager;
@@ -185,34 +185,34 @@ public unsafe partial class DebugRenderer
 
                 switch (eventId.ContentId)
                 {
-                    case EventHandlerType.Quest:
+                    case EventHandlerContent.Quest:
                         type = typeof(QuestEventHandler);
                         additionalName = _textService.GetQuestName(eventId.Id);
                         break;
 
-                    case EventHandlerType.GatheringPoint:
+                    case EventHandlerContent.GatheringPoint:
                         type = typeof(GatheringPointEventHandler);
                         break;
 
-                    case EventHandlerType.Shop:
+                    case EventHandlerContent.Shop:
                         type = typeof(ShopEventHandler);
                         additionalName = new ReadOnlySeStringSpan(((ShopEventHandler*)address)->ShopName.AsSpan()).ExtractText();
                         break;
 
-                    case EventHandlerType.Aetheryte:
+                    case EventHandlerContent.Aetheryte:
                         type = typeof(AetheryteEventHandler);
                         break;
 
-                    case EventHandlerType.Craft:
+                    case EventHandlerContent.Craft:
                         type = typeof(CraftEventHandler);
                         break;
 
-                    case EventHandlerType.CustomTalk:
+                    case EventHandlerContent.CustomTalk:
                         type = typeof(CustomTalkEventHandler);
                         additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ExtractText();
                         break;
 
-                    case EventHandlerType.InstanceContentDirector:
+                    case EventHandlerContent.InstanceContentDirector:
                         type = ((InstanceContentDirector*)address)->InstanceContentType switch
                         {
                             InstanceContentType.DeepDungeon => typeof(InstanceContentDeepDungeon),
@@ -222,7 +222,7 @@ public unsafe partial class DebugRenderer
                         additionalName = ((InstanceContentDirector*)address)->InstanceContentType.ToString();
                         break;
 
-                    case EventHandlerType.PublicContentDirector:
+                    case EventHandlerContent.PublicContentDirector:
                         type = ((PublicContentDirector*)address)->Type switch
                         {
                             PublicContentDirectorType.Bozja => typeof(PublicContentBozja),
@@ -232,7 +232,7 @@ public unsafe partial class DebugRenderer
                         additionalName = ((PublicContentDirector*)address)->Type.ToString();
                         break;
 
-                    case EventHandlerType.GoldSaucerDirector:
+                    case EventHandlerContent.GoldSaucerDirector:
                         type = typeof(GoldSaucerDirector);
                         break;
                 }

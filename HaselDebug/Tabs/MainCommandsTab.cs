@@ -55,7 +55,7 @@ public unsafe partial class MainCommandsTab : DebugTab
             using (ImRaii.PushColor(ImGuiCol.HeaderActive, ImGui.GetColorU32(ImGuiCol.HeaderHovered) & 0xFFFFFF | 0x30000000, !isEnabled))
             using (ImRaii.PushColor(ImGuiCol.HeaderActive, ImGui.GetColorU32(ImGuiCol.HeaderHovered) & 0xFFFFFF | 0x30000000, !isEnabled))
             {
-                if (ImGui.Selectable(row.Name.ExtractText().StripSoftHypen()) && isEnabled)
+                if (ImGui.Selectable(row.Name.ExtractText().StripSoftHyphen()) && isEnabled)
                 {
                     UIModule.Instance()->ExecuteMainCommand(row.RowId);
                 }
@@ -83,9 +83,9 @@ public unsafe partial class MainCommandsTab : DebugTab
                 using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, ImGui.GetStyle().ItemInnerSpacing.X);
                 using var indent = ImRaii.PushIndent(1);
 
-                ImGui.TextUnformatted(row.Name.ExtractText().StripSoftHypen());
+                ImGui.TextUnformatted(row.Name.ExtractText().StripSoftHyphen());
 
-                var categoryName = _excelService.TryGetRow<MainCommandCategory>(row.MainCommandCategory.RowId, out var category) ? category.Name.ExtractText().StripSoftHypen() : string.Empty;
+                var categoryName = _excelService.TryGetRow<MainCommandCategory>(row.MainCommandCategory.RowId, out var category) ? category.Name.ExtractText().StripSoftHyphen() : string.Empty;
                 if (!string.IsNullOrEmpty(categoryName))
                 {
                     ImGuiUtils.PushCursorY(-3);
@@ -99,7 +99,7 @@ public unsafe partial class MainCommandsTab : DebugTab
                 ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
                 ImGuiUtils.PushCursorY(4);
 
-                ImGuiHelpers.SafeTextWrapped(row.Description.ExtractText().StripSoftHypen());
+                ImGuiHelpers.SafeTextWrapped(row.Description.ExtractText().StripSoftHyphen());
             }
         }
     }

@@ -23,7 +23,7 @@ public partial class CategoryColumn : ColumnString<Quest>
         if (row.JournalGenre.RowId == 0 || !row.JournalGenre.IsValid)
             return string.Empty;
 
-        return row.JournalGenre.Value.Name.ExtractText().StripSoftHypen();
+        return row.JournalGenre.Value.Name.ExtractText().StripSoftHyphen();
     }
 
     public override void DrawColumn(Quest row)

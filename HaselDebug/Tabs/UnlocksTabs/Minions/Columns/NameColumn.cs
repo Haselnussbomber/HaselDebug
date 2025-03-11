@@ -67,7 +67,7 @@ public partial class NameColumn : ColumnString<Companion>
                 name,
                 null,
                 _excelService.TryGetRow<CompanionTransient>(row.RowId, out var transient) && !transient.DescriptionEnhanced.IsEmpty
-                    ? transient.DescriptionEnhanced.ExtractText().StripSoftHypen()
+                    ? transient.DescriptionEnhanced.ExtractText().StripSoftHyphen()
                     : null);
         }
     }

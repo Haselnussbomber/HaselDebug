@@ -70,7 +70,7 @@ public partial class NameColumn : ColumnString<Ornament>
                 name,
                 null,
                 _excelService.TryGetRow<OrnamentTransient>(row.RowId, out var transient) && !transient.Unknown0.IsEmpty
-                    ? transient.Unknown0.ExtractText().StripSoftHypen()
+                    ? transient.Unknown0.ExtractText().StripSoftHyphen()
                     : null);
         }
     }

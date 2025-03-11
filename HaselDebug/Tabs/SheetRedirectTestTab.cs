@@ -2,7 +2,7 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Graphics;
-using HaselCommon.Services;
+using HaselCommon.Services.Evaluator;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using ImGuiNET;
@@ -13,7 +13,7 @@ namespace HaselDebug.Tabs;
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class SheetRedirectTestTab : DebugTab, IDisposable
 {
-    private readonly SeStringEvaluatorService _seStringEvaluator;
+    private readonly SheetRedirectResolver _sheetRedirectResolver;
 
     private string _inputSheetName = "Item";
     private int _inputRowId = 0;
@@ -40,16 +40,17 @@ public unsafe partial class SheetRedirectTestTab : DebugTab, IDisposable
 
             _sheetName->SetString(_inputSheetName);
             var rowId1 = (uint)_inputRowId;
-            ushort flags = 0xFFFF;
-            HaselRaptureTextModule.Instance()->ResolveSheetRedirect(_sheetName, &rowId1, &flags);
-            ImGui.TextUnformatted($"{_sheetName->ToString()}#{rowId1}");
+            uint colIndex1 = ushort.MaxValue;
+            var flags1 = HaselRaptureTextModule.Instance()->ResolveSheetRedirect(_sheetName, &rowId1, &colIndex1);
+            ImGui.TextUnformatted($"{_sheetName->ToString()}#{rowId1}-{colIndex1} ({flags1})");
 
             ImGui.SameLine();
 
             var sheetName2 = _inputSheetName;
             var rowId2 = (uint)_inputRowId;
-            _seStringEvaluator.ResolveSheetRedirect(ref sheetName2, ref rowId2);
-            ImGui.TextUnformatted($"{sheetName2}#{rowId2}");
+            uint colIndex2 = ushort.MaxValue;
+            var flags2 = _sheetRedirectResolver.Resolve(ref sheetName2, ref rowId2, ref colIndex2);
+            ImGui.TextUnformatted($"{sheetName2}#{rowId2}-{colIndex2} ({flags2})");
 
             ImGui.SameLine();
 
@@ -64,12 +65,14 @@ public unsafe partial class SheetRedirectTestTab : DebugTab, IDisposable
 
         ImGui.TextUnformatted("To confirm it works, here some examples:");
 
-        using var table = ImRaii.Table("SheetRedirectTestTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("SheetRedirectTestTable", 6, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
         if (!table) return;
 
         ImGui.TableSetupColumn("Input", ImGuiTableColumnFlags.WidthFixed, 200);
         ImGui.TableSetupColumn("Native", ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupColumn("Native Flags", ImGuiTableColumnFlags.WidthFixed, 200);
         ImGui.TableSetupColumn("C# implementation", ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupColumn("C# implementation Flags", ImGuiTableColumnFlags.WidthFixed, 200);
         ImGui.TableSetupColumn("Matches", ImGuiTableColumnFlags.WidthFixed, 50);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
@@ -80,7 +83,6 @@ public unsafe partial class SheetRedirectTestTab : DebugTab, IDisposable
         PrintRedirect("Item", 35588);
         PrintRedirect("Item", 1035588);
         PrintRedirect("Item", 2000217);
-        PrintRedirect("Item", 3000217);
         PrintRedirect("ActStr", 10);       // Trait
         PrintRedirect("ActStr", 1000010);  // Action
         PrintRedirect("ActStr", 2000010);  // Item
@@ -127,24 +129,31 @@ public unsafe partial class SheetRedirectTestTab : DebugTab, IDisposable
     {
         _sheetName->SetString(sheetName);
 
+        using var sheetNameUtf8 = new Utf8String(sheetName);
+
         ImGui.TableNextRow();
         ImGui.TableNextColumn();
         ImGui.TextUnformatted($"{sheetName}#{rowId}");
 
         ImGui.TableNextColumn();
         var rowId1 = rowId;
-        ushort flags = 0xFFFF;
-        HaselRaptureTextModule.Instance()->ResolveSheetRedirect(_sheetName, &rowId1, &flags);
-        ImGui.TextUnformatted($"{_sheetName->ToString()}#{rowId1}");
+        uint colIndex1 = ushort.MaxValue;
+        var flags1 = HaselRaptureTextModule.Instance()->ResolveSheetRedirect(&sheetNameUtf8, &rowId1, &colIndex1);
+        ImGui.TextUnformatted($"{sheetNameUtf8.ToString()}#{rowId1}-{colIndex1}");
+        ImGui.TableNextColumn();
+        ImGui.TextUnformatted($"{flags1}");
 
         ImGui.TableNextColumn();
         var sheetName2 = sheetName;
         var rowId2 = rowId;
-        _seStringEvaluator.ResolveSheetRedirect(ref sheetName2, ref rowId2);
-        ImGui.TextUnformatted($"{sheetName2}#{rowId2}");
+        uint colIndex2 = ushort.MaxValue;
+        var flags2 = _sheetRedirectResolver.Resolve(ref sheetName2, ref rowId2, ref colIndex2);
+        ImGui.TextUnformatted($"{sheetName2}#{rowId2}-{colIndex2}");
+        ImGui.TableNextColumn();
+        ImGui.TextUnformatted($"{flags2}");
 
         ImGui.TableNextColumn();
-        var matches = _sheetName->ToString() == sheetName2 && rowId1 == rowId2;
+        var matches = sheetNameUtf8.ToString() == sheetName2 && rowId1 == rowId2;
         using (ImRaii.PushColor(ImGuiCol.Text, (uint)(matches ? Color.Green : Color.Red)))
             ImGui.TextUnformatted(matches.ToString());
     }
@@ -156,8 +165,8 @@ public unsafe partial struct HaselRaptureTextModule
     public static HaselRaptureTextModule* Instance() => (HaselRaptureTextModule*)RaptureTextModule.Instance();
 
     [MemberFunction("E8 ?? ?? ?? ?? 44 8B E8 A8 10")]
-    public partial uint ResolveSheetRedirect(
+    public partial SheetRedirectFlags ResolveSheetRedirect(
         Utf8String* sheetName,
         uint* rowId,
-        ushort* flags);
+        uint* colIndex);
 }

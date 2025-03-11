@@ -19,7 +19,7 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
     private readonly DebugRenderer _debugRenderer;
     private readonly ExcelService _excelService;
     private readonly TextService _textService;
-    private readonly SeStringEvaluatorService _seStringEvaluatorService;
+    private readonly SeStringEvaluator _seStringEvaluatorService;
     private readonly ITextureProvider _textureProvider;
 
     public override void Draw()
@@ -149,7 +149,7 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
         if (slot->RecipeValid == 0)
             return _textService.GetAddonText(1449); // Deleted Recipes
 
-        return _seStringEvaluatorService.EvaluateFromAddon(1442, [slot->RecipeItemId, slot->RecipeCraftType + 8]).ExtractText().StripSoftHypen();
+        return _seStringEvaluatorService.EvaluateFromAddon(1442, [slot->RecipeItemId, slot->RecipeCraftType + 8]).ExtractText().StripSoftHyphen();
     }
 
     private void DrawHotbarSlotIcon(RaptureHotbarModule.HotbarSlot slot)

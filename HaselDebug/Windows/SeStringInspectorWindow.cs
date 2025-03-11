@@ -7,7 +7,7 @@ using Dalamud.Interface.Utility;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
-using HaselCommon.Services.SeStringEvaluation;
+using HaselCommon.Services.Evaluator;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
@@ -20,7 +20,7 @@ public class SeStringInspectorWindow : SimpleWindow
 {
     private readonly WindowManager _windowManager;
     private readonly DebugRenderer _debugRenderer;
-    private readonly SeStringEvaluatorService _seStringEvaluator;
+    private readonly SeStringEvaluator _seStringEvaluator;
 
     private SeStringParameter[]? _localParameters = null;
     private ReadOnlySeString _string;
@@ -42,7 +42,7 @@ public class SeStringInspectorWindow : SimpleWindow
         TextService textService,
         LanguageProvider languageProvider,
         DebugRenderer debugRenderer,
-        SeStringEvaluatorService seStringEvaluator,
+        SeStringEvaluator seStringEvaluator,
         ReadOnlySeString str,
         ClientLanguage language,
         string windowName = "SeString") : base(windowManager, textService, languageProvider)

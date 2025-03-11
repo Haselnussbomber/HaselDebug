@@ -18,7 +18,7 @@ public partial class NameColumn : ColumnString<OrchestrionRollEntry>
     }
 
     public override string ToName(OrchestrionRollEntry entry)
-        => entry.Row.Name.ExtractText().StripSoftHypen();
+        => entry.Row.Name.ExtractText().StripSoftHyphen();
 
     public override unsafe void DrawColumn(OrchestrionRollEntry entry)
     {
@@ -32,9 +32,9 @@ public partial class NameColumn : ColumnString<OrchestrionRollEntry>
             _unlocksTabUtils.DrawTooltip(
                 entry.UIParamRow.OrchestrionCategory.Value.Icon,
                 name,
-                entry.UIParamRow.OrchestrionCategory.Value.Name.ExtractText().StripSoftHypen(),
+                entry.UIParamRow.OrchestrionCategory.Value.Name.ExtractText().StripSoftHyphen(),
                 !entry.Row.Description.IsEmpty
-                    ? entry.Row.Description.ExtractText().StripSoftHypen()
+                    ? entry.Row.Description.ExtractText().StripSoftHyphen()
                     : null);
         }
     }

@@ -15,7 +15,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks;
 public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 {
     internal readonly ExcelService _excelService;
-    private readonly SeStringEvaluatorService _seStringEvaluator;
+    private readonly SeStringEvaluator _seStringEvaluator;
     private readonly TextService _textService;
     private readonly IClientState _clientState;
 

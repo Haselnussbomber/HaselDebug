@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
-using Dalamud.Utility;
 using HaselCommon.Services;
+using HaselCommon.Services.Noun;
+using HaselCommon.Services.Noun.Enums;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -117,7 +119,42 @@ public partial class NounProcessorTab : DebugTab
                 _amount = 1;
         }
 
+        var articleTypeEnumType = language switch
+        {
+            ClientLanguage.Japanese => typeof(JapaneseArticleType),
+            ClientLanguage.German => typeof(GermanArticleType),
+            ClientLanguage.French => typeof(FrenchArticleType),
+            _ => typeof(EnglishArticleType)
+        };
+
         var numCases = language == ClientLanguage.German ? 4 : 1;
+
+        if (ImGui.Button("Copy as Test"))
+        {
+            var sb = new StringBuilder();
+
+            foreach (var articleType in Enum.GetValues(articleTypeEnumType))
+            {
+                for (var _case = 0; _case < numCases; _case++)
+                {
+                    var nounParams = new NounParams()
+                    {
+                        SheetName = sheetName,
+                        RowId = (uint)_rowId,
+                        Language = language,
+                        Quantity = _amount,
+                        ArticleType = (int)articleType,
+                        GrammaticalCase = _case,
+                    };
+                    var output = _nounProcessor.ProcessNoun(nounParams).ExtractText().Replace("\"", "\\\"");
+                    var caseParam = language == ClientLanguage.German ? $"(int)GermanCases.{GermanCases[_case]}" : "1";
+                    sb.AppendLine($"new(nameof(LSheets.{sheetName}), {_rowId}, ClientLanguage.{language}, {_amount}, (int){articleTypeEnumType.Name}.{Enum.GetName(articleTypeEnumType, articleType)}, {caseParam}, \"{output}\"),");
+                }
+            }
+
+            ImGui.SetClipboardText(sb.ToString());
+        }
+
         using var table = ImRaii.Table("TextDecoderTable", 1 + numCases, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
@@ -126,14 +163,6 @@ public partial class NounProcessorTab : DebugTab
             ImGui.TableSetupColumn(language == ClientLanguage.German ? GermanCases[i] : "Text");
         ImGui.TableSetupScrollFreeze(6, 1);
         ImGui.TableHeadersRow();
-
-        var articleTypeEnumType = language switch
-        {
-            ClientLanguage.Japanese => typeof(JapaneseArticleType),
-            ClientLanguage.German => typeof(GermanArticleType),
-            ClientLanguage.French => typeof(FrenchArticleType),
-            _ => typeof(EnglishArticleType)
-        };
 
         foreach (var articleType in Enum.GetValues(articleTypeEnumType))
         {
@@ -147,7 +176,16 @@ public partial class NounProcessorTab : DebugTab
 
                 try
                 {
-                    _debugRenderer.DrawCopyableText(_nounProcessor.ProcessRow(sheetName, (uint)_rowId, language.ToLumina(), _amount, (int)articleType, _case).ExtractText());
+                    var nounParams = new NounParams()
+                    {
+                        SheetName = sheetName,
+                        RowId = (uint)_rowId,
+                        Language = language,
+                        Quantity = _amount,
+                        ArticleType = (int)articleType,
+                        GrammaticalCase = _case,
+                    };
+                    _debugRenderer.DrawCopyableText(_nounProcessor.ProcessNoun(nounParams).ExtractText());
                 }
                 catch (Exception ex)
                 {

@@ -8,6 +8,7 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using HaselCommon.Services;
+using HaselCommon.Services.Noun.Enums;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 using ImGuiNET;

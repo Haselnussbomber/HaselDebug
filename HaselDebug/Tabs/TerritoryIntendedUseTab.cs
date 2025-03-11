@@ -86,7 +86,7 @@ public unsafe partial class TerritoryIntendedUseTab : DebugTab
                     _debugRenderer.DrawExdRow(typeof(ContentFinderCondition), cfc.RowId, 0, new NodeOptions()
                     {
                         AddressPath = new AddressPath([(nint)territoryIntendedUse]),
-                        Title = $"[ContentFinderCondition#{cfc.RowId}] {cfc.Name.ExtractText().FirstCharToUpper().StripSoftHypen()}"
+                        Title = $"[ContentFinderCondition#{cfc.RowId}] {cfc.Name.ExtractText().FirstCharToUpper().StripSoftHyphen()}"
                     });
                 }
             }

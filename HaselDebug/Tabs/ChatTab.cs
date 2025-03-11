@@ -7,6 +7,7 @@ using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
+using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
@@ -16,7 +17,7 @@ public unsafe partial class ChatTab : DebugTab
     private readonly DebugRenderer _debugRenderer;
     private readonly ExcelService _excelService;
     private readonly TextService _textService;
-    private readonly SeStringEvaluatorService _seStringEvaluator;
+    private readonly SeStringEvaluator _seStringEvaluator;
 
     public override void Draw()
     {
@@ -75,8 +76,8 @@ public unsafe partial class ChatTab : DebugTab
                     ImGui.TextUnformatted(GetLabel(targetKind));
 
                     ImGui.TableNextColumn(); // Formatted Message
-                    var senderEvaluated = _seStringEvaluator.Evaluate(sender);
-                    var messageEvaluated = _seStringEvaluator.Evaluate(message);
+                    var senderEvaluated = _seStringEvaluator.Evaluate((ReadOnlySeStringSpan)sender);
+                    var messageEvaluated = _seStringEvaluator.Evaluate((ReadOnlySeStringSpan)message);
                     var format = _excelService.TryGetRow<LogKind>((uint)logKind, out var logKindRow) ? logKindRow.Format : new();
                     var formatted = _seStringEvaluator.Evaluate(format, [senderEvaluated, messageEvaluated]).AsSpan();
 

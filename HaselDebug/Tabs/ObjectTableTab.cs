@@ -18,7 +18,7 @@ namespace HaselDebug.Tabs;
 public unsafe partial class ObjectTableTab : DebugTab
 {
     private readonly DebugRenderer _debugRenderer;
-    private readonly SeStringEvaluatorService _seStringEvaluator;
+    private readonly SeStringEvaluator _seStringEvaluator;
     private readonly TextService _textService;
     private readonly ExcelService _excelService;
 
@@ -102,7 +102,7 @@ public unsafe partial class ObjectTableTab : DebugTab
             {
                 switch (gameObject->EventHandler->Info.EventId.ContentId)
                 {
-                    case EventHandlerType.Adventure:
+                    case EventHandlerContent.Adventure:
                         ImGui.TextUnformatted($"Adventure#{gameObject->EventHandler->Info.EventId.Id}");
 
                         if (_excelService.TryGetRow<Adventure>(gameObject->EventHandler->Info.EventId.Id, out var adventure) && !adventure.Name.IsEmpty)
@@ -112,7 +112,7 @@ public unsafe partial class ObjectTableTab : DebugTab
                         }
                         break;
 
-                    case EventHandlerType.Quest:
+                    case EventHandlerContent.Quest:
                         ImGui.TextUnformatted($"Quest#{gameObject->EventHandler->Info.EventId.EntryId + 0x10000u}");
 
                         if (_excelService.TryGetRow<Quest>(gameObject->EventHandler->Info.EventId.EntryId + 0x10000u, out var quest) && !quest.Name.IsEmpty)
@@ -122,7 +122,7 @@ public unsafe partial class ObjectTableTab : DebugTab
                         }
                         break;
 
-                    case EventHandlerType.CustomTalk:
+                    case EventHandlerContent.CustomTalk:
                         ImGui.TextUnformatted($"CustomTalk#{gameObject->EventHandler->Info.EventId.Id}");
 
                         if (_excelService.TryGetRow<CustomTalk>(gameObject->EventHandler->Info.EventId.Id, out var customTalk) && !customTalk.Name.IsEmpty)

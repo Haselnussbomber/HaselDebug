@@ -18,7 +18,7 @@ public partial class CategoryColumn : ColumnString<OrchestrionRollEntry>
     }
 
     public override string ToName(OrchestrionRollEntry entry)
-        => entry.UIParamRow.OrchestrionCategory.Value.Name.ExtractText().StripSoftHypen();
+        => entry.UIParamRow.OrchestrionCategory.Value.Name.ExtractText().StripSoftHyphen();
 
     public override void DrawColumn(OrchestrionRollEntry entry)
     {

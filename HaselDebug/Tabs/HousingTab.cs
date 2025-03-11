@@ -25,7 +25,7 @@ public unsafe partial class HousingTab : DebugTab
             return;
         }
 
-        long houseId = 0;
+        HouseId houseId = 0;
 
         switch (housingManager->GetCurrentHousingTerritoryType())
         {
@@ -44,9 +44,23 @@ public unsafe partial class HousingTab : DebugTab
         {
             ImGui.TextUnformatted($"Current HouseId ({housingManager->GetCurrentHousingTerritoryType()})");
             ImGui.SameLine();
-            _debugRenderer.DrawCopyableText($"{houseId}");
+            _debugRenderer.DrawCopyableText($"{(long)houseId}");
             ImGui.SameLine();
-            _debugRenderer.DrawCopyableText($"0x{houseId:X}");
+            _debugRenderer.DrawCopyableText($"0x{(long)houseId:X}");
+            ImGui.SameLine();
+            _debugRenderer.DrawPointerType(&houseId, typeof(HouseId), new());
+            _debugRenderer.DrawCopyableText($"IsApartment: {houseId.IsApartment}");
+            if (houseId.IsApartment)
+            {
+                _debugRenderer.DrawCopyableText($"Division: {houseId.ApartmentDivision}");
+                _debugRenderer.DrawCopyableText($"RoomNumber: {houseId.RoomNumber}");
+            }
+            else
+            {
+                _debugRenderer.DrawCopyableText($"PlotIndex: {houseId.PlotIndex}");
+                _debugRenderer.DrawCopyableText($"WardIndex: {houseId.WardIndex}");
+                _debugRenderer.DrawCopyableText($"RoomNumber: {houseId.RoomNumber}");
+            }
         }
 
         using (var node = ImRaii.TreeNode("Owned HouseIds", ImGuiTreeNodeFlags.SpanAvailWidth))

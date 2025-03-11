@@ -86,7 +86,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
     private readonly DebugRenderer _debugRenderer;
     private readonly WindowManager _windowManager;
-    private readonly SeStringEvaluatorService _seStringEvaluator;
+    private readonly SeStringEvaluator _seStringEvaluator;
     private readonly TextService _textService;
     private readonly LanguageProvider _languageProvider;
     private readonly TextureService _textureService;

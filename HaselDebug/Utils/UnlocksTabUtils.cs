@@ -35,7 +35,7 @@ public unsafe class UnlocksTabUtils(
     IDataManager DataManager,
     ITextureProvider TextureProvider,
     TripleTriadNumberFont TripleTriadNumberFont,
-    SeStringEvaluatorService SeStringEvaluator)
+    SeStringEvaluator SeStringEvaluator)
 {
     private readonly Dictionary<uint, Vector2> _iconSizeCache = [];
     private readonly Dictionary<ushort, uint> _facePaintIconCache = [];
@@ -191,7 +191,7 @@ public unsafe class UnlocksTabUtils(
         if (isUnlocked)
             ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 40 * ImGuiHelpers.GlobalScale / 2f - 3); // wtf
 
-        var category = item.ItemUICategory.IsValid ? item.ItemUICategory.Value.Name.ExtractText().StripSoftHypen() : null;
+        var category = item.ItemUICategory.IsValid ? item.ItemUICategory.Value.Name.ExtractText().StripSoftHyphen() : null;
         if (!string.IsNullOrEmpty(category))
         {
             ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
@@ -199,7 +199,7 @@ public unsafe class UnlocksTabUtils(
                 ImGui.TextUnformatted(category);
         }
 
-        var description = descriptionOverride ?? (!item.Description.IsEmpty ? item.Description.ExtractText().StripSoftHypen() : null);
+        var description = descriptionOverride ?? (!item.Description.IsEmpty ? item.Description.ExtractText().StripSoftHyphen() : null);
         if (!string.IsNullOrEmpty(description))
         {
             DrawSeparator(marginTop: 1, marginBottom: 4);
@@ -244,7 +244,7 @@ public unsafe class UnlocksTabUtils(
                     ImGuiHelpers.SafeTextWrapped(SeStringEvaluator.EvaluateFromAddon(obtainRow.Unknown1, [
                         residentRow.Acquisition.RowId,
                     residentRow.Location.RowId
-                    ]).ExtractText().StripSoftHypen());
+                    ]).ExtractText().StripSoftHyphen());
                 }
 
                 DrawTripleTriadCard(item);
@@ -532,7 +532,7 @@ public unsafe class UnlocksTabUtils(
         {
             DrawSeparator(marginTop: 1, marginBottom: 4);
 
-            ImGuiHelpers.SafeTextWrapped(itemHelp.Description.ExtractText().StripSoftHypen());
+            ImGuiHelpers.SafeTextWrapped(itemHelp.Description.ExtractText().StripSoftHyphen());
         }
     }
 

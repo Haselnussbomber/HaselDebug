@@ -42,7 +42,7 @@ public partial class NameColumn : ColumnString<GlassesSheet>
                 name,
                 null,
                 !row.Description.IsEmpty
-                    ? row.Description.ExtractText().StripSoftHypen()
+                    ? row.Description.ExtractText().StripSoftHyphen()
                     : null);
         }
     }

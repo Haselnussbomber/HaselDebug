@@ -7,7 +7,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.TripleTriadCards.Columns;
 [RegisterTransient, AutoConstruct]
 public partial class NumberColumn : ColumnString<TripleTriadCardEntry>
 {
-    private readonly SeStringEvaluatorService _seStringEvaluator;
+    private readonly SeStringEvaluator _seStringEvaluator;
 
     [AutoPostConstruct]
     public void Initialize()

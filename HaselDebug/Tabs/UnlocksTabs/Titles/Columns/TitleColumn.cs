@@ -23,7 +23,7 @@ public class TitleColumn : ColumnString<Title>
 
     public override string ToName(Title row)
     {
-        return (_isFeminine ? row.Feminine : row.Masculine).ExtractText().StripSoftHypen();
+        return (_isFeminine ? row.Feminine : row.Masculine).ExtractText().StripSoftHyphen();
     }
 
     public override unsafe void DrawColumn(Title row)
