@@ -32,11 +32,13 @@ public unsafe partial class ExcelTab : DebugTab
     private AddonTransient[] _addonTransientRows = null!;
     private Lobby[] _lobbyRows = null!;
     private LogMessage[] _logMessageRows = null!;
+    private LogKind[] _logKindRows = null!;
 
     private Addon[]? _filteredAddonRows;
     private AddonTransient[]? _filteredAddonTransientRows;
     private Lobby[]? _filteredLobbyRows;
     private LogMessage[]? _filteredLogMessageRows;
+    private LogKind[]? _filteredLogKindRows;
 
     private CancellationTokenSource? _filterCTS;
     private string _searchTerm = string.Empty;
@@ -50,6 +52,7 @@ public unsafe partial class ExcelTab : DebugTab
         _addonTransientRows = _dataManager.Excel.GetSheet<AddonTransient>(_selectedLanguage.ToLumina()).ToArray();
         _lobbyRows = _dataManager.Excel.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
         _logMessageRows = _dataManager.Excel.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
+        _logKindRows = _dataManager.Excel.GetSheet<LogKind>(_selectedLanguage.ToLumina()).ToArray();
     }
 
     public override bool DrawInChild => false;
@@ -75,6 +78,7 @@ public unsafe partial class ExcelTab : DebugTab
                         _addonTransientRows = _dataManager.Excel.GetSheet<AddonTransient>(_selectedLanguage.ToLumina()).ToArray();
                         _lobbyRows = _dataManager.Excel.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
                         _logMessageRows = _dataManager.Excel.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
+                        _logKindRows = _dataManager.Excel.GetSheet<LogKind>(_selectedLanguage.ToLumina()).ToArray();
                         listDirty |= true;
                     }
                 }
@@ -94,6 +98,7 @@ public unsafe partial class ExcelTab : DebugTab
         DrawAddonTransientTab();
         DrawLobbyTab();
         DrawLogMessageTab();
+        DrawLogKindTab();
     }
 
     public void DrawAddonTab()
@@ -196,6 +201,31 @@ public unsafe partial class ExcelTab : DebugTab
         ImGuiClip.ClippedDraw(_filteredLogMessageRows ?? _logMessageRows, DrawLogMessageRow, ImGui.GetTextLineHeightWithSpacing());
     }
 
+    public void DrawLogKindTab()
+    {
+        var tabTitle = "LogKind";
+
+        if (!string.IsNullOrWhiteSpace(_searchTerm) && _filteredLogKindRows != null)
+        {
+            tabTitle = $"{tabTitle} ({_filteredLogKindRows.Length})";
+        }
+
+        using var tab = ImRaii.TabItem(tabTitle + "###LogKindTab");
+        if (!tab) return;
+
+        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
+
+        using var table = ImRaii.Table("RowTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        if (!table) return;
+
+        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupScrollFreeze(2, 1);
+        ImGui.TableHeadersRow();
+
+        ImGuiClip.ClippedDraw(_filteredLogKindRows ?? _logKindRows, DrawLogKindRow, ImGui.GetTextLineHeightWithSpacing());
+    }
+
     private void FilterList(CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(_searchTerm))
@@ -204,6 +234,7 @@ public unsafe partial class ExcelTab : DebugTab
             _filteredAddonTransientRows = null;
             _filteredLobbyRows = null;
             _filteredLogMessageRows = null;
+            _filteredLogKindRows = null;
             return;
         }
 
@@ -266,6 +297,21 @@ public unsafe partial class ExcelTab : DebugTab
         }
 
         _filteredLogMessageRows = logMessageList.ToArray();
+
+        var logKindList = new List<LogKind>();
+
+        for (var i = 0; i < _logKindRows.Length && !cancellationToken.IsCancellationRequested; i++)
+        {
+            var row = _logKindRows[i];
+            if (row.RowId.ToString().Contains(_searchTerm)
+             || row.Format.ToString().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase)
+             || row.Format.ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
+            {
+                logKindList.Add(row);
+            }
+        }
+
+        _filteredLogKindRows = logKindList.ToArray();
     }
 
     private void DrawAddonRow(Addon row)
@@ -332,6 +378,23 @@ public unsafe partial class ExcelTab : DebugTab
             AddressPath = new AddressPath((nint)row.RowId),
             RenderSeString = false,
             Title = $"LogMessage#{row.RowId} ({_selectedLanguage})",
+            Language = _selectedLanguage
+        });
+    }
+
+    private void DrawLogKindRow(LogKind row)
+    {
+        ImGui.TableNextRow();
+
+        ImGui.TableNextColumn(); // RowId
+        ImGui.TextUnformatted(row.RowId.ToString());
+
+        ImGui.TableNextColumn(); // Text
+        _debugRenderer.DrawSeString(row.Format.AsSpan(), new NodeOptions()
+        {
+            AddressPath = new AddressPath((nint)row.RowId),
+            RenderSeString = false,
+            Title = $"LogKind#{row.RowId} ({_selectedLanguage})",
             Language = _selectedLanguage
         });
     }
