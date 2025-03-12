@@ -59,7 +59,7 @@ public unsafe class LuaDebugTab : DebugTab
                 L->lua_pushnil();
                 while (L->lua_next(-2) != 0)
                 {
-                    var strKey = L->lua_tostring(-2) ?? "";
+                    var strKey = L->lua_tostring(-2).ToString();
                     var typeValue = L->lua_type(-1);
 
                     var filtered = false;
@@ -237,7 +237,9 @@ public unsafe class LuaDebugTab : DebugTab
         L->lua_pushnil();
         while (L->lua_next(-2) != 0)
         {
-            var strKey = L->lua_tostring(-2) ?? "INVALID_KEY";
+            var strKey = L->lua_tostring(-2).ToString();
+            if (string.IsNullOrEmpty(strKey))
+                strKey = "INVALID_KEY";
             var typeValue = L->lua_type(-1);
             var strValue = L->lua_tostring(-1);
 

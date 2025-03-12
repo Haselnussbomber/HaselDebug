@@ -8,6 +8,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
@@ -18,7 +19,6 @@ using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 using ImGuiNET;
-using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
@@ -483,13 +483,13 @@ public unsafe partial class AddonInspectorTab : DebugTab
                 if (ImGui.Button($"Encode##{(ulong)textNode:X}"))
                 {
                     using var tmp = new Utf8String();
-                    RaptureTextModule.Instance()->MacroEncoder.EncodeString(&tmp, textNode->NodeText.StringPtr);
+                    RaptureTextModule.Instance()->MacroEncoder.EncodeString(&tmp, textNode->NodeText.StringPtr.Value);
                     textNode->NodeText.Copy(&tmp);
                 }
 
                 ImGui.SameLine();
                 if (ImGui.Button($"Decode##{(ulong)textNode:X}"))
-                    textNode->NodeText.SetString(new ReadOnlySeStringSpan(textNode->NodeText.StringPtr).ToString());
+                    textNode->NodeText.SetString(textNode->NodeText.StringPtr.ToReadOnlySeStringSpan().ToString());
 
                 ImGui.TextUnformatted($"AlignmentType: {(AlignmentType)textNode->AlignmentFontType}  FontSize: {textNode->FontSize}");
                 int b = textNode->AlignmentFontType;

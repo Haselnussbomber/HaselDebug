@@ -439,7 +439,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
                         temp->SetString(entry.Message);
                         temp2->Clear();
 
-                        RaptureTextModule.Instance()->TextModule.ProcessMacroCode(temp2, temp->StringPtr);
+                        RaptureTextModule.Instance()->TextModule.ProcessMacroCode(temp2, temp->StringPtr.Value);
                         var out1 = PronounModule.Instance()->ProcessString(temp2, true);
                         var out2 = PronounModule.Instance()->ProcessString(out1, false);
 
@@ -448,7 +448,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
                 }
             }
 
-            RaptureLogModule.Instance()->PrintString(output->StringPtr);
+            RaptureLogModule.Instance()->PrintString(output->StringPtr.Value);
             temp2->Dtor(true);
             temp->Dtor(true);
             output->Dtor(true);

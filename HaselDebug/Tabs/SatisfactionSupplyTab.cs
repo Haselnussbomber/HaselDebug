@@ -50,19 +50,18 @@ public unsafe partial class SatisfactionSupplyTab : DebugTab
             _debugRenderer.DrawIcon((uint)row.RankParams[rank].ImageId);
 
             if (_excelService.TryGetRow<Level>(row.Unknown0, out var level) &&
-                _teleportService.TryGetClosestAetheryte(level, out var aetheryte) &&
-                _excelService.TryGetRow<PlaceName>(aetheryte.Value.PlaceName.RowId, out var placeName))
+                _teleportService.TryGetClosestAetheryte(level, out var aetheryte))
             {
                 var clicked = ImGui.Selectable(_textService.GetENpcResidentName(row.Npc.RowId));
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                     using var tooltip = ImRaii.Tooltip();
-                    ImGui.TextUnformatted($"Teleport to: {placeName.Name.ExtractText()}");
+                    ImGui.TextUnformatted($"Teleport to: {_textService.GetPlaceName(aetheryte.PlaceName.RowId)}");
                 }
                 if (clicked)
                 {
-                    Telepo.Instance()->Teleport(aetheryte.Value.RowId, 0);
+                    Telepo.Instance()->Teleport(aetheryte.RowId, 0);
                 }
             }
             else

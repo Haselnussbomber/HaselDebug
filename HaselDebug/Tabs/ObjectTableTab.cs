@@ -43,7 +43,7 @@ public unsafe partial class ObjectTableTab : DebugTab
             if (gameObject == null) continue;
 
             var objectKind = gameObject->GetObjectKind();
-            var objectName = new ReadOnlySeStringSpan(gameObject->GetName()).ExtractText();
+            var objectName = new ReadOnlySeStringSpan(gameObject->GetName().AsSpan()).ExtractText();
 
             var title = objectName;
             if (objectKind == ObjectKind.EventNpc && _excelService.TryGetRow<ENpcResident>(gameObject->BaseId, out var resident) && !resident.Title.IsEmpty)
