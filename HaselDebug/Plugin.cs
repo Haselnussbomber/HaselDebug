@@ -19,11 +19,8 @@ public class Plugin : IDalamudPlugin
 
     public Plugin(
         IDalamudPluginInterface pluginInterface,
-        IFramework framework,
-        IPluginLog pluginLog,
         ISigScanner sigScanner,
-        IDataManager dataManager,
-        IClientState clientState)
+        IDataManager dataManager)
     {
         _pluginInterface = pluginInterface;
 
@@ -43,9 +40,7 @@ public class Plugin : IDalamudPlugin
             .AddHaselCommon()
             .AddHaselDebug();
 
-        Service.BuildProvider();
-
-        framework.RunOnFrameworkThread(() =>
+        Service.Initialize(() =>
         {
             if (Service.Get<PluginConfig>().AutoOpenPluginWindow)
                 Service.Get<PluginWindow>().Open();
