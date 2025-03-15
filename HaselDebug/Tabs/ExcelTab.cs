@@ -14,7 +14,9 @@ using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
+using Lumina.Excel;
 using Lumina.Excel.Sheets;
+using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
@@ -28,31 +30,45 @@ public unsafe partial class ExcelTab : DebugTab
     private readonly IDataManager _dataManager;
     private readonly DebugRenderer _debugRenderer;
 
-    private Addon[] _addonRows = null!;
-    private AddonTransient[] _addonTransientRows = null!;
-    private Lobby[] _lobbyRows = null!;
-    private LogMessage[] _logMessageRows = null!;
-    private LogKind[] _logKindRows = null!;
-
-    private Addon[]? _filteredAddonRows;
-    private AddonTransient[]? _filteredAddonTransientRows;
-    private Lobby[]? _filteredLobbyRows;
-    private LogMessage[]? _filteredLogMessageRows;
-    private LogKind[]? _filteredLogKindRows;
-
     private CancellationTokenSource? _filterCTS;
-    private string _searchTerm = string.Empty;
-    private ClientLanguage _selectedLanguage;
+
+    private IExcelSheetTab[] _excelTabs;
+
+    public string SearchTerm { get; private set; } = string.Empty;
+    public ClientLanguage SelectedLanguage { get; private set; }
 
     [AutoPostConstruct]
     public void Initialize()
     {
-        _selectedLanguage = _languageProvider.ClientLanguage;
-        _addonRows = _dataManager.Excel.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
-        _addonTransientRows = _dataManager.Excel.GetSheet<AddonTransient>(_selectedLanguage.ToLumina()).ToArray();
-        _lobbyRows = _dataManager.Excel.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
-        _logMessageRows = _dataManager.Excel.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
-        _logKindRows = _dataManager.Excel.GetSheet<LogKind>(_selectedLanguage.ToLumina()).ToArray();
+        SelectedLanguage = _languageProvider.ClientLanguage;
+
+        _excelTabs = [
+            new ExcelSheetTab<Addon>(this, _dataManager) {
+                Columns = [
+                    new ExcelSheetStringColumn<Addon>(this, _debugRenderer, "Text", (row) => row.Text),
+                ]
+            },
+            new ExcelSheetTab<AddonTransient>(this, _dataManager) {
+                Columns = [
+                    new ExcelSheetStringColumn<AddonTransient>(this, _debugRenderer, "Unknown0", (row) => row.Unknown0),
+                ]
+            },
+            new ExcelSheetTab<Lobby>(this, _dataManager) {
+                Columns = [
+                    new ExcelSheetStringColumn<Lobby>(this, _debugRenderer, "Text", (row) => row.Text),
+                ]
+            },
+            new ExcelSheetTab<LogMessage>(this, _dataManager) {
+                Columns = [
+                    new ExcelSheetStringColumn<LogMessage>(this, _debugRenderer, "Text", (row) => row.Text),
+                ]
+            },
+            new ExcelSheetTab<LogKind>(this, _dataManager) {
+                Columns = [
+                    new ExcelSheetStringColumn<LogKind>(this, _debugRenderer, "Format", (row) => row.Format),
+                ]
+            },
+        ];
     }
 
     public override bool DrawInChild => false;
@@ -61,341 +77,176 @@ public unsafe partial class ExcelTab : DebugTab
         using var hostChild = ImRaii.Child("Host", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - LanguageSelectorWidth * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X);
-        var listDirty = ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var searchTerm = SearchTerm;
+        var listDirty = false;
+        if (ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll))
+        {
+            SearchTerm = searchTerm;
+            listDirty |= true;
+        }
+
         ImGui.SameLine();
         ImGui.SetNextItemWidth(LanguageSelectorWidth * ImGuiHelpers.GlobalScale);
-        using (var dropdown = ImRaii.Combo("##Language", _selectedLanguage.ToString() ?? "Language..."))
+        using (var dropdown = ImRaii.Combo("##Language", SelectedLanguage.ToString() ?? "Language..."))
         {
             if (dropdown)
             {
                 var values = Enum.GetValues<ClientLanguage>().OrderBy((ClientLanguage lang) => lang.ToString());
                 foreach (var value in values)
                 {
-                    if (ImGui.Selectable(Enum.GetName(value), value == _selectedLanguage))
+                    if (ImGui.Selectable(Enum.GetName(value), value == SelectedLanguage))
                     {
-                        _selectedLanguage = value;
-                        _addonRows = _dataManager.Excel.GetSheet<Addon>(_selectedLanguage.ToLumina()).ToArray();
-                        _addonTransientRows = _dataManager.Excel.GetSheet<AddonTransient>(_selectedLanguage.ToLumina()).ToArray();
-                        _lobbyRows = _dataManager.Excel.GetSheet<Lobby>(_selectedLanguage.ToLumina()).ToArray();
-                        _logMessageRows = _dataManager.Excel.GetSheet<LogMessage>(_selectedLanguage.ToLumina()).ToArray();
-                        _logKindRows = _dataManager.Excel.GetSheet<LogKind>(_selectedLanguage.ToLumina()).ToArray();
+                        SelectedLanguage = value;
+                        foreach (var tab in _excelTabs)
+                            tab.ReloadSheet();
                         listDirty |= true;
                     }
                 }
             }
         }
+
         if (listDirty)
         {
             _filterCTS?.Cancel();
             _filterCTS = new();
-            Task.Run(() => FilterList(_filterCTS.Token));
+            Task.Run(() =>
+            {
+                foreach (var tab in _excelTabs)
+                    tab.ReloadFilteredRows(_filterCTS.Token);
+            });
         }
 
         using var tabBar = ImRaii.TabBar("ExcelTabs");
         if (!tabBar) return;
 
-        DrawAddonTab();
-        DrawAddonTransientTab();
-        DrawLobbyTab();
-        DrawLogMessageTab();
-        DrawLogKindTab();
+        foreach (var tab in _excelTabs)
+            tab.Draw();
+    }
+}
+
+public interface IExcelSheetTab
+{
+    void Draw();
+    void ReloadFilteredRows(CancellationToken cancellationToken);
+    void ReloadSheet();
+}
+
+public class ExcelSheetTab<T> : IExcelSheetTab where T : struct, IExcelRow<T>
+{
+    private readonly ExcelTab _excelTab;
+    private readonly IDataManager _dataManager;
+
+    private readonly string _sheetName = typeof(T).Name;
+    private T[] _rows = null!;
+    private T[]? _filtereRows;
+
+    public ExcelSheetColumn<T>[] Columns { get; set; } = [];
+
+    public ExcelSheetTab(ExcelTab excelTab, IDataManager dataManager)
+    {
+        _excelTab = excelTab;
+        _dataManager = dataManager;
+        ReloadSheet();
     }
 
-    public void DrawAddonTab()
+    public void ReloadSheet()
     {
-        var tabTitle = "Addon";
-
-        if (!string.IsNullOrWhiteSpace(_searchTerm) && _filteredAddonRows != null)
-        {
-            tabTitle = $"{tabTitle} ({_filteredAddonRows.Length})";
-        }
-
-        using var tab = ImRaii.TabItem(tabTitle + "###AddonTab");
-        if (!tab) return;
-
-        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
-
-        using var table = ImRaii.Table("RowTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
-        if (!table) return;
-
-        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupScrollFreeze(2, 1);
-        ImGui.TableHeadersRow();
-
-        ImGuiClip.ClippedDraw(_filteredAddonRows ?? _addonRows, DrawAddonRow, ImGui.GetTextLineHeightWithSpacing());
+        _rows = [.. _dataManager.Excel.GetSheet<T>(_excelTab.SelectedLanguage.ToLumina())];
     }
 
-    public void DrawAddonTransientTab()
+    public void ReloadFilteredRows(CancellationToken cancellationToken)
     {
-        var tabTitle = "AddonTransient";
-
-        if (!string.IsNullOrWhiteSpace(_searchTerm) && _filteredAddonTransientRows != null)
+        if (string.IsNullOrWhiteSpace(_excelTab.SearchTerm))
         {
-            tabTitle = $"{tabTitle} ({_filteredAddonTransientRows.Length})";
-        }
-
-        using var tab = ImRaii.TabItem(tabTitle + "###AddonTransientTab");
-        if (!tab) return;
-
-        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
-
-        using var table = ImRaii.Table("RowTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
-        if (!table) return;
-
-        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupScrollFreeze(2, 1);
-        ImGui.TableHeadersRow();
-
-        ImGuiClip.ClippedDraw(_filteredAddonTransientRows ?? _addonTransientRows, DrawAddonTransientRow, ImGui.GetTextLineHeightWithSpacing());
-    }
-
-    public void DrawLobbyTab()
-    {
-        var tabTitle = "Lobby";
-
-        if (!string.IsNullOrWhiteSpace(_searchTerm) && _filteredLobbyRows != null)
-        {
-            tabTitle = $"{tabTitle} ({_filteredLobbyRows.Length})";
-        }
-
-        using var tab = ImRaii.TabItem(tabTitle + "###LobbyTab");
-        if (!tab) return;
-
-        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
-
-        using var table = ImRaii.Table("RowTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
-        if (!table) return;
-
-        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupScrollFreeze(2, 1);
-        ImGui.TableHeadersRow();
-
-        ImGuiClip.ClippedDraw(_filteredLobbyRows ?? _lobbyRows, DrawLobbyRow, ImGui.GetTextLineHeightWithSpacing());
-    }
-
-    public void DrawLogMessageTab()
-    {
-        var tabTitle = "LogMessage";
-
-        if (!string.IsNullOrWhiteSpace(_searchTerm) && _filteredLogMessageRows != null)
-        {
-            tabTitle = $"{tabTitle} ({_filteredLogMessageRows.Length})";
-        }
-
-        using var tab = ImRaii.TabItem(tabTitle + "###LogMessageTab");
-        if (!tab) return;
-
-        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
-
-        using var table = ImRaii.Table("RowTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
-        if (!table) return;
-
-        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupScrollFreeze(2, 1);
-        ImGui.TableHeadersRow();
-
-        ImGuiClip.ClippedDraw(_filteredLogMessageRows ?? _logMessageRows, DrawLogMessageRow, ImGui.GetTextLineHeightWithSpacing());
-    }
-
-    public void DrawLogKindTab()
-    {
-        var tabTitle = "LogKind";
-
-        if (!string.IsNullOrWhiteSpace(_searchTerm) && _filteredLogKindRows != null)
-        {
-            tabTitle = $"{tabTitle} ({_filteredLogKindRows.Length})";
-        }
-
-        using var tab = ImRaii.TabItem(tabTitle + "###LogKindTab");
-        if (!tab) return;
-
-        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
-
-        using var table = ImRaii.Table("RowTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
-        if (!table) return;
-
-        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupScrollFreeze(2, 1);
-        ImGui.TableHeadersRow();
-
-        ImGuiClip.ClippedDraw(_filteredLogKindRows ?? _logKindRows, DrawLogKindRow, ImGui.GetTextLineHeightWithSpacing());
-    }
-
-    private void FilterList(CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(_searchTerm))
-        {
-            _filteredAddonRows = null;
-            _filteredAddonTransientRows = null;
-            _filteredLobbyRows = null;
-            _filteredLogMessageRows = null;
-            _filteredLogKindRows = null;
+            _filtereRows = null;
             return;
         }
 
-        var addonList = new List<Addon>();
+        var rows = new List<T>();
 
-        for (var i = 0; i < _addonRows.Length && !cancellationToken.IsCancellationRequested; i++)
+        for (var i = 0; i < _rows.Length && !cancellationToken.IsCancellationRequested; i++)
         {
-            var row = _addonRows[i];
-            if (row.RowId.ToString().Contains(_searchTerm)
-             || row.Text.ToString().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase)
-             || row.Text.ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
-            {
-                addonList.Add(row);
-            }
+            var row = _rows[i];
+
+            if (row.RowId.ToString().Contains(_excelTab.SearchTerm) || Columns.Any(col => col.MatchesSearchTerm?.Invoke(row) == true))
+                rows.Add(row);
         }
 
-        _filteredAddonRows = addonList.ToArray();
-
-        var addonTransientList = new List<AddonTransient>();
-
-        for (var i = 0; i < _addonTransientRows.Length && !cancellationToken.IsCancellationRequested; i++)
-        {
-            var row = _addonTransientRows[i];
-            if (row.RowId.ToString().Contains(_searchTerm)
-             || row.Unknown0.ToString().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase)
-             || row.Unknown0.ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
-            {
-                addonTransientList.Add(row);
-            }
-        }
-
-        _filteredAddonTransientRows = addonTransientList.ToArray();
-
-        var lobbyList = new List<Lobby>();
-
-        for (var i = 0; i < _lobbyRows.Length && !cancellationToken.IsCancellationRequested; i++)
-        {
-            var row = _lobbyRows[i];
-            if (row.RowId.ToString().Contains(_searchTerm)
-             || row.Text.ToString().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase)
-             || row.Text.ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
-            {
-                lobbyList.Add(row);
-            }
-        }
-
-        _filteredLobbyRows = lobbyList.ToArray();
-
-        var logMessageList = new List<LogMessage>();
-
-        for (var i = 0; i < _logMessageRows.Length && !cancellationToken.IsCancellationRequested; i++)
-        {
-            var row = _logMessageRows[i];
-            if (row.RowId.ToString().Contains(_searchTerm)
-             || row.Text.ToString().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase)
-             || row.Text.ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
-            {
-                logMessageList.Add(row);
-            }
-        }
-
-        _filteredLogMessageRows = logMessageList.ToArray();
-
-        var logKindList = new List<LogKind>();
-
-        for (var i = 0; i < _logKindRows.Length && !cancellationToken.IsCancellationRequested; i++)
-        {
-            var row = _logKindRows[i];
-            if (row.RowId.ToString().Contains(_searchTerm)
-             || row.Format.ToString().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase)
-             || row.Format.ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
-            {
-                logKindList.Add(row);
-            }
-        }
-
-        _filteredLogKindRows = logKindList.ToArray();
+        _filtereRows = [.. rows];
     }
 
-    private void DrawAddonRow(Addon row)
+    public void Draw()
+    {
+        var tabTitle = _sheetName;
+
+        if (!string.IsNullOrWhiteSpace(_excelTab.SearchTerm) && _filtereRows != null)
+        {
+            tabTitle = $"{tabTitle} ({_filtereRows.Length})";
+        }
+
+        using var tab = ImRaii.TabItem(tabTitle + $"###{_sheetName}Tab");
+        if (!tab) return;
+
+        using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
+
+        using var table = ImRaii.Table("RowTable", 1 + Columns.Length, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        if (!table) return;
+
+        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
+
+        foreach (var column in Columns)
+            ImGui.TableSetupColumn(column.Name, column.TableColumnFlags, column.TableColumnWidth);
+
+        ImGui.TableSetupScrollFreeze(0, 1);
+        ImGui.TableHeadersRow();
+
+        ImGuiClip.ClippedDraw(_filtereRows ?? _rows, DrawRow, ImGui.GetTextLineHeightWithSpacing());
+    }
+
+    private void DrawRow(T row)
     {
         ImGui.TableNextRow();
 
         ImGui.TableNextColumn(); // RowId
         ImGui.TextUnformatted(row.RowId.ToString());
 
-        ImGui.TableNextColumn(); // Text
-        _debugRenderer.DrawSeString(row.Text.AsSpan(), new NodeOptions()
+        foreach (var column in Columns)
         {
-            AddressPath = new AddressPath((nint)row.RowId),
-            RenderSeString = false,
-            Title = $"Addon#{row.RowId} ({_selectedLanguage})",
-            Language = _selectedLanguage
-        });
+            ImGui.TableNextColumn();
+            column.Draw?.Invoke(row);
+        }
     }
+}
 
-    private void DrawAddonTransientRow(AddonTransient row)
+public class ExcelSheetColumn<T>() where T : struct, IExcelRow<T>
+{
+    public string Name { get; init; } = string.Empty;
+    public Action<T>? Draw { get; init; }
+    public Func<T, bool>? MatchesSearchTerm { get; init; }
+    public ImGuiTableColumnFlags TableColumnFlags { get; init; } = ImGuiTableColumnFlags.WidthStretch;
+    public float TableColumnWidth { get; init; }
+}
+
+public class ExcelSheetStringColumn<T> : ExcelSheetColumn<T> where T : struct, IExcelRow<T>
+{
+    public ExcelSheetStringColumn(ExcelTab excelTab, DebugRenderer debugRenderer, string name, Func<T, ReadOnlySeString> stringGetter)
     {
-        ImGui.TableNextRow();
+        Name = name;
 
-        ImGui.TableNextColumn(); // RowId
-        ImGui.TextUnformatted(row.RowId.ToString());
-
-        ImGui.TableNextColumn(); // Text
-        _debugRenderer.DrawSeString(row.Unknown0.AsSpan(), new NodeOptions()
+        MatchesSearchTerm = (row) =>
         {
-            AddressPath = new AddressPath((nint)row.RowId),
-            RenderSeString = false,
-            Title = $"AddonTransient#{row.RowId} ({_selectedLanguage})",
-            Language = _selectedLanguage
-        });
-    }
+            return stringGetter(row).ToString().Contains(excelTab.SearchTerm, StringComparison.InvariantCultureIgnoreCase);
+        };
 
-    private void DrawLobbyRow(Lobby row)
-    {
-        ImGui.TableNextRow();
-
-        ImGui.TableNextColumn(); // RowId
-        ImGui.TextUnformatted(row.RowId.ToString());
-
-        ImGui.TableNextColumn(); // Text
-        _debugRenderer.DrawSeString(row.Text.AsSpan(), new NodeOptions()
+        Draw = (row) =>
         {
-            AddressPath = new AddressPath((nint)row.RowId),
-            RenderSeString = false,
-            Title = $"Lobby#{row.RowId} ({_selectedLanguage})",
-            Language = _selectedLanguage
-        });
-    }
-
-    private void DrawLogMessageRow(LogMessage row)
-    {
-        ImGui.TableNextRow();
-
-        ImGui.TableNextColumn(); // RowId
-        ImGui.TextUnformatted(row.RowId.ToString());
-
-        ImGui.TableNextColumn(); // Text
-        _debugRenderer.DrawSeString(row.Text.AsSpan(), new NodeOptions()
-        {
-            AddressPath = new AddressPath((nint)row.RowId),
-            RenderSeString = false,
-            Title = $"LogMessage#{row.RowId} ({_selectedLanguage})",
-            Language = _selectedLanguage
-        });
-    }
-
-    private void DrawLogKindRow(LogKind row)
-    {
-        ImGui.TableNextRow();
-
-        ImGui.TableNextColumn(); // RowId
-        ImGui.TextUnformatted(row.RowId.ToString());
-
-        ImGui.TableNextColumn(); // Text
-        _debugRenderer.DrawSeString(row.Format.AsSpan(), new NodeOptions()
-        {
-            AddressPath = new AddressPath((nint)row.RowId),
-            RenderSeString = false,
-            Title = $"LogKind#{row.RowId} ({_selectedLanguage})",
-            Language = _selectedLanguage
-        });
+            debugRenderer.DrawSeString(stringGetter(row).AsSpan(), new NodeOptions()
+            {
+                AddressPath = new AddressPath((nint)row.RowId),
+                RenderSeString = false,
+                Title = $"{row.GetType().Name}#{row.RowId} ({excelTab.SelectedLanguage})",
+                Language = excelTab.SelectedLanguage
+            });
+        };
     }
 }
