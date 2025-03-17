@@ -115,7 +115,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
                 for (var j = 0; j < container->GetSize(); j++)
                 {
                     var slot = container->GetInventorySlot(j);
-                    if (slot == null || slot->IsNotLinked())
+                    if (slot == null || slot->IsEmpty())
                         continue;
 
                     if (slot->GetItemId() == _itemId)

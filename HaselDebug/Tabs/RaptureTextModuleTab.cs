@@ -82,6 +82,30 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
         new TextEntry(TextEntryType.Macro, "<split(Hello World, ,1)>"), // Hello
         new TextEntry(TextEntryType.Macro, "<br>"),
         new TextEntry(TextEntryType.Macro, "<split(Hello World, ,2)>"), // World
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<link(2,1,0,0,A)>"),
+        new TextEntry(TextEntryType.String, "Item Link Test"),
+        new TextEntry(TextEntryType.Macro, "<link(0xCE,0,0,0,)>"),
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<link(4,66822,0,0,Q)>"),
+        new TextEntry(TextEntryType.String, "Quest Link Test"),
+        new TextEntry(TextEntryType.Macro, "<link(0xCE,0,0,0,)>"),
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<link(5,910,0,0,A)>"),
+        new TextEntry(TextEntryType.String, "Achievement Link Test"),
+        new TextEntry(TextEntryType.Macro, "<link(0xCE,0,0,0,)>"),
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<link(6,1,0,0,H)>"),
+        new TextEntry(TextEntryType.String, "HowTo Link Test"),
+        new TextEntry(TextEntryType.Macro, "<link(0xCE,0,0,0,)>"),
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<link(8,327,0,0,S)>"),
+        new TextEntry(TextEntryType.String, "Status Link Test"),
+        new TextEntry(TextEntryType.Macro, "<link(0xCE,0,0,0,)>"),
+        new TextEntry(TextEntryType.Macro, "<br>"),
+        new TextEntry(TextEntryType.Macro, "<link(10,1,0,0,A)>"),
+        new TextEntry(TextEntryType.String, "AkatsukiNote Link Test"),
+        new TextEntry(TextEntryType.Macro, "<link(0xCE,0,0,0,)>"),
     ];
 
     private readonly DebugRenderer _debugRenderer;

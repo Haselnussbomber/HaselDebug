@@ -21,15 +21,17 @@ public unsafe partial class ShopTab : DebugTab
     {
         if (!TryGetAddon<AddonShop>("Shop", out var addon))
         {
-            ImGui.TextUnformatted("No shop open!");
+            ImGui.TextUnformatted("No Shop open!");
             return;
         }
+
+        _debugRenderer.DrawPointerType(addon->List, typeof(AtkComponentList), new());
 
         ImGui.TextUnformatted($"ItemCount: {addon->List->GetItemCount()}");
 
         for (var i = 0; i < addon->List->GetItemCount(); i++)
         {
-            var listItemRenderer = &addon->List->ItemRendererList[i];
+            var listItemRenderer = addon->List->GetItemRenderer(i);
             ImGui.TextUnformatted($"{i}:");
             ImGui.SameLine();
             _debugRenderer.DrawCopyableText($"{(nint)listItemRenderer:X}");

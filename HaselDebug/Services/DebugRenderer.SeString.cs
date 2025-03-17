@@ -13,6 +13,7 @@ using HaselDebug.Utils;
 using HaselDebug.Windows;
 using ImGuiNET;
 using Lumina.Data;
+using Lumina.Excel.Sheets;
 using Lumina.Text.Expressions;
 using Lumina.Text.Payloads;
 using Lumina.Text.ReadOnly;
@@ -354,6 +355,44 @@ public unsafe partial class DebugRenderer
                 if (ImGui.SmallButton("Play"))
                 {
                     UIGlobals.PlayChatSoundEffect(u32 + 1);
+                }
+            }
+
+            if (macroCode is MacroCode.Link && subType != null && idx == 1)
+            {
+                switch ((LinkMacroPayloadType)subType)
+                {
+                    case LinkMacroPayloadType.Item:
+                        ImGui.SameLine();
+                        ImGui.TextUnformatted(_textService.GetItemName(u32));
+                        break;
+
+                    case LinkMacroPayloadType.Quest:
+                        ImGui.SameLine();
+                        ImGui.TextUnformatted(_textService.GetQuestName(u32));
+                        break;
+
+                    case LinkMacroPayloadType.Achievement when _dataManager.GetExcelSheet<Achievement>(_languageProvider.ClientLanguage).TryGetRow(u32, out var achievementRow):
+                        ImGui.SameLine();
+                        ImGui.TextUnformatted(achievementRow.Name.ExtractText());
+                        break;
+
+                    case LinkMacroPayloadType.HowTo when _dataManager.GetExcelSheet<HowTo>(_languageProvider.ClientLanguage).TryGetRow(u32, out var howToRow):
+                        ImGui.SameLine();
+                        ImGui.TextUnformatted(howToRow.Name.ExtractText());
+                        break;
+
+                    case LinkMacroPayloadType.Status when _dataManager.GetExcelSheet<Status>(_languageProvider.ClientLanguage).TryGetRow(u32, out var statusRow):
+                        ImGui.SameLine();
+                        ImGui.TextUnformatted(statusRow.Name.ExtractText());
+                        break;
+
+                    case LinkMacroPayloadType.AkatsukiNote when
+                        _dataManager.GetSubrowExcelSheet<AkatsukiNote>(_languageProvider.ClientLanguage).TryGetRow(u32, out var akatsukiNoteRow) &&
+                        _dataManager.GetExcelSheet<AkatsukiNoteString>(_languageProvider.ClientLanguage).TryGetRow((uint)akatsukiNoteRow[0].Unknown2, out var akatsukiNoteStringRow):
+                        ImGui.SameLine();
+                        ImGui.TextUnformatted(akatsukiNoteStringRow.Unknown0.ExtractText());
+                        break;
                 }
             }
 
