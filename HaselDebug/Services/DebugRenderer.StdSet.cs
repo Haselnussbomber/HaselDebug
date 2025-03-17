@@ -98,7 +98,7 @@ public unsafe partial class DebugRenderer
             ImGui.TableNextColumn(); // Value
 
             // since key equals value, we just use the key here for simplicity
-            DrawPointerType(keyAddress, valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(keyAddress) });
+            DrawPointerType(keyAddress, valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(keyAddress), IsIconIdField = nodeOptions.IsIconIdField });
         }
     }
 

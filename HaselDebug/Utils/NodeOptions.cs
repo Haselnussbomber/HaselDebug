@@ -23,6 +23,7 @@ public record struct NodeOptions
     public AddressPath ResolvedInheritedTypeAddresses { get; set; } = new();
     public bool UseSimpleEventHandlerName { get; set; } = false;
     public ClientLanguage Language { get; set; } = ClientLanguage.English;
+    public bool IsIconIdField { get; set; } = false;
 
     public ImGuiTreeNodeFlags GetTreeNodeFlags(ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.SpanAvailWidth)
     {

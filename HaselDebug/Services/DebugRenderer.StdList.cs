@@ -78,7 +78,7 @@ public unsafe partial class DebugRenderer
             ImGui.TextUnformatted(i.ToString());
 
             ImGui.TableNextColumn(); // Value
-            DrawPointerType(_current + valueOffset, valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath });
+            DrawPointerType(_current + valueOffset, valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath, IsIconIdField = nodeOptions.IsIconIdField });
             i++;
         }
     }

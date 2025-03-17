@@ -489,6 +489,9 @@ public unsafe partial class DebugRenderer
             var fieldAddress = address + offset;
             var fieldType = fieldInfo.FieldType;
 
+            if (fieldInfo.Name.Contains("IconId"))
+                fieldNodeOptions = fieldNodeOptions with { IsIconIdField = true };
+
             if (fieldInfo.GetCustomAttribute<ObsoleteAttribute>() is ObsoleteAttribute obsoleteAttribute)
             {
                 using (ImRaii.PushColor(ImGuiCol.Text, (uint)(obsoleteAttribute.IsError ? ColorObsoleteError : ColorObsolete)))
@@ -645,9 +648,6 @@ public unsafe partial class DebugRenderer
             // TODO: enum values table
 
             DrawFieldName(fieldInfo);
-
-            if (fieldType == typeof(uint) && fieldInfo.Name == "IconId")
-                DrawIcon(*(uint*)fieldAddress);
 
             if (fieldType.IsPointer && fieldAddress != 0)
                 HighlightNode(fieldAddress, fieldType, ref fieldNodeOptions);
@@ -873,7 +873,6 @@ public unsafe partial class DebugRenderer
         }
     }
 
-
     public object? DrawNumeric(nint address, Type type, NodeOptions nodeOptions)
     {
         object? value = null;
@@ -919,6 +918,8 @@ public unsafe partial class DebugRenderer
 
             case Type t when t == typeof(int):
                 value = *(int*)address;
+                if (nodeOptions.IsIconIdField)
+                    DrawIcon((uint)value);
                 DrawCopyableText(((int)value).ToString(CultureInfo.InvariantCulture));
                 ImGui.SameLine();
                 DrawCopyableText($"0x{value:X}");
@@ -926,6 +927,8 @@ public unsafe partial class DebugRenderer
 
             case Type t when t == typeof(uint):
                 value = *(uint*)address;
+                if (nodeOptions.IsIconIdField)
+                    DrawIcon((uint)value);
                 DrawCopyableText(((uint)value).ToString(CultureInfo.InvariantCulture));
                 ImGui.SameLine();
                 DrawCopyableText($"0x{value:X}");
