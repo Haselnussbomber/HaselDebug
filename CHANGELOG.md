@@ -1,6 +1,16 @@
 # Changelog
 
-## [1.18.2] (2025-03-27)
+## [1.19.0] (2025-03-17)
+
+- **Added:** An AtkEvents tab for global events, excluding MouseMove, MouseOver, MouseOut, FocusStart, FocusStop, WindowRollOver, WindowRollOut, TimerTick, 74 and 79 to avoid spam.
+- **Added:** The Excel tab now features the LogKind sheet.
+- **Added:** SeString inspector now shows the name of the Item, Quest, Achievement, HowTo, Status, and AkatsukiNote that was linked in the Link payload.
+- **Added:** The Shop tab now displays the used AtkComponentList struct.
+- **Changed internally:** The Excel tab was rewritten, so that things can be reused.
+- **Updated:** SeStringEvaluator is now reflecting the state of my Dalamud PR, correctly handling Sheet redirects.
+- **Updated:** ClientStructs now at [4d473c7](https://github.com/aers/FFXIVClientStructs/tree/4d473c7) ([compare](https://github.com/aers/FFXIVClientStructs/compare/977a8fd..4d473c7)), which is my PR 1322 based on the `7.2_prep` branch.
+
+## [1.18.2] (2025-03-07)
 
 - **Updated:** Added expression names for macro codes Num, String, Caps, Split, LevelPos.
 - **Fixed:** NounProcessor tab didn't initialize.
@@ -297,7 +307,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.19.0...main
+[1.19.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.2...v1.19.0
 [1.18.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.1...v1.18.2
 [1.18.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.0...v1.18.1
 [1.18.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.17.0...v1.18.0
