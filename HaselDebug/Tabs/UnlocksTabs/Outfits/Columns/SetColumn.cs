@@ -75,10 +75,10 @@ public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
         // TODO: preview whole set??
         _imGuiContextMenuService.Draw($"###Set_{row.RowId}_ItemContextMenu", builder =>
         {
-            builder.AddTryOn(row.Set);
+            builder.AddTryOn(row.Set.RowId);
             builder.AddItemFinder(row.Set.RowId);
             builder.AddCopyItemName(row.Set.RowId);
-            builder.AddItemSearch(row.Set);
+            builder.AddItemSearch(row.Set.RowId);
             builder.AddOpenOnGarlandTools("item", row.Set.RowId);
         });
 

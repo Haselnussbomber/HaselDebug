@@ -43,7 +43,7 @@ public partial class NameColumn : ColumnString<FishParameter>
             {
                 builder.AddItemFinder(item.RowId);
                 builder.AddCopyItemName(item.RowId);
-                builder.AddItemSearch(item);
+                builder.AddItemSearch(item.RowId);
                 builder.AddOpenOnGarlandTools("item", item.RowId);
             }
             else if (isEventItem)

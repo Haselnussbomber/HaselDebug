@@ -69,14 +69,14 @@ public unsafe class UnlocksTabUtils(
 
         ImGuiContextMenuService.Draw($"##{id}_ItemContextMenu{item.RowId}_IconTooltip", builder =>
         {
-            builder.AddTryOn(item);
+            builder.AddTryOn(item.RowId);
             builder.AddItemFinder(item.RowId);
             builder.AddCopyItemName(item.RowId);
-            builder.AddItemSearch(item);
+            builder.AddItemSearch(item.RowId);
             builder.AddOpenOnGarlandTools("item", item.RowId);
         });
 
-        if (ItemService.IsUnlockable(item) && ItemService.IsUnlocked(item))
+        if (ItemService.IsUnlockable(item.RowId) && ItemService.IsUnlocked(item.RowId))
         {
             ImGui.SameLine(1, 0);
 
@@ -170,7 +170,7 @@ public unsafe class UnlocksTabUtils(
         ImGui.TableNextColumn(); // Icon
         ImGui.Image(icon.ImGuiHandle, ImGuiHelpers.ScaledVector2(40));
 
-        var isUnlocked = ItemService.IsUnlockable(item) && ItemService.IsUnlocked(item);
+        var isUnlocked = ItemService.IsUnlockable(item.RowId) && ItemService.IsUnlocked(item.RowId);
         if (isUnlocked)
         {
             ImGui.SameLine(1 + ImGui.GetStyle().CellPadding.X + itemInnerSpacing.X, 0);

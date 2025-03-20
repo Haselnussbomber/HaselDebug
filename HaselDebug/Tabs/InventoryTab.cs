@@ -112,7 +112,7 @@ public unsafe partial class InventoryTab : DebugTab
             var slot = container->GetInventorySlot(i);
             if (slot == null) continue;
 
-            var itemId = (ExcelRowId<Item>)slot->GetItemId();
+            var itemId = slot->GetItemId();
             var quantity = slot->GetQuantity();
 
             using var disableditem = ImRaii.Disabled(itemId == 0);
@@ -132,7 +132,7 @@ public unsafe partial class InventoryTab : DebugTab
             {
                 var itemName = _textService.GetItemName(itemId);
 
-                if (itemId.IsHighQuality())
+                if (IsHighQuality(itemId))
                     itemName += " " + SeIconChar.HighQuality.ToIconString();
 
                 var itemNameSeStr = new SeStringBuilder()
@@ -141,7 +141,7 @@ public unsafe partial class InventoryTab : DebugTab
                     .PopColorType()
                     .ToReadOnlySeString();
 
-                _debugRenderer.DrawIcon(_itemService.GetIconId(itemId), itemId.IsHighQuality());
+                _debugRenderer.DrawIcon(_itemService.GetIconId(itemId), IsHighQuality(itemId));
                 _debugRenderer.DrawPointerType(slot, typeof(InventoryItem), new NodeOptions()
                 {
                     AddressPath = new AddressPath([(nint)inventoryType, slot->Slot]),

@@ -41,7 +41,7 @@ public partial class NameColumn : ColumnString<SpearfishingItem>
         {
             builder.AddItemFinder(item.RowId);
             builder.AddCopyItemName(item.RowId);
-            builder.AddItemSearch(item);
+            builder.AddItemSearch(item.RowId);
             builder.AddOpenOnGarlandTools("item", item.RowId);
         });
     }

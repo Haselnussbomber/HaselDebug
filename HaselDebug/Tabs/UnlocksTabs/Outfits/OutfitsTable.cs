@@ -66,7 +66,7 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
                 continue;
 
             // does not only consist of items that can't be worn
-            if (row.Items.Where(i => i.RowId != 0).All(i => !_itemService.CanTryOn(i.Value)))
+            if (row.Items.Where(i => i.RowId != 0).All(i => !_itemService.CanTryOn(i.Value.RowId)))
                 continue;
 
             Rows.Add(row);

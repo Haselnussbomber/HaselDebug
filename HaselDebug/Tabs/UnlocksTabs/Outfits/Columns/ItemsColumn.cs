@@ -106,11 +106,11 @@ public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
             {
                 builder.AddRestoreItem(_textService, item.RowId);
                 builder.AddViewOutfitGlamourReadyItems(_textService, _excelService, item.RowId);
-                builder.AddTryOn(item);
+                builder.AddTryOn(item.RowId);
                 builder.AddItemFinder(item.RowId);
                 builder.AddCopyItemName(item.RowId);
-                builder.AddItemSearch(item);
-                builder.AddSearchCraftingMethod(item);
+                builder.AddItemSearch(item.RowId);
+                builder.AddSearchCraftingMethod(item.RowId);
                 builder.AddOpenOnGarlandTools("item", item.RowId);
             });
 
