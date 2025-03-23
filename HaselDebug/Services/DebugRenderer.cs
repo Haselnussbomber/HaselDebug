@@ -41,12 +41,12 @@ namespace HaselDebug.Services;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class DebugRenderer
 {
-    public Color ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1);
-    public Color ColorType { get; } = new(0.2f, 0.9f, 0.9f, 1);
-    public Color ColorFieldName { get; } = new(0.2f, 0.9f, 0.4f, 1);
-    public Color ColorTreeNode { get; } = new(1, 1, 0, 1);
-    public Color ColorObsolete { get; } = new(1, 1, 0, 1);
-    public Color ColorObsoleteError { get; } = new(1, 0, 0, 1);
+    public static Color ColorModifier { get; } = new(0.5f, 0.5f, 0.75f, 1);
+    public static Color ColorType { get; } = new(0.2f, 0.9f, 0.9f, 1);
+    public static Color ColorFieldName { get; } = new(0.2f, 0.9f, 0.4f, 1);
+    public static Color ColorTreeNode { get; } = new(1, 1, 0, 1);
+    public static Color ColorObsolete { get; } = new(1, 1, 0, 1);
+    public static Color ColorObsoleteError { get; } = new(1, 0, 0, 1);
 
     private readonly Dictionary<Type, string[]> _knownStringPointers = new() {
         { typeof(FFXIVClientStructs.FFXIV.Client.UI.Agent.MapMarkerBase), ["Subtext"] },
@@ -880,95 +880,133 @@ public unsafe partial class DebugRenderer
         switch (type)
         {
             case Type t when t == typeof(nint):
-                DrawAddress(*(nint*)address);
+                value = *(nint*)address;
                 break;
 
             case Type t when t == typeof(Half):
                 value = *(Half*)address;
-                DrawCopyableText(((Half)value).ToString(CultureInfo.InvariantCulture));
                 break;
 
             case Type t when t == typeof(byte):
                 value = *(byte*)address;
-                DrawCopyableText(((byte)value).ToString(CultureInfo.InvariantCulture));
-                ImGui.SameLine();
-                DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(sbyte):
                 value = *(sbyte*)address;
-                DrawCopyableText(((sbyte)value).ToString(CultureInfo.InvariantCulture));
-                ImGui.SameLine();
-                DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(short):
                 value = *(short*)address;
-                DrawCopyableText(((short)value).ToString(CultureInfo.InvariantCulture));
-                ImGui.SameLine();
-                DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(ushort):
                 value = *(ushort*)address;
-                DrawCopyableText(((ushort)value).ToString(CultureInfo.InvariantCulture));
-                ImGui.SameLine();
-                DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(int):
                 value = *(int*)address;
-                if (nodeOptions.IsIconIdField)
-                    DrawIcon((uint)value);
-                DrawCopyableText(((int)value).ToString(CultureInfo.InvariantCulture));
-                ImGui.SameLine();
-                DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(uint):
                 value = *(uint*)address;
-                if (nodeOptions.IsIconIdField)
-                    DrawIcon((uint)value);
-                DrawCopyableText(((uint)value).ToString(CultureInfo.InvariantCulture));
-                ImGui.SameLine();
-                DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(long):
                 value = *(long*)address;
-                DrawCopyableText(((long)value).ToString(CultureInfo.InvariantCulture));
-                ImGui.SameLine();
-                DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(ulong):
                 value = *(ulong*)address;
-                DrawCopyableText(((ulong)value).ToString(CultureInfo.InvariantCulture));
-                ImGui.SameLine();
-                DrawCopyableText($"0x{value:X}");
                 break;
 
             case Type t when t == typeof(decimal):
                 value = *(decimal*)address;
-                DrawCopyableText(((decimal)value).ToString(CultureInfo.InvariantCulture));
                 break;
 
             case Type t when t == typeof(double):
                 value = *(double*)address;
-                DrawCopyableText(((double)value).ToString(CultureInfo.InvariantCulture));
                 break;
 
             case Type t when t == typeof(float):
                 value = *(float*)address;
-                DrawCopyableText(((float)value).ToString(CultureInfo.InvariantCulture));
                 break;
 
             default:
-                ImGui.TextUnformatted($"Unhandled NumericType {type.FullName}");
-                break;
+                ImGui.TextUnformatted("null");
+                return value;
         }
 
+        DrawNumeric(value, type, nodeOptions);
+
         return value;
+    }
+
+    public void DrawNumeric(object value, Type type, NodeOptions nodeOptions)
+    {
+        if (type == typeof(nint))
+        {
+            DrawAddress((nint)value);
+            return;
+        }
+
+        if (type == typeof(Half) || type == typeof(decimal) || type == typeof(double) || type == typeof(float))
+        {
+            DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+            return;
+        }
+
+        if (type == typeof(byte) || type == typeof(sbyte) ||
+            type == typeof(short) || type == typeof(ushort) ||
+            type == typeof(int) || type == typeof(uint) ||
+            type == typeof(long) || type == typeof(ulong))
+        {
+            DrawNumericWithHex(value, type, nodeOptions);
+            return;
+        }
+
+        ImGui.TextUnformatted($"Unhandled NumericType {type.FullName}");
+    }
+
+    private void DrawNumericWithHex(object value, Type type, NodeOptions nodeOptions)
+    {
+        if (nodeOptions.IsIconIdField && (type == typeof(uint) || type == typeof(int)))
+        {
+            DrawIcon(Convert.ToUInt32(value));
+        }
+
+        if (nodeOptions.HexOnShift)
+        {
+            if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || ImGui.IsKeyDown(ImGuiKey.RightShift))
+            {
+                DrawCopyableText(ToHexString(value, type));
+            }
+            else
+            {
+                DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+            }
+
+            return;
+        }
+
+        DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+        ImGui.SameLine();
+        DrawCopyableText(ToHexString(value, type));
+    }
+
+    private static string ToHexString(object value, Type type)
+    {
+        return type switch
+        {
+            _ when type == typeof(byte) => $"0x{(byte)value:X}",
+            _ when type == typeof(sbyte) => $"0x{(sbyte)value:X}",
+            _ when type == typeof(short) => $"0x{(short)value:X}",
+            _ when type == typeof(ushort) => $"0x{(ushort)value:X}",
+            _ when type == typeof(int) => $"0x{(int)value:X}",
+            _ when type == typeof(uint) => $"0x{(uint)value:X}",
+            _ when type == typeof(long) => $"0x{(long)value:X}",
+            _ when type == typeof(ulong) => $"0x{(ulong)value:X}",
+            _ => throw new InvalidOperationException($"Unsupported type {type.FullName}")
+        };
     }
 
     public string ToBitsString(ulong value, int bits)

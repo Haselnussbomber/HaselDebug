@@ -21,7 +21,6 @@ public unsafe partial class DebugRenderer
         }
 
         nodeOptions = nodeOptions.WithAddress((sheetType.Name.GetHashCode(), (nint)rowId).GetHashCode());
-        nodeOptions.Language = _languageProvider.ClientLanguage;
 
         var title = $"{sheetType.Name}#{rowId}";
         if (!string.IsNullOrEmpty(nodeOptions.Title))
@@ -78,11 +77,15 @@ public unsafe partial class DebugRenderer
         if (propInfo == null)
             return;
 
-        DrawExcelProp(propInfo.Name, propInfo.PropertyType, propInfo.GetValue(row), depth, nodeOptions);
+        DrawExcelProp(propInfo, row, rowId, depth, nodeOptions);
     }
 
-    private void DrawExcelProp(string propName, Type propType, object? value, uint depth, NodeOptions nodeOptions)
+    private void DrawExcelProp(PropertyInfo propInfo, object? row, uint rowId, uint depth, NodeOptions nodeOptions)
     {
+        var propName = propInfo.Name;
+        var propType = propInfo.PropertyType;
+        var value = propInfo.GetValue(row);
+
         if (value == null)
         {
             ImGui.TextUnformatted("null");
@@ -91,10 +94,12 @@ public unsafe partial class DebugRenderer
 
         if (propType == typeof(ReadOnlySeString))
         {
-            DrawSeString(((ReadOnlySeString)value).AsSpan(), true, new NodeOptions()
+            DrawSeString(((ReadOnlySeString)value).AsSpan(), new NodeOptions()
             {
-                RenderSeString = nodeOptions.RenderSeString,
-                AddressPath = nodeOptions.AddressPath.With(propName.GetHashCode())
+                AddressPath = nodeOptions.AddressPath.With(propName.GetHashCode()),
+                RenderSeString = false,
+                Title = $"{row!.GetType().Name}#{rowId} ({nodeOptions.Language})",
+                Language = nodeOptions.Language
             });
             return;
         }
@@ -212,16 +217,16 @@ public unsafe partial class DebugRenderer
                     if (!structNode) continue;
                     structTitleColor?.Dispose();
 
-                    foreach (var propInfo in collectionType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                    foreach (var pi in collectionType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
                     {
-                        if (propInfo.Name == "RowId")
+                        if (pi.Name == "RowId")
                             continue;
 
-                        DrawCopyableText(propInfo.PropertyType.ReadableTypeName(), propInfo.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
+                        DrawCopyableText(pi.PropertyType.ReadableTypeName(), pi.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
                         ImGui.SameLine();
-                        ImGui.TextColored(ColorFieldName, propInfo.Name);
+                        ImGui.TextColored(ColorFieldName, pi.Name);
                         ImGui.SameLine();
-                        DrawExcelProp(propInfo.PropertyType.Name, propInfo.PropertyType, propInfo.GetValue(colValue), depth, nodeOptions);
+                        DrawExcelProp(pi, colValue, rowId, depth, nodeOptions);
                     }
 
                     continue;
@@ -237,6 +242,28 @@ public unsafe partial class DebugRenderer
             }
 
             return;
+        }
+
+        if (nodeOptions.IsIconIdField && propType.IsNumericType())
+        {
+            switch (propType)
+            {
+                case Type t when t == typeof(short):
+                    DrawIcon((uint)(short)value);
+                    break;
+
+                case Type t when t == typeof(ushort):
+                    DrawIcon((ushort)value);
+                    break;
+
+                case Type t when t == typeof(int):
+                    DrawIcon((uint)(int)value);
+                    break;
+
+                case Type t when t == typeof(uint):
+                    DrawIcon((uint)value);
+                    break;
+            }
         }
 
         ImGui.TextUnformatted(value.ToString());

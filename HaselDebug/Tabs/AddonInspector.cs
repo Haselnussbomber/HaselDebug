@@ -475,7 +475,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
                 var textNode = (AtkTextNode*)node;
                 ImGui.TextUnformatted("text: ");
                 ImGui.SameLine();
-                _debugRenderer.DrawUtf8String((nint)(&textNode->NodeText), nodeOptions);
+                _debugRenderer.DrawSeString(textNode->NodeText.AsSpan(), true, nodeOptions);
 
                 ImGui.InputText($"Replace Text##{(ulong)textNode:X}", new nint(textNode->NodeText.StringPtr), (uint)textNode->NodeText.BufSize);
 

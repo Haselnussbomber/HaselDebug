@@ -22,8 +22,9 @@ public record struct NodeOptions
     public bool RenderSeString { get; set; } = true;
     public AddressPath ResolvedInheritedTypeAddresses { get; set; } = new();
     public bool UseSimpleEventHandlerName { get; set; } = false;
-    public ClientLanguage Language { get; set; } = ClientLanguage.English;
+    public ClientLanguage Language { get; set; } = Service.Get<LanguageProvider>().ClientLanguage;
     public bool IsIconIdField { get; set; } = false;
+    public bool HexOnShift { get; set; } = false;
 
     public ImGuiTreeNodeFlags GetTreeNodeFlags(ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.SpanAvailWidth)
     {

@@ -8,14 +8,16 @@ using Lumina.Excel;
 
 namespace HaselDebug.Tabs.UnlocksTabs;
 
-public class RowIdColumn<TRow>(
-    WindowManager windowManager,
-    TextService textService,
-    LanguageProvider languageProvider,
-    DebugRenderer debugRenderer,
-    ImGuiContextMenuService imGuiContextMenu,
-    Type rowType) : ColumnNumber<TRow> where TRow : struct, IExcelRow<TRow>
+[AutoConstruct]
+public partial class RowIdColumn<TRow> : ColumnNumber<TRow> where TRow : struct, IExcelRow<TRow>
 {
+    private readonly WindowManager _windowManager;
+    private readonly TextService _textService;
+    private readonly LanguageProvider _languageProvider;
+    private readonly DebugRenderer _debugRenderer;
+    private readonly ImGuiContextMenuService _imGuiContextMenu;
+    private readonly Type _rowType;
+
     public override int ToValue(TRow row)
         => (int)row.RowId;
 
@@ -23,12 +25,13 @@ public class RowIdColumn<TRow>(
     {
         if (ImGui.Selectable(ToName(row)))
         {
-            windowManager.CreateOrOpen($"{rowType.Name}#{row.RowId}", () => new ExcelRowTab(windowManager, textService, languageProvider, debugRenderer, rowType, row.RowId, $"{rowType.Name}#{row.RowId}"));
+            var title = $"{_rowType.Name}#{row.RowId} ({_languageProvider.ClientLanguage})";
+            _windowManager.CreateOrOpen(title, () => new ExcelRowTab(_windowManager, _textService, _languageProvider, _debugRenderer, _rowType, row.RowId, _languageProvider.ClientLanguage, title));
         }
 
-        imGuiContextMenu.Draw($"{rowType.Name}{row.RowId}RowIdContextMenu", builder =>
+        _imGuiContextMenu.Draw($"{_rowType.Name}{row.RowId}RowIdContextMenu", builder =>
         {
-            builder.AddCopyRowId(textService, row.RowId);
+            builder.AddCopyRowId(_textService, row.RowId);
         });
     }
 
