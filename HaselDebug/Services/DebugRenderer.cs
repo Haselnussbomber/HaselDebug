@@ -969,7 +969,7 @@ public unsafe partial class DebugRenderer
 
     private void DrawNumericWithHex(object value, Type type, NodeOptions nodeOptions)
     {
-        if (nodeOptions.IsIconIdField && (type == typeof(uint) || type == typeof(int)))
+        if (nodeOptions.IsIconIdField)
         {
             DrawIcon(Convert.ToUInt32(value));
         }

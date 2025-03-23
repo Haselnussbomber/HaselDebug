@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -35,6 +36,7 @@ public unsafe partial class Excel2Tab : DebugTab
 
     private Dictionary<string, Type> _sheetTypes;
     private IExcelV2SheetWrapper? _sheetWrapper;
+    private IExcelV2SheetWrapper? _nextSheetWrapper;
     private string _sheetNameSearchTerm = string.Empty;
 
     public override string Title => "Excel (v2)";
@@ -61,6 +63,12 @@ public unsafe partial class Excel2Tab : DebugTab
 
         ImGui.TextUnformatted("Work in progress!");
 
+        if (_nextSheetWrapper != null)
+        {
+            _sheetWrapper = _nextSheetWrapper;
+            _nextSheetWrapper = null;
+        }
+
         /*
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - LanguageSelectorWidth * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X);
         var searchTerm = SearchTerm;
@@ -75,7 +83,7 @@ public unsafe partial class Excel2Tab : DebugTab
         ImGui.SameLine();
 
         ImGui.SetNextItemWidth(LanguageSelectorWidth * ImGuiHelpers.GlobalScale);
-        using (var dropdown = ImRaii.Combo("##Language", SelectedLanguage.ToString() ?? "Language..."))
+        using (var dropdown = ImRaii.Combo("##Language", SelectedLanguage.ToString()))
         {
             if (dropdown)
             {
@@ -126,20 +134,32 @@ public unsafe partial class Excel2Tab : DebugTab
         ImGui.TableHeadersRow();
 
         var i = 0;
-        foreach (var kv in _sheetTypes.OrderBy(kv => kv.Key))
+        foreach (var sheetName in _sheetTypes.Keys.OrderBy(sheetName => sheetName))
         {
-            if (hasSearchTerm && !kv.Key.Contains(_sheetNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
+            if (hasSearchTerm && !sheetName.Contains(_sheetNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
                 continue;
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Name
-            if (ImGui.Selectable(kv.Key + $"###SheetSelectable{i++}", kv.Key == _sheetWrapper?.SheetName, ImGuiSelectableFlags.SpanAllColumns))
+            if (ImGui.Selectable(sheetName + $"###SheetSelectable{i++}", sheetName == _sheetWrapper?.SheetName, ImGuiSelectableFlags.SpanAllColumns))
             {
-                var sheetType = typeof(ExcelV2SheetWrapper<>).MakeGenericType(kv.Value);
-                _sheetWrapper = (IExcelV2SheetWrapper)Activator.CreateInstance(sheetType, this, _debugRenderer, _dataManager, _languageProvider, _excelService)!;
+                ChangeSheet(sheetName);
             }
         }
     }
+
+    private void ChangeSheet(string sheetName)
+    {
+        if (!TryGetSheetType(sheetName, out var sheetType))
+            return;
+
+        _nextSheetWrapper = (IExcelV2SheetWrapper)Activator.CreateInstance(
+            typeof(ExcelV2SheetWrapper<>).MakeGenericType(sheetType),
+            this, _debugRenderer, _dataManager, _languageProvider, _excelService)!;
+    }
+
+    public bool TryGetSheetType(string sheetName, [NotNullWhen(returnValue: true)] out Type? sheetType)
+        => _sheetTypes.TryGetValue(sheetName, out sheetType);
 }
 
 public interface IExcelV2SheetWrapper
@@ -177,7 +197,8 @@ public class ExcelV2SheetWrapper<T> : IExcelV2SheetWrapper where T : struct
         ImGui.TextUnformatted(SheetName);
         ImGui.SameLine();
 
-        ImGui.TextUnformatted($"{(_table.FilteredRows ?? _table.Rows).Count} rows"); // TODO: translation/pluralization
+        var count = (_table.FilteredRows ?? _table.Rows).Count;
+        ImGui.TextUnformatted($"{count} row{(count != 1 ? "s" : "")}");
         ImGui.TextUnformatted($"IsSubrowType: {_table.IsSubrowType}");
 
         ImGui.SameLine();
@@ -369,10 +390,9 @@ public class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
 
         if (!_excelTable.IsSubrowType && Label is "RowId" or "SubrowId")
         {
-            if (ImGui.Selectable(value.ToString()) && Service.TryGet<WindowManager>(out var windowManager))
+            if (ImGui.Selectable(value.ToString()))
             {
-                var title = $"{typeof(T).Name}#{rowId} ({_excelTab.SelectedLanguage})";
-                windowManager.CreateOrOpen(title, () => new ExcelRowTab(windowManager, Service.Get<TextService>(), Service.Get<LanguageProvider>(), _debugRenderer, RowType, rowId, _excelTab.SelectedLanguage, title));
+                OpenSheet(RowType.Name, rowId);
             }
             return;
         }
@@ -398,19 +418,47 @@ public class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
 
         if (ColumnType.IsGenericType && ColumnType.GetGenericTypeDefinition() == typeof(RowRef<>))
         {
-            var columnRowType = ColumnType.GenericTypeArguments[0];
-            var columnRowId = (uint)ColumnType.GetProperty("RowId")?.GetValue(value)!;
-            using (Color.Grey.Push(ImGuiCol.Text))
-                ImGui.TextUnformatted($"{columnRowType.Name}#{columnRowId}"); // TODO: click to navigate
+            var rowRefType = ColumnType.GenericTypeArguments[0];
+            var rowRefRowId = (uint)ColumnType.GetProperty("RowId")?.GetValue(value)!;
+            var rowRefIsValid = (bool)ColumnType.GetProperty("IsValid")?.GetValue(value)!;
+            var text = $"{rowRefType.Name}#{rowRefRowId}";
+
+            if (rowRefIsValid)
+            {
+                using var color = DebugRenderer.ColorTreeNode.Push(ImGuiCol.Text);
+
+                if (ImGui.Selectable(text))
+                    OpenSheet(rowRefType.Name, rowRefRowId);
+            }
+            else
+            {
+                using var disabled = ImRaii.Disabled();
+                ImGui.TextUnformatted(text);
+            }
+
             return;
         }
 
         if (ColumnType.IsGenericType && ColumnType.GetGenericTypeDefinition() == typeof(SubrowRef<>))
         {
-            var columnRowType = ColumnType.GenericTypeArguments[0];
-            var columnRowId = (uint)ColumnType.GetProperty("RowId")?.GetValue(value)!;
-            using (Color.Grey.Push(ImGuiCol.Text))
-                ImGui.TextUnformatted($"{columnRowType.Name}#{columnRowId}"); // TODO: click to navigate
+            var rowRefType = ColumnType.GenericTypeArguments[0];
+            var rowRefRowId = (uint)ColumnType.GetProperty("RowId")?.GetValue(value)!;
+            var rowRefIsValid = (bool)ColumnType.GetProperty("IsValid")?.GetValue(value)!;
+            var text = $"{rowRefType.Name}#{rowRefRowId}";
+
+            if (rowRefIsValid)
+            {
+                using var color = DebugRenderer.ColorTreeNode.Push(ImGuiCol.Text);
+
+                if (ImGui.Selectable(text))
+                    OpenSheet(rowRefType.Name, rowRefRowId);
+            }
+            else
+            {
+                using var disabled = ImRaii.Disabled();
+                ImGui.TextUnformatted(text);
+            }
+
             return;
         }
 
@@ -429,5 +477,15 @@ public class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
         }
 
         ImGui.TextUnformatted(value.ToString()); // TODO: invariant culture
+    }
+
+    private void OpenSheet(string sheetName, uint rowId)
+    {
+        if (!_excelTab.TryGetSheetType(sheetName, out var sheetType))
+            return;
+
+        var windowManager = Service.Get<WindowManager>();
+        var title = $"{sheetName}#{rowId} ({_excelTab.SelectedLanguage})";
+        windowManager.CreateOrOpen(title, () => new ExcelRowTab(windowManager, Service.Get<TextService>(), Service.Get<LanguageProvider>(), _debugRenderer, sheetType, rowId, _excelTab.SelectedLanguage, title));
     }
 }
