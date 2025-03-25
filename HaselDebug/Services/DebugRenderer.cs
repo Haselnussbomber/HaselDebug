@@ -13,6 +13,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using Dalamud.Utility;
 using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
@@ -25,11 +26,11 @@ using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
 using HaselCommon.Extensions.Reflection;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
+using InteropGenerator.Runtime;
 using InteropGenerator.Runtime.Attributes;
 using Lumina.Text.ReadOnly;
 using Microsoft.Extensions.Logging;
@@ -292,7 +293,7 @@ public unsafe partial class DebugRenderer
             DrawAtkValue(address, nodeOptions);
             return;
         }
-        else if (type == typeof(StringPointer))
+        else if (type == typeof(CStringPointer))
         {
             DrawSeString(*(byte**)address, nodeOptions);
             return;

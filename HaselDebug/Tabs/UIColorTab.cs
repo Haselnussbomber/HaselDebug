@@ -39,19 +39,19 @@ public unsafe partial class UIColorTab : DebugTab
             ImGui.TextUnformatted(row.RowId.ToString());
 
             ImGui.TableNextColumn();
-            var color = (Vector4)Color.FromABGR(row.UIForeground);
+            var color = (Vector4)Color.FromABGR(row.Dark);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_Dark", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)Color.FromABGR(row.UIGlow);
+            color = (Vector4)Color.FromABGR(row.Light);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_Light", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)Color.FromABGR(row.Unknown0);
+            color = (Vector4)Color.FromABGR(row.ClassicFF);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClassicFF", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)Color.FromABGR(row.Unknown1);
+            color = (Vector4)Color.FromABGR(row.ClearBlue);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearBlue", ref color, ImGuiColorEditFlags.DisplayHex);
         }
     }

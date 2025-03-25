@@ -1,8 +1,8 @@
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
@@ -109,7 +109,7 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
                             RaptureHotbarModule.HotbarSlotType.ExtraCommand => _excelService.TryGetRow<ExtraCommand>(slot->CommandId, out var extraCommand) ? extraCommand.Name.ExtractText() : $"ExtraCommand#{slot->CommandId}",
                             RaptureHotbarModule.HotbarSlotType.PvPQuickChat => _excelService.TryGetRow<QuickChat>(slot->CommandId, out var quickChat) ? quickChat.NameAction.ExtractText() : $"QuickChat#{slot->CommandId}",
                             RaptureHotbarModule.HotbarSlotType.PvPCombo => _excelService.TryGetRow<ActionComboRoute>(slot->CommandId, out var actionComboRoute) ? actionComboRoute.Name.ExtractText() : $"ActionComboRoute#{slot->CommandId}",
-                            RaptureHotbarModule.HotbarSlotType.BgcArmyAction => _excelService.TryGetRow<BgcArmyAction>(slot->CommandId, out var bgcArmyAction) ? bgcArmyAction.Unknown0.ExtractText() : $"BgcArmyAction#{slot->CommandId}",
+                            RaptureHotbarModule.HotbarSlotType.BgcArmyAction => _excelService.TryGetRow<BgcArmyAction>(slot->CommandId, out var bgcArmyAction) ? bgcArmyAction.Name.ExtractText() : $"BgcArmyAction#{slot->CommandId}",
                             RaptureHotbarModule.HotbarSlotType.PerformanceInstrument => _excelService.TryGetRow<Perform>(slot->CommandId, out var perform) ? perform.Instrument.ExtractText() : $"Perform#{slot->CommandId}",
                             RaptureHotbarModule.HotbarSlotType.McGuffin => _excelService.TryGetRow<McGuffinUIData>(_excelService.TryGetRow<McGuffin>(slot->CommandId, out var mcGuffin) ? mcGuffin.UIData.RowId : 0, out var mcGuffinUIData) ? mcGuffinUIData.Name.ExtractText() : $"McGuffin#{slot->CommandId}",
                             RaptureHotbarModule.HotbarSlotType.Ornament => _textService.GetOrnamentName(slot->CommandId),

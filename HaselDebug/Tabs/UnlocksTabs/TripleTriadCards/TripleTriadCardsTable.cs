@@ -40,8 +40,8 @@ public unsafe partial class TripleTriadCardsTable : Table<TripleTriadCardEntry>
             .Select(row =>
             {
                 var residentRow = residentSheet.GetRow(row.RowId);
-                var obtainRow = obtainSheet.GetRow(residentRow.AcquisitionType);
-                return new TripleTriadCardEntry(row, residentRow, obtainRow.Unknown0, cardItems[row.RowId]);
+                var obtainRow = obtainSheet.GetRow(residentRow.AcquisitionType.RowId);
+                return new TripleTriadCardEntry(row, residentRow, obtainRow.Icon, cardItems[row.RowId]);
             })
             .ToList();
     }

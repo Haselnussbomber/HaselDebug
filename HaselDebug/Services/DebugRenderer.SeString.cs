@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
+using Dalamud.Game.Text.Noun.Enums;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
@@ -8,7 +9,6 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using HaselCommon.Services;
-using HaselCommon.Services.Noun.Enums;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 using ImGuiNET;

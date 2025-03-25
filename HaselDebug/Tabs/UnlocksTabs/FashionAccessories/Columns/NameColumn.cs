@@ -1,8 +1,8 @@
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
@@ -69,8 +69,8 @@ public partial class NameColumn : ColumnString<Ornament>
                 row.Icon,
                 name,
                 null,
-                _excelService.TryGetRow<OrnamentTransient>(row.RowId, out var transient) && !transient.Unknown0.IsEmpty
-                    ? transient.Unknown0.ExtractText().StripSoftHyphen()
+                _excelService.TryGetRow<OrnamentTransient>(row.RowId, out var transient) && !transient.Text.IsEmpty
+                    ? transient.Text.ExtractText().StripSoftHyphen()
                     : null);
         }
     }

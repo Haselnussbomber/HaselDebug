@@ -1,7 +1,7 @@
 using Dalamud.Plugin.Services;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
@@ -37,10 +37,10 @@ public partial class NameColumn : ColumnString<TripleTriadCardEntry>
 
         if (entry.Item.HasValue &&
             _excelService.TryGetRow<TripleTriadCardResident>(entry.Item.Value.ItemAction.Value.Data[0], out var residentRow) &&
-            _excelService.TryGetRow<TripleTriadCardObtain>(residentRow.AcquisitionType, out var obtainRow) &&
-            obtainRow.Unknown1 != 0)
+            _excelService.TryGetRow<TripleTriadCardObtain>(residentRow.AcquisitionType.RowId, out var obtainRow) &&
+            obtainRow.Text.RowId != 0)
         {
-            str += "\n" + _seStringEvaluator.EvaluateFromAddon(obtainRow.Unknown1, [
+            str += "\n" + _seStringEvaluator.EvaluateFromAddon(obtainRow.Text.RowId, [
                 residentRow.Acquisition.RowId,
                     residentRow.Location.RowId
             ]).ExtractText();

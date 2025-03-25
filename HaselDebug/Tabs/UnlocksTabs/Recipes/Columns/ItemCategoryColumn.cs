@@ -1,4 +1,4 @@
-using HaselCommon.Extensions.Strings;
+using Dalamud.Utility;
 using HaselCommon.Gui.ImGuiTable;
 using Lumina.Excel.Sheets;
 

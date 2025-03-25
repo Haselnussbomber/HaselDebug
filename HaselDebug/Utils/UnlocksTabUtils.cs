@@ -5,9 +5,9 @@ using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using HaselCommon.Extensions.Strings;
 using HaselCommon.Game.Enums;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
@@ -235,13 +235,13 @@ public unsafe class UnlocksTabUtils(
 
             case ItemActionType.TripleTriadCard:
                 if (ExcelService.TryGetRow<TripleTriadCardResident>(item.ItemAction.Value.Data[0], out var residentRow) &&
-                    ExcelService.TryGetRow<TripleTriadCardObtain>(residentRow.AcquisitionType, out var obtainRow) &&
-                    obtainRow.Unknown1 != 0)
+                    ExcelService.TryGetRow<TripleTriadCardObtain>(residentRow.AcquisitionType.RowId, out var obtainRow) &&
+                    obtainRow.Icon != 0)
                 {
                     DrawSeparator();
-                    TextureService.DrawIcon(obtainRow.Unknown0, 40 * ImGuiHelpers.GlobalScale);
+                    TextureService.DrawIcon(obtainRow.Icon, 40 * ImGuiHelpers.GlobalScale);
                     ImGui.SameLine();
-                    ImGuiHelpers.SafeTextWrapped(SeStringEvaluator.EvaluateFromAddon(obtainRow.Unknown1, [
+                    ImGuiHelpers.SafeTextWrapped(SeStringEvaluator.EvaluateFromAddon(obtainRow.Icon, [
                         residentRow.Acquisition.RowId,
                     residentRow.Location.RowId
                     ]).ExtractText().StripSoftHyphen());
@@ -447,7 +447,7 @@ public unsafe class UnlocksTabUtils(
             return false;
         }
 
-        if (!ExcelService.TryFindRow<CharaMakeCustomize>(row => row.IsPurchasable && row.Data == dataId && hairMakeType.CharaMakeStruct[7].SubMenuParam.Any(id => id == row.RowId), out var charaMakeCustomize))
+        if (!ExcelService.TryFindRow<CharaMakeCustomize>(row => row.IsPurchasable && row.UnlockLink == dataId && hairMakeType.CharaMakeStruct[7].SubMenuParam.Any(id => id == row.RowId), out var charaMakeCustomize))
         {
             _facePaintIconCache.Add(dataId, iconId = 0);
             return false;
@@ -512,7 +512,7 @@ public unsafe class UnlocksTabUtils(
 
         ImGui.TextUnformatted(title);
 
-        if (item.Unknown2 != 0 && ExcelService.TryGetRow<EventItemCategory>(item.Unknown2, out var itemCategoy) && !itemCategoy.Unknown0.IsEmpty)
+        if (item.Category.RowId != 0 && ExcelService.TryGetRow<EventItemCategory>(item.Category.RowId, out var itemCategoy) && !itemCategoy.Unknown0.IsEmpty)
         {
             var text = itemCategoy.RowId switch
             {

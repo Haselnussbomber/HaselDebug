@@ -1,4 +1,4 @@
-using HaselCommon.Extensions.Strings;
+using Dalamud.Utility;
 using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Utils;

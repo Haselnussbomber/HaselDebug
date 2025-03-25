@@ -105,10 +105,10 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
         foreach (var row in _excelService.GetSheet<BuddyAction>())
         {
-            if (row.Reward != 0)
+            if (row.UnlockLink != 0)
             {
-                if (!dict.TryGetValue(row.Reward, out var names))
-                    dict.Add(row.Reward, names = []);
+                if (!dict.TryGetValue(row.UnlockLink, out var names))
+                    dict.Add(row.UnlockLink, names = []);
 
                 names.Add(new UnlockEntry()
                 {
@@ -158,10 +158,10 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
         foreach (var row in _excelService.GetSheet<Perform>())
         {
-            if (row.StopAnimation.RowId > 0)
+            if (row.UnlockLink > 0)
             {
-                if (!dict.TryGetValue(row.StopAnimation.RowId, out var names))
-                    dict.Add(row.StopAnimation.RowId, names = []);
+                if (!dict.TryGetValue((uint)row.UnlockLink, out var names))
+                    dict.Add((uint)row.UnlockLink, names = []);
 
                 names.Add(new UnlockEntry()
                 {
@@ -263,7 +263,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
                     row.HintItem.Value.ItemAction.RowId != 0 &&
                     row.HintItem.Value.ItemAction.IsValid &&
                     row.HintItem.Value.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink &&
-                    row.HintItem.Value.ItemAction.Value.Data[0] == row.Data)
+                    row.HintItem.Value.ItemAction.Value.Data[0] == row.UnlockLink)
                 {
                     // Hairstyles
                     if (row.HintItem.Value.ItemAction.Value.Data[1] == 4659 && // LogMessage id
@@ -302,8 +302,8 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
                 }
             }
 
-            if (!dict.TryGetValue(row.Data, out var names))
-                dict.Add(row.Data, names = []);
+            if (!dict.TryGetValue(row.UnlockLink, out var names))
+                dict.Add(row.UnlockLink, names = []);
 
             var title = string.Empty;
 
@@ -329,11 +329,11 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
         foreach (var row in _excelService.GetSheet<MJILandmark>())
         {
-            if (row.Unknown0 == 0)
+            if (row.UnlockLink == 0)
                 continue;
 
-            if (!dict.TryGetValue(row.Unknown0, out var names))
-                dict.Add(row.Unknown0, names = []);
+            if (!dict.TryGetValue(row.UnlockLink, out var names))
+                dict.Add(row.UnlockLink, names = []);
 
             names.Add(new UnlockEntry()
             {
@@ -347,11 +347,11 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
         foreach (var row in _excelService.GetSheet<CSBonusContentType>())
         {
-            if (row.Unknown11 == 0)
+            if (row.UnlockLink == 0)
                 continue;
 
-            if (!dict.TryGetValue(row.Unknown11, out var names))
-                dict.Add(row.Unknown11, names = []);
+            if (!dict.TryGetValue(row.UnlockLink, out var names))
+                dict.Add(row.UnlockLink, names = []);
 
             names.Add(new UnlockEntry()
             {

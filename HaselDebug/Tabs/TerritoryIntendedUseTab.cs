@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Dalamud.Interface.Utility.Raii;
-using HaselCommon.Extensions.Strings;
+using Dalamud.Utility;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;

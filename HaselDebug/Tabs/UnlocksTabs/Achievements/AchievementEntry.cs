@@ -1,4 +1,4 @@
-using HaselCommon.Extensions.Strings;
+using Dalamud.Utility;
 using Achievement = FFXIVClientStructs.FFXIV.Client.Game.UI.Achievement;
 using AchievementSheet = Lumina.Excel.Sheets.Achievement;
 
