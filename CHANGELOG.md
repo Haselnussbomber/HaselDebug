@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.20.0] (2025-03-26)
+
+First update for Patch 7.2.
+
+- **Added:** A work in progress Excel (v2) tab, which is based on Lumina.Excel properties.
+- **Added:** Support for IconId arrays in the struct renderer.
+- **Removed:** Noun Processor and Sheet Redirect Test tabs were removed, because the SeStringEvaluator is now part of Dalamud and therefore I removed those services.
+- **Fixed:** HouseIds in the Housing tab are now correctly displayed as structs.
+
 ## [1.19.0] (2025-03-17)
 
 - **Added:** An AtkEvents tab for global events, excluding MouseMove, MouseOver, MouseOut, FocusStart, FocusStop, WindowRollOver, WindowRollOut, TimerTick, 74 and 79 to avoid spam.
@@ -307,7 +316,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.19.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.20.0...main
+[1.20.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.19.0...v1.20.0
 [1.19.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.2...v1.19.0
 [1.18.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.1...v1.18.2
 [1.18.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.0...v1.18.1

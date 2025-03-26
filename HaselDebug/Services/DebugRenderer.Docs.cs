@@ -12,19 +12,19 @@ namespace HaselDebug.Services;
 
 public partial class DebugRenderer
 {
-    private Dictionary<string, MemberDocumentation> MemberDocs = [];
+    private Dictionary<string, MemberDocumentation> _memberDocs = [];
 
     public bool HasDocumentation(string? name)
-        => !string.IsNullOrEmpty(name) && MemberDocs.ContainsKey(name);
+        => !string.IsNullOrEmpty(name) && _memberDocs.ContainsKey(name);
 
     public MemberDocumentation? GetDocumentation(string? name)
-        => !string.IsNullOrEmpty(name) && MemberDocs.TryGetValue(name, out var doc) ? doc : null;
+        => !string.IsNullOrEmpty(name) && _memberDocs.TryGetValue(name, out var doc) ? doc : null;
 
     public record MemberDocumentation(string Name, string Sumamry, string Remarks, KeyValuePair<string, string>[] Parameters, string Returns);
 
     internal void ParseCSDocs()
     {
-        if (MemberDocs.Count != 0)
+        if (_memberDocs.Count != 0)
             return;
 
         var csXmlPath = Path.Join(_pluginInterface.AssemblyLocation.Directory!.FullName, "FFXIVClientStructs.xml");
@@ -107,7 +107,7 @@ public partial class DebugRenderer
                 if (string.IsNullOrEmpty(summariesText) && string.IsNullOrEmpty(remarksText) && parametersArray.Length == 0 && string.IsNullOrEmpty(returnsText))
                     continue;
 
-                MemberDocs.Add(name, new MemberDocumentation(
+                _memberDocs.Add(name, new MemberDocumentation(
                     name,
                     ListToText(parentName, summaries),
                     ListToText(parentName, remarks),
