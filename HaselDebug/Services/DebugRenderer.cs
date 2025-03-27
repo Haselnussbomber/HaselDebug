@@ -785,21 +785,21 @@ public unsafe partial class DebugRenderer
         {
             ImGui.SameLine();
             ImGui.TextUnformatted(" - ");
-            var bits = (uint)Math.Pow(2, Marshal.SizeOf(underlyingType) + 1);
+            var bits = Marshal.SizeOf(underlyingType) * 8;
             for (var i = 0u; i < bits; i++)
             {
-                var bitValue = (uint)Math.Pow(2, i);
+                var bitValue = 1u << (int)i;
                 if ((Convert.ToUInt64(value) & bitValue) != 0)
                 {
                     ImGui.SameLine();
-                    DrawCopyableText(type.GetEnumName(bitValue)?.ToString() ?? $"{bitValue}", $"{bitValue}");
+                    DrawCopyableText(Enum.GetName(type, bitValue)?.ToString() ?? $"{bitValue}", $"{bitValue}");
                 }
             }
         }
         else
         {
             ImGui.SameLine();
-            ImGui.TextUnformatted(type.GetEnumName(value)?.ToString() ?? "");
+            ImGui.TextUnformatted(Enum.GetName(type, value)?.ToString() ?? "");
         }
     }
 
