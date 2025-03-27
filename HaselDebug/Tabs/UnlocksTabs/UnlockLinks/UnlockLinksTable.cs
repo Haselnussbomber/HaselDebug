@@ -5,7 +5,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Game.Enums;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
-using HaselCommon.Sheets;
 using HaselDebug.Tabs.UnlocksTabs.UnlockLinks.Columns;
 using Lumina.Excel.Sheets;
 
@@ -246,7 +245,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             }
         }
 
-        CustomHairMakeType hairMakeType = default;
+        HairMakeType hairMakeType = default;
         var hasFoundHairMakeType = isLoggedIn && _excelService.TryFindRow(t => t.Tribe.RowId == tribeId && t.Gender == sexId, out hairMakeType);
 
         foreach (var row in _excelService.GetSheet<CharaMakeCustomize>())

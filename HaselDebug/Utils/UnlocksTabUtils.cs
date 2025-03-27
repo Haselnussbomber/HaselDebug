@@ -12,7 +12,6 @@ using HaselCommon.Game.Enums;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
-using HaselCommon.Sheets;
 using HaselDebug.Services;
 using HaselDebug.Sheets;
 using ImGuiNET;
@@ -441,7 +440,7 @@ public unsafe class UnlocksTabUtils(
             return false;
         }
 
-        if (!ExcelService.TryFindRow<CustomHairMakeType>(t => t.Tribe.RowId == playerState->Tribe && t.Gender == playerState->Sex, out var hairMakeType))
+        if (!ExcelService.TryFindRow<HairMakeType>(t => t.Tribe.RowId == playerState->Tribe && t.Gender == playerState->Sex, out var hairMakeType))
         {
             _facePaintIconCache.Add(dataId, iconId = 0);
             return false;
