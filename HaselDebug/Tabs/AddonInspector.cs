@@ -3,7 +3,6 @@ using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -19,6 +18,7 @@ using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 using ImGuiNET;
+using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 
@@ -489,7 +489,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
                 ImGui.SameLine();
                 if (ImGui.Button($"Decode##{(ulong)textNode:X}"))
-                    textNode->NodeText.SetString(textNode->NodeText.StringPtr.AsReadOnlySeStringSpan().ExtractText());
+                    textNode->NodeText.SetString(new ReadOnlySeStringSpan(textNode->NodeText.StringPtr.Value).ExtractText());
 
                 ImGui.TextUnformatted($"AlignmentType: {(AlignmentType)textNode->AlignmentFontType}  FontSize: {textNode->FontSize}");
                 int b = textNode->AlignmentFontType;
