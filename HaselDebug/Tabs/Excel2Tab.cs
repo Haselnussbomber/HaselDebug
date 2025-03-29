@@ -215,6 +215,11 @@ public class ExcelV2SheetWrapper<T> : IExcelV2SheetWrapper where T : struct
             ImGui.OpenPopup("ColumnsPopup");
         }
 
+        if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+        {
+            _table.Columns.RemoveAll(col => col.Label is not ("RowId" or "SubrowId"));
+        }
+
         using var contextMenu = ImRaii.Popup("ColumnsPopup");
         if (!contextMenu) return;
 
