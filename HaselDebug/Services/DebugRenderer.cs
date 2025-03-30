@@ -972,7 +972,7 @@ public unsafe partial class DebugRenderer
     {
         if (nodeOptions.IsIconIdField)
         {
-            DrawIcon(Convert.ToUInt32(value));
+            DrawIcon(value, type);
         }
 
         if (nodeOptions.HexOnShift)
@@ -1032,6 +1032,26 @@ public unsafe partial class DebugRenderer
 
     public string ToBitsString(uint byteIn)
         => ToBitsString(byteIn, 32);
+
+    public void DrawIcon(object value, Type? type = null, bool isHq = false, bool sameLine = true, DrawInfo drawInfo = default, bool canCopy = true, bool noTooltip = false)
+    {
+        if (value == null)
+        {
+            DrawIcon(0, isHq, sameLine, drawInfo, canCopy, noTooltip);
+            return;
+        }
+
+        var iconId = (type ?? value.GetType()) switch
+        {
+            Type t when t == typeof(short) => (short)value > 0 ? (uint)(short)value : 0u,
+            Type t when t == typeof(ushort) => (ushort)value,
+            Type t when t == typeof(int) => (int)value > 0 ? (uint)(int)value : 0u,
+            Type t when t == typeof(uint) => (uint)value,
+            _ => 0u
+        };
+
+        DrawIcon(iconId, isHq, sameLine, drawInfo, canCopy, noTooltip);
+    }
 
     public void DrawIcon(uint iconId, bool isHq = false, bool sameLine = true, DrawInfo drawInfo = default, bool canCopy = true, bool noTooltip = false)
     {

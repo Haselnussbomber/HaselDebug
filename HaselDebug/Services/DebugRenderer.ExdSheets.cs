@@ -246,24 +246,7 @@ public unsafe partial class DebugRenderer
 
         if (nodeOptions.IsIconIdField && propType.IsNumericType())
         {
-            switch (propType)
-            {
-                case Type t when t == typeof(short):
-                    DrawIcon((uint)(short)value);
-                    break;
-
-                case Type t when t == typeof(ushort):
-                    DrawIcon((ushort)value);
-                    break;
-
-                case Type t when t == typeof(int):
-                    DrawIcon((uint)(int)value);
-                    break;
-
-                case Type t when t == typeof(uint):
-                    DrawIcon((uint)value);
-                    break;
-            }
+            DrawIcon(value, propType);
         }
 
         ImGui.TextUnformatted(value.ToString());
