@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.1] (2025-03-30)
+
+- **Added:** Node ID is now shown in the Node List in the Addon Inspector.
+- **Added:** Right clicking the Columns button in Excel (v2) now clears all columns (except for RowId/SubrowId).
+- **Fixed:** Enums with FlagsAttribute displayed incorrect values.
+- **Updated:** ClientStructs now at [a625ce4d](https://github.com/aers/FFXIVClientStructs/tree/a625ce4d) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b484eac4..a625ce4d)).
+
 ## [1.20.0] (2025-03-26)
 
 First update for Patch 7.2.
@@ -8,6 +15,7 @@ First update for Patch 7.2.
 - **Added:** Support for IconId arrays in the struct renderer.
 - **Removed:** Noun Processor and Sheet Redirect Test tabs were removed, because the SeStringEvaluator is now part of Dalamud and therefore I removed those services.
 - **Fixed:** HouseIds in the Housing tab are now correctly displayed as structs.
+- **Updated:** ClientStructs now at [b484eac4](https://github.com/aers/FFXIVClientStructs/tree/b484eac4) ([compare](https://github.com/aers/FFXIVClientStructs/compare/4d473c7..b484eac4)).
 
 ## [1.19.0] (2025-03-17)
 
@@ -317,6 +325,7 @@ Updated CS for 7.05hf1
 First release! 🥳
 
 [unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.20.0...main
+[1.20.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.20.0...v1.20.1
 [1.20.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.19.0...v1.20.0
 [1.19.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.2...v1.19.0
 [1.18.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.1...v1.18.2
