@@ -374,9 +374,10 @@ public unsafe partial class AddonInspectorTab : DebugTab
             {
                 ImGui.PopStyleColor();
 
-                for (var j = 0; j < unitBase->UldManager.NodeListCount; j++)
+                var j = 0;
+                foreach (var node in unitBase->UldManager.Nodes)
                 {
-                    PrintNode(unitBase->UldManager.NodeList[j], false, $"[{j}] ", nodeOptions with { DefaultOpen = false });
+                    PrintNode(node, false, $"[{j++} | ID: {node.Value->NodeId}] ", nodeOptions with { DefaultOpen = false });
                 }
 
                 ImGui.TreePop();
