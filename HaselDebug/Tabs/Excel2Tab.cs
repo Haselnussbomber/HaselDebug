@@ -358,7 +358,31 @@ public class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
 
     public override string ToName(T row)
     {
-        return _propertyInfo.GetValue(row)?.ToString() ?? string.Empty;
+        var value = _propertyInfo.GetValue(row);
+        if (value == null)
+            return string.Empty;
+
+        if (ColumnType == typeof(ReadOnlySeString))
+            return ((ReadOnlySeString)value).ToString();
+
+        if (ColumnType == typeof(RowRef))
+            return ((uint)ColumnType.GetProperty("RowId")?.GetValue(value)!).ToString();
+
+        if (ColumnType.IsGenericType && ColumnType.GetGenericTypeDefinition() == typeof(RowRef<>))
+        {
+            var rowRefType = ColumnType.GenericTypeArguments[0];
+            var rowRefRowId = (uint)ColumnType.GetProperty("RowId")?.GetValue(value)!;
+            return $"{rowRefType.Name}#{rowRefRowId}";
+        }
+
+        if (ColumnType.IsGenericType && ColumnType.GetGenericTypeDefinition() == typeof(SubrowRef<>))
+        {
+            var rowRefType = ColumnType.GenericTypeArguments[0];
+            var rowRefRowId = (uint)ColumnType.GetProperty("RowId")?.GetValue(value)!;
+            return $"{rowRefType.Name}#{rowRefRowId}";
+        }
+
+        return value.ToString() ?? string.Empty;
     }
 
     public int ToValue(T row)
