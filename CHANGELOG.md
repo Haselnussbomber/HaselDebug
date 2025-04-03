@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [c24c833a](https://github.com/aers/FFXIVClientStructs/tree/c24c833a) ([compare](https://github.com/aers/FFXIVClientStructs/compare/a625ce4d..c24c833a)).
+
 ## [1.20.1] (2025-03-30)
 
 - **Added:** Node ID is now shown in the Node List in the Addon Inspector.
