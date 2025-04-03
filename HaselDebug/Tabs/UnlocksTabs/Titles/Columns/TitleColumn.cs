@@ -1,10 +1,13 @@
+using Dalamud.Game;
 using Dalamud.Plugin.Services;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Gui.ImGuiTable;
+using HaselCommon.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
@@ -21,8 +24,13 @@ public class TitleColumn : ColumnString<Title>
         LabelKey = isFeminine ? "FeminineTitle.Label" : "MasculineTitle.Label";
     }
 
-    public override string ToName(Title row)
+    public override unsafe string ToName(Title row)
     {
+        if (UIModule.Instance()->GetUIInputData()->IsKeyDown(SeVirtualKey.SHIFT))
+        {
+            Service.Get<ExcelService>().TryGetRow(row.RowId, ClientLanguage.English, out row);
+        }
+
         return (_isFeminine ? row.Feminine : row.Masculine).ExtractText().StripSoftHyphen();
     }
 
