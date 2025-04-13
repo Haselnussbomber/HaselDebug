@@ -38,7 +38,7 @@ public unsafe partial class ObjectTableTab : DebugTab
         ImGui.TableHeadersRow();
 
         var i = 0;
-        foreach (GameObject* gameObject in GameObjectManager.Instance()->Objects.GameObjectIdSorted)
+        foreach (GameObject* gameObject in GameObjectManager.Instance()->Objects.IndexSorted)
         {
             if (gameObject == null) continue;
 
