@@ -1,7 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [1.21.0] (2025-04-13)
 
+- **Added:** Holding shift in Unlock Links -> Titles now shows the english version of the titles.
+- **Added:** Added Radius to the Agent Map Event Markers table.
+- **Updated:** Excel v2 now has a better preview for column values.
 - **Fixed:** Agent Map Event Markers table broke when the icon wasn't found.
 - **Fixed:** Added the missing GameObject -> Companion type redirect.
 - **Fixed:** Object Table tab now sorts by index.
@@ -331,7 +334,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.20.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.21.0...main
+[1.21.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.20.1...1.21.0
 [1.20.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.20.0...v1.20.1
 [1.20.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.19.0...v1.20.0
 [1.19.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.18.2...v1.19.0
