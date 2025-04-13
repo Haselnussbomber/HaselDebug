@@ -5,7 +5,7 @@
 - **Fixed:** Agent Map Event Markers table broke when the icon wasn't found.
 - **Fixed:** Added the missing GameObject -> Companion type redirect.
 - **Fixed:** Object Table tab now sorts by index.
-- **Updated:** ClientStructs now at [c24c833a](https://github.com/aers/FFXIVClientStructs/tree/c24c833a) ([compare](https://github.com/aers/FFXIVClientStructs/compare/a625ce4d..c24c833a)).
+- **Updated:** ClientStructs now at [4ae9f561](https://github.com/aers/FFXIVClientStructs/tree/4ae9f561) ([compare](https://github.com/aers/FFXIVClientStructs/compare/a625ce4d..4ae9f561)).
 
 ## [1.20.1] (2025-03-30)
 
