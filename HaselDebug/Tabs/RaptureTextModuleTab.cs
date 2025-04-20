@@ -512,6 +512,30 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
         ImGui.SameLine();
 
+        if (ImGui.Button("Copy binary"))
+        {
+            var sb = new SeStringBuilder();
+
+            foreach (var entry in _entries)
+            {
+                switch (entry.Type)
+                {
+                    case TextEntryType.String:
+                        sb.Append(entry.Message);
+                        break;
+
+                    case TextEntryType.Macro:
+                    case TextEntryType.Fixed:
+                        sb.AppendMacroString(entry.Message);
+                        break;
+                }
+            }
+
+            ImGui.SetClipboardText(string.Join(", ", sb.ToArray().Select(b => $"0x{b:X2}")));
+        }
+
+        ImGui.SameLine();
+
         if (!_inspectorWindow.IsOpen && ImGui.Button("Open Inspector"))
         {
             _inspectorWindow.Open();
