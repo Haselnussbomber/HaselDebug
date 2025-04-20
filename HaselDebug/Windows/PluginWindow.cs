@@ -11,6 +11,7 @@ using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
+using Microsoft.Extensions.Logging;
 
 namespace HaselDebug.Windows;
 
@@ -18,6 +19,8 @@ namespace HaselDebug.Windows;
 public partial class PluginWindow : SimpleWindow
 {
     private const uint SidebarWidth = 250;
+
+    private readonly ILogger<PluginWindow> _logger;
     private readonly WindowManager _windowManager;
     private readonly PluginConfig _pluginConfig;
     private readonly TextService _textService;
@@ -257,6 +260,9 @@ public partial class PluginWindow : SimpleWindow
         {
             _selectedTab.Draw();
         }
-        catch { }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while drawing {tabName}", _selectedTab.InternalName);
+        }
     }
 }
