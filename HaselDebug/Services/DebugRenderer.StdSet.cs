@@ -111,8 +111,6 @@ public unsafe partial class DebugRenderer
         public nint _Right; // StdMapNode<TKey, TValue>*
         public byte _Color; // RedBlackTreeNodeColor
         public byte _Isnil; // bool
-        public byte _18;
-        public byte _19;
         public TValue _Myval;
     }
 }
