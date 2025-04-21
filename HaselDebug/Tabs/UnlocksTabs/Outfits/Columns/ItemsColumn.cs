@@ -121,10 +121,10 @@ public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
                 ImGui.GetWindowDrawList().AddCircleFilled(
                     ImGui.GetCursorScreenPos() + new Vector2(-dotSize, dotSize), dotSize / 2f,
                     isItemCollected
-                        ? (uint)Color.Yellow
+                        ? Color.Yellow.ToUInt()
                         : isItemInInventory
-                            ? (uint)Color.Green
-                            : (uint)Color.Transparent);
+                            ? Color.Green.ToUInt()
+                            : Color.Transparent.ToUInt());
             }
 
             ImGui.SameLine();

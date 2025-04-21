@@ -391,7 +391,7 @@ public unsafe partial class DebugRenderer
 
     public ImRaii.IEndObject DrawTreeNode(NodeOptions nodeOptions)
     {
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)(nodeOptions.TitleColor ?? ColorTreeNode));
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (nodeOptions.TitleColor ?? ColorTreeNode).ToUInt());
         var previewText = string.Empty;
 
         if (!nodeOptions.DrawSeStringTreeNode && nodeOptions.SeStringTitle != null)
@@ -412,7 +412,7 @@ public unsafe partial class DebugRenderer
         {
             ImGui.SameLine();
 
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)(nodeOptions.TitleColor ?? ColorTreeNode)))
+            using (ImRaii.PushColor(ImGuiCol.Text, (nodeOptions.TitleColor ?? ColorTreeNode).ToUInt()))
             {
                 ImGuiHelpers.SeStringWrapped(nodeOptions.SeStringTitle.Value.AsSpan(), new()
                 {
@@ -464,8 +464,8 @@ public unsafe partial class DebugRenderer
             {
                 if (_gameGui.WorldToScreen(pos, out var screenPos))
                 {
-                    ImGui.GetForegroundDrawList().AddLine(ImGui.GetMousePos(), screenPos, Color.Orange);
-                    ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Color.Orange);
+                    ImGui.GetForegroundDrawList().AddLine(ImGui.GetMousePos(), screenPos, Color.Orange.ToUInt());
+                    ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Color.Orange.ToUInt());
                 }
             }
         }
@@ -498,7 +498,7 @@ public unsafe partial class DebugRenderer
 
             if (fieldInfo.GetCustomAttribute<ObsoleteAttribute>() is ObsoleteAttribute obsoleteAttribute)
             {
-                using (ImRaii.PushColor(ImGuiCol.Text, (uint)(obsoleteAttribute.IsError ? ColorObsoleteError : ColorObsolete)))
+                using (ImRaii.PushColor(ImGuiCol.Text, (obsoleteAttribute.IsError ? ColorObsoleteError : ColorObsolete).ToUInt()))
                     ImGui.TextUnformatted("[Obsolete]");
 
                 if (!string.IsNullOrEmpty(obsoleteAttribute.Message) && ImGui.IsItemHovered())
@@ -674,7 +674,7 @@ public unsafe partial class DebugRenderer
             if (hasDoc)
             {
                 var textSize = ImGui.CalcTextSize(fieldNameOverride ?? fieldInfo.Name);
-                ImGui.GetWindowDrawList().AddLine(startPos + new Vector2(0, textSize.Y), startPos + textSize, ColorFieldName);
+                ImGui.GetWindowDrawList().AddLine(startPos + new Vector2(0, textSize.Y), startPos + textSize, ColorFieldName.ToUInt());
             }
         }
 
@@ -772,7 +772,7 @@ public unsafe partial class DebugRenderer
 
         var pos = new Vector2(node->ScreenX, node->ScreenY);
         var size = new Vector2(node->Width, node->Height);
-        ImGui.GetForegroundDrawList().AddRect(pos, pos + size, Color.Gold);
+        ImGui.GetForegroundDrawList().AddRect(pos, pos + size, Color.Gold.ToUInt());
     }
 
     private void DrawEnum(nint address, Type type, NodeOptions nodeOptions)

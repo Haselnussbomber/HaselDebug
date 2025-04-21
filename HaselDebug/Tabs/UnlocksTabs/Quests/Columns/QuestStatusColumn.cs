@@ -43,7 +43,7 @@ public class QuestStatusColumn : ColumnFlags<QuestStatus, Quest>
     public override unsafe void DrawColumn(Quest row)
     {
         var value = ToStatus(row);
-        using (ImRaii.PushColor(ImGuiCol.Text, (uint)(value == QuestStatus.Complete ? Color.Green : value == QuestStatus.Accepted ? Color.Yellow : Color.Red)))
+        using (ImRaii.PushColor(ImGuiCol.Text, (value == QuestStatus.Complete ? Color.Green : value == QuestStatus.Accepted ? Color.Yellow : Color.Red).ToUInt()))
             ImGui.TextUnformatted(Enum.GetName(value));
     }
 

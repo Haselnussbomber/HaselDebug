@@ -46,7 +46,7 @@ public unsafe partial class DebugRenderer
         var title = $"{tex->ActualWidth}x{tex->ActualHeight}, {(TextureFormat)tex->TextureFormat}";
         if (nodeOptions.SeStringTitle != null)
             title = $"{nodeOptions.SeStringTitle.Value.ExtractText()} ({title})";
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, ColorTreeNode.ToVector());
         using var node = ImRaii.TreeNode($"{title}##TextureNode{nodeOptions.AddressPath}", nodeOptions.GetTreeNodeFlags());
         if (!node) return;
         titleColor?.Dispose();

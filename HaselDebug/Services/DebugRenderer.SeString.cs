@@ -22,7 +22,7 @@ namespace HaselDebug.Services;
 
 public unsafe partial class DebugRenderer
 {
-    private readonly Dictionary<MacroCode, string[]> ExpressionNames = new()
+    private readonly Dictionary<MacroCode, string[]> _expressionNames = new()
     {
         { MacroCode.SetResetTime, ["Hour", "WeekDay"] },
         { MacroCode.SetTime, ["Time"] },
@@ -82,7 +82,7 @@ public unsafe partial class DebugRenderer
 
     private const LinkMacroPayloadType DalamudLinkType = (LinkMacroPayloadType)Payload.EmbeddedInfoType.DalamudLink - 1;
 
-    private readonly Dictionary<LinkMacroPayloadType, string[]> LinkExpressionNames = new()
+    private readonly Dictionary<LinkMacroPayloadType, string[]> _linkExpressionNames = new()
     {
         { LinkMacroPayloadType.Character, ["Flags", "WorldId"] },
         { LinkMacroPayloadType.Item, ["ItemId", "Rarity"] },
@@ -97,7 +97,7 @@ public unsafe partial class DebugRenderer
         { DalamudLinkType, ["CommandId", "Extra1", "Extra2", "ExtraString"] }
     };
 
-    private readonly Dictionary<uint, string[]> FixedExpressionNames = new()
+    private readonly Dictionary<uint, string[]> _fixedExpressionNames = new()
     {
         { 1, ["Type0", "Type1", "WorldId"] },
         { 2, ["Type0", "Type1", "ClassJobId", "Level"] },
@@ -181,7 +181,7 @@ public unsafe partial class DebugRenderer
         {
             var text = rosss.ToString();
 
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode, nodeOptions.RenderSeString))
+            using (ImRaii.PushColor(ImGuiCol.Text, ColorTreeNode.ToVector(), nodeOptions.RenderSeString))
                 clicked = ImGui.Selectable(text + nodeOptions.GetKey("SeStringSelectable"));
 
             _imGuiContextMenu.Draw(nodeOptions.GetKey("SeStringSelectableContextMenu"), (builder) =>
@@ -453,16 +453,16 @@ public unsafe partial class DebugRenderer
 
     private string GetExpressionName(MacroCode macroCode, uint? subType, int idx, ReadOnlySeExpressionSpan expr)
     {
-        if (ExpressionNames.TryGetValue(macroCode, out var names) && idx < names.Length)
+        if (_expressionNames.TryGetValue(macroCode, out var names) && idx < names.Length)
             return names[idx];
 
         if (macroCode == MacroCode.Switch)
             return $"Case {idx - 1}";
 
-        if (macroCode == MacroCode.Link && subType != null && LinkExpressionNames.TryGetValue((LinkMacroPayloadType)subType, out var linkNames) && idx - 1 < linkNames.Length)
+        if (macroCode == MacroCode.Link && subType != null && _linkExpressionNames.TryGetValue((LinkMacroPayloadType)subType, out var linkNames) && idx - 1 < linkNames.Length)
             return linkNames[idx - 1];
 
-        if (macroCode == MacroCode.Fixed && subType != null && FixedExpressionNames.TryGetValue((uint)subType, out var fixedNames) && idx < fixedNames.Length)
+        if (macroCode == MacroCode.Fixed && subType != null && _fixedExpressionNames.TryGetValue((uint)subType, out var fixedNames) && idx < fixedNames.Length)
             return fixedNames[idx];
 
         if (macroCode == MacroCode.Link && idx == 4)

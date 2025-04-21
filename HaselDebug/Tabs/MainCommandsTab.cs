@@ -89,7 +89,7 @@ public unsafe partial class MainCommandsTab : DebugTab
                 if (!string.IsNullOrEmpty(categoryName))
                 {
                     ImGuiUtils.PushCursorY(-3);
-                    using (ImRaii.PushColor(ImGuiCol.Text, (uint)Color.Grey))
+                    using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey.ToUInt()))
                         ImGui.TextUnformatted(categoryName);
                 }
                 ImGuiUtils.PushCursorY(1);

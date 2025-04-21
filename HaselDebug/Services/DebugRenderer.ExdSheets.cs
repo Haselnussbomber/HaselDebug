@@ -29,7 +29,7 @@ public unsafe partial class DebugRenderer
             nodeOptions = nodeOptions with { Title = null };
         }
 
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, nodeOptions.TitleColor ?? (uint)ColorTreeNode);
+        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, nodeOptions.TitleColor ?? ColorTreeNode.ToVector());
         using var node = ImRaii.TreeNode($"{title}###{nodeOptions.AddressPath}", nodeOptions.GetTreeNodeFlags());
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
         if (!node) return;
@@ -143,7 +143,7 @@ public unsafe partial class DebugRenderer
             var collectionType = propType.GenericTypeArguments[0];
             var propNodeOptions = nodeOptions.WithAddress(collectionType.Name.GetHashCode());
 
-            using var colTitleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
+            using var colTitleColor = ImRaii.PushColor(ImGuiCol.Text, ColorTreeNode.ToVector());
             using var colNode = ImRaii.TreeNode($"{count} Value{(count != 1 ? "s" : "")}{propNodeOptions.GetKey("CollectionNode")}", nodeOptions.GetTreeNodeFlags());
             if (!colNode) return;
             colTitleColor?.Dispose();
@@ -212,7 +212,7 @@ public unsafe partial class DebugRenderer
 
                 if (collectionType.IsStruct())
                 {
-                    using var structTitleColor = ImRaii.PushColor(ImGuiCol.Text, (uint)ColorTreeNode);
+                    using var structTitleColor = ImRaii.PushColor(ImGuiCol.Text, ColorTreeNode.ToVector());
                     using var structNode = ImRaii.TreeNode($"{collectionType.Name}{propNodeOptions.GetKey($"{collectionType.Name}_{i}")}", nodeOptions.GetTreeNodeFlags());
                     if (!structNode) continue;
                     structTitleColor?.Dispose();

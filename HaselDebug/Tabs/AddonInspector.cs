@@ -140,7 +140,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
             ImGui.TableNextColumn(); // Name
             using (ImRaii.PushColor(ImGuiCol.Text, ImGui.GetColorU32(ImGuiCol.TextDisabled), !unitBase->IsVisible))
-            using (ImRaii.PushColor(ImGuiCol.Text, (uint)Color.Gold, focusedList.Contains(unitBase)))
+            using (ImRaii.PushColor(ImGuiCol.Text, Color.Gold.ToUInt(), focusedList.Contains(unitBase)))
             {
                 if (ImGui.Selectable(addonName + $"##Addon_{addonId}_{addonName}", addonId == _selectedAddonId && _selectedAddonName == addonName, ImGuiSelectableFlags.SpanAllColumns))
                 {
@@ -166,8 +166,8 @@ public unsafe partial class AddonInspectorTab : DebugTab
                 {
                     var drawList = ImGui.GetForegroundDrawList();
                     var textPos = pos + new Vector2(0, -ImGui.GetTextLineHeight());
-                    drawList.AddText(textPos + Vector2.One, Color.Black, addonName);
-                    drawList.AddText(textPos, Color.Gold, addonName);
+                    drawList.AddText(textPos + Vector2.One, Color.Black.ToUInt(), addonName);
+                    drawList.AddText(textPos, Color.Gold.ToUInt(), addonName);
                     ImGui.End();
                 }
             }
@@ -234,7 +234,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
         ImGui.SameLine();
 
         var isVisible = unitBase->IsVisible;
-        using (ImRaii.PushColor(ImGuiCol.Text, isVisible ? 0xFF00FF00 : Color.From(ImGuiCol.TextDisabled)))
+        using (ImRaii.PushColor(ImGuiCol.Text, isVisible ? 0xFF00FF00 : Color.From(ImGuiCol.TextDisabled).ToUInt()))
         {
             ImGui.TextUnformatted(isVisible ? "Visible" : "Not Visible");
         }
@@ -820,7 +820,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
                         ImGui.GetForegroundDrawList().AddRectFilled(
                             new Vector2(bounds->Pos1.X, bounds->Pos1.Y),
                             new Vector2(bounds->Pos2.X, bounds->Pos2.Y),
-                            Color.From(1, 1, 0, 0.5f));
+                            new Color(1, 1, 0, 0.5f).ToUInt());
 
                         if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                         {
