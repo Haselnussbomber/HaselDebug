@@ -53,7 +53,7 @@ public unsafe partial class AetherCurrentsTable : Table<AetherCurrentEntry>
                     lastWasQuest = false;
                 }
 
-                Rows.Add(new AetherCurrentEntry(row, aetherCurrent.Value, currentNumber));
+                Rows.Add(new AetherCurrentEntry(row, aetherCurrent.Value, currentNumber++));
             }
         }
     }
