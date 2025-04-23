@@ -512,7 +512,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
         ImGui.SameLine();
 
-        if (ImGui.Button("Copy binary"))
+        if (ImGui.Button("Copy as hex"))
         {
             var sb = new SeStringBuilder();
 
