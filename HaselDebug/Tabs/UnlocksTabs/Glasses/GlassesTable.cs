@@ -25,8 +25,6 @@ public unsafe partial class GlassesTable : Table<GlassesSheet>
 
     public override void LoadRows()
     {
-        Rows = _excelService.GetSheet<GlassesSheet>()
-            .Skip(1)
-            .ToList();
+        Rows = [.. _excelService.GetSheet<GlassesSheet>().Where(row => row.Icon != 0)];
     }
 }
