@@ -6,6 +6,7 @@
 - **Fixed:** Incorrect StdSet/SetMap memory alignment.
 - **Fixed:** Inventory tab now correctly relies on functions, so it can work in space (Cosmopouch1/2).
 - **Fixed:** Unreleased Glasses (rows without icons) are now hidden.
+- **Fixed:** Fish not connected with an item are now hidden.
 - **Fixed:** Aether Currents table was missing the increment for the numbering.
 - **Fixed:** Errors that are thrown while rendering a tab are now properly logged.
 - **Updated:** ClientStructs now at [09d40c6a](https://github.com/aers/FFXIVClientStructs/tree/09d40c6a) ([compare](https://github.com/aers/FFXIVClientStructs/compare/4ae9f561..09d40c6a)).
