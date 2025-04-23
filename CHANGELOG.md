@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.22.0] (2025-04-23)
+
+- **Added:** Added a "Copy as hex" button to SeStringMaker that lets you copy the SeString as raw byte data.
+- **Fixed:** Incorrect StdSet/SetMap memory alignment.
+- **Fixed:** Inventory tab now correctly relies on functions, so it can work in space (Cosmopouch1/2).
+- **Fixed:** Unreleased Glasses (rows without icons) are now hidden.
+- **Fixed:** Aether Currents table was missing the increment for the numbering.
+- **Fixed:** Errors that are thrown while rendering a tab are now properly logged.
+- **Updated:** ClientStructs now at [09d40c6a](https://github.com/aers/FFXIVClientStructs/tree/09d40c6a) ([compare](https://github.com/aers/FFXIVClientStructs/compare/4ae9f561..09d40c6a)).
+
 ## [1.21.0] (2025-04-13)
 
 - **Added:** Holding shift in Unlock Links -> Titles now shows the english version of the titles.
@@ -334,7 +344,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.21.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.22.0...main
+[1.22.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.21.0...1.22.0
 [1.21.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.20.1...1.21.0
 [1.20.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.20.0...v1.20.1
 [1.20.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.19.0...v1.20.0

@@ -4,9 +4,9 @@
     "net9.0-windows7.0": {
       "AutoCtor": {
         "type": "Direct",
-        "requested": "[2.7.0, )",
-        "resolved": "2.7.0",
-        "contentHash": "534QKY6r8imsf03OoLB03/yxDAVtPMDt1/cIZ3vAYqIlmyttkaz6fPEax/2bP6Ctt4oUZVDZnpjoWOh9TmZH3A=="
+        "requested": "[2.8.0, )",
+        "resolved": "2.8.0",
+        "contentHash": "0Cj86LZfA/6FmbsCWvlgcK/V2DSD/OS5RCs9CCGXcXglS/ZRavULDUShFxCP/b8P/ziYtawXjYKBGQ2+uznrbQ=="
       },
       "DalamudPackager": {
         "type": "Direct",
