@@ -1,45 +1,45 @@
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.STD;
 using HaselCommon.Gui;
 using HaselCommon.Services;
-using HaselDebug.Abstracts;
-using HaselDebug.Interfaces;
-using HaselDebug.Services;
-using HaselDebug.Utils;
+using HaselDebug.Windows;
 using ImGuiNET;
+using InteropGenerator.Runtime;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
-using ObjectKind = FFXIVClientStructs.FFXIV.Client.Game.Object.ObjectKind;
 
-namespace HaselDebug.Tabs;
+namespace HaselDebug.Services;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class ObjectTableTab : DebugTab
+[RegisterSingleton, AutoConstruct]
+public unsafe partial class ObjectTableRenderer
 {
     private readonly DebugRenderer _debugRenderer;
     private readonly SeStringEvaluator _seStringEvaluator;
     private readonly TextService _textService;
     private readonly ExcelService _excelService;
+    private readonly WindowManager _windowManager;
+    private readonly LanguageProvider _languageProvider;
 
-    public override bool DrawInChild => false;
-
-    public override void Draw()
+    public void Draw(string key, Span<(int Index, Pointer<GameObject> GameObjectPtr)> entries)
     {
-        using var table = ImRaii.Table("ObjectTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table(key, 7, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable | ImGuiTableFlags.Hideable | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 30);
         ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthFixed, 110);
+        ImGui.TableSetupColumn("EntityId", ImGuiTableColumnFlags.WidthFixed, 110);
+        ImGui.TableSetupColumn("ObjectId", ImGuiTableColumnFlags.WidthFixed, 110);
         ImGui.TableSetupColumn("ObjectKind", ImGuiTableColumnFlags.WidthFixed, 90);
         ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupColumn("EventHandler", ImGuiTableColumnFlags.WidthFixed, 300);
         ImGui.TableSetupScrollFreeze(5, 1);
         ImGui.TableHeadersRow();
 
-        var i = 0;
-        foreach (GameObject* gameObject in GameObjectManager.Instance()->Objects.IndexSorted)
+        for (var i = 0; i < entries.Length; i++)
         {
+            var gameObject = entries[i].GameObjectPtr.Value;
             if (gameObject == null) continue;
 
             var objectKind = gameObject->GetObjectKind();
@@ -63,21 +63,27 @@ public unsafe partial class ObjectTableTab : DebugTab
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted(i.ToString());
+            ImGui.TextUnformatted(entries[i].Index.ToString());
 
             ImGui.TableNextColumn(); // Address
             _debugRenderer.DrawAddress(gameObject);
 
+            ImGui.TableNextColumn(); // EntityId
+            _debugRenderer.DrawCopyableText(gameObject->EntityId.ToString("X"));
+
+            ImGui.TableNextColumn(); // ObjectId
+            _debugRenderer.DrawCopyableText(gameObject->GetGameObjectId().Id.ToString("X"));
+
             ImGui.TableNextColumn(); // ObjectKind
-            ImGui.TextUnformatted(objectKind.ToString());
+            _debugRenderer.DrawCopyableText(objectKind.ToString());
 
             ImGui.TableNextColumn(); // Name
             _debugRenderer.DrawPointerType(
-                gameObject,
+            gameObject,
                 typeof(GameObject),
-                new NodeOptions()
+                new Utils.NodeOptions()
                 {
-                    AddressPath = new AddressPath((nint)gameObject),
+                    AddressPath = new Utils.AddressPath((nint)gameObject),
                     Title = title,
                     DrawContextMenu = (nodeOptions, builder) =>
                     {
@@ -140,9 +146,6 @@ public unsafe partial class ObjectTableTab : DebugTab
                         break;
                 }
             }
-
-            i++;
-            if (i >= GameObjectManager.Instance()->Objects.GameObjectIdSortedCount) break;
         }
     }
 }

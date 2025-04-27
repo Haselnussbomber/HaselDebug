@@ -7,10 +7,10 @@ using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 
-namespace HaselDebug.Tabs;
+namespace HaselDebug.Tabs.ObjectTables;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class CharaSelectCharacterListTab : DebugTab
+[RegisterSingleton<IObjectTableTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class CharaSelectCharacterListTab : DebugTab, IObjectTableTab
 {
     private readonly DebugRenderer _debugRenderer;
 

@@ -9,10 +9,10 @@ namespace HaselDebug.Windows;
 
 public class PointerTypeWindow : SimpleWindow
 {
-    private NodeOptions? NodeOptions;
-    private readonly DebugRenderer debugRenderer;
-    private readonly nint address;
-    private readonly Type type;
+    private NodeOptions? _nodeOptions;
+    private readonly DebugRenderer _debugRenderer;
+    private readonly nint _address;
+    private readonly Type _type;
 
     public PointerTypeWindow(
         WindowManager windowManager,
@@ -23,9 +23,9 @@ public class PointerTypeWindow : SimpleWindow
         Type type,
         string? name = null) : base(windowManager, textService, languageProvider)
     {
-        this.debugRenderer = debugRenderer;
-        this.address = address;
-        this.type = type;
+        _debugRenderer = debugRenderer;
+        _address = address;
+        _type = type;
         WindowName = $"{name ?? string.Empty}##{type.Name}";
     }
 
@@ -44,9 +44,9 @@ public class PointerTypeWindow : SimpleWindow
 
     public override void Draw()
     {
-        debugRenderer.DrawPointerType(address, type, NodeOptions ??= new NodeOptions()
+        _debugRenderer.DrawPointerType(_address, _type, _nodeOptions ??= new NodeOptions()
         {
-            AddressPath = new AddressPath(address),
+            AddressPath = new AddressPath(_address),
             DefaultOpen = true,
         });
     }
