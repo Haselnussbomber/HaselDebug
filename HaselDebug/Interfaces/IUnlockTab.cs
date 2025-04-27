@@ -1,10 +1,8 @@
-using HaselDebug.Tabs;
-
 namespace HaselDebug.Interfaces;
 
-public interface IUnlockTab : ISubTab<UnlocksTab>
+public interface IUnlockTab : IDebugTab
 {
-    public UnlockProgress GetUnlockProgress();
+    UnlockProgress GetUnlockProgress();
 }
 
 public struct UnlockProgress

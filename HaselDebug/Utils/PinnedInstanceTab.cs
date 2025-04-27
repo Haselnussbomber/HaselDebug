@@ -1,11 +1,10 @@
 using System.Collections.Immutable;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
-using HaselDebug.Tabs;
 
 namespace HaselDebug.Utils;
 
-public class PinnedInstanceTab(DebugRenderer DebugRenderer, nint address, Type type) : IDrawableTab
+public class PinnedInstanceTab(DebugRenderer debugRenderer, nint address, Type type) : IDebugTab
 {
     public nint Address => address;
     public Type Type => type;
@@ -15,11 +14,11 @@ public class PinnedInstanceTab(DebugRenderer DebugRenderer, nint address, Type t
     public bool IsPinnable => true;
     public bool CanPopOut => true;
     public bool DrawInChild => true;
-    public ImmutableArray<ISubTab<UnlocksTab>>? SubTabs { get; }
+    public ImmutableArray<IDebugTab>? SubTabs { get; }
 
     public void Draw()
     {
-        DebugRenderer.DrawPointerType(Address, Type, new NodeOptions()
+        debugRenderer.DrawPointerType(Address, Type, new NodeOptions()
         {
             AddressPath = new AddressPath(Address),
             DefaultOpen = true,

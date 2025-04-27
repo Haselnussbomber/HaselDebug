@@ -8,9 +8,9 @@ namespace HaselDebug.Windows;
 
 public class TabPopoutWindow : SimpleWindow
 {
-    private readonly IDrawableTab _tab;
+    private readonly IDebugTab _tab;
 
-    public TabPopoutWindow(WindowManager wm, TextService textService, LanguageProvider languageProvider, IDrawableTab tab) : base(wm, textService, languageProvider)
+    public TabPopoutWindow(WindowManager wm, TextService textService, LanguageProvider languageProvider, IDebugTab tab) : base(wm, textService, languageProvider)
     {
         _tab = tab;
         WindowName = $"{tab.Title}##{GetType().Name}";

@@ -32,7 +32,7 @@ public partial class PluginWindow : SimpleWindow
     private readonly IEnumerable<IDebugTab> _debugTabs;
 
     private IDebugTab[] _tabs;
-    private IDrawableTab? _selectedTab;
+    private IDebugTab? _selectedTab;
 
     [AutoPostConstruct]
     public void Initialize()
@@ -61,7 +61,7 @@ public partial class PluginWindow : SimpleWindow
         });
 
         _tabs = [.. _debugTabs
-            .Where(t => !t.GetType().GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition().IsAssignableTo(typeof(ISubTab<>)))) // no sub tabs
+            //.Where(t => !t.GetType().GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition().IsAssignableTo(typeof(ISubTab<>)))) // no sub tabs
             .OrderBy(t => t.Title)
         ];
 
@@ -230,14 +230,14 @@ public partial class PluginWindow : SimpleWindow
     private void SelectTabWithoutSave(string internalName)
     {
         _selectedTab = _pinnedInstances.FirstOrDefault(tab => tab.InternalName == internalName)
-            ?? (IDrawableTab?)_tabs.FirstOrDefault(tab => tab.InternalName == internalName)
+            ?? (IDebugTab?)_tabs.FirstOrDefault(tab => tab.InternalName == internalName)
             ?? _tabs
                 .Where(tab => tab.SubTabs?.Any(subTab => subTab.InternalName == internalName) == true)
                 .Select(tab => tab.SubTabs?.FirstOrDefault(subTab => subTab.InternalName == internalName))
                 .FirstOrDefault();
     }
 
-    private void SelectTab(IDrawableTab tab)
+    private void SelectTab(IDebugTab tab)
     {
         _selectedTab = tab;
         _pluginConfig.LastSelectedTab = tab.InternalName;

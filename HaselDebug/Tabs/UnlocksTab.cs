@@ -4,7 +4,6 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Gui;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Windows;
@@ -21,8 +20,9 @@ public class UnlocksTab : DebugTab
 
     public UnlocksTab(IEnumerable<IUnlockTab> subTabs)
     {
-        var unlockTabs = subTabs.OrderBy(t => t.Title).ToArray();
-        SubTabs = unlockTabs.Cast<ISubTab<UnlocksTab>>().ToImmutableArray();
+        SubTabs = subTabs
+            .OrderBy(t => t.Title).ToArray()
+            .Cast<IDebugTab>().ToImmutableArray();
     }
 
     public override unsafe void Draw()
