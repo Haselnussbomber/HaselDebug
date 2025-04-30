@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.23.0] (2025-04-30)
+
+- **Added:** A Conditions tab, using the CS Conditions struct instead of Dalamuds ConditionFlags enum, providing xmldoc comments if available.
+- **Added:** A new Object Tables category, featuring:
+  - Character Manager,
+  - Chara Select Character List,
+  - Client Object Manager,
+  - Game Object Manager, now with 3 tabs IndexSorted, GameObjectIdSorted and EntityIdSorted,
+  - and the newly reversed Stand Object Manager, displaying nameless, "lively" EventNpcs and EventObjects.
+
+  These now reuse the same table code and I've added the EntityId and ObjectId columns. It's now possible to hide columns, though settings are not saved for these tables.
+- **Changed:** Previously, fields with "IconId" in their name showed the icon next to the value, now it's for all fields containing just "Icon".
+- **Updated:** I updated my TerritoryIntendedUse enum in HaselCommon, so 60 is now called CosmicExploration.
+- **Updated:** ClientStructs now at [377ddb3](https://github.com/aers/FFXIVClientStructs/tree/377ddb3) ([compare](https://github.com/aers/FFXIVClientStructs/compare/09d40c6a..377ddb3)).
+
 ## [1.22.0] (2025-04-23)
 
 - **Added:** Added a "Copy as hex" button to SeStringMaker that lets you copy the SeString as raw byte data.
@@ -345,7 +360,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.22.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.23.0...main
+[1.23.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.22.0...1.23.0
 [1.22.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.21.0...1.22.0
 [1.21.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.20.1...1.21.0
 [1.20.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.20.0...v1.20.1
