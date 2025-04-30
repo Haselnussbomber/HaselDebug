@@ -24,6 +24,7 @@ public record struct NodeOptions
     public bool UseSimpleEventHandlerName { get; set; } = false;
     public ClientLanguage Language { get; set; } = Service.Get<LanguageProvider>().ClientLanguage;
     public bool IsIconIdField { get; set; } = false;
+    public bool IsTimestampField { get; set; } = false;
     public bool HexOnShift { get; set; } = false;
 
     public ImGuiTreeNodeFlags GetTreeNodeFlags(ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.SpanAvailWidth)

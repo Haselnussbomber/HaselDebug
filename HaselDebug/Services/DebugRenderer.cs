@@ -493,8 +493,11 @@ public unsafe partial class DebugRenderer
             var fieldAddress = address + offset;
             var fieldType = fieldInfo.FieldType;
 
-            if (fieldInfo.Name.Contains("IconId"))
+            if (fieldInfo.Name.Contains("Icon"))
                 fieldNodeOptions = fieldNodeOptions with { IsIconIdField = true };
+
+            if ((fieldType == typeof(int) || fieldType == typeof(long)) && fieldInfo.Name.Contains("Timestamp"))
+                fieldNodeOptions = fieldNodeOptions with { IsTimestampField = true };
 
             if (fieldInfo.GetCustomAttribute<ObsoleteAttribute>() is ObsoleteAttribute obsoleteAttribute)
             {
@@ -978,7 +981,26 @@ public unsafe partial class DebugRenderer
             DrawIcon(value, type);
         }
 
-        if (nodeOptions.HexOnShift)
+        if (nodeOptions.IsTimestampField)
+        {
+            DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+
+            switch (value)
+            {
+                case int intTime when intTime != 0:
+                    ImGui.SameLine();
+                    DrawCopyableText(DateTimeOffset.FromUnixTimeSeconds(intTime).ToLocalTime().ToString());
+                    break;
+
+                case long longTime when longTime != 0:
+                    ImGui.SameLine();
+                    DrawCopyableText(DateTimeOffset.FromUnixTimeSeconds(longTime).ToLocalTime().ToString());
+                    break;
+            }
+
+            return;
+        }
+        else if (nodeOptions.HexOnShift)
         {
             if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || ImGui.IsKeyDown(ImGuiKey.RightShift))
             {
