@@ -10,7 +10,7 @@ using ImGuiNET;
 namespace HaselDebug.Tabs.ObjectTables;
 
 [RegisterSingleton<IObjectTableTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class StandObjectTableTab : DebugTab, IDebugTab, IObjectTableTab
+public unsafe partial class StandObjectManagerTab : DebugTab, IDebugTab, IObjectTableTab
 {
     private readonly ObjectTableRenderer _objectTableRenderer;
 
@@ -18,10 +18,10 @@ public unsafe partial class StandObjectTableTab : DebugTab, IDebugTab, IObjectTa
 
     public override void Draw()
     {
-        using var hostchild = ImRaii.Child("StandObjectTableTabChild", new Vector2(-1), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
+        using var hostchild = ImRaii.Child("StandObjectManagerTabChild", new Vector2(-1), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
         if (!hostchild) return;
 
-        using var tabs = ImRaii.TabBar("StandObjectTableTabBar");
+        using var tabs = ImRaii.TabBar("StandObjectManagerTabBar");
         if (!tabs) return;
 
         DrawEventNpcsTable();
@@ -33,7 +33,7 @@ public unsafe partial class StandObjectTableTab : DebugTab, IDebugTab, IObjectTa
         using var tab = ImRaii.TabItem("EventNpcs");
         if (!tab) return;
 
-        _objectTableRenderer.Draw("StandObjectTable_EventNpcs", [..
+        _objectTableRenderer.Draw("StandObjectManager_EventNpcs", [..
             StandObjectManager.Instance()->Characters.ToArray()
                 .Select((entry, i) => (Index: i, Entry: entry))
                 .Where(tuple => tuple.Entry.Character != null && tuple.Entry.ObjectKind != ObjectKind.None)
@@ -45,7 +45,7 @@ public unsafe partial class StandObjectTableTab : DebugTab, IDebugTab, IObjectTa
         using var tab = ImRaii.TabItem("EventObjs");
         if (!tab) return;
 
-        _objectTableRenderer.Draw("StandObjectTable_EventObjs", [.. 
+        _objectTableRenderer.Draw("StandObjectManager_EventObjs", [.. 
             StandObjectManager.Instance()->EventObjects.ToArray()
                 .Select((ptr, i) => (Index: i, Pointer: ptr))
                 .Where(tuple => tuple.Pointer.Value != null)
