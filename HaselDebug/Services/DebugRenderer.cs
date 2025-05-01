@@ -493,7 +493,7 @@ public unsafe partial class DebugRenderer
             var fieldAddress = address + offset;
             var fieldType = fieldInfo.FieldType;
 
-            if (fieldInfo.Name.Contains("Icon"))
+            if (fieldType == typeof(uint) && fieldInfo.Name.Contains("IconId"))
                 fieldNodeOptions = fieldNodeOptions with { IsIconIdField = true };
 
             if ((fieldType == typeof(int) || fieldType == typeof(long)) && fieldInfo.Name.Contains("Timestamp"))
