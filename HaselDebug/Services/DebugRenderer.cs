@@ -18,6 +18,7 @@ using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine.Group;
 using FFXIVClientStructs.FFXIV.Client.System.String;
@@ -179,6 +180,30 @@ public unsafe partial class DebugRenderer
                         break;
                     case ObjectKind.Ornament:
                         type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Ornament);
+                        break;
+                }
+            }
+            else if (Inherits<DrawObject>(type))
+            {
+                switch (((DrawObject*)address)->GetObjectType())
+                {
+                    case ObjectType.CharacterBase:
+                        type = typeof(CharacterBase);
+                        switch (((CharacterBase*)address)->GetModelType())
+                        {
+                            case CharacterBase.ModelType.Human:
+                                type = typeof(Human);
+                                break;
+                            case CharacterBase.ModelType.DemiHuman:
+                                type = typeof(Demihuman);
+                                break;
+                            case CharacterBase.ModelType.Monster:
+                                type = typeof(Monster);
+                                break;
+                            case CharacterBase.ModelType.Weapon:
+                                type = typeof(Weapon);
+                                break;
+                        }
                         break;
                 }
             }
