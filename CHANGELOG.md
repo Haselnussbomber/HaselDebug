@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.23.1] (2025-04-30)
+
+- **Added:** DrawObject type redirects, based on their ObjectType:
+  - CharacterBase, based on their ModelType:
+    - Human
+    - Demihuman
+    - Monster
+    - Weapon
+- **Changed:** The "Icon" name check to draw icons was reverted. Instead, an additional `uint` check was added.
+- **Updated:** ClientStructs now at [ba0a6602](https://github.com/aers/FFXIVClientStructs/tree/ba0a6602) ([compare](https://github.com/aers/FFXIVClientStructs/compare/377ddb3..ba0a6602)).
+
 ## [1.23.0] (2025-04-30)
 
 - **Added:** A Conditions tab, using the CS Conditions struct instead of Dalamuds ConditionFlags enum, providing xmldoc comments if available.
@@ -360,7 +371,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.23.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.23.1...main
+[1.23.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.23.0...1.23.1
 [1.23.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.22.0...1.23.0
 [1.22.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.21.0...1.22.0
 [1.21.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.20.1...1.21.0
