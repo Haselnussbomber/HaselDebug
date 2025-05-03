@@ -106,8 +106,8 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
         {
             if (row.UnlockLink != 0)
             {
-                if (!dict.TryGetValue(row.UnlockLink, out var names))
-                    dict.Add(row.UnlockLink, names = []);
+                if (!dict.TryGetValue(row.UnlockLink - 1u, out var names))
+                    dict.Add(row.UnlockLink - 1u, names = []);
 
                 names.Add(new UnlockEntry()
                 {
@@ -399,8 +399,8 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
         {
             if (row.Requirement0.RowId is > 0 and < 65536)
             {
-                if (!dict.TryGetValue(row.Requirement0.RowId, out var names))
-                    dict.Add(row.Requirement0.RowId, names = []);
+                if (!dict.TryGetValue(row.Requirement0.RowId - 1u, out var names))
+                    dict.Add(row.Requirement0.RowId - 1u, names = []);
 
                 names.Add(new UnlockEntry()
                 {
@@ -413,8 +413,8 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
             if (row.Requirement1.RowId is > 0 and < 65536)
             {
-                if (!dict.TryGetValue(row.Requirement1.RowId, out var names))
-                    dict.Add(row.Requirement1.RowId, names = []);
+                if (!dict.TryGetValue(row.Requirement1.RowId - 1u, out var names))
+                    dict.Add(row.Requirement1.RowId - 1u, names = []);
 
                 names.Add(new UnlockEntry()
                 {
