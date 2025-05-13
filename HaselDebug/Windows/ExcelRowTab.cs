@@ -4,20 +4,23 @@ using HaselCommon.Gui;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Windows;
 
 [AutoConstruct]
 public partial class ExcelRowTab : SimpleWindow
 {
-    private readonly DebugRenderer _debugRenderer;
+    private readonly IServiceProvider _serviceProvider;
     private readonly Type _rowType;
     private readonly uint _rowId;
     private readonly ClientLanguage _language;
+    private DebugRenderer _debugRenderer;
 
     [AutoPostConstruct]
     private void Initialize(string windowName)
     {
+        _debugRenderer = _serviceProvider.GetRequiredService<DebugRenderer>();
         WindowName = windowName;
     }
 

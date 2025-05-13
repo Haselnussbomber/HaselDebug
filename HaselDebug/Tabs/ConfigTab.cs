@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Common.Configuration;
 using HaselCommon.Services;

@@ -1,7 +1,6 @@
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Extensions;
-using HaselDebug.Services;
 using HaselDebug.Windows;
 using ImGuiNET;
 using Lumina.Excel;
@@ -11,10 +10,10 @@ namespace HaselDebug.Tabs.UnlocksTabs;
 [AutoConstruct]
 public partial class RowIdColumn<TRow> : ColumnNumber<TRow> where TRow : struct, IExcelRow<TRow>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly WindowManager _windowManager;
     private readonly TextService _textService;
     private readonly LanguageProvider _languageProvider;
-    private readonly DebugRenderer _debugRenderer;
     private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly Type _rowType;
 
@@ -26,7 +25,7 @@ public partial class RowIdColumn<TRow> : ColumnNumber<TRow> where TRow : struct,
         if (ImGui.Selectable(ToName(row)))
         {
             var title = $"{_rowType.Name}#{row.RowId} ({_languageProvider.ClientLanguage})";
-            _windowManager.CreateOrOpen(title, () => new ExcelRowTab(_windowManager, _textService, _languageProvider, _debugRenderer, _rowType, row.RowId, _languageProvider.ClientLanguage, title));
+            _windowManager.CreateOrOpen(title, () => new ExcelRowTab(_serviceProvider, _rowType, row.RowId, _languageProvider.ClientLanguage, title));
         }
 
         _imGuiContextMenu.Draw($"{_rowType.Name}{row.RowId}RowIdContextMenu", builder =>
@@ -38,10 +37,10 @@ public partial class RowIdColumn<TRow> : ColumnNumber<TRow> where TRow : struct,
     public static RowIdColumn<TRow> Create()
     {
         return new(
+            Service.Get<IServiceProvider>(),
             Service.Get<WindowManager>(),
             Service.Get<TextService>(),
             Service.Get<LanguageProvider>(),
-            Service.Get<DebugRenderer>(),
             Service.Get<ImGuiContextMenuService>(),
             typeof(TRow)
         )

@@ -108,6 +108,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
         new TextEntry(TextEntryType.Macro, "<link(0xCE,0,0,0,)>"),
     ];
 
+    private readonly IServiceProvider _serviceProvider;
     private readonly DebugRenderer _debugRenderer;
     private readonly WindowManager _windowManager;
     private readonly SeStringEvaluator _seStringEvaluator;
@@ -426,7 +427,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
         if (_inspectorWindow == null)
         {
-            _inspectorWindow = _windowManager.CreateOrOpen("StringMaker Preview", () => new SeStringInspectorWindow(_windowManager, _textService, _languageProvider, _debugRenderer, _seStringEvaluator, "", _languageProvider.ClientLanguage, "StringMaker Preview"));
+            _inspectorWindow = _windowManager.CreateOrOpen("StringMaker Preview", () => new SeStringInspectorWindow(_serviceProvider, "", _languageProvider.ClientLanguage, "StringMaker Preview"));
             UpdateInspectorString();
         }
 

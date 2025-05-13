@@ -58,6 +58,7 @@ public unsafe partial class DebugRenderer
     };
 
     private readonly ILogger<DebugRenderer> _logger;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IDalamudPluginInterface _pluginInterface;
     private readonly WindowManager _windowManager;
     private readonly ITextureProvider _textureProvider;

@@ -4,7 +4,6 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Services;
-using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
 using HaselDebug.Interfaces;

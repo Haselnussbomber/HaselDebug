@@ -1,19 +1,19 @@
 using System.Numerics;
 using HaselCommon.Gui;
-using HaselCommon.Services;
 using HaselDebug.Interfaces;
 using ImGuiNET;
 
 namespace HaselDebug.Windows;
 
-public class TabPopoutWindow : SimpleWindow
+[AutoConstruct]
+public partial class TabPopoutWindow : SimpleWindow
 {
     private readonly IDebugTab _tab;
 
-    public TabPopoutWindow(WindowManager wm, TextService textService, LanguageProvider languageProvider, IDebugTab tab) : base(wm, textService, languageProvider)
+    [AutoPostConstruct]
+    private void Initialize()
     {
-        _tab = tab;
-        WindowName = $"{tab.Title}##{GetType().Name}";
+        WindowName = $"{_tab.Title}##{GetType().Name}";
     }
 
     public override void OnOpen()

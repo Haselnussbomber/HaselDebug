@@ -21,10 +21,10 @@ public partial class PluginWindow : SimpleWindow
     private const uint SidebarWidth = 250;
 
     private readonly ILogger<PluginWindow> _logger;
+    private readonly IServiceProvider _serviceProvider;
     private readonly WindowManager _windowManager;
     private readonly PluginConfig _pluginConfig;
     private readonly TextService _textService;
-    private readonly LanguageProvider _languageProvider;
     private readonly PinnedInstancesService _pinnedInstances;
     private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly DebugRenderer _debugRenderer;
@@ -127,7 +127,7 @@ public partial class PluginWindow : SimpleWindow
                     {
                         Visible = tab.CanPopOut && !_windowManager.Contains(win => win.WindowName == tab.Title),
                         Label = _textService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, _languageProvider, tab))
+                        ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_serviceProvider, tab))
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()
@@ -175,7 +175,7 @@ public partial class PluginWindow : SimpleWindow
                 {
                     Visible = tab.CanPopOut && !_windowManager.Contains(win => win.WindowName == tab.Title),
                     Label = _textService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, _languageProvider, tab))
+                    ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_serviceProvider, tab))
                 });
             });
 
@@ -202,7 +202,7 @@ public partial class PluginWindow : SimpleWindow
                         {
                             Visible = subTab.CanPopOut && !_windowManager.Contains(win => win.WindowName == subTab.Title),
                             Label = _textService.Translate("ContextMenu.TabPopout"),
-                            ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, _languageProvider, subTab))
+                            ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_serviceProvider, subTab))
                         });
                     });
 

@@ -33,17 +33,17 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
 
         Flags |= ImGuiTableFlags.SortTristate;
 
-        _globalScaleObserver.ScaleChange += OnScaleChange;
-        OnScaleChange(ImGuiHelpers.GlobalScale);
+        _globalScaleObserver.ScaleChanged += OnScaleChanged;
+        OnScaleChanged(ImGuiHelpers.GlobalScale);
     }
 
     public new void Dispose()
     {
-        _globalScaleObserver.ScaleChange -= OnScaleChange;
+        _globalScaleObserver.ScaleChanged -= OnScaleChanged;
         base.Dispose();
     }
 
-    private void OnScaleChange(float scale)
+    private void OnScaleChanged(float scale)
     {
         LineHeight = IconSize * scale + ImGui.GetStyle().ItemSpacing.Y; // I honestly don't know why using ItemSpacing here works
     }

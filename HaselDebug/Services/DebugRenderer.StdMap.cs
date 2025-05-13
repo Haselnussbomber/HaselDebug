@@ -31,7 +31,7 @@ public unsafe partial class DebugRenderer
                 {
                     Visible = !_windowManager.Contains(win => win.WindowName == "0x" + address.ToString("X")),
                     Label = _textService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_windowManager, _textService, _languageProvider, this, address, typeof(StdMap<,>).MakeGenericType(keyType, valueType), "0x" + address.ToString("X")))
+                    ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_serviceProvider, address, typeof(StdMap<,>).MakeGenericType(keyType, valueType), "0x" + address.ToString("X")))
                 });
             }
         });

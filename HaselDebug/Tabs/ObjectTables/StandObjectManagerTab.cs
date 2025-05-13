@@ -45,7 +45,7 @@ public unsafe partial class StandObjectManagerTab : DebugTab, IDebugTab, IObject
         using var tab = ImRaii.TabItem("EventObjs");
         if (!tab) return;
 
-        _objectTableRenderer.Draw("StandObjectManager_EventObjs", [.. 
+        _objectTableRenderer.Draw("StandObjectManager_EventObjs", [..
             StandObjectManager.Instance()->EventObjects.ToArray()
                 .Select((ptr, i) => (Index: i, Pointer: ptr))
                 .Where(tuple => tuple.Pointer.Value != null)

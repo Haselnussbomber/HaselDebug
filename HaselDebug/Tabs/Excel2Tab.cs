@@ -6,7 +6,6 @@ using System.Reflection;
 using Dalamud.Game;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using HaselCommon.Extensions.Reflection;
 using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
@@ -19,6 +18,7 @@ using HaselDebug.Windows;
 using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Text.ReadOnly;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Tabs;
 
@@ -28,11 +28,9 @@ public unsafe partial class Excel2Tab : DebugTab
     public const int MaxColumns = 60;
     private const int LanguageSelectorWidth = 90;
 
-    private readonly ExcelService _excelService;
+    private readonly IServiceProvider _serviceProvider;
     private readonly LanguageProvider _languageProvider;
     private readonly TextService _textService;
-    private readonly IDataManager _dataManager;
-    private readonly DebugRenderer _debugRenderer;
 
     private Dictionary<string, Type> _sheetTypes;
     private IExcelV2SheetWrapper? _sheetWrapper;
@@ -153,9 +151,10 @@ public unsafe partial class Excel2Tab : DebugTab
         if (!TryGetSheetType(sheetName, out var sheetType))
             return;
 
-        _nextSheetWrapper = (IExcelV2SheetWrapper)Activator.CreateInstance(
+        _nextSheetWrapper = (IExcelV2SheetWrapper)ActivatorUtilities.CreateInstance(
+            _serviceProvider,
             typeof(ExcelV2SheetWrapper<>).MakeGenericType(sheetType),
-            this, _debugRenderer, _dataManager, _languageProvider, _excelService)!;
+            this);
     }
 
     public bool TryGetSheetType(string sheetName, [NotNullWhen(returnValue: true)] out Type? sheetType)
@@ -170,21 +169,23 @@ public interface IExcelV2SheetWrapper
     void ReloadSheet();
 }
 
-public class ExcelV2SheetWrapper<T> : IExcelV2SheetWrapper where T : struct
+[AutoConstruct]
+public partial class ExcelV2SheetWrapper<T> : IExcelV2SheetWrapper where T : struct
 {
-    private readonly ExcelTable<T> _table;
+    private readonly IServiceProvider _serviceProvider;
     private readonly Excel2Tab _excelTab;
+
+    private ExcelTable<T> _table;
 
     public List<ExcelV2SheetColumn<T>> Columns { get; set; } = [];
     public string SheetName { get; } = typeof(T).Name;
     public ClientLanguage Language => _excelTab.SelectedLanguage;
 
-    public ExcelV2SheetWrapper(Excel2Tab excelTab, DebugRenderer debugRenderer, IDataManager dataManager, LanguageProvider languageProvider, ExcelService excelService)
+    [AutoPostConstruct]
+    private void Initialize()
     {
-        _table = new ExcelTable<T>(languageProvider, excelTab, excelService, debugRenderer);
-
+        _table = ActivatorUtilities.CreateInstance<ExcelTable<T>>(_serviceProvider, _excelTab);
         ReloadSheet();
-        _excelTab = excelTab;
     }
 
     public void ReloadSheet()
@@ -250,9 +251,9 @@ public class ExcelV2SheetWrapper<T> : IExcelV2SheetWrapper where T : struct
 [AutoConstruct]
 public partial class ExcelTable<T> : Table<T> where T : struct
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly Excel2Tab _excelTab;
     private readonly ExcelService _excelService;
-    private readonly DebugRenderer _debugRenderer;
 
     public List<ExcelV2SheetColumn<T>> AvailableColumns { get; private set; } = [];
     public bool IsSubrowType { get; private set; }
@@ -271,10 +272,9 @@ public partial class ExcelTable<T> : Table<T> where T : struct
 
         if (IsSubrowType) ScrollFreezeCols = 2;
 
-        var columnType = typeof(ExcelV2SheetColumn<>).MakeGenericType(typeof(T));
         foreach (var property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
-            var column = (ExcelV2SheetColumn<T>)Activator.CreateInstance(columnType, _excelTab, this, _debugRenderer, property)!;
+            var column = ActivatorUtilities.CreateInstance<ExcelV2SheetColumn<T>>(_serviceProvider, _excelTab, this, property);
 
             AvailableColumns.Add(column);
 
@@ -314,29 +314,37 @@ public partial class ExcelTable<T> : Table<T> where T : struct
     }
 }
 
-public class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
+[AutoConstruct]
+public partial class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly Excel2Tab _excelTab;
     private readonly ExcelTable<T> _excelTable;
     private readonly DebugRenderer _debugRenderer;
+    private readonly WindowManager _windowManager;
     private readonly PropertyInfo _propertyInfo;
 
     public Type RowType => typeof(T);
     public Type ColumnType => _propertyInfo.PropertyType;
-    public string ColumnTypeName { get; }
 
-    public bool IsStringType { get; }
-    public bool IsNumericType { get; }
-    public bool IsStructType { get; }
-    public bool IsIconColumn { get; }
+    [AutoConstructIgnore]
+    public string ColumnTypeName { get; private set; }
 
-    public ExcelV2SheetColumn(Excel2Tab excelTab, ExcelTable<T> excelTable, DebugRenderer debugRenderer, PropertyInfo columnPropertyInfo)
+    [AutoConstructIgnore]
+    public bool IsStringType { get; private set; }
+
+    [AutoConstructIgnore]
+    public bool IsNumericType { get; private set; }
+
+    [AutoConstructIgnore]
+    public bool IsStructType { get; private set; }
+
+    [AutoConstructIgnore]
+    public bool IsIconColumn { get; private set; }
+
+    [AutoPostConstruct]
+    private void Initialize()
     {
-        _excelTab = excelTab;
-        _excelTable = excelTable;
-        _debugRenderer = debugRenderer;
-        _propertyInfo = columnPropertyInfo;
-
         AutoLabel = false;
         Label = _propertyInfo.Name;
         ColumnTypeName = ColumnType.ReadableTypeName();
@@ -513,8 +521,7 @@ public class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
         if (!_excelTab.TryGetSheetType(sheetName, out var sheetType))
             return;
 
-        var windowManager = Service.Get<WindowManager>();
         var title = $"{sheetName}#{rowId} ({_excelTab.SelectedLanguage})";
-        windowManager.CreateOrOpen(title, () => new ExcelRowTab(windowManager, Service.Get<TextService>(), Service.Get<LanguageProvider>(), _debugRenderer, sheetType, rowId, _excelTab.SelectedLanguage, title));
+        _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, sheetType, rowId, _excelTab.SelectedLanguage, title));
     }
 }

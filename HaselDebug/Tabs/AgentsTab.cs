@@ -21,6 +21,7 @@ namespace HaselDebug.Tabs;
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class AgentsTab : DebugTab
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly TextService _textService;
     private readonly LanguageProvider _languageProvider;
     private readonly DebugRenderer _debugRenderer;
@@ -108,7 +109,7 @@ public unsafe partial class AgentsTab : DebugTab
                 {
                     Visible = !_windowManager.Contains(win => win.WindowName == agentType.Name),
                     Label = _textService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_windowManager, _textService, _languageProvider, _debugRenderer, (nint)agent.Value, agentType))
+                    ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_serviceProvider, (nint)agent.Value, agentType, string.Empty))
                 });
 
                 builder.Add(new ImGuiContextMenuEntry()
@@ -163,7 +164,7 @@ public unsafe partial class AgentsTab : DebugTab
                 {
                     Visible = !_windowManager.Contains(win => win.WindowName == agentType.Name),
                     Label = _textService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_windowManager, _textService, _languageProvider, _debugRenderer, (nint)agent, agentType))
+                    ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_serviceProvider, (nint)agent, agentType, string.Empty))
                 });
 
                 builder.Add(new ImGuiContextMenuEntry()

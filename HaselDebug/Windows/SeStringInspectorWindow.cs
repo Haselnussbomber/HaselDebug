@@ -13,14 +13,18 @@ using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Text.Expressions;
 using Lumina.Text.ReadOnly;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Windows;
 
-public class SeStringInspectorWindow : SimpleWindow
+[AutoConstruct]
+public partial class SeStringInspectorWindow : SimpleWindow
 {
-    private readonly WindowManager _windowManager;
-    private readonly DebugRenderer _debugRenderer;
-    private readonly SeStringEvaluator _seStringEvaluator;
+    private readonly IServiceProvider _serviceProvider;
+
+    private WindowManager _windowManager;
+    private DebugRenderer _debugRenderer;
+    private SeStringEvaluator _seStringEvaluator;
 
     private SeStringParameter[]? _localParameters = null;
     private ReadOnlySeString _string;
@@ -37,21 +41,19 @@ public class SeStringInspectorWindow : SimpleWindow
 
     public ClientLanguage Language { get; set; }
 
-    public SeStringInspectorWindow(
-        WindowManager windowManager,
-        TextService textService,
-        LanguageProvider languageProvider,
-        DebugRenderer debugRenderer,
-        SeStringEvaluator seStringEvaluator,
-        ReadOnlySeString str,
-        ClientLanguage language,
-        string windowName = "SeString") : base(windowManager, textService, languageProvider)
+    [AutoPostConstruct]
+    private void Initialize(ReadOnlySeString str, ClientLanguage language, string windowName)
     {
-        _windowManager = windowManager;
-        _debugRenderer = debugRenderer;
-        _seStringEvaluator = seStringEvaluator;
         Language = language;
         String = str;
+
+        _windowManager = _serviceProvider.GetRequiredService<WindowManager>();
+        _debugRenderer = _serviceProvider.GetRequiredService<DebugRenderer>();
+        _seStringEvaluator = _serviceProvider.GetRequiredService<SeStringEvaluator>();
+
+        if (string.IsNullOrEmpty(windowName))
+            windowName = "SeString";
+
         WindowName = $"{windowName.Replace("\n", "")}##{GetType().Name}";
     }
 

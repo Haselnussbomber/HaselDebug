@@ -1,32 +1,27 @@
 using System.Numerics;
 using HaselCommon.Gui;
-using HaselCommon.Services;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Windows;
 
-public class PointerTypeWindow : SimpleWindow
+[AutoConstruct]
+public partial class PointerTypeWindow : SimpleWindow
 {
+    private DebugRenderer _debugRenderer;
     private NodeOptions? _nodeOptions;
-    private readonly DebugRenderer _debugRenderer;
-    private readonly nint _address;
-    private readonly Type _type;
+    private nint _address;
+    private Type _type;
 
-    public PointerTypeWindow(
-        WindowManager windowManager,
-        TextService textService,
-        LanguageProvider languageProvider,
-        DebugRenderer debugRenderer,
-        nint address,
-        Type type,
-        string? name = null) : base(windowManager, textService, languageProvider)
+    [AutoPostConstruct]
+    private void Initialize(IServiceProvider serviceProvider, nint address, Type type, string name)
     {
-        _debugRenderer = debugRenderer;
+        _debugRenderer = serviceProvider.GetRequiredService<DebugRenderer>();
         _address = address;
         _type = type;
-        WindowName = $"{name ?? string.Empty}##{type.Name}";
+        WindowName = $"{name}##{type.Name}";
     }
 
     public override void OnOpen()

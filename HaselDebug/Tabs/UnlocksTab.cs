@@ -27,7 +27,8 @@ public class UnlocksTab : DebugTab
 
     public override unsafe void Draw()
     {
-        if (!AgentLobby.Instance()->IsLoggedIn || SubTabs == null){
+        if (!AgentLobby.Instance()->IsLoggedIn || SubTabs == null)
+        {
             ImGui.TextUnformatted("Not logged in.");
             return;
         }
