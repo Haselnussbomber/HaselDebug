@@ -40,10 +40,8 @@ public partial class NameColumn : ColumnString<GlassesSheet>
             _unlocksTabUtils.DrawTooltip(
                 (uint)row.Icon,
                 name,
-                null,
-                !row.Description.IsEmpty
-                    ? row.Description.ExtractText().StripSoftHyphen()
-                    : null);
+                default,
+                row.Description);
         }
     }
 }

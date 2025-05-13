@@ -32,10 +32,10 @@ public partial class NameColumn : ColumnString<OrchestrionRollEntry>
             _unlocksTabUtils.DrawTooltip(
                 entry.UIParamRow.OrchestrionCategory.Value.Icon,
                 name,
-                entry.UIParamRow.OrchestrionCategory.Value.Name.ExtractText().StripSoftHyphen(),
+                entry.UIParamRow.OrchestrionCategory.Value.Name,
                 !entry.Row.Description.IsEmpty
-                    ? entry.Row.Description.ExtractText().StripSoftHyphen()
-                    : null);
+                    ? entry.Row.Description
+                    : default);
         }
     }
 }

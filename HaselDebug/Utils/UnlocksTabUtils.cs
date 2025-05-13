@@ -19,6 +19,7 @@ using Lumina.Data.Files;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using Lumina.Extensions;
+using Lumina.Text.ReadOnly;
 using Companion = Lumina.Excel.Sheets.Companion;
 using Ornament = Lumina.Excel.Sheets.Ornament;
 
@@ -90,7 +91,7 @@ public unsafe partial class UnlocksTabUtils
         return clicked;
     }
 
-    public void DrawTooltip(uint iconId, string title, string? category = null, string? description = null)
+    public void DrawTooltip(uint iconId, ReadOnlySeString title, ReadOnlySeString category = default, ReadOnlySeString description = default)
     {
         if (!_textureProvider.TryGetFromGameIcon(iconId, out var tex) || !tex.TryGetWrap(out var texture, out _))
             return;
@@ -98,7 +99,7 @@ public unsafe partial class UnlocksTabUtils
         DrawTooltip(texture, title, category, description);
     }
 
-    public void DrawTooltip(IDalamudTextureWrap icon, string title, string? category = null, string? description = null)
+    public void DrawTooltip(IDalamudTextureWrap icon, ReadOnlySeString title, ReadOnlySeString category = default, ReadOnlySeString description = default)
     {
         using var tooltip = ImRaii.Tooltip();
         if (!tooltip) return;
@@ -107,9 +108,10 @@ public unsafe partial class UnlocksTabUtils
         if (!popuptable) return;
 
         var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
+        var drawResult = ImGuiHelpers.SeStringWrapped(title, new() { TargetDrawList = default(ImDrawListPtr) });
 
         ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale + itemInnerSpacing.X);
-        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
+        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(drawResult.Size.X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
 
         ImGui.TableNextColumn(); // Icon
         ImGui.Image(icon.ImGuiHandle, ImGuiHelpers.ScaledVector2(40));
@@ -118,16 +120,15 @@ public unsafe partial class UnlocksTabUtils
         using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
         using var indent = ImRaii.PushIndent(1);
 
-        ImGui.TextUnformatted(title);
+        ImGuiHelpers.SeStringWrapped(title);
 
-        if (!string.IsNullOrEmpty(category))
+        if (!category.IsEmpty)
         {
             ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
-            using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey.ToUInt()))
-                ImGui.TextUnformatted(category);
+            ImGuiHelpers.SeStringWrapped(category, new() { Color = Color.Grey.ToUInt() });
         }
 
-        if (!string.IsNullOrEmpty(description))
+        if (!description.IsEmpty)
         {
             ImGuiUtils.PushCursorY(1 * ImGuiHelpers.GlobalScale);
 
@@ -136,7 +137,7 @@ public unsafe partial class UnlocksTabUtils
             ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
             ImGuiUtils.PushCursorY(4 * ImGuiHelpers.GlobalScale);
 
-            ImGuiHelpers.SafeTextWrapped(description);
+            ImGuiHelpers.SeStringWrapped(description);
         }
     }
 

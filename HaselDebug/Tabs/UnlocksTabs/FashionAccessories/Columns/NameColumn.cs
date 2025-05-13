@@ -68,10 +68,10 @@ public partial class NameColumn : ColumnString<Ornament>
             _unlocksTabUtils.DrawTooltip(
                 row.Icon,
                 name,
-                null,
-                _excelService.TryGetRow<OrnamentTransient>(row.RowId, out var transient) && !transient.Text.IsEmpty
-                    ? transient.Text.ExtractText().StripSoftHyphen()
-                    : null);
+                default,
+                _excelService.TryGetRow<OrnamentTransient>(row.RowId, out var transient)
+                    ? transient.Text
+                    : default);
         }
     }
 }
