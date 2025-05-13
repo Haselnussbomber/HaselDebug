@@ -96,6 +96,15 @@
   "HaselDebug.Tabs.UnlocksTabs.AetherCurrents.Columns.LocationColumn.Label": {
     "en": "Location"
   },
+  "HaselDebug.Tabs.UnlocksTabs.AozActions.Columns.NumberColumn.Label": {
+    "en": "Number"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.AozActions.Columns.ActionColumn.Label": {
+    "en": "Action"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.AozActions.Columns.LocationColumn.Label": {
+    "en": "Location"
+  },
   "HaselDebug.Tabs.UnlocksTabs.Bardings.Columns.ItemColumn.Label": {
     "en": "Item"
   },

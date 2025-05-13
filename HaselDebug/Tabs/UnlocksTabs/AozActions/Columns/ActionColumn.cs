@@ -1,5 +1,6 @@
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
+using HaselCommon.Utils;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
@@ -25,11 +26,15 @@ public partial class ActionColumn : ColumnString<AozEntry>
 
         if (ImGui.IsItemHovered())
         {
+            using var _ = SeStringBuilderHelper.Rent(out var sb);
+            sb.Append(entry.AozActionTransient.Description);
+            sb.AppendNewLine();
+            sb.Append(entry.AozActionTransient.Stats);
             _unlocksTabUtils.DrawTooltip(
                 entry.AozActionTransient.Icon,
                 entry.Action.Name,
                 _seStringEvaluator.EvaluateFromAddon(12262, [(uint)entry.AozActionTransient.Number]),
-                entry.AozActionTransient.Description);
+                sb.ToReadOnlySeString());
         }
     }
 }
