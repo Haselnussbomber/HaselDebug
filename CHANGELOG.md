@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.24.1] (2025-05-27)
+
+- **Updated:** ClientStructs now at [901b2362](https://github.com/aers/FFXIVClientStructs/tree/901b2362) ([compare](https://github.com/aers/FFXIVClientStructs/compare/bd82d122..901b2362)).
+
 ## [1.24.0] (2025-05-27)
 
 - **Added:** Type redirects for AtkResNode and AtkComponentBase.
@@ -380,7 +384,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.23.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.1...main
+[1.24.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.0...1.24.1
 [1.24.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.23.1...1.24.0
 [1.23.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.23.0...1.23.1
 [1.23.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.22.0...1.23.0
