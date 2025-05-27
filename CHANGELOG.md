@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.24.0] (2025-05-27)
+
+- **Added:** Type redirects for AtkResNode and AtkComponentBase.
+- **Added:** Blue Mage Actions tab.
+- **Added:** Input tab.
+- **Changed:** The AtkEventData in the Atk Events tab now displays the correct struct based on the AtkEventType.
+- **Fixed:** BuddyAction and QuestAcceptAdditionCondition unlock link indexes were off by 1.
+- **Updated:** ClientStructs now at [bd82d122](https://github.com/aers/FFXIVClientStructs/tree/bd82d122) ([compare](https://github.com/aers/FFXIVClientStructs/compare/ba0a6602..bd82d122)).
+
 ## [1.23.1] (2025-04-30)
 
 - **Added:** DrawObject type redirects, based on their ObjectType:
@@ -372,6 +381,7 @@ Updated CS for 7.05hf1
 First release! 🥳
 
 [unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.23.1...main
+[1.24.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.23.1...1.24.0
 [1.23.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.23.0...1.23.1
 [1.23.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.22.0...1.23.0
 [1.22.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.21.0...1.22.0
