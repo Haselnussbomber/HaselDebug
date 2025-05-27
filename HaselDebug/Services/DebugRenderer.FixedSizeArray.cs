@@ -2,7 +2,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Dalamud.Interface.Utility.Raii;
-using HaselCommon.Extensions.Reflection;
+using HaselCommon.Extensions;
 using HaselCommon.Graphics;
 using HaselDebug.Utils;
 using ImGuiNET;

@@ -50,7 +50,7 @@ public unsafe partial class UnlocksTabUtils
 
     public bool DrawSelectableItem(Item item, ImGuiId id, bool drawIcon = true, bool isHq = false, float? iconSize = null)
     {
-        var itemName = _textService.GetItemName(item.RowId);
+        var itemName = _textService.GetItemName(item.RowId).ExtractText().StripSoftHyphen();
         var isHovered = false;
         iconSize ??= ImGui.GetTextLineHeight();
 
@@ -163,7 +163,7 @@ public unsafe partial class UnlocksTabUtils
         if (!popuptable) return;
 
         var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
-        var title = _textService.GetItemName(item.RowId);
+        var title = _textService.GetItemName(item.RowId).ExtractText().StripSoftHyphen();
 
         ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale + itemInnerSpacing.X);
         ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
@@ -499,7 +499,7 @@ public unsafe partial class UnlocksTabUtils
         if (!popuptable) return;
 
         var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
-        var title = _textService.GetItemName(item.RowId);
+        var title = _textService.GetItemName(item.RowId).ExtractText().StripSoftHyphen();
 
         ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale + itemInnerSpacing.X);
         ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));

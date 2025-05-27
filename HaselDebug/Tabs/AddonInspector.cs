@@ -660,17 +660,17 @@ public unsafe partial class AddonInspectorTab : DebugTab
                     ImGui.SameLine();
                     ImGuiHelpers.SeStringWrapped(textInputComponent->UnkText02.AsSpan()); // Service<SeStringRenderer>.Get().Draw(textInputComponent->UnkText02);
 
-                    ImGui.TextUnformatted("Text3: ");
+                    ImGui.TextUnformatted("AvailableLines: ");
                     ImGui.SameLine();
-                    ImGuiHelpers.SeStringWrapped(textInputComponent->UnkText03.AsSpan()); // Service<SeStringRenderer>.Get().Draw(textInputComponent->UnkText03);
+                    ImGuiHelpers.SeStringWrapped(textInputComponent->AvailableLines.AsSpan()); // Service<SeStringRenderer>.Get().Draw(textInputComponent->UnkText03);
 
-                    ImGui.TextUnformatted("Text4: ");
+                    ImGui.TextUnformatted("HighlightedAutoTranslateOptionColorPrefix: ");
                     ImGui.SameLine();
-                    ImGuiHelpers.SeStringWrapped(textInputComponent->UnkText04.AsSpan()); // Service<SeStringRenderer>.Get().Draw(textInputComponent->UnkText04);
+                    ImGuiHelpers.SeStringWrapped(textInputComponent->HighlightedAutoTranslateOptionColorPrefix.AsSpan()); // Service<SeStringRenderer>.Get().Draw(textInputComponent->UnkText04);
 
-                    ImGui.TextUnformatted("Text5: ");
+                    ImGui.TextUnformatted("HighlightedAutoTranslateOptionColorSuffix: ");
                     ImGui.SameLine();
-                    ImGuiHelpers.SeStringWrapped(textInputComponent->UnkText05.AsSpan()); // Service<SeStringRenderer>.Get().Draw(textInputComponent->UnkText05);
+                    ImGuiHelpers.SeStringWrapped(textInputComponent->HighlightedAutoTranslateOptionColorSuffix.AsSpan()); // Service<SeStringRenderer>.Get().Draw(textInputComponent->UnkText05);
                     break;
             }
 

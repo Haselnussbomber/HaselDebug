@@ -26,7 +26,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
-using HaselCommon.Extensions.Reflection;
+using HaselCommon.Extensions;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Utils;

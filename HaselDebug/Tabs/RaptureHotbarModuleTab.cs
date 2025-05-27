@@ -89,8 +89,8 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
                         Title = slot->CommandType switch
                         {
                             RaptureHotbarModule.HotbarSlotType.Action => _textService.GetActionName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.Item => _textService.GetItemName(slot->CommandId),
-                            RaptureHotbarModule.HotbarSlotType.EventItem => _textService.GetItemName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.Item => _textService.GetItemName(slot->CommandId).ExtractText().StripSoftHyphen(),
+                            RaptureHotbarModule.HotbarSlotType.EventItem => _textService.GetItemName(slot->CommandId).ExtractText().StripSoftHyphen(),
                             RaptureHotbarModule.HotbarSlotType.Emote => _textService.GetEmoteName(slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.Macro => GetMacroName(slot->CommandId),
                             RaptureHotbarModule.HotbarSlotType.Marker => _excelService.TryGetRow<Marker>(slot->CommandId, out var marker) ? marker.Name.ExtractText() : $"Marker#{slot->CommandId}",

@@ -1,6 +1,7 @@
 using System.Numerics;
 using Dalamud.Game.Text;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Services;
@@ -131,16 +132,16 @@ public unsafe partial class InventoryTab : DebugTab
             {
                 var itemName = _textService.GetItemName(itemId);
 
-                if (IsHighQuality(itemId))
+                if (ItemUtil.IsHighQuality(itemId))
                     itemName += " " + SeIconChar.HighQuality.ToIconString();
 
                 var itemNameSeStr = new SeStringBuilder()
-                    .PushColorType(_itemService.GetItemRarityColorType(itemId))
+                    .PushColorType(ItemUtil.GetItemRarityColorType(itemId))
                     .Append(itemName)
                     .PopColorType()
                     .ToReadOnlySeString();
 
-                _debugRenderer.DrawIcon(_itemService.GetIconId(itemId), IsHighQuality(itemId));
+                _debugRenderer.DrawIcon(_itemService.GetIconId(itemId), ItemUtil.IsHighQuality(itemId));
                 _debugRenderer.DrawPointerType(slot, typeof(InventoryItem), new NodeOptions()
                 {
                     AddressPath = new AddressPath([(nint)inventoryType, slot->Slot]),

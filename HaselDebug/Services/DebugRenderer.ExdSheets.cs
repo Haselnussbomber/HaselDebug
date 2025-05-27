@@ -2,7 +2,7 @@ using System.Linq;
 using System.Reflection;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
-using HaselCommon.Extensions.Reflection;
+using HaselCommon.Extensions;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel;

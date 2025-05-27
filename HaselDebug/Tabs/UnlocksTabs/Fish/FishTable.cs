@@ -1,4 +1,5 @@
 using System.Linq;
+using Dalamud.Utility;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Tabs.UnlocksTabs.Fish.Columns;
@@ -27,7 +28,7 @@ public unsafe partial class FishTable : Table<FishParameter>
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<FishParameter>()
-            .Where(row => row.RowId != 0 && row.Item.RowId != 0 && !string.IsNullOrEmpty(_textService.GetItemName(row.Item.RowId)))
+            .Where(row => row.RowId != 0 && row.Item.RowId != 0 && !string.IsNullOrEmpty(_textService.GetItemName(row.Item.RowId).ExtractText().StripSoftHyphen()))
             .ToList();
     }
 }

@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Text;
 using Dalamud.Interface.Utility;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
@@ -39,7 +40,7 @@ public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
         _stringBuilder.Clear();
 
         for (var i = 1; i < row.Items.Count; i++)
-            _stringBuilder.AppendLine(_textService.GetItemName(row.Items[i].RowId));
+            _stringBuilder.AppendLine(_textService.GetItemName(row.Items[i].RowId).ExtractText().StripSoftHyphen());
 
         return _stringBuilder.ToString();
     }

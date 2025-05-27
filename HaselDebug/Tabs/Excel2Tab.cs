@@ -6,7 +6,7 @@ using System.Reflection;
 using Dalamud.Game;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using HaselCommon.Extensions.Reflection;
+using HaselCommon.Extensions;
 using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;

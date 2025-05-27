@@ -1,5 +1,6 @@
 using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
@@ -50,7 +51,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         if (currencyManager->IsItemLimited(itemId))
                             ImGui.TextUnformatted(currencyManager->GetItemCountRemaining(itemId).ToString());
                         ImGui.TableNextColumn();
-                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
+                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
                     }
                 }
             }
@@ -83,7 +84,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
-                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
+                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
                     }
                 }
             }
@@ -116,7 +117,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
-                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null));
+                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
                     }
                 }
             }

@@ -26,7 +26,8 @@ public partial class ActionColumn : ColumnString<AozEntry>
 
         if (ImGui.IsItemHovered())
         {
-            using var _ = SeStringBuilderHelper.Rent(out var sb);
+            using var rssb = new RentedSeStringBuilder();
+            var sb = rssb.Builder;
             sb.Append(entry.AozActionTransient.Description);
             sb.AppendNewLine();
             sb.Append(entry.AozActionTransient.Stats);
