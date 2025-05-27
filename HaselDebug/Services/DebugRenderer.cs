@@ -278,6 +278,122 @@ public unsafe partial class DebugRenderer
                     };
                 }
             }
+            else if (Inherits<AtkResNode>(type))
+            {
+                switch (((AtkResNode*)address)->GetNodeType())
+                {
+                    case NodeType.Image:
+                        type = typeof(AtkImageNode);
+                        break;
+                    case NodeType.Text:
+                        type = typeof(AtkTextNode);
+                        break;
+                    case NodeType.NineGrid:
+                        type = typeof(AtkNineGridNode);
+                        break;
+                    case NodeType.Counter:
+                        type = typeof(AtkCounterNode);
+                        break;
+                    case NodeType.Collision:
+                        type = typeof(AtkCollisionNode);
+                        break;
+                    case NodeType.ClippingMask:
+                        type = typeof(AtkClippingMaskNode);
+                        break;
+                    case NodeType.Component:
+                        type = typeof(AtkComponentNode);
+                        break;
+                }
+            }
+            else if (Inherits<AtkComponentBase>(type))
+            {
+                var compBase = (AtkComponentBase*)address;
+                if (compBase->UldManager.ResourceFlags.HasFlag(AtkUldManagerResourceFlag.Initialized) &&
+                    compBase->UldManager.BaseType == AtkUldManagerBaseType.Component)
+                {
+                    switch (((AtkUldComponentInfo*)compBase->UldManager.Objects)->ComponentType)
+                    {
+                        case ComponentType.Base:
+                            type = typeof(AtkComponentBase);
+                            break;
+                        case ComponentType.Button:
+                            type = typeof(AtkComponentButton);
+                            break;
+                        case ComponentType.Window:
+                            type = typeof(AtkComponentWindow);
+                            break;
+                        case ComponentType.CheckBox:
+                            type = typeof(AtkComponentCheckBox);
+                            break;
+                        case ComponentType.RadioButton:
+                            type = typeof(AtkComponentRadioButton);
+                            break;
+                        case ComponentType.GaugeBar:
+                            type = typeof(AtkComponentGaugeBar);
+                            break;
+                        case ComponentType.Slider:
+                            type = typeof(AtkComponentSlider);
+                            break;
+                        case ComponentType.TextInput:
+                            type = typeof(AtkComponentTextInput);
+                            break;
+                        case ComponentType.NumericInput:
+                            type = typeof(AtkComponentNumericInput);
+                            break;
+                        case ComponentType.List:
+                            type = typeof(AtkComponentList);
+                            break;
+                        case ComponentType.DropDownList:
+                            type = typeof(AtkComponentDropDownList);
+                            break;
+                        case ComponentType.Tab:
+                            type = typeof(AtkComponentTab);
+                            break;
+                        case ComponentType.TreeList:
+                            type = typeof(AtkComponentTreeList);
+                            break;
+                        case ComponentType.ScrollBar:
+                            type = typeof(AtkComponentScrollBar);
+                            break;
+                        case ComponentType.ListItemRenderer:
+                            type = typeof(AtkComponentListItemRenderer);
+                            break;
+                        case ComponentType.Icon:
+                            type = typeof(AtkComponentIcon);
+                            break;
+                        case ComponentType.IconText:
+                            type = typeof(AtkComponentIconText);
+                            break;
+                        case ComponentType.DragDrop:
+                            type = typeof(AtkComponentDragDrop);
+                            break;
+                        case ComponentType.GuildLeveCard:
+                            type = typeof(AtkComponentGuildLeveCard);
+                            break;
+                        case ComponentType.TextNineGrid:
+                            type = typeof(AtkComponentTextNineGrid);
+                            break;
+                        case ComponentType.JournalCanvas:
+                            type = typeof(AtkComponentJournalCanvas);
+                            break;
+                        case ComponentType.Multipurpose:
+                            type = typeof(AtkComponentMultipurpose);
+                            break;
+                        case ComponentType.Map:
+                            type = typeof(AtkComponentMap);
+                            break;
+                        case ComponentType.Preview:
+                            type = typeof(AtkComponentPreview);
+                            break;
+                        case ComponentType.HoldButton:
+                            type = typeof(AtkComponentHoldButton);
+                            break;
+                        case ComponentType.Portrait:
+                            type = typeof(AtkComponentPortrait);
+                            break;
+                    }
+                }
+            }
 
             nodeOptions = nodeOptions with
             {
@@ -460,7 +576,7 @@ public unsafe partial class DebugRenderer
             .Where(fieldInfo => !fieldInfo.IsLiteral) // no constants
             .Where(fieldInfo => !fieldInfo.IsStatic);
 
-        using var disabled = ImRaii.Disabled(fields.Count() == 0);
+        using var disabled = ImRaii.Disabled(!fields.Any());
         using var node = DrawTreeNode(nodeOptions.WithSeStringTitleIfNull(type.FullName ?? "Unknown Type Name"));
 
         if (ImGui.IsItemHovered())
