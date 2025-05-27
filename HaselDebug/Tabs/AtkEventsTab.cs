@@ -82,12 +82,12 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
         ImGui.SameLine();
         if (ImGui.Button("Clear")) _events.Clear();
 
-        using var table = ImRaii.Table("EventTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg);
+        using var table = ImRaii.Table("EventTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable);
         if (!table) return;
 
         ImGui.TableSetupColumn("Time", ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed, 150);
-        ImGui.TableSetupColumn("Event", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("EventData", ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
@@ -104,7 +104,35 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
             ImGui.TextUnformatted(eventType.ToString() + (Enum.GetName(eventType) != null ? $" ({(int)eventType})" : string.Empty));
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawPointerType(evt, typeof(AtkEventDispatcher.Event), new NodeOptions() { AddressPath = new(i) });
+
+            if ((int)eventType is >= (int)AtkEventType.MouseDown and <= (int)AtkEventType.MouseDoubleClick)
+            {
+                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkMouseData), new NodeOptions() { AddressPath = new(i) });
+            }
+            else if ((int)eventType is >= (int)AtkEventType.InputReceived and <= (int)AtkEventType.InputNavigation)
+            {
+                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkInputData), new NodeOptions() { AddressPath = new(i) });
+            }
+            else if ((int)eventType is >= (int)AtkEventType.ListItemRollOver and <= (int)AtkEventType.ListItemSelect)
+            {
+                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkListItemData), new NodeOptions() { AddressPath = new(i) });
+            }
+            else if ((int)eventType is >= (int)AtkEventType.DragDropBegin and <= (int)AtkEventType.DragDropCancel)
+            {
+                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkDragDropData), new NodeOptions() { AddressPath = new(i) });
+            }
+            else if (eventType == AtkEventType.ChildAddonAttached)
+            {
+                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkAddonControlData), new NodeOptions() { AddressPath = new(i) });
+            }
+            else if ((int)eventType is >= (int)AtkEventType.LinkMouseClick and <= (int)AtkEventType.LinkMouseOut)
+            {
+                _debugRenderer.DrawPointerType(evt + 0x8, typeof(LinkData), new NodeOptions() { AddressPath = new(i) });
+            }
+            else
+            {
+                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData), new NodeOptions() { AddressPath = new(i) });
+            }
         }
     }
 }
