@@ -1,5 +1,4 @@
 using System.Numerics;
-using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.System.Input;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -12,8 +11,6 @@ namespace HaselDebug.Tabs;
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class InputTab : DebugTab
 {
-    private readonly ISigScanner _sigScanner;
-
     public override bool DrawInChild => true;
 
     public override void Draw()
@@ -117,48 +114,6 @@ public unsafe partial class InputTab : DebugTab
     {
         using var tab = ImRaii.TabItem("Inputs");
         if (!tab) return;
-
-        /*
-        var strings = (byte**)(_sigScanner.Module.BaseAddress + 0x2716980);
-
-        if (ImGui.Button("Copy enum to clipboard"))
-        {
-            var sb = new StringBuilder();
-            var lastLineWasEmpty = false;
-
-            sb.AppendLine("public enum InputId {");
-
-            for (var i = 0; i < 675; i++)
-            {
-                var name = strings[i] != null ? new ReadOnlySeStringSpan(strings[i]).ExtractText() : string.Empty;
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    if (!lastLineWasEmpty)
-                    {
-                        sb.AppendLine();
-                        lastLineWasEmpty = true;
-                    }
-                }
-                else
-                {
-                    for (var j = 0; j < 10; j++)
-                    {
-                        if (name == j.ToString())
-                        {
-                            name = $"/// <remarks>NUM_ prefix was added for C# enum compatibility</remarks>\n    NUM_{name}";
-                            break;
-                        }
-                    }
-                    sb.AppendLine($"    {name} = {i},");
-                    lastLineWasEmpty = false;
-                }
-            }
-
-            sb.AppendLine("}");
-
-            ImGui.SetClipboardText(sb.ToString());
-        }
-        */
 
         using var table = ImRaii.Table("InputsTable", 6, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.ScrollY);
         if (!table) return;
