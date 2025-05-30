@@ -257,6 +257,7 @@ public unsafe partial class DebugRenderer
                         {
                             PublicContentDirectorType.Bozja => typeof(PublicContentBozja),
                             PublicContentDirectorType.Eureka => typeof(PublicContentEureka),
+                            PublicContentDirectorType.OccultCrescent => typeof(PublicContentOccultCrescent),
                             _ => typeof(PublicContentDirector)
                         };
                         additionalName = ((PublicContentDirector*)address)->Type.ToString();
