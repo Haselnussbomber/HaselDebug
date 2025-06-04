@@ -24,7 +24,6 @@ public class Plugin : IDalamudPlugin
     {
         _pluginInterface = pluginInterface;
 
-#if HAS_LOCAL_CS
         FFXIVClientStructs.Interop.Generated.Addresses.Register();
         Addresses.Register();
         Resolver.GetInstance.Setup(
@@ -32,7 +31,6 @@ public class Plugin : IDalamudPlugin
             dataManager.GameData.Repositories["ffxiv"].Version,
             new FileInfo(Path.Join(pluginInterface.ConfigDirectory.FullName, "SigCache.json")));
         Resolver.GetInstance.Resolve();
-#endif
 
         Service.Collection
             .AddDalamud(pluginInterface)

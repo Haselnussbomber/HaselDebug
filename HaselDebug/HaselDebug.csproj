@@ -3,7 +3,14 @@
   <PropertyGroup>
     <Version>1.24.1</Version>
     <OutputPath>..\bin\</OutputPath>
+    <Use_Dalamud_FFXIVClientStructs>false</Use_Dalamud_FFXIVClientStructs>
+    <InteropGenerator_InteropNamespace>HaselDebug</InteropGenerator_InteropNamespace>
+    <DefineConstants>AUTOCTOR_EMBED_ATTRIBUTES</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Translations.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Reloaded.Assembler" Private="false" />
@@ -13,31 +20,16 @@
     <Reference Include="SharpDX.Mathematics" Private="false" />
   </ItemGroup>
 
-  <ItemGroup Condition="!Exists('$(ProjectDir)..\FFXIVClientStructs')">
-    <Reference Include="InteropGenerator.Runtime" Private="false" />
-    <Reference Include="FFXIVClientStructs" Private="false" />
+  <ItemGroup>
+    <PackageReference Include="AutoCtor" Version="2.8.1" PrivateAssets="all" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="Injectio" Version="5.0.0" PrivateAssets="all" />
   </ItemGroup>
 
-  <PropertyGroup Condition="Exists('$(ProjectDir)..\FFXIVClientStructs')">
-    <Use_Dalamud_FFXIVClientStructs>false</Use_Dalamud_FFXIVClientStructs>
-    <InteropGenerator_InteropNamespace>HaselDebug</InteropGenerator_InteropNamespace>
-    <DefineConstants>HAS_LOCAL_CS</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup Condition="Exists('$(ProjectDir)..\FFXIVClientStructs')">
+  <ItemGroup>
     <CompilerVisibleProperty Include="InteropGenerator_InteropNamespace" />
     <ProjectReference Include="..\FFXIVClientStructs\InteropGenerator\InteropGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\FFXIVClientStructs\FFXIVClientStructs\FFXIVClientStructs.csproj" Private="True" />
     <ProjectReference Include="..\FFXIVClientStructs\InteropGenerator.Runtime\InteropGenerator.Runtime.csproj" Private="True" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Translations.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AutoCtor" Version="2.8.1" PrivateAssets="all" />
-    <PackageReference Include="Injectio" Version="5.0.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
