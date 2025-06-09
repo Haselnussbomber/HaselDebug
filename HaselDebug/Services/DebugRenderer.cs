@@ -488,50 +488,6 @@ public unsafe partial class DebugRenderer
         ImGui.TextUnformatted("Unsupported Type");
     }
 
-    private bool Inherits<T>(Type pointerType) where T : struct
-    {
-        var targetType = typeof(T);
-        var currentType = pointerType;
-
-        if (currentType == targetType)
-            return true;
-
-        do
-        {
-            var attributes = currentType.GetCustomAttributes();
-            var inheritedTypeFound = false;
-
-            foreach (var attr in attributes)
-            {
-                var attrType = attr.GetType();
-
-                if (!attrType.IsGenericType)
-                    continue;
-
-                if (attrType.GetGenericTypeDefinition() != typeof(InheritsAttribute<>))
-                    continue;
-
-                var parentOffsetProperty = attrType.GetProperty("ParentOffset", BindingFlags.Instance | BindingFlags.Public);
-                if (parentOffsetProperty == null || parentOffsetProperty.GetValue(attr) is null or (not 0))
-                    continue;
-
-                var attrStructType = attrType.GenericTypeArguments[0]!;
-                if (attrStructType == currentType)
-                    continue;
-
-                currentType = attrStructType;
-                inheritedTypeFound = true;
-                break;
-            }
-
-            if (!inheritedTypeFound)
-                break;
-
-        } while (currentType != targetType);
-
-        return currentType == targetType;
-    }
-
     public ImRaii.IEndObject DrawTreeNode(NodeOptions nodeOptions)
     {
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (nodeOptions.TitleColor ?? ColorTreeNode).ToUInt());
@@ -800,7 +756,7 @@ public unsafe partial class DebugRenderer
             DrawFieldName(fieldInfo);
 
             if (fieldType.IsPointer && fieldAddress != 0)
-                HighlightNode(fieldAddress, fieldType, ref fieldNodeOptions);
+                fieldNodeOptions = fieldNodeOptions.WithHighlightNode(*(nint*)fieldAddress, fieldType);
 
             DrawPointerType(fieldAddress, fieldType, fieldNodeOptions);
         }
@@ -863,62 +819,6 @@ public unsafe partial class DebugRenderer
         }
 
         ImGui.SameLine();
-    }
-
-    public void HighlightNode(nint fieldAddress, Type fieldType, ref NodeOptions fieldNodeOptions)
-    {
-        if (fieldType == typeof(AtkResNode*) || fieldType == typeof(Pointer<AtkResNode>) ||
-            fieldType == typeof(AtkCollisionNode*) || fieldType == typeof(Pointer<AtkCollisionNode>) ||
-            fieldType == typeof(AtkComponentNode*) || fieldType == typeof(Pointer<AtkComponentNode>) ||
-            fieldType == typeof(AtkCounterNode*) || fieldType == typeof(Pointer<AtkCounterNode>) ||
-            fieldType == typeof(AtkImageNode*) || fieldType == typeof(Pointer<AtkImageNode>) ||
-            fieldType == typeof(AtkNineGridNode*) || fieldType == typeof(Pointer<AtkNineGridNode>) ||
-            fieldType == typeof(AtkTextNode*) || fieldType == typeof(Pointer<AtkTextNode>))
-        {
-            fieldNodeOptions = fieldNodeOptions with
-            {
-                OnHovered = () => HighlightNode(*(AtkResNode**)fieldAddress)
-            };
-        }
-        else if (fieldType == typeof(AtkComponentButton*) || fieldType == typeof(Pointer<AtkComponentButton>) ||
-            fieldType == typeof(AtkComponentRadioButton*) || fieldType == typeof(Pointer<AtkComponentRadioButton>) ||
-            fieldType == typeof(AtkComponentDragDrop*) || fieldType == typeof(Pointer<AtkComponentDragDrop>) ||
-            fieldType == typeof(AtkComponentDropDownList*) || fieldType == typeof(Pointer<AtkComponentDropDownList>) ||
-            fieldType == typeof(AtkComponentGaugeBar*) || fieldType == typeof(Pointer<AtkComponentGaugeBar>) ||
-            fieldType == typeof(AtkComponentGuildLeveCard*) || fieldType == typeof(Pointer<AtkComponentGuildLeveCard>) ||
-            fieldType == typeof(AtkComponentIcon*) || fieldType == typeof(Pointer<AtkComponentIcon>) ||
-            fieldType == typeof(AtkComponentIconText*) || fieldType == typeof(Pointer<AtkComponentIconText>) ||
-            fieldType == typeof(AtkComponentInputBase*) || fieldType == typeof(Pointer<AtkComponentInputBase>) ||
-            fieldType == typeof(AtkComponentJournalCanvas*) || fieldType == typeof(Pointer<AtkComponentJournalCanvas>) ||
-            fieldType == typeof(AtkComponentList*) || fieldType == typeof(Pointer<AtkComponentList>) ||
-            fieldType == typeof(AtkComponentPortrait*) || fieldType == typeof(Pointer<AtkComponentPortrait>) ||
-            fieldType == typeof(AtkComponentScrollBar*) || fieldType == typeof(Pointer<AtkComponentScrollBar>) ||
-            fieldType == typeof(AtkComponentSlider*) || fieldType == typeof(Pointer<AtkComponentSlider>) ||
-            fieldType == typeof(AtkComponentTextNineGrid*) || fieldType == typeof(Pointer<AtkComponentTextNineGrid>) ||
-            fieldType == typeof(AtkComponentWindow*) || fieldType == typeof(Pointer<AtkComponentWindow>))
-        {
-            fieldNodeOptions = fieldNodeOptions with
-            {
-                OnHovered = () =>
-                {
-                    var component = *(AtkComponentBase**)fieldAddress;
-                    if (component == null || component->AtkResNode == null)
-                        return;
-
-                    HighlightNode(component->AtkResNode);
-                }
-            };
-        }
-    }
-
-    public void HighlightNode(AtkResNode* node)
-    {
-        if (node == null)
-            return;
-
-        var pos = new Vector2(node->ScreenX, node->ScreenY);
-        var size = new Vector2(node->Width, node->Height);
-        ImGui.GetForegroundDrawList().AddRect(pos, pos + size, Color.Gold.ToUInt());
     }
 
     private void DrawEnum(nint address, Type type, NodeOptions nodeOptions)

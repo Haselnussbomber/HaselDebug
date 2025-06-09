@@ -6,6 +6,7 @@
     <Use_Dalamud_FFXIVClientStructs>false</Use_Dalamud_FFXIVClientStructs>
     <InteropGenerator_InteropNamespace>HaselDebug</InteropGenerator_InteropNamespace>
     <DefineConstants>AUTOCTOR_EMBED_ATTRIBUTES</DefineConstants>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

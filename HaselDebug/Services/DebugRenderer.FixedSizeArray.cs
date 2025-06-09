@@ -70,7 +70,7 @@ public unsafe partial class DebugRenderer
 
             ImGui.TableNextColumn(); // Value
             var entryNodeOptions = new NodeOptions() { AddressPath = entryAddressPath, IsIconIdField = nodeOptions.IsIconIdField };
-            HighlightNode(entryAddress, fieldType, ref entryNodeOptions);
+            entryNodeOptions = entryNodeOptions.WithHighlightNode(entryAddress, fieldType);
             DrawPointerType(entryAddress, fieldType, entryNodeOptions);
         }
     }

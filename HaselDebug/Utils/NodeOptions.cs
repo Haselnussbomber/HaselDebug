@@ -1,4 +1,5 @@
 using Dalamud.Game;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using ImGuiNET;
@@ -56,6 +57,34 @@ public record struct NodeOptions
     public NodeOptions WithSeStringTitleIfNull(ReadOnlySeString title)
         => SeStringTitle == null && Title == null ? this with { SeStringTitle = title } : this;
 
+    public unsafe NodeOptions WithHighlightNode(nint nodeAddress, Type nodeType)
+    {
+        if (Inherits<AtkResNode>(nodeType))
+        {
+            return this with
+            {
+                OnHovered = () =>
+                {
+                    HighlightNode((AtkResNode*)nodeAddress);
+                }
+            };
+        }
+        else if (Inherits<AtkComponentBase>(nodeType))
+        {
+            return this with
+            {
+                OnHovered = () =>
+                {
+                    var component = (AtkComponentBase*)nodeAddress;
+                    if (component != null && component->AtkResNode != null)
+                        HighlightNode(component->AtkResNode);
+                }
+            };
+        }
+
+        return this;
+    }
+
     public NodeOptions ConsumeTreeNodeOptions()
         => this with
         {
@@ -69,9 +98,4 @@ public record struct NodeOptions
         };
 
     public string GetKey(string prefix) => $"###{prefix}{AddressPath}";
-
-    internal NodeOptions WithSeStringTitle(object value)
-    {
-        throw new NotImplementedException();
-    }
 }
