@@ -240,7 +240,7 @@ public unsafe partial class AtkDebugRenderer
 
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
-            Title = $"{treePrefix}[Id: {node->NodeId}] {node->Type} Node (0x{(nint)node:X})",
+            Title = $"{treePrefix}[#{node->NodeId}] {node->Type} Node (0x{(nint)node:X})",
             TitleColor = node->IsVisible() ? Color.Green : Color.Grey,
             DrawContextMenu = (nodeOptions, builder) =>
             {
@@ -270,7 +270,13 @@ public unsafe partial class AtkDebugRenderer
         ImGui.SameLine();
         _debugRenderer.DrawPointerType((nint)node, typeof(AtkResNode), nodeOptions);
 
-        PrintResNodeInfo(node);
+        ImGui.TextUnformatted("NodeId:");
+        ImGui.SameLine();
+        _debugRenderer.DrawNumeric(node->NodeId, typeof(uint), new NodeOptions() { HexOnShift = true });
+
+        PrintProperties(node);
+        PrintLabelSets(node);
+        // TODO: Timeline Frames
 
         if (node->ChildNode != null)
             PrintNode(node->ChildNode, true, string.Empty, nodeOptions);
@@ -291,7 +297,7 @@ public unsafe partial class AtkDebugRenderer
 
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
-            Title = $"{treePrefix}[Id: {node->NodeId}] {objectInfo->ComponentType} Component Node (Node: 0x{(nint)node:X}, Component: 0x{(nint)component:X})###{nodeOptions.GetKey("ComponentNode")}",
+            Title = $"{treePrefix}[#{node->NodeId}] {objectInfo->ComponentType} Component Node (Node: 0x{(nint)node:X}, Component: 0x{(nint)component:X})###{nodeOptions.GetKey("ComponentNode")}",
             TitleColor = node->IsVisible() ? Color.Green : Color.Grey,
             DrawContextMenu = (nodeOptions, builder) =>
             {
@@ -316,19 +322,27 @@ public unsafe partial class AtkDebugRenderer
         if (!treeNode)
             return;
 
-        ImGui.TextUnformatted("Node: ");
+        ImGui.TextUnformatted("Node:");
         ImGui.SameLine();
         _debugRenderer.DrawAddress(node);
         ImGui.SameLine();
-        _debugRenderer.DrawPointerType((nint)node, typeof(AtkComponentNode), nodeOptions.WithAddress((nint)node));
+        _debugRenderer.DrawPointerType((nint)node, typeof(AtkComponentNode), nodeOptions.WithAddress(1));
 
-        ImGui.TextUnformatted("Component: ");
+        ImGui.TextUnformatted("Component:");
         ImGui.SameLine();
         _debugRenderer.DrawAddress(component);
         ImGui.SameLine();
         _debugRenderer.DrawPointerType((nint)component, typeof(AtkComponentBase), nodeOptions.WithAddress(2));
 
-        PrintResNodeInfo(resNode);
+        ImGuiUtilsEx.PrintFieldValuePairs(
+            ("NodeId", node->NodeId.ToString()),
+            ("NodeType", node->Type.ToString())
+        );
+
+        PrintProperties(resNode);
+        PrintLabelSets(resNode);
+        // TODO: Timeline Frames
+
         PrintNode(component->UldManager.RootNode, true, string.Empty, nodeOptions);
 
         ImGui.PushStyleColor(ImGuiCol.Text, 0xFFFFAAAA);
@@ -349,12 +363,70 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
-    private void PrintResNodeInfo(AtkResNode* node)
+    private void PrintLabelSets(AtkResNode* node)
     {
-        ImGui.TextUnformatted("NodeId:");
-        ImGui.SameLine();
-        _debugRenderer.DrawNumeric(node->NodeId, typeof(uint), new NodeOptions() { HexOnShift = true });
+        if (node == null ||
+            node->Timeline == null ||
+            node->Timeline->Resource == null ||
+            node->Timeline->Resource->LabelSetCount == 0 ||
+            node->Timeline->Resource->LabelSets == null)
+        {
+            return;
+        }
 
+        using var treeNode = ImRaii.TreeNode("Label Sets", ImGuiTreeNodeFlags.SpanAvailWidth);
+        if (!treeNode) return;
+
+        var labelSets = node->Timeline->Resource->LabelSets;
+
+        ImGuiUtilsEx.PrintFieldValuePairs(
+            ("StartFrameIdx", labelSets->StartFrameIdx.ToString()),
+            ("EndFrameIdx", labelSets->EndFrameIdx.ToString()));
+
+        var keyFrameGroup = labelSets->LabelKeyGroup;
+
+        using var table = ImRaii.Table("LabelSetKeyFrameTable", 7, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoHostExtendX);
+        if (!table) return;
+
+        ImGui.TableSetupColumn("Frame ID", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Speed Start", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Speed End", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Interpolation", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Label ID", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Jump Behavior", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Target Label ID", ImGuiTableColumnFlags.WidthFixed);
+
+        ImGui.TableHeadersRow();
+
+        for (var i = 0; i < keyFrameGroup.KeyFrameCount; i++)
+        {
+            var keyFrame = keyFrameGroup.KeyFrames[i];
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{keyFrame.FrameIdx}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{keyFrame.SpeedCoefficient1:F2}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{keyFrame.SpeedCoefficient2:F2}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{keyFrame.Interpolation}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{keyFrame.Value.Label.LabelId}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{keyFrame.Value.Label.JumpBehavior}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{keyFrame.Value.Label.JumpLabelId}");
+        }
+    }
+
+    private void PrintProperties(AtkResNode* node)
+    {
         using var treeNode = ImRaii.TreeNode("Properties", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!treeNode) return;
 
@@ -464,9 +536,9 @@ public unsafe partial class AtkDebugRenderer
 
                 StartRow("Font Size");
                 var fontSize = (int)textNode->FontSize;
-                if (ImGui.DragInt("##FontSize", ref fontSize, 1, 0, int.MaxValue))
+                if (ImGui.InputInt("##FontSize", ref fontSize))
                 {
-                    textNode->FontSize = (byte)fontSize;
+                    textNode->FontSize = (byte)(fontSize < 0 ? 0 : fontSize > byte.MaxValue ? byte.MaxValue : fontSize);
                 }
 
                 StartRow("Text Color");
@@ -523,6 +595,23 @@ public unsafe partial class AtkDebugRenderer
                 }
                 break;
 
+            case NodeType.Collision:
+                var collNode = (AtkCollisionNode*)node;
+                StartRow("CollisionType");
+                var collisionType = (CollisionType)collNode->CollisionType;
+                if (ImGuiUtilsEx.EnumCombo("##CollisionType", ref collisionType))
+                {
+                    collNode->CollisionType = (ushort)collisionType;
+                }
+
+                StartRow("Uses");
+                var uses = (int)collNode->Uses;
+                if (ImGui.InputInt("##Uses", ref uses))
+                {
+                    collNode->Uses = (ushort)(uses < 0 ? 0 : uses > ushort.MaxValue ? ushort.MaxValue : uses);
+                }
+                break;
+
             case NodeType.ClippingMask:
                 var cmNode = (AtkClippingMaskNode*)node;
                 StartRow("Asset");
@@ -531,6 +620,38 @@ public unsafe partial class AtkDebugRenderer
                 {
                     cmNode->PartId = (ushort)partId;
                     cmNode->DrawFlags |= 1;
+                }
+                break;
+
+            case NodeType.Component:
+                var componentNode = (AtkComponentNode*)node;
+                var component = componentNode->Component;
+                if (component != null && 
+                    component->UldManager.ResourceFlags.HasFlag(AtkUldManagerResourceFlag.Initialized) &&
+                    component->UldManager.BaseType == AtkUldManagerBaseType.Component)
+                {
+                    switch (((AtkUldComponentInfo*)component->UldManager.Objects)->ComponentType)
+                    {
+                        /*
+                        case ComponentType.Icon:
+                            var iconComp = (AtkComponentIcon*)component;
+                            StartRow("IconId");
+                            var iconId = (int)iconComp->IconId;
+                            if (ImGui.InputInt("##IconId", ref iconId))
+                            {
+                                iconComp->LoadIcon((uint)(iconId < 0 ? 0 : iconId > ushort.MaxValue ? ushort.MaxValue : iconId));
+                            }
+
+                            StartRow("Flags");
+                            var iconFlags = iconComp->Flags;
+                            if (ImGuiUtilsEx.EnumCombo("##IconFlags", ref iconFlags, true))
+                            {
+                                iconComp->Flags = iconFlags;
+                                iconComp->UpdateIndicator();
+                            }
+                            break;
+                        */
+                    }
                 }
                 break;
         }
