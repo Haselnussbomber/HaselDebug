@@ -518,7 +518,10 @@ public unsafe partial class AtkDebugRenderer
             case NodeType.Text:
                 var textNode = (AtkTextNode*)node;
                 StartRow("Text");
-                _debugRenderer.DrawSeString(textNode->NodeText.AsSpan(), true, new NodeOptions() { AddressPath = new((nint)node) }); // TODO: make editable
+                _debugRenderer.DrawSeString(textNode->NodeText.AsSpan(), true, new NodeOptions() {
+                    AddressPath = new((nint)node),
+                    DrawSeStringTreeNode = false,
+                }); // TODO: make editable
 
                 StartRow("Alignment");
                 var alignmentType = textNode->AlignmentType;
@@ -581,7 +584,11 @@ public unsafe partial class AtkDebugRenderer
             case NodeType.Counter:
                 var counterNode = (AtkCounterNode*)node;
                 StartRow("Text");
-                _debugRenderer.DrawSeString(counterNode->NodeText.AsSpan(), true, new NodeOptions() { AddressPath = new((nint)node) }); // TODO: make editable
+                _debugRenderer.DrawSeString(counterNode->NodeText.AsSpan(), true, new NodeOptions()
+                {
+                    AddressPath = new((nint)node),
+                    DrawSeStringTreeNode = false,
+                }); // TODO: make editable
                 break;
 
             case NodeType.NineGrid:
