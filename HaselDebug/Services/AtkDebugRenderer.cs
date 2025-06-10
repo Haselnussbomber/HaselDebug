@@ -20,6 +20,7 @@ public unsafe partial class AtkDebugRenderer
     private readonly DebugRenderer _debugRenderer;
     private readonly TextService _textService;
     private readonly WindowManager _windowManager;
+    private string _nodeQuery = string.Empty;
 
     public void DrawAddon(string addonName, bool border = true)
     {
@@ -186,9 +187,23 @@ public unsafe partial class AtkDebugRenderer
             {
                 ImGui.PopStyleColor();
 
+                ImGui.InputTextWithHint("##NodeSearch", _textService.Translate("SearchBar.Hint"), ref _nodeQuery, 256, ImGuiInputTextFlags.AutoSelectAll);
+
                 var j = 0;
                 foreach (var node in unitBase->UldManager.Nodes)
                 {
+                    if (node == null)
+                    {
+                        j++;
+                        continue;
+                    }
+
+                    if (!IsNodeMatchingSearch(node))
+                    {
+                        j++;
+                        continue;
+                    }
+
                     PrintNode(node, false, $"[{j++}] ", nodeOptions with { DefaultOpen = false });
                 }
 
@@ -199,6 +214,39 @@ public unsafe partial class AtkDebugRenderer
                 ImGui.PopStyleColor();
             }
         }
+    }
+
+    private bool IsNodeMatchingSearch(AtkResNode* node)
+    {
+        if (string.IsNullOrEmpty(_nodeQuery))
+            return true;
+
+        if (("0x" + ((nint)node).ToString("X")).Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        if (node->NodeId.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        if (node->GetNodeType().ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        if (node->Type.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        if (node->GetNodeType() == NodeType.Component)
+        {
+            var componentNode = (AtkComponentNode*)node;
+            var component = componentNode->Component;
+            if (component != null &&
+                component->UldManager.ResourceFlags.HasFlag(AtkUldManagerResourceFlag.Initialized) &&
+                component->UldManager.BaseType == AtkUldManagerBaseType.Component &&
+                ((AtkUldComponentInfo*)component->UldManager.Objects)->ComponentType.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void DrawNode(AtkResNode* node)
@@ -633,7 +681,7 @@ public unsafe partial class AtkDebugRenderer
             case NodeType.Component:
                 var componentNode = (AtkComponentNode*)node;
                 var component = componentNode->Component;
-                if (component != null && 
+                if (component != null &&
                     component->UldManager.ResourceFlags.HasFlag(AtkUldManagerResourceFlag.Initialized) &&
                     component->UldManager.BaseType == AtkUldManagerBaseType.Component)
                 {
