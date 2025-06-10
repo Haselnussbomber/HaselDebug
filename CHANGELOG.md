@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [7028ecae](https://github.com/aers/FFXIVClientStructs/tree/7028ecae) ([compare](https://github.com/aers/FFXIVClientStructs/compare/3d53c797..7028ecae)).
+
 ## [1.24.2] (2025-06-04)
 
 - **Added:** Type redirect for PublicContentOccultCrescent.
