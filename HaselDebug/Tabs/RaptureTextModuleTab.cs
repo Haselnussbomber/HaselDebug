@@ -427,7 +427,12 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
         if (_inspectorWindow == null)
         {
-            _inspectorWindow = _windowManager.CreateOrOpen("StringMaker Preview", () => new SeStringInspectorWindow(_serviceProvider, "", _languageProvider.ClientLanguage, "StringMaker Preview"));
+            _inspectorWindow = _windowManager.CreateOrOpen("StringMaker Preview", () => new SeStringInspectorWindow(_serviceProvider)
+            {
+                String = "",
+                Language = _languageProvider.ClientLanguage,
+                WindowName = "StringMaker Preview",
+            });
             UpdateInspectorString();
         }
 

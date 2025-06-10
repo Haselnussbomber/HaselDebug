@@ -5,20 +5,25 @@ using Dalamud.Game;
 using Dalamud.Game.Text.Evaluator;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
+using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselCommon.Services;
+using HaselCommon.Utils;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Text.Expressions;
+using Lumina.Text.Parse;
 using Lumina.Text.ReadOnly;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Windows;
 
 [AutoConstruct]
-public partial class SeStringInspectorWindow : SimpleWindow
+public unsafe partial class SeStringInspectorWindow : SimpleWindow
 {
     private readonly IServiceProvider _serviceProvider;
 
@@ -27,34 +32,44 @@ public partial class SeStringInspectorWindow : SimpleWindow
     private SeStringEvaluator _seStringEvaluator;
 
     private SeStringParameter[]? _localParameters = null;
-    private ReadOnlySeString _string;
+    private string _macroString = string.Empty;
 
     public ReadOnlySeString String
     {
-        get => _string;
+        get;
         set
         {
-            _string = value;
+            field = value;
             _localParameters = null;
         }
     }
 
+    public ReadOnlySeStringSpan StringSpan => IsValidUtf8String ? Utf8String->AsSpan() : String.AsSpan();
+
     public ClientLanguage Language { get; set; }
 
-    [AutoPostConstruct]
-    private void Initialize(ReadOnlySeString str, ClientLanguage language, string windowName)
+    public AtkResNode* Node { get; set; }
+    public Utf8String* Utf8String
     {
-        Language = language;
-        String = str;
+        get;
+        set
+        {
+            field = value;
+            _macroString = value != null ? new ReadOnlySeStringSpan(value->AsSpan()).ToString() : string.Empty;
+        }
+    }
 
+    public bool IsValidUtf8String
+        => Node != null &&
+            Utf8String != null &&
+            RaptureAtkUnitManager.Instance()->GetAddonByNode(Node) != null;
+
+    [AutoPostConstruct]
+    private void Initialize()
+    {
         _windowManager = _serviceProvider.GetRequiredService<WindowManager>();
         _debugRenderer = _serviceProvider.GetRequiredService<DebugRenderer>();
         _seStringEvaluator = _serviceProvider.GetRequiredService<SeStringEvaluator>();
-
-        if (string.IsNullOrEmpty(windowName))
-            windowName = "SeString";
-
-        WindowName = $"{windowName.Replace("\n", "")}##{GetType().Name}";
     }
 
     public override void OnOpen()
@@ -91,9 +106,20 @@ public partial class SeStringInspectorWindow : SimpleWindow
 
     public override void Draw()
     {
-        _localParameters ??= GetLocalParameters(String.AsSpan(), []);
+        if (IsValidUtf8String)
+        {
+            ImGui.SetNextItemWidth(-1);
+            if (ImGui.InputText("MacroString", ref _macroString, 1024, ImGuiInputTextFlags.EnterReturnsTrue))
+            {
+                using var rssb = new RentedSeStringBuilder();
+                rssb.Builder.Append(ReadOnlySeString.FromMacroString(_macroString, new MacroStringParseOptions { ExceptionMode = MacroStringParseExceptionMode.Ignore }));
+                Utf8String->SetString(rssb.Builder.GetViewAsSpan());
+            }
+        }
 
-        var evaluated = _seStringEvaluator.Evaluate(String.AsSpan(), _localParameters, Language);
+        _localParameters ??= GetLocalParameters(StringSpan, []);
+
+        var evaluated = _seStringEvaluator.Evaluate(StringSpan, _localParameters, Language);
 
         DrawPreview(evaluated);
 
@@ -151,7 +177,7 @@ public partial class SeStringInspectorWindow : SimpleWindow
         using var node = _debugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(3), Title = "Payloads", TitleColor = Color.Green, DefaultOpen = true });
         if (node)
         {
-            _debugRenderer.DrawSeString(String.AsSpan(), false, new NodeOptions()
+            _debugRenderer.DrawSeString(StringSpan, false, new NodeOptions()
             {
                 RenderSeString = false,
                 DefaultOpen = true
@@ -159,7 +185,7 @@ public partial class SeStringInspectorWindow : SimpleWindow
         }
         node.Dispose();
 
-        if (String.Equals(evaluated))
+        if (IsValidUtf8String || String.Equals(evaluated))
             return;
 
         using var node2 = _debugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(4), Title = "Payloads (Evaluated)", TitleColor = Color.Green, DefaultOpen = true });

@@ -10,6 +10,7 @@ using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 using ImGuiNET;
+using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Services;
 
@@ -20,6 +21,7 @@ public unsafe partial class AtkDebugRenderer
     private readonly DebugRenderer _debugRenderer;
     private readonly TextService _textService;
     private readonly WindowManager _windowManager;
+    private readonly LanguageProvider _languageProvider;
     private string _nodeQuery = string.Empty;
 
     public void DrawAddon(string addonName, bool border = true)
@@ -566,10 +568,19 @@ public unsafe partial class AtkDebugRenderer
             case NodeType.Text:
                 var textNode = (AtkTextNode*)node;
                 StartRow("Text");
-                _debugRenderer.DrawSeString(textNode->NodeText.AsSpan(), true, new NodeOptions() {
-                    AddressPath = new((nint)node),
-                    DrawSeStringTreeNode = false,
-                }); // TODO: make editable
+                var str = new ReadOnlySeString(textNode->NodeText.AsSpan());
+                var macroCode = str.ToString();
+                if (ImGui.Selectable(str.ToString() + $"##TextNodeText{(nint)node:X}"))
+                {
+                    var windowTitle = $"Text Node #{node->NodeId} (0x{(nint)node:X})";
+                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_serviceProvider) {
+                        String = str,
+                        Language = _languageProvider.ClientLanguage,
+                        WindowName = windowTitle,
+                        Node = node,
+                        Utf8String = &textNode->NodeText,
+                    });
+                }
 
                 StartRow("Alignment");
                 var alignmentType = textNode->AlignmentType;
@@ -632,11 +643,20 @@ public unsafe partial class AtkDebugRenderer
             case NodeType.Counter:
                 var counterNode = (AtkCounterNode*)node;
                 StartRow("Text");
-                _debugRenderer.DrawSeString(counterNode->NodeText.AsSpan(), true, new NodeOptions()
+                str = new ReadOnlySeString(counterNode->NodeText.AsSpan());
+                macroCode = str.ToString();
+                if (ImGui.Selectable(str.ToString() + $"##CounterNodeText{(nint)node:X}"))
                 {
-                    AddressPath = new((nint)node),
-                    DrawSeStringTreeNode = false,
-                }); // TODO: make editable
+                    var windowTitle = $"Counter Node #{node->NodeId} (0x{(nint)node:X})";
+                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_serviceProvider)
+                    {
+                        String = str,
+                        Language = _languageProvider.ClientLanguage,
+                        WindowName = windowTitle,
+                        Node = node,
+                        Utf8String = &counterNode->NodeText,
+                    });
+                }
                 break;
 
             case NodeType.NineGrid:

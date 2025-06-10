@@ -199,7 +199,12 @@ public unsafe partial class DebugRenderer
         {
             var str = new ReadOnlySeString(rosss.Data.ToArray());
             var windowTitle = nodeOptions.Title ?? (nodeOptions.SeStringTitle ?? str).ToString();
-            _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_serviceProvider, str, nodeOptions.Language, windowTitle));
+            _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_serviceProvider)
+            {
+                String = str,
+                Language = nodeOptions.Language,
+                WindowName = windowTitle,
+            });
         }
     }
 
