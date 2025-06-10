@@ -1,7 +1,14 @@
 # Changelog
 
-## [Unreleased]
+## [1.25.0] (2025-06-10)
 
+- **Updated:** Addon Inspector was updated a bit:
+  - Addons and Nodes can be popped out into their own window (rightclick the tree nodes)
+  - Most properties are now editable
+  - Label Sets are now displayed
+  - Added a search bar to the top-level (=addon) Node List, which can find nodes by address (hex only), NodeId, NodeType, ComponentType
+
+  It's still work in progress. Animations and Parts will be added later.
 - **Updated:** ClientStructs now at [7028ecae](https://github.com/aers/FFXIVClientStructs/tree/7028ecae) ([compare](https://github.com/aers/FFXIVClientStructs/compare/3d53c797..7028ecae)).
 
 ## [1.24.2] (2025-06-04)
@@ -393,7 +400,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.25.0...main
+[1.25.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.2...1.25.0
 [1.24.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.1...1.24.2
 [1.24.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.0...1.24.1
 [1.24.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.23.1...1.24.0
