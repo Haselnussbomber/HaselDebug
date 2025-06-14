@@ -515,6 +515,23 @@ public unsafe partial class AtkDebugRenderer
             if (hasPartId) tableColumnCount += 1;
             if (hasTextEdge) tableColumnCount += 1;
             if (hasTextLabel) tableColumnCount += 1;
+
+            var groupHasAnyFrames = false;
+
+            foreach (var group in animation.KeyGroups)
+            {
+                if (group.KeyFrameCount > 0)
+                {
+                    groupHasAnyFrames = true;
+                    break;
+                }
+            }
+
+            if (!groupHasAnyFrames)
+            {
+                ImGui.Text("Group has no keyframes");
+                continue;
+            }
             
             using var keyFrameTable = ImRaii.Table("AnimationKeyFrameTable", tableColumnCount, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoHostExtendX);
             if (!keyFrameTable) return;
