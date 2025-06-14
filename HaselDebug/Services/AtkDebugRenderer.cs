@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
@@ -326,7 +327,7 @@ public unsafe partial class AtkDebugRenderer
 
         PrintProperties(node);
         PrintLabelSets(node);
-        // TODO: Timeline Frames
+        PrintAnimations(node);
 
         if (node->ChildNode != null)
             PrintNode(node->ChildNode, true, string.Empty, nodeOptions);
@@ -391,7 +392,7 @@ public unsafe partial class AtkDebugRenderer
 
         PrintProperties(resNode);
         PrintLabelSets(resNode);
-        // TODO: Timeline Frames
+        PrintAnimations(resNode);
 
         PrintNode(component->UldManager.RootNode, true, string.Empty, nodeOptions);
 
@@ -426,6 +427,11 @@ public unsafe partial class AtkDebugRenderer
 
         using var treeNode = ImRaii.TreeNode("Label Sets", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!treeNode) return;
+
+        if (ImGui.Button($"Export Timeline##{(nint)node:X}"))
+        {
+            ExportTimeline(node->Timeline);
+        }
 
         var labelSets = node->Timeline->Resource->LabelSets;
 
@@ -473,6 +479,285 @@ public unsafe partial class AtkDebugRenderer
             ImGui.TableNextColumn();
             ImGui.TextUnformatted($"{keyFrame.Value.Label.JumpLabelId}");
         }
+    }
+
+    private void PrintAnimations(AtkResNode* node) 
+    {
+        if (node == null ||
+            node->Timeline == null ||
+            node->Timeline->Resource == null ||
+            node->Timeline->Resource->AnimationCount == 0 ||
+            node->Timeline->Resource->Animations == null)
+        {
+            return;
+        }
+        
+        using var animationsTreeNode = ImRaii.TreeNode("Animation Groups", ImGuiTreeNodeFlags.SpanAvailWidth);
+        if (!animationsTreeNode) return;
+        
+        if (ImGui.Button($"Export Timeline##{(nint)node:X}"))
+        {
+            ExportTimeline(node->Timeline);
+        }
+
+        for (var i = 0; i < node->Timeline->Resource->AnimationCount; i++)
+        {
+            var animation = node->Timeline->Resource->Animations[i];
+            
+            using var keyGroupTreeNode = ImRaii.TreeNode($"[{i}] [Frames {animation.StartFrameIdx}-{animation.EndFrameIdx}]", ImGuiTreeNodeFlags.SpanAvailWidth);
+            if (!keyGroupTreeNode) continue;
+            
+            var hasPosition = animation.KeyGroups[0].KeyFrameCount > 0;
+            var hasRotation = animation.KeyGroups[1].KeyFrameCount > 0;
+            var hasScale = animation.KeyGroups[2].KeyFrameCount > 0;
+            var hasAlpha = animation.KeyGroups[3].KeyFrameCount > 0;
+            var hasTint = animation.KeyGroups[4].KeyFrameCount > 0;
+            var hasPartId = animation.KeyGroups[5].KeyFrameCount > 0;
+            var hasTextEdge = animation.KeyGroups[6].KeyFrameCount > 0;
+            var hasTextLabel = animation.KeyGroups[7].KeyFrameCount > 0;
+
+            var tableColumnCount = 1;
+            if (hasPosition) tableColumnCount += 2;
+            if (hasRotation) tableColumnCount += 1;
+            if (hasScale) tableColumnCount += 2;
+            if (hasAlpha) tableColumnCount += 1;
+            if (hasTint) tableColumnCount += 2;
+            if (hasPartId) tableColumnCount += 1;
+            if (hasTextEdge) tableColumnCount += 1;
+            if (hasTextLabel) tableColumnCount += 1;
+
+            var groupHasAnyFrames = hasPosition || hasRotation || hasScale || hasAlpha || hasTint || hasPartId || hasTextEdge || hasTextLabel;
+
+            if (!groupHasAnyFrames)
+            {
+                ImGui.Text("Group has no keyframes");
+                continue;
+            }
+            
+            using var keyFrameTable = ImRaii.Table("AnimationKeyFrameTable", tableColumnCount, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoHostExtendX);
+            if (!keyFrameTable) return;
+            
+            ImGui.TableSetupColumn("Frame ID", ImGuiTableColumnFlags.WidthFixed);
+
+            if (hasPosition)
+            {
+                ImGui.TableSetupColumn("X", ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("Y", ImGuiTableColumnFlags.WidthFixed);
+            }
+
+            if (hasRotation)
+            {
+                ImGui.TableSetupColumn("Rotation", ImGuiTableColumnFlags.WidthFixed);
+            }
+
+            if (hasScale)
+            {
+                ImGui.TableSetupColumn("Scale", ImGuiTableColumnFlags.WidthFixed);
+            }
+
+            if (hasAlpha)
+            {
+                ImGui.TableSetupColumn("Alpha", ImGuiTableColumnFlags.WidthFixed);
+            }
+
+            if (hasTint)
+            {
+                ImGui.TableSetupColumn("Add Color", ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("Multiply Color", ImGuiTableColumnFlags.WidthFixed);
+            }
+
+            if (hasPartId)
+            {
+                ImGui.TableSetupColumn("Part ID", ImGuiTableColumnFlags.WidthFixed);
+            }
+
+            if (hasTextEdge)
+            {
+                ImGui.TableSetupColumn("Text Edge", ImGuiTableColumnFlags.WidthFixed);
+            }
+
+            if (hasTextLabel)
+            {
+                ImGui.TableSetupColumn("Text Label", ImGuiTableColumnFlags.WidthFixed);
+            }
+            
+            ImGui.TableHeadersRow();
+
+            for (var frameIndex = animation.StartFrameIdx; frameIndex <= animation.EndFrameIdx; frameIndex++)
+            {
+                var groupHasFrame = false;
+                foreach (var group in animation.KeyGroups)
+                {
+                    for (var keyFrameIndex = 0; keyFrameIndex < group.KeyFrameCount; keyFrameIndex++)
+                    {
+                        var keyFrame = group.KeyFrames[keyFrameIndex];
+
+                        if (keyFrame.FrameIdx == frameIndex)
+                        {
+                            groupHasFrame = true;
+                            break;
+                        }
+                    }
+
+                    if (groupHasFrame) break;
+                }
+                
+                if (!groupHasFrame) continue;
+                
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+                ImGui.Text(frameIndex.ToString());
+                
+                for (var groupSelector = 0; groupSelector < 8; groupSelector++)
+                {
+                    var keyFrameGroup = animation.KeyGroups[groupSelector];
+
+                    for (var keyFrameIndex = 0; keyFrameIndex < keyFrameGroup.KeyFrameCount; keyFrameIndex++)
+                    {
+                        var keyFrame = keyFrameGroup.KeyFrames[keyFrameIndex];
+                        if (keyFrame.FrameIdx != frameIndex) continue;
+                        
+                        switch (groupSelector)
+                        {
+                            case 0: // Position
+                                ImGui.TableNextColumn();
+                                ImGui.Text(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
+                    
+                                ImGui.TableNextColumn();
+                                ImGui.Text(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
+                                break;
+                    
+                            case 1: // Rotation
+                                ImGui.TableNextColumn();
+                                ImGui.Text(keyFrame.Value.Float.ToString(CultureInfo.InvariantCulture));
+                                break;
+                    
+                            case 2: // Scale
+                                ImGui.TableNextColumn();
+                                ImGui.Text(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
+                    
+                                ImGui.TableNextColumn();
+                                ImGui.Text(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
+                                break;
+                    
+                            case 3: // Alpha
+                                ImGui.TableNextColumn();
+                                ImGui.Text(keyFrame.Value.Byte.ToString());
+                                break;
+                    
+                            case 4: // NodeTint
+                                ImGui.TableNextColumn();
+                                var addColor = new Vector3(keyFrame.Value.NodeTint.AddR, keyFrame.Value.NodeTint.AddG, keyFrame.Value.NodeTint.AddB);
+                                ImGui.Text(addColor.ToString()); // todo: show this as an actual color
+                    
+                                ImGui.TableNextColumn();
+                                var multiplyColor = new Vector3(keyFrame.Value.NodeTint.MultiplyRGB.R, keyFrame.Value.NodeTint.MultiplyRGB.G, keyFrame.Value.NodeTint.MultiplyRGB.B);
+                                ImGui.Text(multiplyColor.ToString());
+                                break;
+                            
+                            case 5: // PartId
+                                ImGui.TableNextColumn();
+                                ImGui.Text(keyFrame.Value.UShort.ToString());
+                                break;
+                            
+                            case 6: // TextEdge
+                                ImGui.TableNextColumn();
+                                var outlineColor = new Vector3(keyFrame.Value.RGB.R, keyFrame.Value.RGB.G, keyFrame.Value.RGB.B);
+                                ImGui.Text(outlineColor.ToString());
+                                break;
+                            
+                            case 7: // TextLabel
+                                ImGui.TableNextColumn();
+                                ImGui.Text(keyFrame.Value.UShort.ToString()); // Might not be the correct property UShort vs Short for this bucket
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void ExportTimeline(AtkTimeline* timeline)
+    {
+        if (timeline == null ||
+            timeline->Resource == null)
+        {
+            return;
+        }
+        
+        var timelineResource = timeline->Resource;
+        var codeString = "new TimelineBuilder()\n";
+
+        // Build Timeline LabelSets
+        if (timelineResource->LabelSetCount > 0 && timelineResource->LabelSets is not null)
+        {
+            for (var i = 0; i < timelineResource->LabelSetCount; i++)
+            {
+                var labelSet = timelineResource->LabelSets[i];
+
+                codeString += $".BeginFrameSet({labelSet.StartFrameIdx}, {labelSet.EndFrameIdx})\n";
+
+                for (var j = 0; j < labelSet.LabelKeyGroup.KeyFrameCount; j++)
+                {
+                    var keyFrame = labelSet.LabelKeyGroup.KeyFrames[j];
+
+                    var label = keyFrame.Value.Label;
+                    codeString += $".AddLabel({keyFrame.FrameIdx}, {label.LabelId}, AtkTimelineJumpBehavior.{label.JumpBehavior}, {label.JumpLabelId})\n";
+                }
+            }
+            
+            codeString += $".EndFrameSet()\n";
+        }
+        
+        // Build Timeline Animations
+        if (timeline->Resource->AnimationCount > 0 && timeline->Resource->Animations is not null)
+        {
+            for (var i = 0; i < timeline->Resource->AnimationCount; i++)
+            {
+                var animation = timeline->Resource->Animations[i];
+                
+                codeString += $".BeginFrameSet({animation.StartFrameIdx}, {animation.EndFrameIdx})\n";
+                var frameSetHasFrames = false;
+                
+                for (var groupSelector = 0; groupSelector < 8; groupSelector++)
+                {
+                    var keyGroup = animation.KeyGroups[groupSelector];
+                    
+                    for (var j = 0; j < keyGroup.KeyFrameCount; j++)
+                    {
+                        var keyFrame = keyGroup.KeyFrames[j];
+                        var keyFrameValue = keyFrame.Value;
+                        frameSetHasFrames = true;
+
+                        codeString += $".AddFrame({keyFrame.FrameIdx}, ";
+
+                        codeString += groupSelector switch
+                        {
+                            0 => $"position: new Vector2({keyFrameValue.Float2.Item1},{keyFrameValue.Float2.Item2}))\n",
+                            1 => $"rotation: {keyFrameValue.Float})\n",
+                            2 => $"scale: new Vector2({keyFrameValue.Float2.Item1}, {keyFrameValue.Float2.Item2}))\n",
+                            3 => $"alpha: {keyFrameValue.Byte})\n",
+                            4 => $"addColor: new Vector3({keyFrameValue.NodeTint.AddR}, {keyFrameValue.NodeTint.AddG}, {keyFrameValue.NodeTint.AddB}), multiplyColor: new Vector3({keyFrameValue.NodeTint.MultiplyRGB.R}, {keyFrameValue.NodeTint.MultiplyRGB.G}, {keyFrameValue.NodeTint.MultiplyRGB.B}))\n",
+                            5 => $"partId: {keyFrameValue.UShort})\n",
+                            6 => $"textOutlineColor: new Vector3({keyFrameValue.RGB.R}, {keyFrameValue.RGB.G}, {keyFrameValue.RGB.B})))\n",
+                            7 => string.Empty, // Not implemented yet
+                            _ => string.Empty,
+                        };
+                    }
+                }
+
+                if (!frameSetHasFrames)
+                {
+                    codeString += $".AddEmptyFrame({animation.StartFrameIdx})\n";
+                }
+                
+                codeString += $".EndFrameSet()\n";
+            }
+        }
+        
+        codeString += $".Build();\n";
+
+        ImGui.SetClipboardText(codeString);
     }
 
     private void PrintProperties(AtkResNode* node)
