@@ -735,7 +735,7 @@ public unsafe partial class AtkDebugRenderer
                         {
                             0 => $"position: new Vector2({keyFrameValue.Float2.Item1},{keyFrameValue.Float2.Item2}))\n",
                             1 => $"rotation: {keyFrameValue.Float})\n",
-                            2 => $"scale: new Vector2({keyFrameValue.Float2.Item1},{keyFrameValue.Float2.Item2}))\n",
+                            2 => $"scale: new Vector2({keyFrameValue.Float2.Item1}, {keyFrameValue.Float2.Item2}))\n",
                             3 => $"alpha: {keyFrameValue.Byte})\n",
                             4 => $"addColor: new Vector3({keyFrameValue.NodeTint.AddR}, {keyFrameValue.NodeTint.AddG}, {keyFrameValue.NodeTint.AddB}), multiplyColor: new Vector3({keyFrameValue.NodeTint.MultiplyRGB.R}, {keyFrameValue.NodeTint.MultiplyRGB.G}, {keyFrameValue.NodeTint.MultiplyRGB.B}))\n",
                             5 => $"partId: {keyFrameValue.UShort})\n",
