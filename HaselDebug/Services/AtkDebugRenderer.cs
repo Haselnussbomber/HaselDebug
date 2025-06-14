@@ -428,6 +428,11 @@ public unsafe partial class AtkDebugRenderer
         using var treeNode = ImRaii.TreeNode("Label Sets", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!treeNode) return;
 
+        if (ImGui.Button($"Export Timeline##{(nint)node:X}"))
+        {
+            ExportTimeline(node->Timeline);
+        }
+
         var labelSets = node->Timeline->Resource->LabelSets;
 
         ImGuiUtilsEx.PrintFieldValuePairs(
@@ -489,6 +494,11 @@ public unsafe partial class AtkDebugRenderer
         
         using var animationsTreeNode = ImRaii.TreeNode("Animation Groups", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!animationsTreeNode) return;
+        
+        if (ImGui.Button($"Export Timeline##{(nint)node:X}"))
+        {
+            ExportTimeline(node->Timeline);
+        }
 
         for (var i = 0; i < node->Timeline->Resource->AnimationCount; i++)
         {
@@ -647,7 +657,7 @@ public unsafe partial class AtkDebugRenderer
                             
                             case 5: // PartId
                                 ImGui.TableNextColumn();
-                                ImGui.Text(keyFrame.Value.Short.ToString());
+                                ImGui.Text(keyFrame.Value.UShort.ToString());
                                 break;
                             
                             case 6: // TextEdge
@@ -665,6 +675,89 @@ public unsafe partial class AtkDebugRenderer
                 }
             }
         }
+    }
+
+    private void ExportTimeline(AtkTimeline* timeline)
+    {
+        if (timeline == null ||
+            timeline->Resource == null)
+        {
+            return;
+        }
+        
+        var timelineResource = timeline->Resource;
+        var codeString = "new TimelineBuilder()\n";
+
+        // Build Timeline LabelSets
+        if (timelineResource->LabelSetCount > 0 && timelineResource->LabelSets is not null)
+        {
+            for (var i = 0; i < timelineResource->LabelSetCount; i++)
+            {
+                var labelSet = timelineResource->LabelSets[i];
+
+                codeString += $".BeginFrameSet({labelSet.StartFrameIdx}, {labelSet.EndFrameIdx})\n";
+
+                for (var j = 0; j < labelSet.LabelKeyGroup.KeyFrameCount; j++)
+                {
+                    var keyFrame = labelSet.LabelKeyGroup.KeyFrames[j];
+
+                    var label = keyFrame.Value.Label;
+                    codeString += $".AddLabel({keyFrame.FrameIdx}, {label.LabelId}, AtkTimelineJumpBehavior.{label.JumpBehavior}, {label.JumpLabelId})\n";
+                }
+            }
+            
+            codeString += $".EndFrameSet()\n";
+        }
+        
+        // Build Timeline Animations
+        if (timeline->Resource->AnimationCount > 0 && timeline->Resource->Animations is not null)
+        {
+            for (var i = 0; i < timeline->Resource->AnimationCount; i++)
+            {
+                var animation = timeline->Resource->Animations[i];
+                
+                codeString += $".BeginFrameSet({animation.StartFrameIdx}, {animation.EndFrameIdx})\n";
+                var frameSetHasFrames = false;
+                
+                for (var groupSelector = 0; groupSelector < 8; groupSelector++)
+                {
+                    var keyGroup = animation.KeyGroups[groupSelector];
+                    
+                    for (var j = 0; j < keyGroup.KeyFrameCount; j++)
+                    {
+                        var keyFrame = keyGroup.KeyFrames[j];
+                        var keyFrameValue = keyFrame.Value;
+                        frameSetHasFrames = true;
+
+                        codeString += $".AddFrame({keyFrame.FrameIdx}, ";
+
+                        codeString += groupSelector switch
+                        {
+                            0 => $"position: new Vector2({keyFrameValue.Float2.Item1},{keyFrameValue.Float2.Item2}))\n",
+                            1 => $"rotation: {keyFrameValue.Float})\n",
+                            2 => $"scale: new Vector2({keyFrameValue.Float2.Item1},{keyFrameValue.Float2.Item2}))\n",
+                            3 => $"alpha: {keyFrameValue.Byte})\n",
+                            4 => $"addColor: new Vector3({keyFrameValue.NodeTint.AddR}, {keyFrameValue.NodeTint.AddG}, {keyFrameValue.NodeTint.AddB}), multiplyColor: new Vector3({keyFrameValue.NodeTint.MultiplyRGB.R}, {keyFrameValue.NodeTint.MultiplyRGB.G}, {keyFrameValue.NodeTint.MultiplyRGB.B}))\n",
+                            5 => $"partId: {keyFrameValue.UShort})\n",
+                            6 => $"textOutlineColor: new Vector3({keyFrameValue.RGB.R}, {keyFrameValue.RGB.G}, {keyFrameValue.RGB.B})))\n",
+                            7 => string.Empty, // Not implemented yet
+                            _ => string.Empty,
+                        };
+                    }
+                }
+
+                if (!frameSetHasFrames)
+                {
+                    codeString += $".AddEmptyFrame({animation.StartFrameIdx})\n";
+                }
+                
+                codeString += $".EndFrameSet()\n";
+            }
+        }
+        
+        codeString += $".Build();\n";
+
+        ImGui.SetClipboardText(codeString);
     }
 
     private void PrintProperties(AtkResNode* node)
