@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.26.0] (2025-06-14)
 
 - **Added:** Addon Inspector can now display Animation Groups and has an "Export Timeline" button to copy code for KamiToolKit. (Thanks to @MidoriKami!)
 - **Added:** A new Atk Handler Calls tab to log calls of `AtkStage->AtkExternalInterface->CallHandler`. I named as many handlers as I could.
@@ -407,7 +407,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.25.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.26.0...main
+[1.26.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.25.0...1.26.0
 [1.25.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.2...1.25.0
 [1.24.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.1...1.24.2
 [1.24.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.0...1.24.1
