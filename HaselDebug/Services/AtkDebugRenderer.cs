@@ -516,16 +516,7 @@ public unsafe partial class AtkDebugRenderer
             if (hasTextEdge) tableColumnCount += 1;
             if (hasTextLabel) tableColumnCount += 1;
 
-            var groupHasAnyFrames = false;
-
-            foreach (var group in animation.KeyGroups)
-            {
-                if (group.KeyFrameCount > 0)
-                {
-                    groupHasAnyFrames = true;
-                    break;
-                }
-            }
+            var groupHasAnyFrames = hasPosition || hasRotation || hasScale || hasAlpha || hasTint || hasPartId || hasTextEdge || hasTextLabel;
 
             if (!groupHasAnyFrames)
             {
