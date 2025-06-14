@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - **Added:** Addon Inspector can now display Animation Groups and has an "Export Timeline" button to copy code for KamiToolKit. (Thanks to @MidoriKami!)
+- **Added:** A new Atk Handler Calls tab to log calls of `AtkStage->AtkExternalInterface->CallHandler`. I named as many handlers as I could.
 - **Updated:** More AtkValue ValueTypes are now rendered, including nested AtkValues.
 - **Updated:** ClientStructs now at [b45b7d42](https://github.com/aers/FFXIVClientStructs/tree/b45b7d42) ([compare](https://github.com/aers/FFXIVClientStructs/compare/7028ecae..b45b7d42)).
 
