@@ -109,7 +109,7 @@ public unsafe partial class InputTab : DebugTab
             ImGui.TextUnformatted($"{isReleased}");
         }
     }
-    
+
     private void DrawInputs()
     {
         using var tab = ImRaii.TabItem("Inputs");

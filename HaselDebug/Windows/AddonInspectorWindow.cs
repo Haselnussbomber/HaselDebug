@@ -10,7 +10,8 @@ public partial class AddonInspectorWindow : SimpleWindow
 {
     private readonly AtkDebugRenderer _atkDebugRenderer;
 
-    public string AddonName {
+    public string AddonName
+    {
         get;
         set { field = value; WindowName = value; }
     }

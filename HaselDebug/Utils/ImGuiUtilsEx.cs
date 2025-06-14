@@ -1,7 +1,5 @@
-using System.Diagnostics;
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Gui;
 using HaselDebug.Services;
