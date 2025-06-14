@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** Addon Inspector can now display Animation Groups and has an "Export Timeline" button to copy code for KamiToolKit. (Thanks to @MidoriKami!)
+
 ## [1.25.0] (2025-06-10)
 
 - **Updated:** Addon Inspector was updated a bit:
