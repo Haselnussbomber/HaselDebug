@@ -993,7 +993,6 @@ public unsafe partial class AtkDebugRenderer
                 {
                     switch (((AtkUldComponentInfo*)component->UldManager.Objects)->ComponentType)
                     {
-                        /*
                         case ComponentType.Icon:
                             var iconComp = (AtkComponentIcon*)component;
                             StartRow("IconId");
@@ -1011,7 +1010,6 @@ public unsafe partial class AtkDebugRenderer
                                 iconComp->UpdateIndicator();
                             }
                             break;
-                        */
                     }
                 }
                 break;
