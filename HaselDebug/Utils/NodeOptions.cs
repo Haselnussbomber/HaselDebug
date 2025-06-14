@@ -42,6 +42,9 @@ public record struct NodeOptions
     public NodeOptions WithAddress(nint[] addresses)
         => this with { AddressPath = AddressPath.With(addresses) };
 
+    public NodeOptions WithTitle(string title)
+        => this with { Title = title };
+
     public NodeOptions WithSeStringTitle(string title)
         => this with { SeStringTitle = title };
 
@@ -97,5 +100,5 @@ public record struct NodeOptions
             DrawSeStringTreeNode = false
         };
 
-    public string GetKey(string prefix) => $"###{prefix}{AddressPath}";
+    public string GetKey(string prefix) => $"##{prefix}{AddressPath}";
 }
