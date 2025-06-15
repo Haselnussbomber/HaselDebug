@@ -100,5 +100,5 @@ public record struct NodeOptions
             DrawSeStringTreeNode = false
         };
 
-    public string GetKey(string prefix) => $"##{prefix}{AddressPath}";
+    public string GetKey(string prefix) => $"###{prefix}{AddressPath}";
 }
