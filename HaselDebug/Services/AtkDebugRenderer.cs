@@ -25,27 +25,35 @@ public unsafe partial class AtkDebugRenderer
     private readonly LanguageProvider _languageProvider;
     private string _nodeQuery = string.Empty;
 
-    public void DrawAddon(string addonName, bool border = true)
+    public void DrawAddon(ushort addonId, string addonName, bool border = true)
     {
-        if (string.IsNullOrEmpty(addonName))
+        if (addonId == 0 && string.IsNullOrEmpty(addonName))
             return;
 
         using var hostchild = ImRaii.Child("AddonChild", new Vector2(-1), border, ImGuiWindowFlags.NoSavedSettings);
 
         var unitManager = RaptureAtkUnitManager.Instance();
-        var unitBase = unitManager->GetAddonByName(addonName);
+
+        AtkUnitBase* unitBase = null;
+
+        if (addonId != 0)
+            unitBase = unitManager->GetAddonById(addonId);
+
+        if ((unitBase == null && !string.IsNullOrEmpty(addonName)) || (unitBase != null && unitBase->NameString != addonName))
+            unitBase = unitManager->GetAddonByName(addonName);
+
         if (unitBase == null)
         {
-            ImGui.TextUnformatted($"Could not find addon {addonName}");
+            ImGui.TextUnformatted($"Could not find addon with id {addonId} or name {addonName}");
             return;
         }
 
         var nodeOptions = new NodeOptions() { AddressPath = new((nint)unitBase), DefaultOpen = true };
 
-        if (!_debugRenderer.AddonTypes.TryGetValue(addonName, out var type))
+        if (!_debugRenderer.AddonTypes.TryGetValue(unitBase->NameString, out var type))
             type = typeof(AtkUnitBase);
 
-        _debugRenderer.DrawCopyableText(addonName);
+        _debugRenderer.DrawCopyableText(unitBase->NameString);
 
         ImGui.SameLine();
 

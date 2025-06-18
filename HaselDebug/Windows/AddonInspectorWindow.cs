@@ -10,6 +10,8 @@ public partial class AddonInspectorWindow : SimpleWindow
 {
     private readonly AtkDebugRenderer _atkDebugRenderer;
 
+    public ushort AddonId { get; internal set; }
+
     public string AddonName
     {
         get;
@@ -37,6 +39,6 @@ public partial class AddonInspectorWindow : SimpleWindow
 
     public override void Draw()
     {
-        _atkDebugRenderer.DrawAddon(AddonName, false);
+        _atkDebugRenderer.DrawAddon(AddonId, AddonName, false);
     }
 }

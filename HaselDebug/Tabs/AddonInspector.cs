@@ -47,7 +47,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
         DrawAddonList();
         ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
-        _atkDebugRenderer.DrawAddon(_selectedAddonName);
+        _atkDebugRenderer.DrawAddon(_selectedAddonId, _selectedAddonName);
         DrawNodePicker();
     }
 
@@ -188,6 +188,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
                     {
                         _windowManager.Open(new AddonInspectorWindow(_serviceProvider, _atkDebugRenderer)
                         {
+                            AddonId = addonId,
                             AddonName = addonName
                         });
                     }
