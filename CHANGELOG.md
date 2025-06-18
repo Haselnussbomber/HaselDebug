@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.27.0] (2025-06-19)
+
+- **Added:** Addon Inspector can now display Events. Target and Listener columns are hidden unless an event points to something different than the same Node or UnitBase.
+- **Added:** A Drag Drop Type tab displaying the matrix of DragDropTypeMasks.
+- **Updated:** Animation Group values in the Addon Inspector are now copyable and colors are shown with ImGui.ColorEdit3 (can't make them read-only with Dalamuds ImGui version).
+- **Fixed:** Addon Inspector now primarily uses the addon id, before checking the addon name. This should fix displaying the wrong addon if multiple have the same name.
+- **Fixed:** TreeNode ids were no longer unique with the last update.
+- **Updated:** ClientStructs updated to the branch used in my [DragDrop PR](https://github.com/aers/FFXIVClientStructs/pull/1457), based on [a93b68f5](https://github.com/aers/FFXIVClientStructs/tree/a93b68f5) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b45b7d42..a93b68f5)).
+
 ## [1.26.0] (2025-06-14)
 
 - **Added:** Addon Inspector can now display Animation Groups and has an "Export Timeline" button to copy code for KamiToolKit. (Thanks to @MidoriKami!)
@@ -407,7 +416,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.26.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.27.0...main
+[1.27.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.26.0...1.27.0
 [1.26.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.25.0...1.26.0
 [1.25.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.2...1.25.0
 [1.24.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.1...1.24.2
