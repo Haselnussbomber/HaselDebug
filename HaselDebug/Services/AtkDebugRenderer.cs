@@ -48,7 +48,12 @@ public unsafe partial class AtkDebugRenderer
             return;
         }
 
-        var nodeOptions = new NodeOptions() { AddressPath = new((nint)unitBase), DefaultOpen = true };
+        var nodeOptions = new NodeOptions()
+        {
+            AddressPath = new((nint)unitBase),
+            DefaultOpen = true,
+            UnitBase = unitBase,
+        };
 
         if (!_debugRenderer.AddonTypes.TryGetValue(unitBase->NameString, out var type))
             type = typeof(AtkUnitBase);
@@ -331,7 +336,7 @@ public unsafe partial class AtkDebugRenderer
         _debugRenderer.DrawNumeric(node->NodeId, typeof(uint), new NodeOptions() { HexOnShift = true });
 
         PrintProperties(node);
-        PrintEvents(node);
+        PrintEvents(node, nodeOptions);
         PrintLabelSets(node);
         PrintAnimations(node);
 
@@ -397,7 +402,7 @@ public unsafe partial class AtkDebugRenderer
         );
 
         PrintProperties(resNode);
-        PrintEvents(resNode);
+        PrintEvents(resNode, nodeOptions);
         PrintLabelSets(resNode);
         PrintAnimations(resNode);
 
@@ -417,16 +422,88 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
-    private void PrintEvents(AtkResNode* node)
+    private void PrintEvents(AtkResNode* node, NodeOptions nodeOptions)
     {
         if (node == null || node->AtkEventManager.Event == null)
         {
             return;
         }
 
+        var unitBaseAddress = (nint)(nodeOptions.UnitBase.HasValue ? nodeOptions.UnitBase.Value.Value : null);
+        var hasDifferentTarget = false;
+        var hasDifferentListener = unitBaseAddress == 0;
+
+        var evt = node->AtkEventManager.Event;
+        while (evt != null)
+        {
+            if (evt->Target != node)
+                hasDifferentTarget = true;
+
+            if (unitBaseAddress != 0 && (nint)evt->Listener != unitBaseAddress)
+                hasDifferentListener = true;
+
+            evt = evt->NextEvent;
+        }
+
         using var treeNode = ImRaii.TreeNode("Events", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!treeNode) return;
 
+        var columns = 3;
+        if (hasDifferentTarget) columns += 1;
+        if (hasDifferentListener) columns += 1;
+
+        using var table = ImRaii.Table("EventTable", columns, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+        if (!table) return;
+
+        ImGui.TableSetupColumn("EventType", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Param", ImGuiTableColumnFlags.WidthFixed, 50);
+        if (hasDifferentTarget) ImGui.TableSetupColumn("Target", ImGuiTableColumnFlags.WidthFixed, 100);
+        if (hasDifferentListener) ImGui.TableSetupColumn("Listener", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Event", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupScrollFreeze(0, 1);
+        ImGui.TableHeadersRow();
+
+        evt = node->AtkEventManager.Event;
+        while (evt != null)
+        {
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{evt->State.EventType}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{evt->Param}");
+
+            if (hasDifferentTarget)
+            {
+                ImGui.TableNextColumn();
+                if (evt->Target == node)
+                {
+                    ImGui.TextUnformatted("Node");
+                }
+                else
+                {
+                    _debugRenderer.DrawAddress(evt->Target);
+                }
+            }
+
+            if (hasDifferentListener)
+            {
+                ImGui.TableNextColumn();
+                if ((nint)evt->Listener == unitBaseAddress)
+                {
+                    ImGui.TextUnformatted("UnitBase");
+                }
+                else
+                {
+                    _debugRenderer.DrawAddress(evt->Listener);
+                }
+            }
+
+            ImGui.TableNextColumn();
+            _debugRenderer.DrawPointerType(evt, typeof(AtkEvent), new() { AddressPath = new((nint)evt) });
+
+            evt = evt->NextEvent;
+        }
     }
 
     private void PrintLabelSets(AtkResNode* node)

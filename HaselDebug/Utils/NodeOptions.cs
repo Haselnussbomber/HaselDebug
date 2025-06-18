@@ -27,6 +27,7 @@ public record struct NodeOptions
     public bool IsIconIdField { get; set; } = false;
     public bool IsTimestampField { get; set; } = false;
     public bool HexOnShift { get; set; } = false;
+    public Pointer<AtkUnitBase>? UnitBase { get; set; } = null;
 
     public ImGuiTreeNodeFlags GetTreeNodeFlags(ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.SpanAvailWidth)
     {
