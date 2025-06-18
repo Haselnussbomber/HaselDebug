@@ -606,7 +606,8 @@ public unsafe partial class AtkDebugRenderer
 
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
-                ImGui.Text(frameIndex.ToString());
+                ImGui.AlignTextToFramePadding();
+                ImGui.TextUnformatted(frameIndex.ToString());
 
                 for (var groupSelector = 0; groupSelector < 8; groupSelector++)
                 {
@@ -616,59 +617,72 @@ public unsafe partial class AtkDebugRenderer
                     {
                         var keyFrame = keyFrameGroup.KeyFrames[keyFrameIndex];
                         if (keyFrame.FrameIdx != frameIndex) continue;
+                        var numericNodeOptions = new NodeOptions() { AddressPath = new([(nint)node, 1337, groupSelector, keyFrameIndex]) };
+                        const int ColorEditWidth = 180;
 
                         switch (groupSelector)
                         {
-                            case 0: // Position
+                            case 0 when hasPosition: // Position
                                 ImGui.TableNextColumn();
-                                ImGui.Text(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
+                                ImGui.AlignTextToFramePadding();
+                                _debugRenderer.DrawCopyableText(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
 
                                 ImGui.TableNextColumn();
-                                ImGui.Text(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
+                                ImGui.AlignTextToFramePadding();
+                                _debugRenderer.DrawCopyableText(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
                                 break;
 
-                            case 1: // Rotation
+                            case 1 when hasRotation: // Rotation
                                 ImGui.TableNextColumn();
-                                ImGui.Text(keyFrame.Value.Float.ToString(CultureInfo.InvariantCulture));
+                                ImGui.AlignTextToFramePadding();
+                                _debugRenderer.DrawCopyableText(keyFrame.Value.Float.ToString(CultureInfo.InvariantCulture));
                                 break;
 
-                            case 2: // Scale
+                            case 2 when hasScale: // Scale
                                 ImGui.TableNextColumn();
-                                ImGui.Text(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
+                                ImGui.AlignTextToFramePadding();
+                                _debugRenderer.DrawCopyableText(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
 
                                 ImGui.TableNextColumn();
-                                ImGui.Text(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
+                                ImGui.AlignTextToFramePadding();
+                                _debugRenderer.DrawCopyableText(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
                                 break;
 
-                            case 3: // Alpha
+                            case 3 when hasAlpha: // Alpha
                                 ImGui.TableNextColumn();
-                                ImGui.Text(keyFrame.Value.Byte.ToString());
+                                ImGui.AlignTextToFramePadding();
+                                _debugRenderer.DrawCopyableText(keyFrame.Value.Byte.ToString(CultureInfo.InvariantCulture));
                                 break;
 
-                            case 4: // NodeTint
+                            case 4 when hasTint: // NodeTint
                                 ImGui.TableNextColumn();
-                                var addColor = new Vector3(keyFrame.Value.NodeTint.AddR, keyFrame.Value.NodeTint.AddG, keyFrame.Value.NodeTint.AddB);
-                                ImGui.Text(addColor.ToString()); // todo: show this as an actual color
+                                var addColor = new Vector3(keyFrame.Value.NodeTint.AddR, keyFrame.Value.NodeTint.AddG, keyFrame.Value.NodeTint.AddB) / 255f;
+                                ImGui.SetNextItemWidth(ColorEditWidth);
+                                ImGui.ColorEdit3(numericNodeOptions.GetKey("AddColor"), ref addColor);
 
                                 ImGui.TableNextColumn();
-                                var multiplyColor = new Vector3(keyFrame.Value.NodeTint.MultiplyRGB.R, keyFrame.Value.NodeTint.MultiplyRGB.G, keyFrame.Value.NodeTint.MultiplyRGB.B);
-                                ImGui.Text(multiplyColor.ToString());
+                                var multiplyColor = new Vector3(keyFrame.Value.NodeTint.MultiplyRGB.R, keyFrame.Value.NodeTint.MultiplyRGB.G, keyFrame.Value.NodeTint.MultiplyRGB.B) / 255f;
+                                ImGui.SetNextItemWidth(ColorEditWidth);
+                                ImGui.ColorEdit3(numericNodeOptions.GetKey("MultiplyColor"), ref multiplyColor);
                                 break;
 
-                            case 5: // PartId
+                            case 5 when hasPartId: // PartId
                                 ImGui.TableNextColumn();
-                                ImGui.Text(keyFrame.Value.UShort.ToString());
+                                ImGui.AlignTextToFramePadding();
+                                _debugRenderer.DrawCopyableText(keyFrame.Value.UShort.ToString(CultureInfo.InvariantCulture));
                                 break;
 
-                            case 6: // TextEdge
+                            case 6 when hasTextEdge: // TextEdge
                                 ImGui.TableNextColumn();
-                                var outlineColor = new Vector3(keyFrame.Value.RGB.R, keyFrame.Value.RGB.G, keyFrame.Value.RGB.B);
-                                ImGui.Text(outlineColor.ToString());
+                                var outlineColor = new Vector3(keyFrame.Value.RGB.R, keyFrame.Value.RGB.G, keyFrame.Value.RGB.B) / 255f;
+                                ImGui.SetNextItemWidth(ColorEditWidth);
+                                ImGui.ColorEdit3(numericNodeOptions.GetKey("OutlineColor"), ref outlineColor);
                                 break;
 
-                            case 7: // TextLabel
+                            case 7 when hasTextLabel: // TextLabel
                                 ImGui.TableNextColumn();
-                                ImGui.Text(keyFrame.Value.UShort.ToString()); // Might not be the correct property UShort vs Short for this bucket
+                                ImGui.AlignTextToFramePadding();
+                                _debugRenderer.DrawCopyableText(keyFrame.Value.UShort.ToString(CultureInfo.InvariantCulture)); // Might not be the correct property UShort vs Short for this bucket
                                 break;
                         }
                     }
