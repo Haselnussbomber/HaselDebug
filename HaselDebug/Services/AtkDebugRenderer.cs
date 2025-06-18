@@ -193,36 +193,33 @@ public unsafe partial class AtkDebugRenderer
         {
             ImGui.Dummy(ImGuiHelpers.ScaledVector2(25));
             ImGui.Separator();
-            ImGui.PushStyleColor(ImGuiCol.Text, 0xFFFFAAAA);
-            if (ImGui.TreeNodeEx($"Node List##{(ulong)unitBase:X}", ImGuiTreeNodeFlags.SpanAvailWidth))
+
+            using var nodeTree = _debugRenderer.DrawTreeNode(new NodeOptions()
             {
-                ImGui.PopStyleColor();
+                AddressPath = nodeOptions.AddressPath,
+                Title = "Node List",
+                TitleColor = Color.FromUInt(0xFFFFAAAA),
+            });
+            if (!nodeTree) return;
 
-                ImGui.InputTextWithHint("##NodeSearch", _textService.Translate("SearchBar.Hint"), ref _nodeQuery, 256, ImGuiInputTextFlags.AutoSelectAll);
+            ImGui.InputTextWithHint("##NodeSearch", _textService.Translate("SearchBar.Hint"), ref _nodeQuery, 256, ImGuiInputTextFlags.AutoSelectAll);
 
-                var j = 0;
-                foreach (var node in unitBase->UldManager.Nodes)
+            var j = 0;
+            foreach (var node in unitBase->UldManager.Nodes)
+            {
+                if (node == null)
                 {
-                    if (node == null)
-                    {
-                        j++;
-                        continue;
-                    }
-
-                    if (!IsNodeMatchingSearch(node))
-                    {
-                        j++;
-                        continue;
-                    }
-
-                    PrintNode(node, false, $"[{j++}] ", nodeOptions with { DefaultOpen = false });
+                    j++;
+                    continue;
                 }
 
-                ImGui.TreePop();
-            }
-            else
-            {
-                ImGui.PopStyleColor();
+                if (!IsNodeMatchingSearch(node))
+                {
+                    j++;
+                    continue;
+                }
+
+                PrintNode(node, false, $"[{j++}] ", nodeOptions with { DefaultOpen = false });
             }
         }
     }
@@ -334,6 +331,7 @@ public unsafe partial class AtkDebugRenderer
         _debugRenderer.DrawNumeric(node->NodeId, typeof(uint), new NodeOptions() { HexOnShift = true });
 
         PrintProperties(node);
+        PrintEvents(node);
         PrintLabelSets(node);
         PrintAnimations(node);
 
@@ -356,7 +354,7 @@ public unsafe partial class AtkDebugRenderer
 
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
-            Title = $"{treePrefix}[#{node->NodeId}] {objectInfo->ComponentType} Component Node (Node: 0x{(nint)node:X}, Component: 0x{(nint)component:X})###{nodeOptions.GetKey("ComponentNode")}",
+            Title = $"{treePrefix}[#{node->NodeId}] {objectInfo->ComponentType} Component Node (Node: 0x{(nint)node:X}, Component: 0x{(nint)component:X})",
             TitleColor = node->IsVisible() ? Color.Green : Color.Grey,
             DrawContextMenu = (nodeOptions, builder) =>
             {
@@ -399,27 +397,36 @@ public unsafe partial class AtkDebugRenderer
         );
 
         PrintProperties(resNode);
+        PrintEvents(resNode);
         PrintLabelSets(resNode);
         PrintAnimations(resNode);
 
         PrintNode(component->UldManager.RootNode, true, string.Empty, nodeOptions);
 
-        ImGui.PushStyleColor(ImGuiCol.Text, 0xFFFFAAAA);
-        if (ImGui.TreeNodeEx($"Node List##{(ulong)node:X}", ImGuiTreeNodeFlags.SpanAvailWidth))
+        using var nodeTree = _debugRenderer.DrawTreeNode(new NodeOptions()
         {
-            ImGui.PopStyleColor();
+            AddressPath = nodeOptions.AddressPath,
+            Title = "Node List",
+            TitleColor = Color.FromUInt(0xFFFFAAAA),
+        });
+        if (!nodeTree) return;
 
-            for (var i = 0; i < component->UldManager.NodeListCount; i++)
-            {
-                PrintNode(component->UldManager.NodeList[i], false, $"[{i}] ", nodeOptions);
-            }
-
-            ImGui.TreePop();
-        }
-        else
+        for (var i = 0; i < component->UldManager.NodeListCount; i++)
         {
-            ImGui.PopStyleColor();
+            PrintNode(component->UldManager.NodeList[i], false, $"[{i}] ", nodeOptions);
         }
+    }
+
+    private void PrintEvents(AtkResNode* node)
+    {
+        if (node == null || node->AtkEventManager.Event == null)
+        {
+            return;
+        }
+
+        using var treeNode = ImRaii.TreeNode("Events", ImGuiTreeNodeFlags.SpanAvailWidth);
+        if (!treeNode) return;
+
     }
 
     private void PrintLabelSets(AtkResNode* node)
