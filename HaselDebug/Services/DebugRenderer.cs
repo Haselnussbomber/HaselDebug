@@ -11,6 +11,7 @@ using Dalamud.Game;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Memory;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Dalamud.Utility;
@@ -21,6 +22,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine.Group;
+using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
@@ -449,6 +451,11 @@ public unsafe partial class DebugRenderer
             DrawSeString(*(byte**)address, nodeOptions);
             return;
         }
+        else if (type == typeof(StdString))
+        {
+            DrawCopyableText(((StdString*)address)->ToString());
+            return;
+        }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdVector<>))
         {
             DrawStdVector(address, type.GenericTypeArguments[0], nodeOptions);
@@ -827,6 +834,18 @@ public unsafe partial class DebugRenderer
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<AtkTimelineKeyFrame>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->KeyFrameCount), fieldNodeOptions);
+                continue;
+            }
+
+            // ResourceHandle.FileType
+            if (type == typeof(ResourceHandle) && fieldType == typeof(uint) && fieldInfo.Name == "FileType")
+            {
+                DrawFieldName(fieldInfo);
+                DrawNumeric(fieldAddress, fieldType, fieldNodeOptions);
+                ImGui.SameLine();
+                var chars = MemoryHelper.ReadString(fieldAddress, 4).ToCharArray();
+                Array.Reverse(chars);
+                DrawCopyableText(new string(chars));
                 continue;
             }
 
