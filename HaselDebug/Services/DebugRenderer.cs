@@ -829,7 +829,7 @@ public unsafe partial class DebugRenderer
                 continue;
             }
 
-            // AtkTimelineManager.LabelSets
+            // AtkTimelineManager.KeyFrames
             if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimelineKeyFrame*) && fieldInfo.Name == "KeyFrames")
             {
                 DrawFieldName(fieldInfo);
