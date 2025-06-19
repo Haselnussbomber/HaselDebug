@@ -1341,7 +1341,7 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
-        using var table = ImRaii.Table(nodeOptions.GetKey("Array"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new System.Numerics.Vector2(-1, 200));
+        using var table = ImRaii.Table(nodeOptions.GetKey("Array"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
