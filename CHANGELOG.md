@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.28.0] (2025-06-20)
+
+- **Added:** StdLinkedLists are now supported.
+- **Added:** StdStrings are now rendered as normal, copyable strings.
+- **Added:** ResourceHandle.FileType is now written as string.
+- **Added:** The following pointers are now rendered as array:
+  - AtkUldManager.Assets
+  - AtkUldManager.PartsList
+  - AtkUldManager.NodeList
+  - AtkUldManager.Objects (exception for ObjectCount 1 which is displayed directly)
+  - AtkUldWidgetInfo.NodeList
+  - AtkTimelineManager.Timelines
+  - AtkTimelineManager.Animations
+  - AtkTimelineManager.LabelSets
+  - AtkTimelineManager.KeyFrames
+- **Updated:** Atk nodes as TreeNode are now always highlighted on hover.
+- **Changed:** The AtkValues table is no longer limited in size.
+
 ## [1.27.0] (2025-06-19)
 
 - **Added:** Addon Inspector can now display Events. Target and Listener columns are hidden unless an event points to something different than the same Node or UnitBase.
@@ -416,7 +434,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.27.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.28.0...main
+[1.28.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.27.0...1.28.0
 [1.27.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.26.0...1.27.0
 [1.26.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.25.0...1.26.0
 [1.25.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.24.2...1.25.0
