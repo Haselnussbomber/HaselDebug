@@ -838,7 +838,7 @@ public unsafe partial class DebugRenderer
             }
 
             // ResourceHandle.FileType
-            if (type == typeof(ResourceHandle) && fieldType == typeof(uint) && fieldInfo.Name == "FileType")
+            if (Inherits<ResourceHandle>(type) && fieldType == typeof(uint) && fieldInfo.Name == "FileType")
             {
                 DrawFieldName(fieldInfo);
                 DrawNumeric(fieldAddress, fieldType, fieldNodeOptions);
