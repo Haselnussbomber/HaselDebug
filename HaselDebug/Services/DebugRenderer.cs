@@ -726,6 +726,64 @@ public unsafe partial class DebugRenderer
                 continue;
             }
 
+            // AtkUldManager.Assets
+            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkUldAsset*) && fieldInfo.Name == "Assets")
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(new Span<AtkUldAsset>(*(nint**)fieldAddress, ((AtkUldManager*)address)->AssetCount), fieldNodeOptions);
+                continue;
+            }
+
+            // AtkUldManager.PartsList
+            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkUldPartsList*) && fieldInfo.Name == "PartsList")
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(new Span<AtkUldPartsList>(*(nint**)fieldAddress, ((AtkUldManager*)address)->PartsListCount), fieldNodeOptions);
+                continue;
+            }
+
+            // AtkUldManager.NodeList
+            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkResNode**) && fieldInfo.Name == "NodeList")
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(new Span<Pointer<AtkResNode>>(*(nint**)fieldAddress, ((AtkUldManager*)address)->NodeListCount), fieldNodeOptions);
+                continue;
+            }
+
+            // AtkUldManager.Objects
+            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkUldObjectInfo*) && fieldInfo.Name == "Objects")
+            {
+                DrawFieldName(fieldInfo);
+                var uldManager = (AtkUldManager*)address;
+                var objectCount = uldManager->ObjectCount;
+                switch (uldManager->BaseType)
+                {
+                    case AtkUldManagerBaseType.Component:
+                        if (objectCount == 1)
+                            DrawPointerType(*(nint**)fieldAddress, typeof(AtkUldComponentInfo), fieldNodeOptions);
+                        else
+                            DrawArray(new Span<AtkUldComponentInfo>(*(nint**)fieldAddress, objectCount), fieldNodeOptions);
+                        break;
+
+                    case AtkUldManagerBaseType.Widget:
+                        if (objectCount == 1)
+                            DrawPointerType(*(nint**)fieldAddress, typeof(AtkUldWidgetInfo), fieldNodeOptions);
+                        else
+                            DrawArray(new Span<AtkUldWidgetInfo>(*(nint**)fieldAddress, objectCount), fieldNodeOptions);
+                        break;
+                }
+
+                continue;
+            }
+
+            // AtkUldWidgetInfo.NodeList
+            if ( type == typeof(AtkUldWidgetInfo) && fieldType == typeof(AtkResNode**) && fieldInfo.Name == "NodeList")
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(new Span<Pointer<AtkResNode>>(*(nint**)fieldAddress, ((AtkUldWidgetInfo*)address)->NodeCount), fieldNodeOptions);
+                continue;
+            }
+
             // byte* that are strings
             if (fieldType.IsPointer && _knownStringPointers.TryGetValue(type, out var fieldNames) && fieldNames.Contains(fieldInfo.Name))
             {
@@ -1201,5 +1259,42 @@ public unsafe partial class DebugRenderer
 
         if (sameLine)
             ImGui.SameLine();
+    }
+
+    public void DrawArray<T>(Span<T> span, NodeOptions nodeOptions) where T : unmanaged
+    {
+        if (span.Length == 0)
+        {
+            ImGui.TextUnformatted("No values");
+            return;
+        }
+
+        nodeOptions = nodeOptions.WithAddress((nint)span.GetPointer(0));
+
+        using var node = DrawTreeNode(nodeOptions.WithTitle($"{span.Length} value{(span.Length != 1 ? "s" : "")}") with { DrawSeStringTreeNode = false });
+        if (!node) return;
+
+        nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
+
+        using var table = ImRaii.Table(nodeOptions.GetKey("Array"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new System.Numerics.Vector2(-1, 200));
+        if (!table) return;
+
+        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Value");
+        ImGui.TableSetupScrollFreeze(2, 1);
+        ImGui.TableHeadersRow();
+
+        var type = typeof(T);
+        for (var i = 0; i < span.Length; i++)
+        {
+            ImGui.TableNextRow();
+
+            ImGui.TableNextColumn(); // Index
+            ImGui.TextUnformatted(i.ToString());
+
+            ImGui.TableNextColumn(); // Value
+            var ptr = span.GetPointer(i);
+            DrawPointerType(ptr, type, nodeOptions);
+        }
     }
 }
