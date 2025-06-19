@@ -128,7 +128,11 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        nodeOptions = nodeOptions.WithAddress(address);
+        nodeOptions = nodeOptions.WithAddress(address) with
+        {
+            HighlightAddress = address,
+            HighlightType = type,
+        };
 
         if (type.IsVoid())
         {
@@ -501,8 +505,72 @@ public unsafe partial class DebugRenderer
         var node = ImRaii.TreeNode(previewText + nodeOptions.GetKey("Node"), nodeOptions.GetTreeNodeFlags());
         titleColor?.Dispose();
 
-        if (nodeOptions.OnHovered != null && ImGui.IsItemHovered())
-            nodeOptions.OnHovered();
+        if (ImGui.IsItemHovered())
+        {
+            nodeOptions.OnHovered?.Invoke();
+
+            if (nodeOptions.HighlightType != null && nodeOptions.HighlightAddress != 0)
+            {
+                var highlightType = nodeOptions.HighlightType;
+                var highlightAddress = nodeOptions.HighlightAddress;
+
+                if (highlightType.IsGenericType && highlightType.GetGenericTypeDefinition() == typeof(Pointer<>))
+                {
+                    highlightType = highlightType.GenericTypeArguments[0];
+                    highlightAddress = *(nint*)highlightAddress;
+                }
+
+                if (highlightType.IsPointer)
+                {
+                    highlightType = highlightType.GetElementType()!;
+                    highlightAddress = *(nint*)highlightAddress;
+                }
+
+                if (Inherits<ILayoutInstance>(highlightType))
+                {
+                    var inst = (ILayoutInstance*)highlightAddress;
+                    if (inst != null)
+                    {
+                        var transform = inst->GetTransformImpl();
+                        if (transform != null)
+                            DrawLine(transform->Translation);
+                    }
+                }
+                else if (Inherits<GameObject>(highlightType))
+                {
+                    var gameObject = (GameObject*)highlightAddress;
+                    if (gameObject != null)
+                        DrawLine(gameObject->Position);
+                }
+                else if (Inherits<AtkUnitBase>(highlightType))
+                {
+                    var unitBase = (AtkUnitBase*)highlightAddress;
+                    if (unitBase->WindowNode != null)
+                        HighlightNode((AtkResNode*)unitBase->WindowNode);
+                    else if (unitBase->RootNode != null)
+                        HighlightNode(unitBase->RootNode);
+                }
+                else if (Inherits<AtkResNode>(highlightType))
+                {
+                    HighlightNode((AtkResNode*)highlightAddress);
+                }
+                else if (Inherits<AtkComponentBase>(highlightType))
+                {
+                    var component = (AtkComponentBase*)highlightAddress;
+                    if (component != null && component->AtkResNode != null)
+                        HighlightNode(component->AtkResNode);
+                }
+
+                void DrawLine(Vector3 pos)
+                {
+                    if (_gameGui.WorldToScreen(pos, out var screenPos))
+                    {
+                        ImGui.GetForegroundDrawList().AddLine(ImGui.GetMousePos(), screenPos, Color.Orange.ToUInt());
+                        ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Color.Orange.ToUInt());
+                    }
+                }
+            }
+        }
 
         if (nodeOptions.DrawContextMenu != null)
             _imGuiContextMenu.Draw(nodeOptions.GetKey("ContextMenu"), builder => nodeOptions.DrawContextMenu(nodeOptions, builder));
@@ -535,40 +603,6 @@ public unsafe partial class DebugRenderer
 
         using var disabled = ImRaii.Disabled(!fields.Any());
         using var node = DrawTreeNode(nodeOptions.WithSeStringTitleIfNull(type.FullName ?? "Unknown Type Name"));
-
-        if (ImGui.IsItemHovered())
-        {
-            if (Inherits<ILayoutInstance>(type))
-            {
-                var inst = (ILayoutInstance*)address;
-                if (inst != null)
-                {
-                    var transform = inst->GetTransformImpl();
-                    if (transform != null)
-                    {
-                        DrawLine(transform->Translation);
-                    }
-                }
-            }
-            else if (Inherits<GameObject>(type))
-            {
-                var gameObject = (GameObject*)address;
-                if (gameObject != null)
-                {
-                    DrawLine(gameObject->Position);
-                }
-            }
-
-            void DrawLine(Vector3 pos)
-            {
-                if (_gameGui.WorldToScreen(pos, out var screenPos))
-                {
-                    ImGui.GetForegroundDrawList().AddLine(ImGui.GetMousePos(), screenPos, Color.Orange.ToUInt());
-                    ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Color.Orange.ToUInt());
-                }
-            }
-        }
-
         if (!node) return;
 
         var processedFields = fields
@@ -754,10 +788,6 @@ public unsafe partial class DebugRenderer
             // TODO: enum values table
 
             DrawFieldName(fieldInfo);
-
-            if (fieldType.IsPointer && fieldAddress != 0)
-                fieldNodeOptions = fieldNodeOptions.WithHighlightNode(*(nint*)fieldAddress, fieldType);
-
             DrawPointerType(fieldAddress, fieldType, fieldNodeOptions);
         }
     }

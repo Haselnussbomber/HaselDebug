@@ -28,6 +28,8 @@ public record struct NodeOptions
     public bool IsTimestampField { get; set; } = false;
     public bool HexOnShift { get; set; } = false;
     public Pointer<AtkUnitBase>? UnitBase { get; set; } = null;
+    public nint HighlightAddress { get; set; } = 0;
+    public Type? HighlightType { get; set; } = null;
 
     public ImGuiTreeNodeFlags GetTreeNodeFlags(ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.SpanAvailWidth)
     {
@@ -61,34 +63,6 @@ public record struct NodeOptions
     public NodeOptions WithSeStringTitleIfNull(ReadOnlySeString title)
         => SeStringTitle == null && Title == null ? this with { SeStringTitle = title } : this;
 
-    public unsafe NodeOptions WithHighlightNode(nint nodeAddress, Type nodeType)
-    {
-        if (Inherits<AtkResNode>(nodeType))
-        {
-            return this with
-            {
-                OnHovered = () =>
-                {
-                    HighlightNode((AtkResNode*)nodeAddress);
-                }
-            };
-        }
-        else if (Inherits<AtkComponentBase>(nodeType))
-        {
-            return this with
-            {
-                OnHovered = () =>
-                {
-                    var component = (AtkComponentBase*)nodeAddress;
-                    if (component != null && component->AtkResNode != null)
-                        HighlightNode(component->AtkResNode);
-                }
-            };
-        }
-
-        return this;
-    }
-
     public NodeOptions ConsumeTreeNodeOptions()
         => this with
         {
@@ -98,7 +72,9 @@ public record struct NodeOptions
             DefaultOpen = false,
             DrawContextMenu = null,
             OnHovered = null,
-            DrawSeStringTreeNode = false
+            DrawSeStringTreeNode = false,
+            HighlightAddress = 0,
+            HighlightType = null,
         };
 
     public string GetKey(string prefix) => $"###{prefix}{AddressPath}";

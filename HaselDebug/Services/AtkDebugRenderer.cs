@@ -297,12 +297,12 @@ public unsafe partial class AtkDebugRenderer
 
     private void PrintSimpleNode(AtkResNode* node, string treePrefix, NodeOptions nodeOptions)
     {
-        nodeOptions = nodeOptions.WithHighlightNode((nint)node, typeof(AtkResNode));
-
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
             Title = $"{treePrefix}[#{node->NodeId}] {node->Type} Node (0x{(nint)node:X})",
             TitleColor = node->IsVisible() ? Color.Green : Color.Grey,
+            HighlightAddress = (nint)node,
+            HighlightType = typeof(AtkResNode),
             DrawContextMenu = (nodeOptions, builder) =>
             {
                 builder.Add(new ImGuiContextMenuEntry()
@@ -353,14 +353,12 @@ public unsafe partial class AtkDebugRenderer
         if (objectInfo == null)
             return;
 
-        var isVisible = node->NodeFlags.HasFlag(NodeFlags.Visible);
-
-        nodeOptions = nodeOptions.WithHighlightNode((nint)node, typeof(AtkComponentNode));
-
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
             Title = $"{treePrefix}[#{node->NodeId}] {objectInfo->ComponentType} Component Node (Node: 0x{(nint)node:X}, Component: 0x{(nint)component:X})",
             TitleColor = node->IsVisible() ? Color.Green : Color.Grey,
+            HighlightAddress = (nint)node,
+            HighlightType = typeof(AtkComponentNode),
             DrawContextMenu = (nodeOptions, builder) =>
             {
                 builder.Add(new ImGuiContextMenuEntry()
