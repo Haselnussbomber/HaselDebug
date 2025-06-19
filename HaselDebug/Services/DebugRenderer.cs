@@ -798,6 +798,38 @@ public unsafe partial class DebugRenderer
                 continue;
             }
 
+            // AtkTimelineManager.Timelines
+            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimeline*) && fieldInfo.Name == "Timelines")
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(new Span<AtkTimeline>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->TimelineCount), fieldNodeOptions);
+                continue;
+            }
+
+            // AtkTimelineManager.Animations
+            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimelineAnimation*) && fieldInfo.Name == "Animations")
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(new Span<AtkTimelineAnimation>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->AnimationCount), fieldNodeOptions);
+                continue;
+            }
+
+            // AtkTimelineManager.LabelSets
+            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimelineLabelSet*) && fieldInfo.Name == "LabelSets")
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(new Span<AtkTimelineLabelSet>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->LabelSetCount), fieldNodeOptions);
+                continue;
+            }
+
+            // AtkTimelineManager.LabelSets
+            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimelineKeyFrame*) && fieldInfo.Name == "KeyFrames")
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(new Span<AtkTimelineKeyFrame>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->KeyFrameCount), fieldNodeOptions);
+                continue;
+            }
+
             // byte* that are strings
             if (fieldType.IsPointer && _knownStringPointers.TryGetValue(type, out var fieldNames) && fieldNames.Contains(fieldInfo.Name))
             {
