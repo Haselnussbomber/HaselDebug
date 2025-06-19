@@ -35,6 +35,7 @@ using InteropGenerator.Runtime;
 using InteropGenerator.Runtime.Attributes;
 using Lumina.Text.ReadOnly;
 using Microsoft.Extensions.Logging;
+using static FFXIVClientStructs.FFXIV.Component.GUI.AtkUldManager;
 using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
@@ -468,6 +469,11 @@ public unsafe partial class DebugRenderer
             DrawStdList(address, type.GenericTypeArguments[0], nodeOptions);
             return;
         }
+        else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdLinkedList<>))
+        {
+            DrawStdLinkedList(address, type.GenericTypeArguments[0], nodeOptions);
+            return;
+        }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdDeque<>))
         {
             DrawStdDeque(address, type.GenericTypeArguments[0], nodeOptions);
@@ -777,10 +783,18 @@ public unsafe partial class DebugRenderer
             }
 
             // AtkUldWidgetInfo.NodeList
-            if ( type == typeof(AtkUldWidgetInfo) && fieldType == typeof(AtkResNode**) && fieldInfo.Name == "NodeList")
+            if (type == typeof(AtkUldWidgetInfo) && fieldType == typeof(AtkResNode**) && fieldInfo.Name == "NodeList")
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<Pointer<AtkResNode>>(*(nint**)fieldAddress, ((AtkUldWidgetInfo*)address)->NodeCount), fieldNodeOptions);
+                continue;
+            }
+
+            // DuplicateObjectList.NodeList
+            if (type == typeof(DuplicateObjectList) && fieldType == typeof(AtkComponentNode*) && fieldInfo.Name == "NodeList")
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(new Span<AtkComponentNode>(*(nint**)fieldAddress, (int)((DuplicateObjectList*)address)->NodeCount), fieldNodeOptions);
                 continue;
             }
 
