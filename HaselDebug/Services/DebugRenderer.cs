@@ -402,6 +402,24 @@ public unsafe partial class DebugRenderer
                     }
                 }
             }
+            else if (type == typeof(AtkUnitBase))
+            {
+                nodeOptions = nodeOptions.WithTitle($"{type.FullName} ({((AtkUnitBase*)address)->NameString})");
+            }
+            else if (type == typeof(AgentInterface))
+            {
+                var agent = (AgentInterface*)address;
+                var agentModule = AgentModule.Instance();
+                for (var i = 0; i < agentModule->Agents.Length; i++)
+                {
+                    var ptr = agentModule->Agents.GetPointer(i);
+                    if (ptr->Value != null && ptr->Value == agent)
+                    {
+                        nodeOptions = nodeOptions.WithTitle($"{type.FullName} ({(AgentId)i})");
+                        break;
+                    }
+                }
+            }
 
             nodeOptions = nodeOptions with
             {
