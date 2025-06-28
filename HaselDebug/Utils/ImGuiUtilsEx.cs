@@ -1,8 +1,8 @@
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselCommon.Graphics;
 using HaselCommon.Gui;
-using HaselDebug.Services;
 using ImGuiNET;
 
 namespace HaselDebug.Utils;
@@ -64,7 +64,7 @@ public static unsafe class ImGuiUtilsEx
         return $"{texPath} | U: {part.U} V: {part.V} | W: {part.Width} H: {part.Height}";
     }
 
-    public static bool PartListSelector(AtkUldPartsList* partsList, ref uint partId)
+    public static bool PartListSelector(IServiceProvider serviceProvider, AtkUldPartsList* partsList, ref uint partId)
     {
         if (partsList == null || partId > partsList->PartCount)
             return false;
@@ -108,8 +108,7 @@ public static unsafe class ImGuiUtilsEx
 
         if (texType == TextureType.Resource)
         {
-            if (Service.TryGet<DebugRenderer>(out var debugRenderer))
-                debugRenderer.DrawCopyableText(textureInfo->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString());
+            DrawCopyableText(textureInfo->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString());
 
             /* explodes
             if (textureInfo->AtkTexture.Resource->IconId != 0)
@@ -162,8 +161,7 @@ public static unsafe class ImGuiUtilsEx
         ImGuiUtils.SameLineSpace();
         if (copy)
         {
-            if (Service.TryGet<DebugRenderer>(out var debugRenderer))
-                debugRenderer.DrawCopyableText(value);
+            DrawCopyableText(value);
         }
         else
         {
@@ -199,5 +197,52 @@ public static unsafe class ImGuiUtilsEx
         {
             ImGui.Dummy(new(padding * ImGui.GetIO().FontGlobalScale));
         }
+    }
+
+    public static void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Color? textColor = null, string? highligtedText = null, bool noTooltip = false)
+    {
+        textCopy ??= text;
+
+        using var color = textColor?.Push(ImGuiCol.Text);
+
+        if (asSelectable)
+        {
+            ImGui.Selectable(text);
+        }
+        else if (!string.IsNullOrEmpty(highligtedText))
+        {
+            var pos = text.IndexOf(highligtedText, StringComparison.InvariantCultureIgnoreCase);
+            if (pos != -1)
+            {
+                ImGui.TextUnformatted(text[..pos]);
+                ImGui.SameLine(0, 0);
+
+                using (Color.Yellow.Push(ImGuiCol.Text))
+                    ImGui.TextUnformatted(text[pos..(pos + highligtedText.Length)]);
+
+                ImGui.SameLine(0, 0);
+                ImGui.TextUnformatted(text[(pos + highligtedText.Length)..]);
+            }
+            else
+            {
+                ImGui.TextUnformatted(text);
+            }
+        }
+        else
+        {
+            ImGui.TextUnformatted(text);
+        }
+
+        color?.Pop();
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+            if (!noTooltip)
+                ImGui.SetTooltip(tooltipText ?? textCopy);
+        }
+
+        if (ImGui.IsItemClicked())
+            ImGui.SetClipboardText(textCopy);
     }
 }

@@ -42,7 +42,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                     {
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
-                        _debugRenderer.DrawCopyableText(itemId.ToString());
+                        ImGuiUtilsEx.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted(item.SpecialId.ToString());
                         ImGui.TableNextColumn();
@@ -51,7 +51,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         if (currencyManager->IsItemLimited(itemId))
                             ImGui.TextUnformatted(currencyManager->GetItemCountRemaining(itemId).ToString());
                         ImGui.TableNextColumn();
-                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
+                        ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
                     }
                 }
             }
@@ -75,7 +75,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                     {
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
-                        _debugRenderer.DrawCopyableText(itemId.ToString());
+                        ImGuiUtilsEx.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
                         ImGui.TableNextColumn();
@@ -84,7 +84,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
-                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
+                        ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
                     }
                 }
             }
@@ -108,7 +108,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                     {
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
-                        _debugRenderer.DrawCopyableText(itemId.ToString());
+                        ImGuiUtilsEx.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
                         ImGui.TableNextColumn();
@@ -117,7 +117,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
-                        _debugRenderer.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
+                        ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
                     }
                 }
             }

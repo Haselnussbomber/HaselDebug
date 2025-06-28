@@ -6,6 +6,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
@@ -63,7 +64,7 @@ public unsafe partial class ContentsFinderDutyListTab : DebugTab
             var item = addon->DutyList->Items[i].Value;
             ImGui.TextUnformatted($"{i}:");
             ImGui.SameLine();
-            _debugRenderer.DrawCopyableText($"{(nint)item:X}");
+            ImGuiUtilsEx.DrawCopyableText($"{(nint)item:X}");
 
             using (ImRaii.PushIndent())
             {

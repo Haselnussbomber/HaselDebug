@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Recipes;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class RecipesTable : Table<Recipe>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly CompletedColumn _completedColumn;
     private readonly ItemCategoryColumn _itemCategoryColumn;
@@ -18,7 +19,7 @@ public unsafe partial class RecipesTable : Table<Recipe>
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<Recipe>.Create(),
+            RowIdColumn<Recipe>.Create(_serviceProvider),
             _completedColumn,
             _itemCategoryColumn,
             _nameColumn,

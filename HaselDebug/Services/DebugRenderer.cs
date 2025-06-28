@@ -28,7 +28,6 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
-using HaselCommon.Extensions;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Utils;
@@ -70,8 +69,10 @@ public unsafe partial class DebugRenderer
     private readonly TextService _textService;
     private readonly TextureService _textureService;
     private readonly IDataManager _dataManager;
+    private readonly ISigScanner _sigScanner;
     private readonly IGameGui _gameGui;
     private readonly LanguageProvider _languageProvider;
+    private readonly AddonObserver _addonObserver;
 
     public ImmutableSortedDictionary<string, Type> AddonTypes { get; private set; }
     public ImmutableSortedDictionary<AgentId, Type> AgentTypes { get; private set; }
@@ -471,7 +472,7 @@ public unsafe partial class DebugRenderer
         }
         else if (type == typeof(StdString))
         {
-            DrawCopyableText(((StdString*)address)->ToString());
+            ImGuiUtilsEx.DrawCopyableText(((StdString*)address)->ToString());
             return;
         }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdVector<>))
@@ -649,7 +650,7 @@ public unsafe partial class DebugRenderer
         foreach (var (fieldInfo, offset, size) in processedFields)
         {
             i++;
-            DrawCopyableText($"[0x{offset:X}]", ImGui.IsKeyDown(ImGuiKey.LeftShift) ? $"0x{offset:X}" : $"{address + offset:X}", textColor: Color.Grey3);
+            ImGuiUtilsEx.DrawCopyableText($"[0x{offset:X}]", ImGui.IsKeyDown(ImGuiKey.LeftShift) ? $"0x{offset:X}" : $"{address + offset:X}", textColor: Color.Grey3);
             ImGui.SameLine();
 
             var fieldNodeOptions = nodeOptions.WithAddress(i);
@@ -680,7 +681,7 @@ public unsafe partial class DebugRenderer
                 ImGui.SameLine();
             }
 
-            DrawCopyableText(fieldType.ReadableTypeName(), fieldType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
+            ImGuiUtilsEx.DrawCopyableText(fieldType.ReadableTypeName(), fieldType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
             ImGui.SameLine();
 
             // delegate*
@@ -863,7 +864,7 @@ public unsafe partial class DebugRenderer
                 ImGui.SameLine();
                 var chars = MemoryHelper.ReadString(fieldAddress, 4).ToCharArray();
                 Array.Reverse(chars);
-                DrawCopyableText(new string(chars));
+                ImGuiUtilsEx.DrawCopyableText(new string(chars));
                 continue;
             }
 
@@ -1012,7 +1013,7 @@ public unsafe partial class DebugRenderer
                 if ((Convert.ToUInt64(value) & bitValue) != 0)
                 {
                     ImGui.SameLine();
-                    DrawCopyableText(Enum.GetName(type, bitValue)?.ToString() ?? $"{bitValue}", $"{bitValue}");
+                    ImGuiUtilsEx.DrawCopyableText(Enum.GetName(type, bitValue)?.ToString() ?? $"{bitValue}", $"{bitValue}");
                 }
             }
         }
@@ -1021,53 +1022,6 @@ public unsafe partial class DebugRenderer
             ImGui.SameLine();
             ImGui.TextUnformatted(Enum.GetName(type, value)?.ToString() ?? "");
         }
-    }
-
-    public void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Color? textColor = null, string? highligtedText = null, bool noTooltip = false)
-    {
-        textCopy ??= text;
-
-        using var color = textColor?.Push(ImGuiCol.Text);
-
-        if (asSelectable)
-        {
-            ImGui.Selectable(text);
-        }
-        else if (!string.IsNullOrEmpty(highligtedText))
-        {
-            var pos = text.IndexOf(highligtedText, StringComparison.InvariantCultureIgnoreCase);
-            if (pos != -1)
-            {
-                ImGui.TextUnformatted(text[..pos]);
-                ImGui.SameLine(0, 0);
-
-                using (Color.Yellow.Push(ImGuiCol.Text))
-                    ImGui.TextUnformatted(text[pos..(pos + highligtedText.Length)]);
-
-                ImGui.SameLine(0, 0);
-                ImGui.TextUnformatted(text[(pos + highligtedText.Length)..]);
-            }
-            else
-            {
-                ImGui.TextUnformatted(text);
-            }
-        }
-        else
-        {
-            ImGui.TextUnformatted(text);
-        }
-
-        color?.Pop();
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            if (!noTooltip)
-                ImGui.SetTooltip(tooltipText ?? textCopy);
-        }
-
-        if (ImGui.IsItemClicked())
-            ImGui.SetClipboardText(textCopy);
     }
 
     public void DrawAddress(void* obj)
@@ -1081,16 +1035,14 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        var sigScanner = Service.Get<ISigScanner>();
-
-        if (address > sigScanner.Module.BaseAddress && !ImGui.IsKeyDown(ImGuiKey.LeftShift))
+        if (address > _sigScanner.Module.BaseAddress && !ImGui.IsKeyDown(ImGuiKey.LeftShift))
         {
-            DrawCopyableText($"+0x{address - sigScanner.Module.BaseAddress:X}");
+            ImGuiUtilsEx.DrawCopyableText($"+0x{address - _sigScanner.Module.BaseAddress:X}");
             return;
         }
         else
         {
-            DrawCopyableText($"0x{address:X}");
+            ImGuiUtilsEx.DrawCopyableText($"0x{address:X}");
         }
     }
 
@@ -1172,7 +1124,7 @@ public unsafe partial class DebugRenderer
 
         if (type == typeof(Half) || type == typeof(decimal) || type == typeof(double) || type == typeof(float))
         {
-            DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+            ImGuiUtilsEx.DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
             return;
         }
 
@@ -1197,18 +1149,18 @@ public unsafe partial class DebugRenderer
 
         if (nodeOptions.IsTimestampField)
         {
-            DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+            ImGuiUtilsEx.DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
 
             switch (value)
             {
                 case int intTime when intTime != 0:
                     ImGui.SameLine();
-                    DrawCopyableText(DateTimeOffset.FromUnixTimeSeconds(intTime).ToLocalTime().ToString());
+                    ImGuiUtilsEx.DrawCopyableText(DateTimeOffset.FromUnixTimeSeconds(intTime).ToLocalTime().ToString());
                     break;
 
                 case long longTime when longTime != 0:
                     ImGui.SameLine();
-                    DrawCopyableText(DateTimeOffset.FromUnixTimeSeconds(longTime).ToLocalTime().ToString());
+                    ImGuiUtilsEx.DrawCopyableText(DateTimeOffset.FromUnixTimeSeconds(longTime).ToLocalTime().ToString());
                     break;
             }
 
@@ -1218,19 +1170,19 @@ public unsafe partial class DebugRenderer
         {
             if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || ImGui.IsKeyDown(ImGuiKey.RightShift))
             {
-                DrawCopyableText(ToHexString(value, type));
+                ImGuiUtilsEx.DrawCopyableText(ToHexString(value, type));
             }
             else
             {
-                DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+                ImGuiUtilsEx.DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
             }
 
             return;
         }
 
-        DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+        ImGuiUtilsEx.DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
         ImGui.SameLine();
-        DrawCopyableText(ToHexString(value, type));
+        ImGuiUtilsEx.DrawCopyableText(ToHexString(value, type));
     }
 
     private static string ToHexString(object value, Type type)

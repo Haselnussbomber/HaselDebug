@@ -16,7 +16,6 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 {
     internal readonly ExcelService _excelService;
     private readonly SeStringEvaluator _seStringEvaluator;
-    private readonly TextService _textService;
     private readonly IClientState _clientState;
 
     private readonly IndexColumn _indexColumn;

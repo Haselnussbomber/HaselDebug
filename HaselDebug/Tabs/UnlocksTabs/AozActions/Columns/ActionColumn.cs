@@ -21,7 +21,7 @@ public partial class ActionColumn : ColumnString<AozEntry>
     {
         ImGui.BeginGroup();
         _debugRenderer.DrawIcon(entry.AozActionTransient.Icon, noTooltip: true);
-        _debugRenderer.DrawCopyableText(entry.Action.Name.ExtractText(), noTooltip: true);
+        ImGuiUtilsEx.DrawCopyableText(entry.Action.Name.ExtractText(), noTooltip: true);
         ImGui.EndGroup();
 
         if (ImGui.IsItemHovered())

@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.OrchestrionRolls;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class OrchestrionRollsTable : Table<OrchestrionRollEntry>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly UnlockedColumn _unlockedColumn;
     private readonly CategoryColumn _categoryColumn;
@@ -19,7 +20,7 @@ public unsafe partial class OrchestrionRollsTable : Table<OrchestrionRollEntry>
     public void Initialize()
     {
         Columns = [
-            EntryRowIdColumn<OrchestrionRollEntry, Orchestrion>.Create(),
+            EntryRowIdColumn<OrchestrionRollEntry, Orchestrion>.Create(_serviceProvider),
             _unlockedColumn,
             _categoryColumn,
             _numberColumn,

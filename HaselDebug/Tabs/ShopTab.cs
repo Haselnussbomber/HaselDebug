@@ -2,6 +2,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
@@ -34,7 +35,7 @@ public unsafe partial class ShopTab : DebugTab
             var listItemRenderer = addon->List->GetItemRenderer(i);
             ImGui.TextUnformatted($"{i}:");
             ImGui.SameLine();
-            _debugRenderer.DrawCopyableText($"{(nint)listItemRenderer:X}");
+            ImGuiUtilsEx.DrawCopyableText($"{(nint)listItemRenderer:X}");
             ImGui.SameLine();
 
             if (addon->List->ItemRendererList[i].IsDisabled)

@@ -199,10 +199,11 @@ public unsafe partial class DebugRenderer
         {
             var str = new ReadOnlySeString(rosss.Data.ToArray());
             var windowTitle = nodeOptions.Title ?? (nodeOptions.SeStringTitle ?? str).ToString();
-            _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_serviceProvider)
+            var language = nodeOptions.Language ?? _languageProvider.ClientLanguage;
+            _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _addonObserver, _serviceProvider)
             {
                 String = str,
-                Language = nodeOptions.Language,
+                Language = language,
                 WindowName = windowTitle,
             });
         }
@@ -260,7 +261,7 @@ public unsafe partial class DebugRenderer
             ImGui.TextUnformatted(payload.Type == ReadOnlySePayloadType.Text ? "Text" : "ToString()");
             ImGui.TableNextColumn();
             var text = payload.ToString();
-            DrawCopyableText($"\"{text}\"", text);
+            ImGuiUtilsEx.DrawCopyableText($"\"{text}\"", text);
 
             if (payload.Type != ReadOnlySePayloadType.Macro)
                 continue;
@@ -318,9 +319,9 @@ public unsafe partial class DebugRenderer
                 ImGui.SameLine();
             }
 
-            DrawCopyableText(u32.ToString());
+            ImGuiUtilsEx.DrawCopyableText(u32.ToString());
             ImGui.SameLine();
-            DrawCopyableText($"0x{u32:X}");
+            ImGuiUtilsEx.DrawCopyableText($"0x{u32:X}");
 
             if (macroCode == MacroCode.Link && idx == 0)
             {

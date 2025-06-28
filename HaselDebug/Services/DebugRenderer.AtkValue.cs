@@ -22,7 +22,7 @@ public unsafe partial class DebugRenderer
                 ImGui.TextUnformatted("Null");
                 break;
             case ValueType.Bool:
-                DrawCopyableText($"{value->Byte == 0x01}");
+                ImGuiUtilsEx.DrawCopyableText($"{value->Byte == 0x01}");
                 break;
             case ValueType.Int:
                 DrawNumeric((nint)(&value->Int), typeof(int), nodeOptions);

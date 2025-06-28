@@ -10,6 +10,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Quests;
 [RegisterSingleton, AutoConstruct]
 public partial class QuestsTable : Table<Quest>, IDisposable
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly QuestIdColumn _questIdColumn;
     private readonly QuestStatusColumn _questStatusColumn;
@@ -21,7 +22,7 @@ public partial class QuestsTable : Table<Quest>, IDisposable
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<Quest>.Create(),
+            RowIdColumn<Quest>.Create(_serviceProvider),
             _questIdColumn,
             _questStatusColumn,
             _repeatableColumn,

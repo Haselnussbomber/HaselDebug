@@ -44,22 +44,22 @@ public unsafe partial class HousingTab : DebugTab
         {
             ImGui.TextUnformatted($"Current HouseId ({housingManager->GetCurrentHousingTerritoryType()})");
             ImGui.SameLine();
-            _debugRenderer.DrawCopyableText($"{(long)houseId}");
+            ImGuiUtilsEx.DrawCopyableText($"{(long)houseId}");
             ImGui.SameLine();
-            _debugRenderer.DrawCopyableText($"0x{(long)houseId:X}");
+            ImGuiUtilsEx.DrawCopyableText($"0x{(long)houseId:X}");
             ImGui.SameLine();
             _debugRenderer.DrawPointerType(&houseId, typeof(HouseId), new() { AddressPath = new(0) });
-            _debugRenderer.DrawCopyableText($"IsApartment: {houseId.IsApartment}");
+            ImGuiUtilsEx.DrawCopyableText($"IsApartment: {houseId.IsApartment}");
             if (houseId.IsApartment)
             {
-                _debugRenderer.DrawCopyableText($"Division: {houseId.ApartmentDivision}");
-                _debugRenderer.DrawCopyableText($"RoomNumber: {houseId.RoomNumber}");
+                ImGuiUtilsEx.DrawCopyableText($"Division: {houseId.ApartmentDivision}");
+                ImGuiUtilsEx.DrawCopyableText($"RoomNumber: {houseId.RoomNumber}");
             }
             else
             {
-                _debugRenderer.DrawCopyableText($"PlotIndex: {houseId.PlotIndex}");
-                _debugRenderer.DrawCopyableText($"WardIndex: {houseId.WardIndex}");
-                _debugRenderer.DrawCopyableText($"RoomNumber: {houseId.RoomNumber}");
+                ImGuiUtilsEx.DrawCopyableText($"PlotIndex: {houseId.PlotIndex}");
+                ImGuiUtilsEx.DrawCopyableText($"WardIndex: {houseId.WardIndex}");
+                ImGuiUtilsEx.DrawCopyableText($"RoomNumber: {houseId.RoomNumber}");
             }
         }
 
@@ -80,7 +80,7 @@ public unsafe partial class HousingTab : DebugTab
                     ImGui.TextUnformatted("FreeCompanyEstate");
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.FreeCompanyEstate);
-                    _debugRenderer.DrawCopyableText($"{(long)houseId}");
+                    ImGuiUtilsEx.DrawCopyableText($"{(long)houseId}");
                     ImGui.TableNextColumn();
                     _debugRenderer.DrawPointerType(&houseId, typeof(HouseId), new() { AddressPath = new([1, 0]) });
 
@@ -89,7 +89,7 @@ public unsafe partial class HousingTab : DebugTab
                     ImGui.TextUnformatted("PersonalChambers");
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.PersonalChambers);
-                    _debugRenderer.DrawCopyableText($"{(long)houseId}");
+                    ImGuiUtilsEx.DrawCopyableText($"{(long)houseId}");
                     ImGui.TableNextColumn();
                     _debugRenderer.DrawPointerType(&houseId, typeof(HouseId), new() { AddressPath = new([1, 1]) });
 
@@ -98,7 +98,7 @@ public unsafe partial class HousingTab : DebugTab
                     ImGui.TextUnformatted("PersonalEstate");
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.PersonalEstate);
-                    _debugRenderer.DrawCopyableText($"{(long)houseId}");
+                    ImGuiUtilsEx.DrawCopyableText($"{(long)houseId}");
                     ImGui.TableNextColumn();
                     _debugRenderer.DrawPointerType(&houseId, typeof(HouseId), new() { AddressPath = new([1, 2]) });
 
@@ -107,7 +107,7 @@ public unsafe partial class HousingTab : DebugTab
                     ImGui.TextUnformatted("Unknown3");
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.Unknown3);
-                    _debugRenderer.DrawCopyableText($"{(long)houseId}");
+                    ImGuiUtilsEx.DrawCopyableText($"{(long)houseId}");
                     ImGui.TableNextColumn();
                     _debugRenderer.DrawPointerType(&houseId, typeof(HouseId), new() { AddressPath = new([1, 3]) });
 
@@ -116,7 +116,7 @@ public unsafe partial class HousingTab : DebugTab
                     ImGui.TextUnformatted("SharedEstate 0");
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 0);
-                    _debugRenderer.DrawCopyableText($"{(long)houseId}");
+                    ImGuiUtilsEx.DrawCopyableText($"{(long)houseId}");
                     ImGui.TableNextColumn();
                     _debugRenderer.DrawPointerType(&houseId, typeof(HouseId), new() { AddressPath = new([1, 4]) });
 
@@ -125,7 +125,7 @@ public unsafe partial class HousingTab : DebugTab
                     ImGui.TextUnformatted("SharedEstate 1");
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 1);
-                    _debugRenderer.DrawCopyableText($"{(long)houseId}");
+                    ImGuiUtilsEx.DrawCopyableText($"{(long)houseId}");
                     ImGui.TableNextColumn();
                     _debugRenderer.DrawPointerType(&houseId, typeof(HouseId), new() { AddressPath = new([1, 5]) });
 
@@ -134,7 +134,7 @@ public unsafe partial class HousingTab : DebugTab
                     ImGui.TextUnformatted("ApartmentBuilding");
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.ApartmentBuilding);
-                    _debugRenderer.DrawCopyableText($"{(long)houseId}");
+                    ImGuiUtilsEx.DrawCopyableText($"{(long)houseId}");
                     ImGui.TableNextColumn();
                     _debugRenderer.DrawPointerType(&houseId, typeof(HouseId), new() { AddressPath = new([1, 6]) });
 
@@ -143,7 +143,7 @@ public unsafe partial class HousingTab : DebugTab
                     ImGui.TextUnformatted("ApartmentRoom");
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.ApartmentRoom);
-                    _debugRenderer.DrawCopyableText($"{(long)houseId}");
+                    ImGuiUtilsEx.DrawCopyableText($"{(long)houseId}");
                     ImGui.TableNextColumn();
                     _debugRenderer.DrawPointerType(&houseId, typeof(HouseId), new() { AddressPath = new([1, 7]) });
                 }

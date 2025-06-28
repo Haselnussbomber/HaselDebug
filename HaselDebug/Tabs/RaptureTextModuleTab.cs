@@ -113,6 +113,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
     private readonly WindowManager _windowManager;
     private readonly SeStringEvaluator _seStringEvaluator;
     private readonly TextService _textService;
+    private readonly AddonObserver _addonObserver;
     private readonly LanguageProvider _languageProvider;
     private readonly TextureService _textureService;
 
@@ -133,8 +134,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
     private void OnLanguageChanged(string langCode)
     {
-        if (_inspectorWindow != null)
-            _inspectorWindow.Language = _languageProvider.ClientLanguage;
+        _inspectorWindow?.Language = _languageProvider.ClientLanguage;
     }
 
     public override unsafe void Draw()
@@ -186,9 +186,9 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
             switch (item.Type)
             {
                 case TextParameterType.Integer:
-                    _debugRenderer.DrawCopyableText($"0x{item.IntValue:X}");
+                    ImGuiUtilsEx.DrawCopyableText($"0x{item.IntValue:X}");
                     ImGui.SameLine();
-                    _debugRenderer.DrawCopyableText(item.IntValue.ToString());
+                    ImGuiUtilsEx.DrawCopyableText(item.IntValue.ToString());
                     break;
 
                 case TextParameterType.ReferencedUtf8String:
@@ -427,7 +427,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
         if (_inspectorWindow == null)
         {
-            _inspectorWindow = _windowManager.CreateOrOpen("StringMaker Preview", () => new SeStringInspectorWindow(_serviceProvider)
+            _inspectorWindow = _windowManager.CreateOrOpen("StringMaker Preview", () => new SeStringInspectorWindow(_windowManager, _textService, _addonObserver, _serviceProvider)
             {
                 String = "",
                 Language = _languageProvider.ClientLanguage,

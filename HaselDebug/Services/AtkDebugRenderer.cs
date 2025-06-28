@@ -12,6 +12,7 @@ using HaselDebug.Utils;
 using HaselDebug.Windows;
 using ImGuiNET;
 using Lumina.Text.ReadOnly;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Services;
 
@@ -23,6 +24,8 @@ public unsafe partial class AtkDebugRenderer
     private readonly TextService _textService;
     private readonly WindowManager _windowManager;
     private readonly LanguageProvider _languageProvider;
+    private readonly AddonObserver _addonObserver;
+    private readonly PinnedInstancesService _pinnedInstancesService;
     private string _nodeQuery = string.Empty;
 
     public void DrawAddon(ushort addonId, string addonName, bool border = true)
@@ -58,7 +61,7 @@ public unsafe partial class AtkDebugRenderer
         if (!_debugRenderer.AddonTypes.TryGetValue(unitBase->NameString, out var type))
             type = typeof(AtkUnitBase);
 
-        _debugRenderer.DrawCopyableText(unitBase->NameString);
+        ImGuiUtilsEx.DrawCopyableText(unitBase->NameString);
 
         ImGui.SameLine();
 
@@ -102,8 +105,7 @@ public unsafe partial class AtkDebugRenderer
                 DefaultOpen = false,
                 DrawContextMenu = (nodeOptions, builder) =>
                 {
-                    var pinnedInstances = Service.Get<PinnedInstancesService>();
-                    var isPinned = pinnedInstances.Contains(agentType);
+                    var isPinned = _pinnedInstancesService.Contains(agentType);
 
                     builder.AddCopyName(_textService, agentId.ToString());
                     builder.AddCopyAddress(_textService, (nint)agent);
@@ -114,21 +116,21 @@ public unsafe partial class AtkDebugRenderer
                     {
                         Visible = !_windowManager.Contains(win => win.WindowName == agentType.Name),
                         Label = _textService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_serviceProvider, (nint)agent, agentType, string.Empty))
+                        ClickCallback = () => _windowManager.Open(ActivatorUtilities.CreateInstance<PointerTypeWindow>(_serviceProvider, (nint)agent, agentType, string.Empty))
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()
                     {
                         Visible = !isPinned,
                         Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
-                        ClickCallback = () => pinnedInstances.Add((nint)agent, agentType)
+                        ClickCallback = () => _pinnedInstancesService.Add((nint)agent, agentType)
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()
                     {
                         Visible = isPinned,
                         Label = _textService.Translate("ContextMenu.PinnedInstances.Unpin"),
-                        ClickCallback = () => pinnedInstances.Remove(agentType)
+                        ClickCallback = () => _pinnedInstancesService.Remove(agentType)
                     });
                 }
             });
@@ -151,8 +153,7 @@ public unsafe partial class AtkDebugRenderer
                     DefaultOpen = false,
                     DrawContextMenu = (nodeOptions, builder) =>
                     {
-                        var pinnedInstances = Service.Get<PinnedInstancesService>();
-                        var isPinned = pinnedInstances.Contains(hostType);
+                        var isPinned = _pinnedInstancesService.Contains(hostType);
 
                         builder.AddCopyName(_textService, host->NameString);
                         builder.AddCopyAddress(_textService, (nint)host);
@@ -163,7 +164,7 @@ public unsafe partial class AtkDebugRenderer
                         {
                             Visible = !_windowManager.Contains(win => win.WindowName == hostType.Name),
                             Label = _textService.Translate("ContextMenu.TabPopout"),
-                            ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_serviceProvider, (nint)host, hostType, string.Empty))
+                            ClickCallback = () => _windowManager.Open(ActivatorUtilities.CreateInstance<PointerTypeWindow>(_serviceProvider, (nint)host, hostType, string.Empty))
                         });
                     }
                 });
@@ -311,7 +312,7 @@ public unsafe partial class AtkDebugRenderer
                     Label = _textService.Translate("ContextMenu.TabPopout"),
                     ClickCallback = () =>
                     {
-                        _windowManager.Open(new NodeInspectorWindow(_serviceProvider, this)
+                        _windowManager.Open(new NodeInspectorWindow(_windowManager, _textService, _addonObserver, this)
                         {
                             WindowName = nodeOptions.Title!,
                             NodeAddress = (nint)node
@@ -367,7 +368,7 @@ public unsafe partial class AtkDebugRenderer
                     Label = _textService.Translate("ContextMenu.TabPopout"),
                     ClickCallback = () =>
                     {
-                        _windowManager.Open(new NodeInspectorWindow(_serviceProvider, this)
+                        _windowManager.Open(new NodeInspectorWindow(_windowManager, _textService, _addonObserver, this)
                         {
                             WindowName = nodeOptions.Title!,
                             NodeAddress = (nint)node
@@ -715,33 +716,33 @@ public unsafe partial class AtkDebugRenderer
                             case 0 when hasPosition: // Position
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                _debugRenderer.DrawCopyableText(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
 
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                _debugRenderer.DrawCopyableText(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
                                 break;
 
                             case 1 when hasRotation: // Rotation
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                _debugRenderer.DrawCopyableText(keyFrame.Value.Float.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Float.ToString(CultureInfo.InvariantCulture));
                                 break;
 
                             case 2 when hasScale: // Scale
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                _debugRenderer.DrawCopyableText(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
 
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                _debugRenderer.DrawCopyableText(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
                                 break;
 
                             case 3 when hasAlpha: // Alpha
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                _debugRenderer.DrawCopyableText(keyFrame.Value.Byte.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Byte.ToString(CultureInfo.InvariantCulture));
                                 break;
 
                             case 4 when hasTint: // NodeTint
@@ -759,7 +760,7 @@ public unsafe partial class AtkDebugRenderer
                             case 5 when hasPartId: // PartId
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                _debugRenderer.DrawCopyableText(keyFrame.Value.UShort.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.UShort.ToString(CultureInfo.InvariantCulture));
                                 break;
 
                             case 6 when hasTextEdge: // TextEdge
@@ -772,7 +773,7 @@ public unsafe partial class AtkDebugRenderer
                             case 7 when hasTextLabel: // TextLabel
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                _debugRenderer.DrawCopyableText(keyFrame.Value.UShort.ToString(CultureInfo.InvariantCulture)); // Might not be the correct property UShort vs Short for this bucket
+                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.UShort.ToString(CultureInfo.InvariantCulture)); // Might not be the correct property UShort vs Short for this bucket
                                 break;
                         }
                     }
@@ -947,7 +948,7 @@ public unsafe partial class AtkDebugRenderer
                 var imageNode = (AtkImageNode*)node;
                 StartRow("Asset");
                 partId = imageNode->PartId;
-                if (ImGuiUtilsEx.PartListSelector(imageNode->PartsList, ref partId))
+                if (ImGuiUtilsEx.PartListSelector(_serviceProvider, imageNode->PartsList, ref partId))
                 {
                     imageNode->PartId = (ushort)partId;
                     imageNode->DrawFlags |= 1;
@@ -962,7 +963,7 @@ public unsafe partial class AtkDebugRenderer
                 if (ImGui.Selectable(str.ToString() + $"##TextNodeText{(nint)node:X}"))
                 {
                     var windowTitle = $"Text Node #{node->NodeId} (0x{(nint)node:X})";
-                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_serviceProvider)
+                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _addonObserver, _serviceProvider)
                     {
                         String = str,
                         Language = _languageProvider.ClientLanguage,
@@ -1038,7 +1039,7 @@ public unsafe partial class AtkDebugRenderer
                 if (ImGui.Selectable(str.ToString() + $"##CounterNodeText{(nint)node:X}"))
                 {
                     var windowTitle = $"Counter Node #{node->NodeId} (0x{(nint)node:X})";
-                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_serviceProvider)
+                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _addonObserver, _serviceProvider)
                     {
                         String = str,
                         Language = _languageProvider.ClientLanguage,
@@ -1053,7 +1054,7 @@ public unsafe partial class AtkDebugRenderer
                 var ngNode = (AtkNineGridNode*)node;
                 StartRow("Asset");
                 partId = ngNode->PartId;
-                if (ImGuiUtilsEx.PartListSelector(ngNode->PartsList, ref partId))
+                if (ImGuiUtilsEx.PartListSelector(_serviceProvider, ngNode->PartsList, ref partId))
                 {
                     ngNode->PartId = partId;
                     ngNode->DrawFlags |= 1;
@@ -1081,7 +1082,7 @@ public unsafe partial class AtkDebugRenderer
                 var cmNode = (AtkClippingMaskNode*)node;
                 StartRow("Asset");
                 partId = cmNode->PartId;
-                if (ImGuiUtilsEx.PartListSelector(cmNode->PartsList, ref partId))
+                if (ImGuiUtilsEx.PartListSelector(_serviceProvider, cmNode->PartsList, ref partId))
                 {
                     cmNode->PartId = (ushort)partId;
                     cmNode->DrawFlags |= 1;

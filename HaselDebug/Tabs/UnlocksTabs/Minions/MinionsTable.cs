@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Minions;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class MinionsTable : Table<Companion>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly UnlockedColumn _unlockedColumn;
     private readonly NameColumn _nameColumn;
@@ -17,7 +18,7 @@ public unsafe partial class MinionsTable : Table<Companion>
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<Companion>.Create(),
+            RowIdColumn<Companion>.Create(_serviceProvider),
             _unlockedColumn,
             _nameColumn
         ];

@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Spearfish;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class SpearfishTable : Table<SpearfishingItem>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly CaughtColumn _caughtColumn;
     private readonly NameColumn _nameColumn;
@@ -17,7 +18,7 @@ public unsafe partial class SpearfishTable : Table<SpearfishingItem>
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<SpearfishingItem>.Create(),
+            RowIdColumn<SpearfishingItem>.Create(_serviceProvider),
             _caughtColumn,
             _nameColumn
         ];

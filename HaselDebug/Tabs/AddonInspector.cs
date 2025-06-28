@@ -26,6 +26,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
     private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly PinnedInstancesService _pinnedInstances;
     private readonly WindowManager _windowManager;
+    private readonly AddonObserver _addonObserver;
     private readonly AtkDebugRenderer _atkDebugRenderer;
 
     private ushort _selectedAddonId = 0;
@@ -186,7 +187,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
                     Label = _textService.Translate("ContextMenu.TabPopout"),
                     ClickCallback = () =>
                     {
-                        _windowManager.Open(new AddonInspectorWindow(_serviceProvider, _atkDebugRenderer)
+                        _windowManager.Open(new AddonInspectorWindow(_windowManager, _textService, _addonObserver, _atkDebugRenderer)
                         {
                             AddonId = addonId,
                             AddonName = addonName

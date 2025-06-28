@@ -10,8 +10,8 @@ namespace HaselDebug.Tabs.UnlocksTabs.Mounts;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class MountsTable : Table<Mount>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
-    private readonly TextService _textService;
     private readonly UnlockedColumn _unlockedColumn;
     private readonly NameColumn _nameColumn;
 
@@ -19,7 +19,7 @@ public unsafe partial class MountsTable : Table<Mount>
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<Mount>.Create(),
+            RowIdColumn<Mount>.Create(_serviceProvider),
             _unlockedColumn,
             _nameColumn
         ];

@@ -28,7 +28,7 @@ public partial class UnlocksNameColumn : ColumnString<UnlockLinkEntry>
                 default:
                     ImGui.BeginGroup();
                     _debugRenderer.DrawIcon(unlock.IconId, noTooltip: true);
-                    _debugRenderer.DrawCopyableText(unlock.Label, noTooltip: true);
+                    ImGuiUtilsEx.DrawCopyableText(unlock.Label, noTooltip: true);
                     ImGui.EndGroup();
 
                     if (ImGui.IsItemHovered())

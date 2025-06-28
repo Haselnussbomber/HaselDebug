@@ -8,17 +8,21 @@ using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Windows;
 using ImGuiNET;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Tabs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public class UnlocksTab : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public partial class UnlocksTab : DebugTab
 {
+    private readonly IServiceProvider _serviceProvider;
+
     public override unsafe bool DrawInChild => !AgentLobby.Instance()->IsLoggedIn;
     public override bool IsPinnable => false;
     public override bool CanPopOut => false;
 
-    public UnlocksTab(IEnumerable<IUnlockTab> subTabs)
+    [AutoPostConstruct]
+    private void Initialize(IEnumerable<IUnlockTab> subTabs)
     {
         SubTabs = subTabs
             .OrderBy(t => t.Title).ToArray()
@@ -50,7 +54,7 @@ public class UnlocksTab : DebugTab
             ImGui.TableNextColumn();
             if (ImGui.Selectable(tab.Title, false, ImGuiSelectableFlags.SpanAllColumns))
             {
-                Service.Get<PluginWindow>().SelectTab(tab.InternalName);
+                _serviceProvider.GetRequiredService<PluginWindow>().SelectTab(tab.InternalName);
             }
 
             ImGui.TableNextColumn();

@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
@@ -222,7 +223,7 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
 
             ImGui.TextUnformatted("Input:");
             ImGui.SameLine();
-            _debugRenderer.DrawCopyableText(entry.Input);
+            ImGuiUtilsEx.DrawCopyableText(entry.Input);
 
             using var table = ImRaii.Table(entry.Name + "Table", 2, ImGuiTableFlags.Borders);
             if (!table) continue;
@@ -237,7 +238,7 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
                 ImGui.TableNextColumn();
                 ImGui.TextUnformatted($"{(AllowedEntities)(1 << i)}");
                 ImGui.TableNextColumn();
-                _debugRenderer.DrawCopyableText(entry.Output[i]);
+                ImGuiUtilsEx.DrawCopyableText(entry.Output[i]);
             }
         }
     }

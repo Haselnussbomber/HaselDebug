@@ -7,6 +7,7 @@ using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 using ImGuiNET;
 
 namespace HaselDebug.Tabs;
@@ -122,7 +123,7 @@ public unsafe partial class ConfigTab : DebugTab
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Index
-            _debugRenderer.DrawCopyableText(option->Index.ToString());
+            ImGuiUtilsEx.DrawCopyableText(option->Index.ToString());
 
             ImGui.TableNextColumn(); // Type
             switch (option->Type)
@@ -152,7 +153,7 @@ public unsafe partial class ConfigTab : DebugTab
             }
 
             ImGui.TableNextColumn(); // Name
-            _debugRenderer.DrawCopyableText(optionName, highligtedText: hasSearchTerm ? _searchTerm : null);
+            ImGuiUtilsEx.DrawCopyableText(optionName, highligtedText: hasSearchTerm ? _searchTerm : null);
 
             switch (option->Type)
             {
@@ -190,7 +191,7 @@ public unsafe partial class ConfigTab : DebugTab
 
                 case 4: // String
                     ImGui.TableNextColumn(); // Value
-                    _debugRenderer.DrawCopyableText(option->Properties.String.DefaultValue->ToString());
+                    ImGuiUtilsEx.DrawCopyableText(option->Properties.String.DefaultValue->ToString());
 
                     ImGui.TableNextColumn(); // Default
                     ImGui.TableNextColumn(); // Min

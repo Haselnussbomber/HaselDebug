@@ -2,7 +2,6 @@ using System.Linq;
 using System.Reflection;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
-using HaselCommon.Extensions;
 using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel;
@@ -40,7 +39,7 @@ public unsafe partial class DebugRenderer
             if (propInfo.Name == "RowId")
                 continue;
 
-            DrawCopyableText(propInfo.PropertyType.ReadableTypeName(), propInfo.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
+            ImGuiUtilsEx.DrawCopyableText(propInfo.PropertyType.ReadableTypeName(), propInfo.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
             ImGui.SameLine();
             ImGui.TextColored(ColorFieldName, propInfo.Name);
             ImGui.SameLine();
@@ -52,7 +51,8 @@ public unsafe partial class DebugRenderer
     {
         var getSheet = _dataManager.Excel.GetType().GetMethod("GetSheet", BindingFlags.Instance | BindingFlags.Public)!;
         var genericGetSheet = getSheet.MakeGenericMethod(sheetType);
-        var sheet = genericGetSheet.Invoke(_dataManager.Excel, [nodeOptions.Language.ToLumina(), sheetType.GetCustomAttribute<SheetAttribute>()?.Name ?? sheetType.Name]);
+        var language = nodeOptions.Language ?? _languageProvider.ClientLanguage;
+        var sheet = genericGetSheet.Invoke(_dataManager.Excel, [language.ToLumina(), sheetType.GetCustomAttribute<SheetAttribute>()?.Name ?? sheetType.Name]);
         if (sheet == null)
         {
             ImGui.TextUnformatted("sheet is null");
@@ -94,12 +94,13 @@ public unsafe partial class DebugRenderer
 
         if (propType == typeof(ReadOnlySeString))
         {
+            var language = nodeOptions.Language ?? _languageProvider.ClientLanguage;
             DrawSeString(((ReadOnlySeString)value).AsSpan(), new NodeOptions()
             {
                 AddressPath = nodeOptions.AddressPath.With(propName.GetHashCode()),
                 RenderSeString = false,
-                Title = $"{row!.GetType().Name}#{rowId} ({nodeOptions.Language})",
-                Language = nodeOptions.Language
+                Title = $"{row!.GetType().Name}#{rowId} ({language})",
+                Language = language
             });
             return;
         }
@@ -222,7 +223,7 @@ public unsafe partial class DebugRenderer
                         if (pi.Name == "RowId")
                             continue;
 
-                        DrawCopyableText(pi.PropertyType.ReadableTypeName(), pi.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
+                        ImGuiUtilsEx.DrawCopyableText(pi.PropertyType.ReadableTypeName(), pi.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
                         ImGui.SameLine();
                         ImGui.TextColored(ColorFieldName, pi.Name);
                         ImGui.SameLine();

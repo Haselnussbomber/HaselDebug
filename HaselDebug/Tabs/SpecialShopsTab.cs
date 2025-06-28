@@ -23,6 +23,7 @@ public unsafe partial class SpecialShopsTab : DebugTab
 [RegisterSingleton, AutoConstruct]
 public partial class SpecialShopsTable : Table<SpecialShop>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly SpecialShopsRowColumn _rowColumn;
 
@@ -30,7 +31,7 @@ public partial class SpecialShopsTable : Table<SpecialShop>
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<SpecialShop>.Create(),
+            RowIdColumn<SpecialShop>.Create(_serviceProvider),
             _rowColumn,
         ];
     }

@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.FashionAccessories;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class FashionAccessoriesTable : Table<Ornament>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly UnlockedColumn _unlockedColumn;
     private readonly NameColumn _nameColumn;
@@ -17,7 +18,7 @@ public unsafe partial class FashionAccessoriesTable : Table<Ornament>
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<Ornament>.Create(),
+            RowIdColumn<Ornament>.Create(_serviceProvider),
             _unlockedColumn,
             _nameColumn,
         ];

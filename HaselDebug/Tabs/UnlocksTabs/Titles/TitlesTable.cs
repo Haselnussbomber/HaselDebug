@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Titles;
 [RegisterSingleton, AutoConstruct]
 public partial class TitlesTable : Table<Title>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly UnlockedColumn _unlockedColumn;
     private readonly PrefixColumn _prefixColumn;
@@ -19,7 +20,7 @@ public partial class TitlesTable : Table<Title>
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<Title>.Create(),
+            RowIdColumn<Title>.Create(_serviceProvider),
             _unlockedColumn,
             _prefixColumn,
             _masculineTitleColumn,

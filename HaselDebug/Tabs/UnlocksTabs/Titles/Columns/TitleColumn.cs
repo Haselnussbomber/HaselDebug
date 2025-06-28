@@ -1,5 +1,4 @@
 using Dalamud.Game;
-using Dalamud.Plugin.Services;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
@@ -10,12 +9,16 @@ using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
+using Microsoft.Extensions.Logging;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Titles.Columns;
 
-[RegisterTransient]
-public class TitleColumn : ColumnString<Title>
+[RegisterTransient, AutoConstruct]
+public partial class TitleColumn : ColumnString<Title>
 {
+    private readonly ILogger<TitleColumn> _logger;
+    private readonly ExcelService _excelService;
+
     private bool _isFeminine;
 
     public void SetSex(bool isFeminine)
@@ -28,7 +31,7 @@ public class TitleColumn : ColumnString<Title>
     {
         if (UIModule.Instance()->GetUIInputData()->IsKeyDown(SeVirtualKey.SHIFT))
         {
-            Service.Get<ExcelService>().TryGetRow(row.RowId, ClientLanguage.English, out row);
+            _excelService.TryGetRow(row.RowId, ClientLanguage.English, out row);
         }
 
         return (_isFeminine ? row.Feminine : row.Masculine).ExtractText().StripSoftHyphen();
@@ -50,7 +53,7 @@ public class TitleColumn : ColumnString<Title>
             if (clicked)
             {
                 var titleIdToSend = (ushort)(localPlayer->TitleId == row.RowId ? 0 : row.RowId);
-                Service.Get<IPluginLog>().Debug($"Sending Title Update {titleIdToSend}");
+                _logger.LogDebug($"Sending Title Update {titleIdToSend}");
                 uiState->TitleController.SendTitleIdUpdate(titleIdToSend);
                 if (titleIdToSend != 0)
                 {

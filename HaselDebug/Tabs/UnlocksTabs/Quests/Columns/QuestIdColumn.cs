@@ -1,16 +1,13 @@
 using HaselCommon.Gui.ImGuiTable;
-using HaselDebug.Services;
+using HaselDebug.Utils;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Quests.Columns;
 
-[RegisterTransient, AutoConstruct]
-public partial class QuestIdColumn : ColumnNumber<Quest>
+[RegisterTransient]
+public class QuestIdColumn : ColumnNumber<Quest>
 {
-    private readonly DebugRenderer _debugRenderer;
-
-    [AutoPostConstruct]
-    public void Initialize()
+    public QuestIdColumn()
     {
         SetFixedWidth(60);
     }
@@ -19,5 +16,5 @@ public partial class QuestIdColumn : ColumnNumber<Quest>
         => (int)(row.RowId - 0x10000);
 
     public override void DrawColumn(Quest row)
-        => _debugRenderer.DrawCopyableText(ToName(row));
+        => ImGuiUtilsEx.DrawCopyableText(ToName(row));
 }

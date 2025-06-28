@@ -3,6 +3,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using HaselCommon.Gui;
 using HaselCommon.Services;
+using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
@@ -66,13 +67,13 @@ public unsafe partial class ObjectTableRenderer
             _debugRenderer.DrawAddress(gameObject);
 
             ImGui.TableNextColumn(); // EntityId
-            _debugRenderer.DrawCopyableText(gameObject->EntityId.ToString("X"));
+            ImGuiUtilsEx.DrawCopyableText(gameObject->EntityId.ToString("X"));
 
             ImGui.TableNextColumn(); // ObjectId
-            _debugRenderer.DrawCopyableText(gameObject->GetGameObjectId().Id.ToString("X"));
+            ImGuiUtilsEx.DrawCopyableText(gameObject->GetGameObjectId().Id.ToString("X"));
 
             ImGui.TableNextColumn(); // ObjectKind
-            _debugRenderer.DrawCopyableText(objectKind.ToString());
+            ImGuiUtilsEx.DrawCopyableText(objectKind.ToString());
 
             ImGui.TableNextColumn(); // Name
             _debugRenderer.DrawPointerType(

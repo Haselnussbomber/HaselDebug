@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Emotes;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class EmotesTable : Table<Emote>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly CanUseColumn _canUseColumn;
     private readonly ItemColumn _itemColumn;
@@ -17,7 +18,7 @@ public unsafe partial class EmotesTable : Table<Emote>
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<Emote>.Create(),
+            RowIdColumn<Emote>.Create(_serviceProvider),
             _canUseColumn,
             _itemColumn,
         ];

@@ -2,7 +2,6 @@ using System.IO;
 using Dalamud.Game;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using HaselCommon;
 using HaselCommon.Commands;
 using HaselCommon.Services;
 using HaselDebug.Config;
@@ -16,11 +15,13 @@ namespace HaselDebug;
 public class Plugin : IDalamudPlugin
 {
     private readonly IDalamudPluginInterface _pluginInterface;
+    private readonly ServiceProvider _serviceProvider;
 
     public Plugin(
         IDalamudPluginInterface pluginInterface,
         ISigScanner sigScanner,
-        IDataManager dataManager)
+        IDataManager dataManager,
+        IFramework framework)
     {
         _pluginInterface = pluginInterface;
 
@@ -32,18 +33,19 @@ public class Plugin : IDalamudPlugin
             new FileInfo(Path.Join(pluginInterface.ConfigDirectory.FullName, "SigCache.json")));
         Resolver.GetInstance.Resolve();
 
-        Service.Collection
+        _serviceProvider = new ServiceCollection()
             .AddDalamud(pluginInterface)
             .AddSingleton(PluginConfig.Load)
             .AddHaselCommon()
-            .AddHaselDebug();
+            .AddHaselDebug()
+            .BuildServiceProvider();
 
-        Service.Initialize(() =>
+        framework.RunOnFrameworkThread(() =>
         {
-            if (Service.Get<PluginConfig>().AutoOpenPluginWindow)
-                Service.Get<PluginWindow>().Open();
+            if (_serviceProvider.GetRequiredService<PluginConfig>().AutoOpenPluginWindow)
+                _serviceProvider.GetRequiredService<PluginWindow>().Open();
 
-            Service.Get<CommandService>().Register(OnCommand, true);
+            _serviceProvider.GetRequiredService<CommandService>().Register(OnCommand, true);
 
             _pluginInterface.UiBuilder.Draw += DrawMainMenuItem;
             _pluginInterface.UiBuilder.OpenMainUi += TogglePluginWindow;
@@ -73,21 +75,21 @@ public class Plugin : IDalamudPlugin
         {
             if (ImGui.MenuItem("HaselDebug"))
             {
-                Service.Get<PluginWindow>().Toggle();
+                _serviceProvider.GetRequiredService<PluginWindow>().Toggle();
             }
 
             ImGui.EndMainMenuBar();
         }
     }
 
-    private static void TogglePluginWindow()
+    private void TogglePluginWindow()
     {
-        Service.Get<PluginWindow>().Toggle();
+        _serviceProvider.GetRequiredService<PluginWindow>().Toggle();
     }
 
-    private static void ToggleConfigWindow()
+    private void ToggleConfigWindow()
     {
-        Service.Get<ConfigWindow>().Toggle();
+        _serviceProvider.GetRequiredService<ConfigWindow>().Toggle();
     }
 
     void IDisposable.Dispose()
@@ -96,6 +98,6 @@ public class Plugin : IDalamudPlugin
         _pluginInterface.UiBuilder.OpenMainUi -= TogglePluginWindow;
         _pluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigWindow;
 
-        Service.Dispose();
+        _serviceProvider.Dispose();
     }
 }

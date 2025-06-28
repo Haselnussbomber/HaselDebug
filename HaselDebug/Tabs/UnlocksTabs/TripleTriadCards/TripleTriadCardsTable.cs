@@ -10,6 +10,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.TripleTriadCards;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class TripleTriadCardsTable : Table<TripleTriadCardEntry>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly UnlockedColumn _unlockedColumn;
     private readonly NumberColumn _numberColumn;
@@ -19,7 +20,7 @@ public unsafe partial class TripleTriadCardsTable : Table<TripleTriadCardEntry>
     public void Initialize()
     {
         Columns = [
-            EntryRowIdColumn<TripleTriadCardEntry, TripleTriadCard>.Create(),
+            EntryRowIdColumn<TripleTriadCardEntry, TripleTriadCard>.Create(_serviceProvider),
             _unlockedColumn,
             _numberColumn,
             _nameColumn,

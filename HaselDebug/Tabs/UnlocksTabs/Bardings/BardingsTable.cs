@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Bardings;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class BardingsTable : Table<BuddyEquip>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly UnlockedColumn _unlockedColumn;
     private readonly ItemColumn _itemColumn;
@@ -17,7 +18,7 @@ public unsafe partial class BardingsTable : Table<BuddyEquip>
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<BuddyEquip>.Create(),
+            RowIdColumn<BuddyEquip>.Create(_serviceProvider),
             _unlockedColumn,
             _itemColumn,
         ];

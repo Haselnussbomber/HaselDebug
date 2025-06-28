@@ -10,8 +10,8 @@ namespace HaselDebug.Tabs.UnlocksTabs.Fish;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class FishTable : Table<FishParameter>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
-    private readonly TextService _textService;
     private readonly CaughtColumn _caughtColumn;
     private readonly NameColumn _nameColumn;
 
@@ -19,7 +19,7 @@ public unsafe partial class FishTable : Table<FishParameter>
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<FishParameter>.Create(),
+            RowIdColumn<FishParameter>.Create(_serviceProvider),
             _caughtColumn,
             _nameColumn,
         ];

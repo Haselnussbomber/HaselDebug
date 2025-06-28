@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Cutscenes;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class CutscenesTable : Table<CutsceneEntry>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly WorkIndexColumn _workIndexColumn;
     private readonly SeenColumn _seenColumn;
@@ -21,7 +22,7 @@ public unsafe partial class CutscenesTable : Table<CutsceneEntry>
     public void Initialize()
     {
         Columns = [
-            EntryRowIdColumn<CutsceneEntry, Cutscene>.Create(),
+            EntryRowIdColumn<CutsceneEntry, Cutscene>.Create(_serviceProvider),
             _workIndexColumn,
             _seenColumn,
             _pathColumn,

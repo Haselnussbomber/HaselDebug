@@ -16,6 +16,8 @@ namespace HaselDebug.Tabs.UnlocksTabs.Outfits;
 public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
 {
     public const float IconSize = 32;
+
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly ItemService _itemService;
     private readonly GlobalScaleObserver _globalScaleObserver;
@@ -26,7 +28,7 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<CustomMirageStoreSetItem>.Create(),
+            RowIdColumn<CustomMirageStoreSetItem>.Create(_serviceProvider),
             _setColumn,
             _itemsColumn,
         ];

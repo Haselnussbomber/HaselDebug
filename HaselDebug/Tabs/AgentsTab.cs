@@ -15,6 +15,7 @@ using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 using ImGuiNET;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Tabs;
 
@@ -97,8 +98,7 @@ public unsafe partial class AgentsTab : DebugTab
                 if (!_debugRenderer.AgentTypes.TryGetValue(agentId, out var agentType))
                     agentType = typeof(AgentInterface);
 
-                var pinnedInstances = Service.Get<PinnedInstancesService>();
-                var isPinned = pinnedInstances.Contains(agentType);
+                var isPinned = _pinnedInstances.Contains(agentType);
 
                 builder.AddCopyName(_textService, agentId.ToString());
                 builder.AddCopyAddress(_textService, (nint)agent.Value);
@@ -109,21 +109,21 @@ public unsafe partial class AgentsTab : DebugTab
                 {
                     Visible = !_windowManager.Contains(win => win.WindowName == agentType.Name),
                     Label = _textService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_serviceProvider, (nint)agent.Value, agentType, string.Empty))
+                    ClickCallback = () => _windowManager.Open(ActivatorUtilities.CreateInstance<PointerTypeWindow>(_serviceProvider, (nint)agent.Value, agentType, string.Empty))
                 });
 
                 builder.Add(new ImGuiContextMenuEntry()
                 {
                     Visible = !isPinned,
                     Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
-                    ClickCallback = () => pinnedInstances.Add((nint)agent.Value, agentType)
+                    ClickCallback = () => _pinnedInstances.Add((nint)agent.Value, agentType)
                 });
 
                 builder.Add(new ImGuiContextMenuEntry()
                 {
                     Visible = isPinned,
                     Label = _textService.Translate("ContextMenu.PinnedInstances.Unpin"),
-                    ClickCallback = () => pinnedInstances.Remove(agentType)
+                    ClickCallback = () => _pinnedInstances.Remove(agentType)
                 });
             });
 
@@ -164,7 +164,7 @@ public unsafe partial class AgentsTab : DebugTab
                 {
                     Visible = !_windowManager.Contains(win => win.WindowName == agentType.Name),
                     Label = _textService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_serviceProvider, (nint)agent, agentType, string.Empty))
+                    ClickCallback = () => _windowManager.Open(ActivatorUtilities.CreateInstance<PointerTypeWindow>(_serviceProvider, (nint)agent, agentType, string.Empty))
                 });
 
                 builder.Add(new ImGuiContextMenuEntry()

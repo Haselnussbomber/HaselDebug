@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.SightseeingLog;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class SightseeingLogTable : Table<AdventureEntry>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly IndexColumn _indexColumn;
     private readonly CompletedColumn _completedColumn;
@@ -19,7 +20,7 @@ public unsafe partial class SightseeingLogTable : Table<AdventureEntry>
     public void Initialize()
     {
         Columns = [
-            EntryRowIdColumn<AdventureEntry, Adventure>.Create(),
+            EntryRowIdColumn<AdventureEntry, Adventure>.Create(_serviceProvider),
             _indexColumn,
             _completedColumn,
             _zoneColumn,

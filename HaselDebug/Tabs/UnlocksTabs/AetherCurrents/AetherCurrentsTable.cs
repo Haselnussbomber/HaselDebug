@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.AetherCurrents;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class AetherCurrentsTable : Table<AetherCurrentEntry>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly CompletedColumn _completedColumn;
     private readonly ZoneColumn _zoneColumn;
@@ -23,7 +24,7 @@ public unsafe partial class AetherCurrentsTable : Table<AetherCurrentEntry>
         _locationColumn.SetTable(this);
 
         Columns = [
-            EntryRowIdColumn<AetherCurrentEntry, AetherCurrent>.Create(),
+            EntryRowIdColumn<AetherCurrentEntry, AetherCurrent>.Create(_serviceProvider),
             _completedColumn,
             _zoneColumn,
             _locationColumn,

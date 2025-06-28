@@ -9,6 +9,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Achievements;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class AchievementsTable : Table<AchievementEntry>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly UnlockedColumn _unlockedColumn;
     private readonly CategoryColumn _categoryColumn;
@@ -18,7 +19,7 @@ public unsafe partial class AchievementsTable : Table<AchievementEntry>
     public void Initialize()
     {
         Columns = [
-            EntryRowIdColumn<AchievementEntry, AchievementSheet>.Create(),
+            EntryRowIdColumn<AchievementEntry, AchievementSheet>.Create(_serviceProvider),
             _unlockedColumn,
             _categoryColumn,
             _nameColumn
