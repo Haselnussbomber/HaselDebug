@@ -134,7 +134,8 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
     private void OnLanguageChanged(string langCode)
     {
-        _inspectorWindow?.Language = _languageProvider.ClientLanguage;
+        if (_inspectorWindow != null)
+            _inspectorWindow.Language = _languageProvider.ClientLanguage;
     }
 
     public override unsafe void Draw()
