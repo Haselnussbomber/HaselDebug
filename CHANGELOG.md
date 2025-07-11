@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.29.0] (2025-07-12)
 
 - **Added:** An Item Action Type tab to list all ItemActions grouped by Type and their items.
 - **Updated:** The Addon Inspector's Node Picker now opens the TreeNodes up to the node that was clicked on and only resets the selection index when hovered nodes change, not when the cursor moved by a single pixel.
@@ -444,7 +444,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.28.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.0...main
+[1.29.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.28.1...1.29.0
 [1.28.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.28.0...1.28.1
 [1.28.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.27.0...1.28.0
 [1.27.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.26.0...1.27.0
