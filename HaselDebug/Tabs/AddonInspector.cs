@@ -319,6 +319,15 @@ public unsafe partial class AddonInspectorTab : DebugTab
                             _selectedAddonId = unitBase.Value->Id;
                             _selectedAddonName = unitBase.Value->NameString;
 
+                            var path = new List<nint>();
+                            var current = node;
+                            while (current != null)
+                            {
+                                path.Insert(0, (nint)current);
+                                current = current->ParentNode;
+                            }
+                            _atkDebugRenderer.SelectedNodePath = path;
+
                             _nodePickerSelectionIndex = 0;
                             _showPicker = false;
                             _lastHoveredNodePtrs.Clear();

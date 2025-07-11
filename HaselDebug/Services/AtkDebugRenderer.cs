@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
@@ -27,6 +29,8 @@ public unsafe partial class AtkDebugRenderer
     private readonly AddonObserver _addonObserver;
     private readonly PinnedInstancesService _pinnedInstancesService;
     private string _nodeQuery = string.Empty;
+
+    public List<nint> SelectedNodePath { get; set; } = [];
 
     public void DrawAddon(ushort addonId, string addonName, bool border = true)
     {
@@ -228,6 +232,8 @@ public unsafe partial class AtkDebugRenderer
                 PrintNode(node, false, $"[{j++}] ", nodeOptions with { DefaultOpen = false });
             }
         }
+
+        SelectedNodePath.Clear();
     }
 
     private bool IsNodeMatchingSearch(AtkResNode* node)
@@ -283,10 +289,15 @@ public unsafe partial class AtkDebugRenderer
 
         nodeOptions = nodeOptions.WithAddress((nint)node);
 
+        bool isSelectedNode = SelectedNodePath.Count > 0 && (nint)node == SelectedNodePath.Last();
+
+        if (SelectedNodePath.Count != 0)
+            ImGui.SetNextItemOpen(SelectedNodePath.Contains((nint)node), ImGuiCond.Always);
+
         if ((int)node->Type < 1000)
-            PrintSimpleNode(node, treePrefix, nodeOptions);
+            PrintSimpleNode(node, treePrefix, nodeOptions, isSelectedNode);
         else
-            PrintComponentNode(node, treePrefix, nodeOptions);
+            PrintComponentNode(node, treePrefix, nodeOptions, isSelectedNode);
 
         if (printSiblings)
         {
@@ -296,7 +307,7 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
-    private void PrintSimpleNode(AtkResNode* node, string treePrefix, NodeOptions nodeOptions)
+    private void PrintSimpleNode(AtkResNode* node, string treePrefix, NodeOptions nodeOptions, bool scrollToNode = false)
     {
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
@@ -322,6 +333,9 @@ public unsafe partial class AtkDebugRenderer
             }
         });
 
+        if (scrollToNode && treeNode.Success)
+            ImGui.SetScrollHereY();
+
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
         if (!treeNode) return;
@@ -345,7 +359,7 @@ public unsafe partial class AtkDebugRenderer
             PrintNode(node->ChildNode, true, string.Empty, nodeOptions);
     }
 
-    private void PrintComponentNode(AtkResNode* resNode, string treePrefix, NodeOptions nodeOptions)
+    private void PrintComponentNode(AtkResNode* resNode, string treePrefix, NodeOptions nodeOptions, bool scrollToNode = false)
     {
         var node = (AtkComponentNode*)resNode;
         var component = node->Component;
@@ -377,6 +391,9 @@ public unsafe partial class AtkDebugRenderer
                 });
             }
         });
+
+        if (scrollToNode && treeNode.Success)
+            ImGui.SetScrollHereY();
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
