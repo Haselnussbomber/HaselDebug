@@ -2,7 +2,9 @@
 
 ## [Unreleased]
 
-- **Updated:** ClientStructs now at [9afd5d49](https://github.com/aers/FFXIVClientStructs/tree/9afd5d49) ([compare](https://github.com/aers/FFXIVClientStructs/compare/8a6e0bb6..9afd5d49)).
+- **Added:** An Item Action Type tab to list all ItemActions grouped by Type and their items.
+- **Updated:** The Addon Inspector's Node Picker now opens the TreeNodes up to the node that was clicked on and only resets the selection index when hovered nodes change, not when the cursor moved by a single pixel.
+- **Updated:** ClientStructs updated to the branch used in my [Update InventoryItem PR](https://github.com/aers/FFXIVClientStructs/pull/1480), based on [8b3a8f45](https://github.com/aers/FFXIVClientStructs/tree/8b3a8f45) ([compare](https://github.com/aers/FFXIVClientStructs/compare/8a6e0bb6..2ee1714c)).
 
 ## [1.28.1] (2025-06-24)
 
