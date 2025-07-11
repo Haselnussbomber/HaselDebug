@@ -37,6 +37,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
     private string _addonNameSearchTerm = string.Empty;
     private bool _showPicker;
     private HashSet<Pointer<AtkResNode>> _lastHoveredNodePtrs = [];
+    private List<Pointer<AtkResNode>>? _nodePath = null;
     private int _nodePickerSelectionIndex;
     private Vector2 _lastMousePos;
 
@@ -49,7 +50,9 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
         DrawAddonList();
         ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
-        _atkDebugRenderer.DrawAddon(_selectedAddonId, _selectedAddonName);
+        _atkDebugRenderer.DrawAddon(_selectedAddonId, _selectedAddonName, _nodePath);
+        if (_nodePath != null)
+            _nodePath = null;
         DrawNodePicker();
     }
 
@@ -319,14 +322,14 @@ public unsafe partial class AddonInspectorTab : DebugTab
                             _selectedAddonId = unitBase.Value->Id;
                             _selectedAddonName = unitBase.Value->NameString;
 
-                            var path = new List<nint>();
+                            _nodePath ??= [];
+                            _nodePath.Clear();
                             var current = node;
                             while (current != null)
                             {
-                                path.Insert(0, (nint)current);
+                                _nodePath.Insert(0, current);
                                 current = current->ParentNode;
                             }
-                            _atkDebugRenderer.SelectedNodePath = path;
 
                             _nodePickerSelectionIndex = 0;
                             _showPicker = false;

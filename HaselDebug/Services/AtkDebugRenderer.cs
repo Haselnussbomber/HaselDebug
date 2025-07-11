@@ -30,9 +30,7 @@ public unsafe partial class AtkDebugRenderer
     private readonly PinnedInstancesService _pinnedInstancesService;
     private string _nodeQuery = string.Empty;
 
-    public List<nint> SelectedNodePath { get; set; } = [];
-
-    public void DrawAddon(ushort addonId, string addonName, bool border = true)
+    public void DrawAddon(ushort addonId, string addonName, List<Pointer<AtkResNode>>? nodePath = null, bool border = true)
     {
         if (addonId == 0 && string.IsNullOrEmpty(addonName))
             return;
@@ -196,7 +194,7 @@ public unsafe partial class AtkDebugRenderer
 
         if (unitBase->RootNode != null)
         {
-            PrintNode(unitBase->RootNode, true, string.Empty, nodeOptions with { DefaultOpen = true });
+            PrintNode(unitBase->RootNode, true, string.Empty, nodePath, nodeOptions with { DefaultOpen = true });
         }
 
         if (unitBase->UldManager.NodeListCount > 0)
@@ -210,7 +208,9 @@ public unsafe partial class AtkDebugRenderer
                 Title = "Node List",
                 TitleColor = Color.FromUInt(0xFFFFAAAA),
             });
-            if (!nodeTree) return;
+
+            if (!nodeTree)
+                return;
 
             ImGui.InputTextWithHint("##NodeSearch", _textService.Translate("SearchBar.Hint"), ref _nodeQuery, 256, ImGuiInputTextFlags.AutoSelectAll);
 
@@ -229,11 +229,9 @@ public unsafe partial class AtkDebugRenderer
                     continue;
                 }
 
-                PrintNode(node, false, $"[{j++}] ", nodeOptions with { DefaultOpen = false });
+                PrintNode(node, false, $"[{j++}] ", nodePath, nodeOptions with { DefaultOpen = false });
             }
         }
-
-        SelectedNodePath.Clear();
     }
 
     private bool IsNodeMatchingSearch(AtkResNode* node)
@@ -279,35 +277,33 @@ public unsafe partial class AtkDebugRenderer
             return;
         }
 
-        PrintNode(node, false, string.Empty, new() { DefaultOpen = true });
+        PrintNode(node, false, string.Empty, null, new() { DefaultOpen = true });
     }
 
-    private void PrintNode(AtkResNode* node, bool printSiblings, string treePrefix, NodeOptions nodeOptions)
+    private void PrintNode(AtkResNode* node, bool printSiblings, string treePrefix, List<Pointer<AtkResNode>>? nodePath, NodeOptions nodeOptions)
     {
         if (node == null)
             return;
 
         nodeOptions = nodeOptions.WithAddress((nint)node);
 
-        bool isSelectedNode = SelectedNodePath.Count > 0 && (nint)node == SelectedNodePath.Last();
-
-        if (SelectedNodePath.Count != 0)
-            ImGui.SetNextItemOpen(SelectedNodePath.Contains((nint)node), ImGuiCond.Always);
+        if (nodePath != null)
+            ImGui.SetNextItemOpen(nodePath.Contains(node), ImGuiCond.Always);
 
         if ((int)node->Type < 1000)
-            PrintSimpleNode(node, treePrefix, nodeOptions, isSelectedNode);
+            PrintSimpleNode(node, treePrefix, nodePath, nodeOptions);
         else
-            PrintComponentNode(node, treePrefix, nodeOptions, isSelectedNode);
+            PrintComponentNode(node, treePrefix, nodePath, nodeOptions);
 
         if (printSiblings)
         {
             var prevNode = node;
             while ((prevNode = prevNode->PrevSiblingNode) != null)
-                PrintNode(prevNode, false, string.Empty, nodeOptions);
+                PrintNode(prevNode, false, string.Empty, nodePath, nodeOptions);
         }
     }
 
-    private void PrintSimpleNode(AtkResNode* node, string treePrefix, NodeOptions nodeOptions, bool scrollToNode = false)
+    private void PrintSimpleNode(AtkResNode* node, string treePrefix, List<Pointer<AtkResNode>>? nodePath, NodeOptions nodeOptions)
     {
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
@@ -333,12 +329,13 @@ public unsafe partial class AtkDebugRenderer
             }
         });
 
-        if (scrollToNode && treeNode.Success)
-            ImGui.SetScrollHereY();
-
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
-        if (!treeNode) return;
+        if (!treeNode)
+            return;
+
+        if (nodePath != null && nodePath.Count > 0 && node == nodePath.Last())
+            ImGui.SetScrollHereY();
 
         ImGui.TextUnformatted("Node: ");
         ImGui.SameLine();
@@ -356,10 +353,10 @@ public unsafe partial class AtkDebugRenderer
         PrintAnimations(node);
 
         if (node->ChildNode != null)
-            PrintNode(node->ChildNode, true, string.Empty, nodeOptions);
+            PrintNode(node->ChildNode, true, string.Empty, nodePath, nodeOptions);
     }
 
-    private void PrintComponentNode(AtkResNode* resNode, string treePrefix, NodeOptions nodeOptions, bool scrollToNode = false)
+    private void PrintComponentNode(AtkResNode* resNode, string treePrefix, List<Pointer<AtkResNode>>? nodePath, NodeOptions nodeOptions)
     {
         var node = (AtkComponentNode*)resNode;
         var component = node->Component;
@@ -392,13 +389,13 @@ public unsafe partial class AtkDebugRenderer
             }
         });
 
-        if (scrollToNode && treeNode.Success)
-            ImGui.SetScrollHereY();
-
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
         if (!treeNode)
             return;
+
+        if (nodePath != null && nodePath.Count > 0 && node == nodePath.Last())
+            ImGui.SetScrollHereY();
 
         ImGui.TextUnformatted("Node:");
         ImGui.SameLine();
@@ -422,7 +419,7 @@ public unsafe partial class AtkDebugRenderer
         PrintLabelSets(resNode);
         PrintAnimations(resNode);
 
-        PrintNode(component->UldManager.RootNode, true, string.Empty, nodeOptions);
+        PrintNode(component->UldManager.RootNode, true, string.Empty, nodePath, nodeOptions);
 
         using var nodeTree = _debugRenderer.DrawTreeNode(new NodeOptions()
         {
@@ -434,7 +431,7 @@ public unsafe partial class AtkDebugRenderer
 
         for (var i = 0; i < component->UldManager.NodeListCount; i++)
         {
-            PrintNode(component->UldManager.NodeList[i], false, $"[{i}] ", nodeOptions);
+            PrintNode(component->UldManager.NodeList[i], false, $"[{i}] ", nodePath, nodeOptions);
         }
     }
 
