@@ -36,6 +36,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
     private ImGuiSortDirection _sortDirection = ImGuiSortDirection.Ascending;
     private string _addonNameSearchTerm = string.Empty;
     private bool _showPicker;
+    private HashSet<Pointer<AtkResNode>> _lastHoveredNodePtrs = [];
     private int _nodePickerSelectionIndex;
     private Vector2 _lastMousePos;
 
@@ -230,6 +231,8 @@ public unsafe partial class AddonInspectorTab : DebugTab
         var nodeCount = 0;
         var bounds = stackalloc FFXIVClientStructs.FFXIV.Common.Math.Bounds[1];
 
+        var currentHoveredNodePtrs = new HashSet<Pointer<AtkResNode>>();
+
         foreach (AtkUnitBase* unitBase in allUnitsList)
         {
             unitBase->GetWindowBounds(bounds);
@@ -247,6 +250,8 @@ public unsafe partial class AddonInspectorTab : DebugTab
                 if (!bounds->ContainsPoint((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y))
                     continue;
 
+                currentHoveredNodePtrs.Add(node);
+
                 if (!hoveredDepthLayerAddonNodes.TryGetValue(unitBase->DepthLayer, out var addonNodes))
                     hoveredDepthLayerAddonNodes.Add(unitBase->DepthLayer, addonNodes = []);
 
@@ -259,19 +264,22 @@ public unsafe partial class AddonInspectorTab : DebugTab
             }
         }
 
+        // Only reset selection index if hovered nodes changed
+        if (!currentHoveredNodePtrs.SetEquals(_lastHoveredNodePtrs))
+        {
+            _nodePickerSelectionIndex = 0;
+            _lastHoveredNodePtrs = currentHoveredNodePtrs;
+        }
+
         if (nodeCount == 0)
         {
             _showPicker = false;
+            _lastHoveredNodePtrs.Clear();
             return;
         }
 
         ImGui.SetNextWindowPos(Vector2.Zero);
         ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
-
-        var mousePos = ImGui.GetMousePos();
-        var mouseMoved = _lastMousePos != mousePos;
-        if (mouseMoved)
-            _nodePickerSelectionIndex = 0;
 
         if (!ImGui.Begin("NodePicker", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBackground))
             return;
@@ -313,6 +321,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
                             _nodePickerSelectionIndex = 0;
                             _showPicker = false;
+                            _lastHoveredNodePtrs.Clear();
                         }
                     }
 
@@ -339,9 +348,6 @@ public unsafe partial class AddonInspectorTab : DebugTab
             _nodePickerSelectionIndex = nodeCount - 1;
         if (_nodePickerSelectionIndex > nodeCount - 1)
             _nodePickerSelectionIndex = 0;
-
-        if (mouseMoved)
-            _lastMousePos = mousePos;
 
         ImGui.End();
     }
