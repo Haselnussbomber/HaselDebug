@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Reflection;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Graphics;
 using ImGuiNET;
@@ -58,8 +59,13 @@ public static unsafe class DebugUtils
         if (node == null)
             return;
 
+        var scale = 1f;
+        var addon = RaptureAtkUnitManager.Instance()->GetAddonByNode(node);
+        if (addon != null)
+            scale *= addon->Scale;
+
         var pos = new Vector2(node->ScreenX, node->ScreenY);
-        var size = new Vector2(node->Width, node->Height);
+        var size = new Vector2(node->Width, node->Height) * scale;
         ImGui.GetForegroundDrawList().AddRect(pos, pos + size, Color.Gold.ToUInt());
     }
 }
