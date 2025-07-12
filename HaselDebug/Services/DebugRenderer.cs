@@ -591,6 +591,8 @@ public unsafe partial class DebugRenderer
                     var component = (AtkComponentBase*)highlightAddress;
                     if (component != null && component->AtkResNode != null)
                         HighlightNode(component->AtkResNode);
+                    else if (component != null && component->OwnerNode != null)
+                        HighlightNode((AtkResNode*)component->OwnerNode);
                 }
 
                 void DrawLine(Vector3 pos)
