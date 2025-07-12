@@ -1,15 +1,16 @@
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using Dalamud.Interface.Utility.Raii;
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 using ImGuiNET;
+using InteropGenerator.Runtime;
 using InteropGenerator.Runtime.Attributes;
+using Microsoft.Extensions.Logging;
 
 namespace HaselDebug.Tabs;
 
@@ -17,57 +18,46 @@ namespace HaselDebug.Tabs;
 [StructLayout(LayoutKind.Explicit, Size = 0)]
 public unsafe partial struct AddonConfigFunctions
 {
-    [MemberFunction("E8 ?? ?? ?? ?? 41 8B CE E8 ?? ?? ?? ?? 48 8B C8")]
-    public static partial byte* GetNameByIndex(uint index);
+    [MemberFunction("E8 ?? ?? ?? ?? 45 33 F6 44 8B E0")]
+    public static partial int GetNameCount();
 
-    [MemberFunction("E8 ?? ?? ?? ?? 3B C7 74 1E")]
-    public static partial uint GetNameHash(byte* name);
+    [MemberFunction("E8 ?? ?? ?? ?? 41 8B CE E8 ?? ?? ?? ?? 48 8B C8")]
+    public static partial CStringPointer GetNameByIndex(uint index);
+
+    [MemberFunction("E8 ?? ?? ?? ?? 3B C7 74 1E"), GenerateStringOverloads]
+    public static partial uint GetNameHash(CStringPointer name);
 }
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class AddonConfigTab : DebugTab
 {
     private readonly DebugRenderer _debugRenderer;
+    private readonly ILogger<AddonConfigTab> _logger;
     private readonly Dictionary<uint, string> _addonNames = [];
 
     [AutoPostConstruct]
     public void Initialize()
     {
-        for (var i = 0u; i < 99; i++)
+        void AddName(string name)
         {
-            var namePtr = AddonConfigFunctions.GetNameByIndex(i);
-            var name = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(namePtr));
-            var hash = AddonConfigFunctions.GetNameHash(namePtr);
-            _addonNames[hash] = name;
+            if (name.Length < 32)
+                _addonNames[AddonConfigFunctions.GetNameHash(name)] = name;
+        }
+
+        for (var i = 0u; i < AddonConfigFunctions.GetNameCount(); i++)
+        {
+            AddName(AddonConfigFunctions.GetNameByIndex(i));
         }
 
         foreach (var addonName in RaptureAtkModule.Instance()->AddonNames)
         {
-            if (addonName.IsEmpty || addonName.StringPtr == null)
-                continue;
-
-            var hash = AddonConfigFunctions.GetNameHash(addonName.StringPtr);
-            _addonNames[hash] = addonName.ToString();
+            var addonNameString = addonName.StringPtr.ToString();
+            AddName(addonNameString);
 
             for (var i = 0u; i < 10; i++)
             {
-                var numName = Utf8String.CreateEmpty();
-                numName->SetString($"{addonName.ToString().TrimEnd('\0')}{i}");
-
-                if (numName->StringPtr == null)
-                    continue;
-
-                hash = AddonConfigFunctions.GetNameHash(numName->StringPtr);
-                _addonNames[hash] = numName->ToString();
-
-                numName->SetString($"{addonName.ToString().TrimEnd('\0')}{i:00}");
-
-                if (numName->StringPtr == null)
-                    continue;
-
-                hash = AddonConfigFunctions.GetNameHash(numName->StringPtr);
-                _addonNames[hash] = numName->ToString();
-                numName->Dtor(true);
+                AddName($"{addonNameString}{i}");
+                AddName($"{addonNameString}{i:00}");
             }
         }
     }
@@ -170,46 +160,46 @@ public unsafe partial class AddonConfigTab : DebugTab
         ImGui.TableNextRow();
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted(i.ToString());
+        ImGuiUtilsEx.DrawCopyableText(i.ToString());
 
         ImGui.TableNextColumn();
         var hash = configEntry->AddonNameHash;
-        ImGui.TextUnformatted(_addonNames.TryGetValue(hash, out var name) ? name : hash.ToString("X"));
+        ImGuiUtilsEx.DrawCopyableText(_addonNames.TryGetValue(hash, out var name) ? name : hash.ToString("X"));
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted(configEntry->X.ToString("0.###", CultureInfo.InvariantCulture));
+        ImGuiUtilsEx.DrawCopyableText(configEntry->X.ToString("0.###", CultureInfo.InvariantCulture));
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted(configEntry->Y.ToString("0.###", CultureInfo.InvariantCulture));
+        ImGuiUtilsEx.DrawCopyableText(configEntry->Y.ToString("0.###", CultureInfo.InvariantCulture));
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted(configEntry->Scale.ToString("0.0", CultureInfo.InvariantCulture));
+        ImGuiUtilsEx.DrawCopyableText(configEntry->Scale.ToString("0.0", CultureInfo.InvariantCulture));
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted("0x" + configEntry->ElementFlags.ToString("X"));
+        ImGuiUtilsEx.DrawCopyableText("0x" + configEntry->ElementFlags.ToString("X"));
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted(configEntry->Width.ToString());
+        ImGuiUtilsEx.DrawCopyableText(configEntry->Width.ToString());
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted(configEntry->Height.ToString());
+        ImGuiUtilsEx.DrawCopyableText(configEntry->Height.ToString());
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted("0x" + configEntry->ByteValue1.ToString("X"));
+        ImGuiUtilsEx.DrawCopyableText("0x" + configEntry->ByteValue1.ToString("X"));
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted("0x" + configEntry->ByteValue2.ToString("X"));
+        ImGuiUtilsEx.DrawCopyableText("0x" + configEntry->ByteValue2.ToString("X"));
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted("0x" + configEntry->ByteValue3.ToString("X"));
+        ImGuiUtilsEx.DrawCopyableText("0x" + configEntry->ByteValue3.ToString("X"));
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted(configEntry->Alpha.ToString());
+        ImGuiUtilsEx.DrawCopyableText(configEntry->Alpha.ToString());
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted(configEntry->HasValue.ToString());
+        ImGuiUtilsEx.DrawCopyableText(configEntry->HasValue.ToString());
 
         ImGui.TableNextColumn();
-        ImGui.TextUnformatted(configEntry->IsOpen.ToString());
+        ImGuiUtilsEx.DrawCopyableText(configEntry->IsOpen.ToString());
     }
 }

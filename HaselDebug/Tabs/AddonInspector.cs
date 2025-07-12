@@ -39,7 +39,6 @@ public unsafe partial class AddonInspectorTab : DebugTab
     private HashSet<Pointer<AtkResNode>> _lastHoveredNodePtrs = [];
     private List<Pointer<AtkResNode>>? _nodePath = null;
     private int _nodePickerSelectionIndex;
-    private Vector2 _lastMousePos;
 
     public override bool DrawInChild => false;
 

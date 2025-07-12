@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** It's now possible to copy values from the Addon Config table.
+
 ## [1.29.0] (2025-07-12)
 
 - **Added:** An Item Action Type tab to list all ItemActions grouped by Type and their items.
