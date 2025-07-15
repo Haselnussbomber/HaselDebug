@@ -1,7 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [1.29.1] (2025-07-15)
 
+- **Fixed:** The border around highlighted nodes didn't respect the user-set scaling of the addon.
+- **Fixed:** The border around highlighted component nodes wasn’t shown when `AtkResNode` was null. It now falls back to `OwnerNode`.
 - **Updated:** It's now possible to copy values from the Addon Config table.
 - **Updated:** ClientStructs now at [62ea2008](https://github.com/aers/FFXIVClientStructs/tree/62ea2008) ([compare](https://github.com/aers/FFXIVClientStructs/compare/8a6e0bb6..62ea2008)).
 
@@ -449,7 +451,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.1...main
+[1.29.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.0...1.29.1
 [1.29.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.28.1...1.29.0
 [1.28.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.28.0...1.28.1
 [1.28.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.27.0...1.28.0
