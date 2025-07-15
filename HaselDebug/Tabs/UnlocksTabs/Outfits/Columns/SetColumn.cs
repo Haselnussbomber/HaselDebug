@@ -9,7 +9,6 @@ using HaselCommon.Gui;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Sheets;
-using ImGuiNET;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
@@ -58,7 +57,7 @@ public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
             using var tooltip = ImRaii.Tooltip();
             if (_textureProvider.TryGetFromGameIcon(new(row.Set.Value.Icon), out var texture) && texture.TryGetWrap(out var textureWrap, out _))
             {
-                ImGui.Image(textureWrap.ImGuiHandle, new(textureWrap.Width, textureWrap.Height));
+                ImGui.Image(textureWrap.Handle, new(textureWrap.Width, textureWrap.Height));
                 ImGui.SameLine();
                 ImGuiUtils.PushCursorY(textureWrap.Height / 2f - ImGui.GetTextLineHeight() / 2f);
             }

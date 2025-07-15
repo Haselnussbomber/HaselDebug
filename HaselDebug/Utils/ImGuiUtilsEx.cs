@@ -3,7 +3,6 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
-using ImGuiNET;
 
 namespace HaselDebug.Utils;
 
@@ -130,7 +129,7 @@ public static unsafe class ImGuiUtilsEx
             if (treeNode)
             {
                 ImGui.Image(
-                    (nint)kernelTexture->D3D11ShaderResourceView,
+                    new ImTextureID(kernelTexture->D3D11ShaderResourceView),
                     new Vector2(
                         kernelTexture->ActualWidth,
                         kernelTexture->ActualHeight));
@@ -145,7 +144,7 @@ public static unsafe class ImGuiUtilsEx
             if (treeNode)
             {
                 ImGui.Image(
-                    (nint)textureInfo->AtkTexture.KernelTexture->D3D11ShaderResourceView,
+                    new ImTextureID(textureInfo->AtkTexture.KernelTexture->D3D11ShaderResourceView),
                     new Vector2(
                         textureInfo->AtkTexture.KernelTexture->ActualWidth,
                         textureInfo->AtkTexture.KernelTexture->ActualHeight));

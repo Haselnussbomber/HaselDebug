@@ -1,7 +1,6 @@
 using Dalamud.Plugin.Services;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
-using ImGuiNET;
 
 namespace HaselDebug.Tabs.UnlocksTabs.SightseeingLog.Columns;
 

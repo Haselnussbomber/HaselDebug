@@ -7,7 +7,6 @@ using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using InteropGenerator.Runtime;
 using InteropGenerator.Runtime.Attributes;
 using Microsoft.Extensions.Logging;

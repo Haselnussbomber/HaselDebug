@@ -14,7 +14,6 @@ using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
-using ImGuiNET;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Tabs;

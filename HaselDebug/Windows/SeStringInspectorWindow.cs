@@ -14,7 +14,6 @@ using HaselCommon.Services;
 using HaselCommon.Utils;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using Lumina.Text.Expressions;
 using Lumina.Text.Parse;
 using Lumina.Text.ReadOnly;

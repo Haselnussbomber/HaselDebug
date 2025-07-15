@@ -4,7 +4,6 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 
@@ -80,7 +79,7 @@ public partial class FateTab : DebugTab
             {
                 if (textureManager.GetFromGameIcon(fate.IconId).TryGetWrap(out var texture, out _))
                 {
-                    ImGui.Image(texture.ImGuiHandle, new(ImGui.GetTextLineHeight()));
+                    ImGui.Image(texture.Handle, new(ImGui.GetTextLineHeight()));
 
                     if (ImGui.IsItemHovered())
                     {
@@ -88,7 +87,7 @@ public partial class FateTab : DebugTab
                         ImGui.BeginTooltip();
                         ImGui.TextUnformatted("Click to copy IconId");
                         ImGui.TextUnformatted($"ID: {fate.IconId} – Size: {texture.Width}x{texture.Height}");
-                        ImGui.Image(texture.ImGuiHandle, new(texture.Width, texture.Height));
+                        ImGui.Image(texture.Handle, new(texture.Width, texture.Height));
                         ImGui.EndTooltip();
                     }
 
@@ -105,7 +104,7 @@ public partial class FateTab : DebugTab
             {
                 if (textureManager.GetFromGameIcon(fate.MapIconId).TryGetWrap(out var texture, out _))
                 {
-                    ImGui.Image(texture.ImGuiHandle, new(ImGui.GetTextLineHeight()));
+                    ImGui.Image(texture.Handle, new(ImGui.GetTextLineHeight()));
 
                     if (ImGui.IsItemHovered())
                     {
@@ -113,7 +112,7 @@ public partial class FateTab : DebugTab
                         ImGui.BeginTooltip();
                         ImGui.TextUnformatted("Click to copy MapIconId");
                         ImGui.TextUnformatted($"ID: {fate.MapIconId} – Size: {texture.Width}x{texture.Height}");
-                        ImGui.Image(texture.ImGuiHandle, new(texture.Width, texture.Height));
+                        ImGui.Image(texture.Handle, new(texture.Width, texture.Height));
                         ImGui.EndTooltip();
                     }
 

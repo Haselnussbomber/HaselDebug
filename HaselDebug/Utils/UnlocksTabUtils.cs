@@ -14,7 +14,6 @@ using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselDebug.Services;
 using HaselDebug.Sheets;
-using ImGuiNET;
 using Lumina.Data.Files;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
@@ -84,7 +83,7 @@ public unsafe partial class UnlocksTabUtils
             if (_textureProvider.GetFromGame("ui/uld/RecipeNoteBook_hr1.tex").TryGetWrap(out var tex, out _))
             {
                 var pos = ImGui.GetCursorScreenPos() + new Vector2((float)iconSize / 2f);
-                ImGui.GetWindowDrawList().AddImage(tex.ImGuiHandle, pos, pos + new Vector2((float)iconSize / 1.5f), new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
+                ImGui.GetWindowDrawList().AddImage(tex.Handle, pos, pos + new Vector2((float)iconSize / 1.5f), new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
             }
         }
 
@@ -114,7 +113,7 @@ public unsafe partial class UnlocksTabUtils
         ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(drawResult.Size.X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
 
         ImGui.TableNextColumn(); // Icon
-        ImGui.Image(icon.ImGuiHandle, ImGuiHelpers.ScaledVector2(40));
+        ImGui.Image(icon.Handle, ImGuiHelpers.ScaledVector2(40));
 
         ImGui.TableNextColumn(); // Text
         using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
@@ -169,7 +168,7 @@ public unsafe partial class UnlocksTabUtils
         ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
 
         ImGui.TableNextColumn(); // Icon
-        ImGui.Image(icon.ImGuiHandle, ImGuiHelpers.ScaledVector2(40));
+        ImGui.Image(icon.Handle, ImGuiHelpers.ScaledVector2(40));
 
         var isUnlocked = _itemService.IsUnlockable(item.RowId) && _itemService.IsUnlocked(item.RowId);
         if (isUnlocked)
@@ -179,7 +178,7 @@ public unsafe partial class UnlocksTabUtils
             if (_textureProvider.GetFromGame("ui/uld/RecipeNoteBook_hr1.tex").TryGetWrap(out var checkTex, out _))
             {
                 var pos = ImGui.GetCursorScreenPos() + new Vector2(40 * ImGuiHelpers.GlobalScale / 2f);
-                ImGui.GetWindowDrawList().AddImage(checkTex.ImGuiHandle, pos, pos + new Vector2(40 * ImGuiHelpers.GlobalScale / 1.5f), new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
+                ImGui.GetWindowDrawList().AddImage(checkTex.Handle, pos, pos + new Vector2(40 * ImGuiHelpers.GlobalScale / 1.5f), new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
             }
         }
 
@@ -505,7 +504,7 @@ public unsafe partial class UnlocksTabUtils
         ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
 
         ImGui.TableNextColumn(); // Icon
-        ImGui.Image(icon.ImGuiHandle, ImGuiHelpers.ScaledVector2(40));
+        ImGui.Image(icon.Handle, ImGuiHelpers.ScaledVector2(40));
 
         ImGui.TableNextColumn(); // Text
         using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
@@ -569,7 +568,7 @@ public unsafe partial class UnlocksTabUtils
             _textureProvider.TryGetFromGameIcon(eventIconType.MapIconAvailable + iconOffset, out var tex) &&
             tex.TryGetWrap(out var icon, out _))
         {
-            ImGui.Image(icon.ImGuiHandle, ImGuiHelpers.ScaledVector2(40));
+            ImGui.Image(icon.Handle, ImGuiHelpers.ScaledVector2(40));
         }
 
         ImGui.TableNextColumn(); // Text
@@ -601,7 +600,7 @@ public unsafe partial class UnlocksTabUtils
             var newWidth = ImGui.GetContentRegionAvail().X;
             var ratio = newWidth / image.Width;
             var newHeight = image.Height * ratio;
-            ImGui.Image(image.ImGuiHandle, new Vector2(newWidth, newHeight));
+            ImGui.Image(image.Handle, new Vector2(newWidth, newHeight));
         }
 
         var questText = _excelService.GetSheet<QuestText>($"quest/{(quest.RowId - 0x10000) / 100:000}/{quest.Id.ExtractText()}");
@@ -670,7 +669,7 @@ public unsafe partial class UnlocksTabUtils
             var newWidth = ImGui.GetContentRegionAvail().X;
             var ratio = newWidth / image.Width;
             var newHeight = image.Height * ratio;
-            ImGui.Image(image.ImGuiHandle, new Vector2(newWidth, newHeight));
+            ImGui.Image(image.Handle, new Vector2(newWidth, newHeight));
             iconDrawn = true;
         }
 

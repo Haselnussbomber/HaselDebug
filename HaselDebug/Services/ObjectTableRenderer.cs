@@ -4,7 +4,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using HaselCommon.Gui;
 using HaselCommon.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
 

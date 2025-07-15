@@ -19,6 +19,11 @@
     <Reference Include="SharpDX.DXGI" Private="false" />
     <Reference Include="SharpDX.Direct3D11" Private="false" />
     <Reference Include="SharpDX.Mathematics" Private="false" />
+    <Reference Remove="ImGui.NET" />
+    <Reference Include="Dalamud.Bindings.ImGui" Private="false" />
+    <Reference Include="Dalamud.Bindings.ImPlot" Private="false" />
+    <Reference Include="Dalamud.Bindings.ImGuizmo" Private="false" />
+    <Reference Include="Microsoft.Extensions.ObjectPool" Private="false" />
   </ItemGroup>
 
   <ItemGroup>

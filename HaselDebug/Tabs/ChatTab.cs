@@ -5,7 +5,6 @@ using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
 
@@ -50,11 +49,11 @@ public unsafe partial class ChatTab : DebugTab
         ImGui.TableSetupScrollFreeze(5, 1);
         ImGui.TableHeadersRow();
 
-        var imGuiListClipperPtr = new ImGuiListClipperPtr(ImGuiNative.ImGuiListClipper_ImGuiListClipper());
-        imGuiListClipperPtr.Begin(count, ImGui.GetTextLineHeightWithSpacing());
-        while (imGuiListClipperPtr.Step())
+        var clipper = new ImGuiListClipper();
+        clipper.Begin(count, ImGui.GetTextLineHeightWithSpacing());
+        while (clipper.Step())
         {
-            for (var i = imGuiListClipperPtr.DisplayStart; i < imGuiListClipperPtr.DisplayEnd; i++)
+            for (var i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
             {
                 if (i >= count)
                     return;
@@ -94,8 +93,7 @@ public unsafe partial class ChatTab : DebugTab
             }
         }
 
-        imGuiListClipperPtr.End();
-        imGuiListClipperPtr.Destroy();
+        clipper.End();
     }
 
     private string GetLabel(int index)

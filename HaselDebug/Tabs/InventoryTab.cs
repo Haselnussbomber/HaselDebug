@@ -9,7 +9,6 @@ using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 using Lumina.Text;
 using ItemUtil = Dalamud.Utility.ItemUtil;

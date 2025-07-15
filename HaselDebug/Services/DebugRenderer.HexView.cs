@@ -4,7 +4,6 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Memory;
 using HaselCommon.Graphics;
 using HaselDebug.Utils;
-using ImGuiNET;
 
 namespace HaselDebug.Services;
 

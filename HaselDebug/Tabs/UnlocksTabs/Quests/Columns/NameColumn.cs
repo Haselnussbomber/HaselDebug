@@ -6,7 +6,6 @@ using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Utils;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Quests.Columns;
@@ -45,7 +44,7 @@ public partial class NameColumn : ColumnString<Quest>
             _textureProvider.TryGetFromGameIcon(eventIconType.MapIconAvailable + iconOffset, out var tex) &&
             tex.TryGetWrap(out var icon, out _))
         {
-            ImGui.Image(icon.ImGuiHandle, ImGuiHelpers.ScaledVector2(ImGui.GetTextLineHeight()));
+            ImGui.Image(icon.Handle, ImGuiHelpers.ScaledVector2(ImGui.GetTextLineHeight()));
         }
         else
         {

@@ -1,7 +1,6 @@
 using System.Numerics;
 using HaselCommon.Gui;
 using HaselDebug.Services;
-using ImGuiNET;
 
 namespace HaselDebug.Windows;
 

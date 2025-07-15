@@ -5,7 +5,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
-using ImGuiNET;
 
 namespace HaselDebug.Tabs.ObjectTables;
 

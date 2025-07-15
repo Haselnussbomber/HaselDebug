@@ -12,7 +12,6 @@ using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Sheets;
 using HaselDebug.Utils;
-using ImGuiNET;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 

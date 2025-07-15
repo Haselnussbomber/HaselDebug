@@ -3,7 +3,6 @@ using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Achievements.Columns;
 

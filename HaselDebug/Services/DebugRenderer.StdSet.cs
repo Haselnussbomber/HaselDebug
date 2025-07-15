@@ -4,7 +4,6 @@ using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
-using ImGuiNET;
 
 namespace HaselDebug.Services;
 

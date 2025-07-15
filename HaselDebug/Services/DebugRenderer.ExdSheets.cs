@@ -3,7 +3,6 @@ using System.Reflection;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
 using HaselDebug.Utils;
-using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Text.ReadOnly;
 

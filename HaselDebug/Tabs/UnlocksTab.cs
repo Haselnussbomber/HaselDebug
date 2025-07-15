@@ -7,7 +7,6 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Windows;
-using ImGuiNET;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Tabs;

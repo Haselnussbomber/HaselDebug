@@ -7,7 +7,6 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 using Microsoft.Extensions.Logging;
 

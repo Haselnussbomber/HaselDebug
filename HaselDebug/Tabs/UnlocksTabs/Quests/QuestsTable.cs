@@ -2,7 +2,6 @@ using System.Linq;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Tabs.UnlocksTabs.Quests.Columns;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Quests;

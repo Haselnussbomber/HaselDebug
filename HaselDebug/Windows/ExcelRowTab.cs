@@ -3,7 +3,6 @@ using Dalamud.Game;
 using HaselCommon.Gui;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Windows;

@@ -8,7 +8,6 @@ using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
@@ -156,7 +155,7 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
     {
         if (_textureProvider.TryGetFromGameIcon(slot.IconId, out var tex) && tex.TryGetWrap(out var texture, out _))
         {
-            ImGui.Image(texture.ImGuiHandle, new Vector2(ImGui.GetTextLineHeight()));
+            ImGui.Image(texture.Handle, new Vector2(ImGui.GetTextLineHeight()));
         }
         else
         {

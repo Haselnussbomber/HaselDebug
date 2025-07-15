@@ -4,7 +4,6 @@ using HaselCommon.Graphics;
 using HaselCommon.Gui;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using ImGuiNET;
 
 namespace HaselDebug.Tabs;
 

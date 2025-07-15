@@ -7,7 +7,6 @@ using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
 using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;

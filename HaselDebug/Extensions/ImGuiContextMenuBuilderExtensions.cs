@@ -4,7 +4,6 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Services;
 using HaselCommon.Utils;
-using ImGuiNET;
 
 namespace HaselDebug.Extensions;
 
@@ -72,6 +71,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
         }
 
         public bool Enabled => true;
+        public bool Selected => false;
         public string Label => textService.GetAddonText(15635);
         public bool LoseFocusOnClick => false;
         public Action? ClickCallback => OnClick;
@@ -86,7 +86,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
                 ClickCallback?.Invoke();
 
                 if (LoseFocusOnClick)
-                    ImGui.SetWindowFocus(null);
+                    ImGui.SetWindowFocus();
             }
             if (ImGui.IsItemHovered())
                 HoverCallback?.Invoke();
@@ -148,6 +148,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
         }
 
         public bool Enabled => true;
+        public bool Selected => false;
         public string Label => textService.GetAddonText(11904);
         public bool LoseFocusOnClick => false;
         public Action? ClickCallback => OnClick;
@@ -162,7 +163,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
                 ClickCallback?.Invoke();
 
                 if (LoseFocusOnClick)
-                    ImGui.SetWindowFocus(null);
+                    ImGui.SetWindowFocus();
             }
             if (ImGui.IsItemHovered())
                 HoverCallback?.Invoke();

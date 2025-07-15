@@ -2,7 +2,6 @@ using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using ImGuiNET;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits;
 

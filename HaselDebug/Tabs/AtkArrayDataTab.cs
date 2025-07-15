@@ -9,7 +9,6 @@ using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;

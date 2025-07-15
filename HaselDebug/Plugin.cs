@@ -6,7 +6,6 @@ using HaselCommon.Commands;
 using HaselCommon.Services;
 using HaselDebug.Config;
 using HaselDebug.Windows;
-using ImGuiNET;
 using InteropGenerator.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 

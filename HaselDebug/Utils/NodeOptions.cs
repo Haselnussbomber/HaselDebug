@@ -2,7 +2,6 @@ using Dalamud.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
-using ImGuiNET;
 using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Utils;

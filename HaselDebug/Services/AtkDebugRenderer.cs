@@ -12,7 +12,6 @@ using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
-using ImGuiNET;
 using Lumina.Text.ReadOnly;
 using Microsoft.Extensions.DependencyInjection;
 

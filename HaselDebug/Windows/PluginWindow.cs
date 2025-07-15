@@ -10,7 +10,6 @@ using HaselDebug.Config;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using Microsoft.Extensions.Logging;
 
 namespace HaselDebug.Windows;

@@ -2,7 +2,6 @@ using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Windows;
-using ImGuiNET;
 using Lumina.Excel;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -31,7 +31,6 @@ using FFXIVClientStructs.STD;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using InteropGenerator.Runtime;
 using InteropGenerator.Runtime.Attributes;
 using Lumina.Text.ReadOnly;
@@ -1279,7 +1278,7 @@ public unsafe partial class DebugRenderer
 
         if (_textureProvider.TryGetFromGameIcon(new GameIconLookup(iconId, isHq), out var tex) && tex.TryGetWrap(out var texture, out _))
         {
-            ImGui.Image(texture.ImGuiHandle, drawInfo.DrawSize.Value);
+            ImGui.Image(texture.Handle, drawInfo.DrawSize.Value);
 
             if (ImGui.IsItemHovered())
             {
@@ -1292,7 +1291,7 @@ public unsafe partial class DebugRenderer
                     if (canCopy)
                         ImGui.TextUnformatted("Click to copy IconId");
                     ImGui.TextUnformatted($"ID: {iconId} – Size: {texture.Width}x{texture.Height}");
-                    ImGui.Image(texture.ImGuiHandle, new(texture.Width, texture.Height));
+                    ImGui.Image(texture.Handle, new(texture.Width, texture.Height));
                     ImGui.EndTooltip();
                 }
             }

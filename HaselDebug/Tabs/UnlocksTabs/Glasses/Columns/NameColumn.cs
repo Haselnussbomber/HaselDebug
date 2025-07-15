@@ -3,7 +3,6 @@ using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using ImGuiNET;
 using GlassesSheet = Lumina.Excel.Sheets.Glasses;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Glasses.Columns;

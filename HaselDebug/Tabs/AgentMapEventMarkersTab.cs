@@ -3,7 +3,6 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using ImGuiNET;
 using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
@@ -38,7 +37,7 @@ public unsafe partial class AgentMapEventMarkersTab : DebugTab
 
             ImGui.TableNextColumn(); // Icon
             if (_textureProvider.TryGetFromGameIcon(marker.IconId, out var sharedTex) && sharedTex.TryGetWrap(out var tex, out var _))
-                ImGui.Image(tex.ImGuiHandle, new(ImGui.GetTextLineHeight()));
+                ImGui.Image(tex.Handle, new(ImGui.GetTextLineHeight()));
 
             ImGui.SameLine();
             ImGui.TextUnformatted(marker.IconId.ToString());

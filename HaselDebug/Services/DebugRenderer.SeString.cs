@@ -12,7 +12,6 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using HaselCommon.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
-using ImGuiNET;
 using Lumina.Data;
 using Lumina.Excel.Sheets;
 using Lumina.Text.Expressions;

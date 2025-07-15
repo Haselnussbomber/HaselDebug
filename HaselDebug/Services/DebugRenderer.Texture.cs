@@ -2,7 +2,6 @@ using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Utils;
-using ImGuiNET;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
 namespace HaselDebug.Services;
@@ -57,7 +56,7 @@ public unsafe partial class DebugRenderer
         var scale = availSize.X / size.X;
         var scaledSize = new Vector2(size.X * scale, size.Y * scale);
 
-        ImGui.Image((nint)tex->D3D11ShaderResourceView, availSize.X < size.X ? scaledSize : size);
+        ImGui.Image(new ImTextureID(tex->D3D11ShaderResourceView), availSize.X < size.X ? scaledSize : size);
     }
 
     // See https://github.com/aers/FFXIVClientStructs/pull/1065
