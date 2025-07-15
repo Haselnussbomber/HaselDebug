@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - **Updated:** It's now possible to copy values from the Addon Config table.
+- **Updated:** ClientStructs now at [62ea2008](https://github.com/aers/FFXIVClientStructs/tree/62ea2008) ([compare](https://github.com/aers/FFXIVClientStructs/compare/8a6e0bb6..62ea2008)).
 
 ## [1.29.0] (2025-07-12)
 
