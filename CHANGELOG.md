@@ -3,9 +3,9 @@
 ## [1.29.1] (2025-07-15)
 
 - **Fixed:** The border around highlighted nodes didn't respect the user-set scaling of the addon.
-- **Fixed:** The border around highlighted component nodes wasn’t shown when `AtkResNode` was null. It now falls back to `OwnerNode`.
+- **Fixed:** The border around highlighted component nodes wasn't shown when `AtkResNode` was null. It now falls back to `OwnerNode`.
 - **Updated:** It's now possible to copy values from the Addon Config table.
-- **Updated:** ClientStructs now at [62ea2008](https://github.com/aers/FFXIVClientStructs/tree/62ea2008) ([compare](https://github.com/aers/FFXIVClientStructs/compare/8a6e0bb6..62ea2008)).
+- **Updated:** ClientStructs now at [62ea2008](https://github.com/aers/FFXIVClientStructs/tree/62ea2008) ([compare](https://github.com/aers/FFXIVClientStructs/compare/8b3a8f45..62ea2008)).
 
 ## [1.29.0] (2025-07-12)
 
