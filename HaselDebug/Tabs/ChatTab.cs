@@ -49,7 +49,7 @@ public unsafe partial class ChatTab : DebugTab
         ImGui.TableSetupScrollFreeze(5, 1);
         ImGui.TableHeadersRow();
 
-        var clipper = new ImGuiListClipper();
+        var clipper = ImGui.ImGuiListClipper();
         clipper.Begin(count, ImGui.GetTextLineHeightWithSpacing());
         while (clipper.Step())
         {
@@ -94,6 +94,7 @@ public unsafe partial class ChatTab : DebugTab
         }
 
         clipper.End();
+        clipper.Destroy();
     }
 
     private string GetLabel(int index)
