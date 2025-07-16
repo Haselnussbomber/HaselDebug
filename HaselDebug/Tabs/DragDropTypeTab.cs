@@ -16,6 +16,8 @@ public unsafe partial class DragDropTypeTab : DebugTab
 
     public override void Draw()
     {
+        ImGui.TextUnformatted("Disabled because ImGui can only render 64 columns.");
+        return;
         const int count = 88;
         using var table = ImRaii.Table("DragDropTypeTable", count, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollX | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table)
