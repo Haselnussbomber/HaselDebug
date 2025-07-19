@@ -19,8 +19,8 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
     private readonly List<(DateTime, nint)> _events = [];
     private Hook<AtkEventDispatcher.Delegates.DispatchEvent>? _dispatchEventHook;
     private bool _enabled = false;
+    private bool _isInitialized;
 
-    [AutoPostConstruct]
     private void Initialize()
     {
         _dispatchEventHook = _gameInteropProvider.HookFromAddress<AtkEventDispatcher.Delegates.DispatchEvent>(AtkEventDispatcher.MemberFunctionPointers.DispatchEvent, DispatchEventDetour);
@@ -61,6 +61,12 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
 
     public override void Draw()
     {
+        if (!_isInitialized)
+        {
+            Initialize();
+            _isInitialized = true;
+        }
+
         if (_dispatchEventHook == null)
         {
             ImGui.TextUnformatted("Hook not created");

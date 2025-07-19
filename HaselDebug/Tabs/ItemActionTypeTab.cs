@@ -20,9 +20,9 @@ public unsafe partial class ItemActionTypeTab : DebugTab
     private readonly DebugRenderer _debugRenderer;
 
     private ImmutableSortedDictionary<ushort, Item[]> _dict;
+    private bool _isInitialized;
 
-    [AutoPostConstruct]
-    public void Initialize()
+    private void Initialize()
     {
         _dict = _excelService.GetSheet<ItemAction>()
             .GroupBy(row => row.Type)
@@ -35,6 +35,12 @@ public unsafe partial class ItemActionTypeTab : DebugTab
 
     public override void Draw()
     {
+        if (!_isInitialized)
+        {
+            Initialize();
+            _isInitialized = true;
+        }
+
         foreach (var (type, items) in _dict)
         {
             using var node = ImRaii.TreeNode($"[{type}] {(ItemActionType)type} ({items.Length})", ImGuiTreeNodeFlags.SpanAvailWidth);

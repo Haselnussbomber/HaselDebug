@@ -35,14 +35,14 @@ public unsafe partial class Excel2Tab : DebugTab
     private IExcelV2SheetWrapper? _sheetWrapper;
     private IExcelV2SheetWrapper? _nextSheetWrapper;
     private string _sheetNameSearchTerm = string.Empty;
+    private bool _isInitialized;
 
     public override string Title => "Excel (v2)";
 
     public string SearchTerm { get; private set; } = string.Empty;
     public ClientLanguage SelectedLanguage { get; private set; }
 
-    [AutoPostConstruct]
-    public void Initialize()
+    private void Initialize()
     {
         SelectedLanguage = _languageProvider.ClientLanguage;
 
@@ -55,6 +55,12 @@ public unsafe partial class Excel2Tab : DebugTab
     public override bool DrawInChild => false;
     public override void Draw()
     {
+        if (!_isInitialized)
+        {
+            Initialize();
+            _isInitialized = true;
+        }
+
         using var hostChild = ImRaii.Child("Host", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
         if (!hostChild) return;
 

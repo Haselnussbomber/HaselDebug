@@ -22,9 +22,9 @@ public unsafe partial class TerritoryIntendedUseTab : DebugTab
     private readonly DebugRenderer _debugRenderer;
 
     private ImmutableSortedDictionary<uint, List<(TerritoryType, ContentFinderCondition[])>> _dict;
+    private bool _isInitialized;
 
-    [AutoPostConstruct]
-    public void Initialize()
+    private void Initialize()
     {
         var dict = new Dictionary<uint, List<(TerritoryType, ContentFinderCondition[])>>();
 
@@ -47,6 +47,12 @@ public unsafe partial class TerritoryIntendedUseTab : DebugTab
 
     public override void Draw()
     {
+        if (!_isInitialized)
+        {
+            Initialize();
+            _isInitialized = true;
+        }
+
         foreach (var territoryIntendedUse in Enum.GetValues<TerritoryIntendedUseEnum>())
         {
             if (!_dict.TryGetValue((uint)territoryIntendedUse, out var entries))

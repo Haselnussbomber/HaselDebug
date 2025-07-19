@@ -118,11 +118,11 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
     private readonly TextureService _textureService;
 
     private SeStringInspectorWindow? _inspectorWindow;
+    private bool _isInitialized;
 
     public override bool DrawInChild => false;
 
-    [AutoPostConstruct]
-    public void Initialize()
+    private void Initialize()
     {
         _languageProvider.LanguageChanged += OnLanguageChanged;
     }
@@ -140,6 +140,12 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
     public override unsafe void Draw()
     {
+        if (!_isInitialized)
+        {
+            Initialize();
+            _isInitialized = true;
+        }
+
         using var hostchild = ImRaii.Child("RaptureTextModuleTabChild", new Vector2(-1), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
         if (!hostchild) return;
 

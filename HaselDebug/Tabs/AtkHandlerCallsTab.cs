@@ -25,8 +25,8 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
     private readonly List<CallEntry> _calls = [];
     private Hook<CallHandler>? _callHandlerDetour;
     private bool _enabled = false;
+    private bool _isInitialized;
 
-    [AutoPostConstruct]
     private void Initialize()
     {
         _callHandlerDetour = _gameInteropProvider.HookFromSignature<CallHandler>(
@@ -128,6 +128,12 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
 
     public override void Draw()
     {
+        if (!_isInitialized)
+        {
+            Initialize();
+            _isInitialized = true;
+        }
+
         if (_callHandlerDetour == null)
         {
             ImGui.TextUnformatted("Hook not created");

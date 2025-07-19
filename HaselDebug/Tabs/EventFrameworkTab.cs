@@ -23,14 +23,14 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
     private readonly IGameInteropProvider _gameInteropProvider;
 
     private readonly List<(DateTime, nint, EventSceneTaskInterface)> _taskTypeHistory = [];
-    private Hook<EventSceneModuleTaskManager.Delegates.AddTask> _addTaskHook;
+    private Hook<EventSceneModuleTaskManager.Delegates.AddTask>? _addTaskHook;
     private bool _logEnabled;
+    private bool _isInitialized;
 
     public override string Title => "EventFramework";
     public override bool DrawInChild => false;
 
-    [AutoPostConstruct]
-    public void Initialize()
+    private void Initialize()
     {
         _addTaskHook = _gameInteropProvider.HookFromAddress<EventSceneModuleTaskManager.Delegates.AddTask>(
             EventSceneModuleTaskManager.MemberFunctionPointers.AddTask,
@@ -41,7 +41,7 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
 
     public void Dispose()
     {
-        _addTaskHook.Dispose();
+        _addTaskHook?.Dispose();
     }
 
     private void AddTaskDetour(EventSceneModuleTaskManager* thisPtr, EventSceneTaskInterface* task)
@@ -51,11 +51,17 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
             _taskTypeHistory.Add((DateTime.Now, (nint)task, *task));
         }
 
-        _addTaskHook.Original(thisPtr, task);
+        _addTaskHook!.Original(thisPtr, task);
     }
 
     public override void Draw()
     {
+        if (!_isInitialized)
+        {
+            Initialize();
+            _isInitialized = true;
+        }
+
         using var hostchild = ImRaii.Child("EventFrameworkTabChild", new Vector2(-1), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
         if (!hostchild) return;
 

@@ -33,12 +33,12 @@ public unsafe partial class ExcelTab : DebugTab
     private CancellationTokenSource? _filterCTS;
 
     private IExcelSheetTab[] _excelTabs;
+    private bool _isInitialized;
 
     public string SearchTerm { get; private set; } = string.Empty;
     public ClientLanguage SelectedLanguage { get; private set; }
 
-    [AutoPostConstruct]
-    public void Initialize()
+    private void Initialize()
     {
         SelectedLanguage = _languageProvider.ClientLanguage;
 
@@ -74,6 +74,12 @@ public unsafe partial class ExcelTab : DebugTab
     public override bool DrawInChild => false;
     public override void Draw()
     {
+        if (!_isInitialized)
+        {
+            Initialize();
+            _isInitialized = true;
+        }
+
         using var hostChild = ImRaii.Child("Host", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - LanguageSelectorWidth * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X);

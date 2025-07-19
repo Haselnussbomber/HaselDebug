@@ -34,9 +34,9 @@ public unsafe partial class AddonConfigTab : DebugTab
     private readonly DebugRenderer _debugRenderer;
     private readonly ILogger<AddonConfigTab> _logger;
     private readonly Dictionary<uint, string> _addonNames = [];
+    private bool _isInitialized;
 
-    [AutoPostConstruct]
-    public void Initialize()
+    private void Initialize()
     {
         void AddName(string name)
         {
@@ -64,6 +64,12 @@ public unsafe partial class AddonConfigTab : DebugTab
 
     public override void Draw()
     {
+        if (!_isInitialized)
+        {
+            Initialize();
+            _isInitialized = true;
+        }
+
         var addonConfig = AddonConfig.Instance();
 
         using var tabbar = ImRaii.TabBar("AddonConfigTabBar");
