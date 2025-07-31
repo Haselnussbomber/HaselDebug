@@ -1077,10 +1077,10 @@ public unsafe partial class AtkDebugRenderer
             case NodeType.Collision:
                 var collNode = (AtkCollisionNode*)node;
                 StartRow("CollisionType");
-                var collisionType = (CollisionType)collNode->CollisionType;
+                var collisionType = collNode->CollisionType;
                 if (ImGuiUtilsEx.EnumCombo("##CollisionType", ref collisionType))
                 {
-                    collNode->CollisionType = (ushort)collisionType;
+                    collNode->CollisionType = collisionType;
                 }
 
                 StartRow("Uses");

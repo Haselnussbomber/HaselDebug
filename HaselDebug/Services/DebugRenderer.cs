@@ -184,8 +184,8 @@ public unsafe partial class DebugRenderer
                     case ObjectKind.HousingEventObject:
                         type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.HousingObject);
                         break;
-                    case ObjectKind.MjiObject:
-                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.MJIObject);
+                    case ObjectKind.ReactionEventObject:
+                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.ReactionEventObject);
                         break;
                     case ObjectKind.Ornament:
                         type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Ornament);

@@ -435,7 +435,7 @@ public unsafe partial class UnlocksTabUtils
             return true;
 
         var playerState = PlayerState.Instance();
-        if (playerState == null || playerState->IsLoaded == 0)
+        if (playerState == null || playerState->IsLoaded)
         {
             _facePaintIconCache.Add(dataId, iconId = 0);
             return false;

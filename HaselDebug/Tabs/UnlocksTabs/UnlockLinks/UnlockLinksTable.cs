@@ -62,7 +62,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
         var playerState = PlayerState.Instance();
 
-        var isLoggedIn = playerState->IsLoaded == 1;
+        var isLoggedIn = playerState->IsLoaded;
         var tribeId = isLoggedIn ? playerState->Tribe : 1;
         var sexId = isLoggedIn ? playerState->Sex : 1;
 

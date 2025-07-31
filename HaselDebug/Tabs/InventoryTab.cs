@@ -3,6 +3,7 @@ using Dalamud.Game.Text;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.Game.WKS;
 using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
@@ -142,7 +143,7 @@ public unsafe partial class InventoryTab : DebugTab
                     .ToReadOnlySeString();
 
                 _debugRenderer.DrawIcon(_itemService.GetIconId(itemId), ItemUtil.IsHighQuality(itemId));
-                _debugRenderer.DrawPointerType(slot, typeof(InventoryItem), new NodeOptions()
+                _debugRenderer.DrawPointerType(slot, inventoryType is InventoryType.Cosmopouch1 or InventoryType.Cosmopouch2 ? typeof(WKSContentInventoryItem) : typeof(InventoryItem), new NodeOptions()
                 {
                     AddressPath = new AddressPath([(nint)inventoryType, slot->Slot]),
                     SeStringTitle = itemNameSeStr

@@ -122,7 +122,7 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
             {
                 _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkListItemData), new NodeOptions() { AddressPath = new(i) });
             }
-            else if ((int)eventType is >= (int)AtkEventType.DragDropBegin and <= (int)AtkEventType.DragDropCancel)
+            else if ((int)eventType is >= (int)AtkEventType.DragDropBegin and <= (int)AtkEventType.DragDropClick)
             {
                 _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkDragDropData), new NodeOptions() { AddressPath = new(i) });
             }

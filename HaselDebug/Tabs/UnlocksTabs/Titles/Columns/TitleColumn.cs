@@ -42,7 +42,7 @@ public partial class TitleColumn : ColumnString<Title>
         var isUnlocked = uiState->TitleList.IsTitleUnlocked((ushort)row.RowId);
         var localPlayer = Control.GetLocalPlayer();
 
-        if (localPlayer != null && uiState->PlayerState.IsLoaded == 1 && uiState->PlayerState.Sex == (_isFeminine ? 1 : 0) && isUnlocked)
+        if (localPlayer != null && uiState->PlayerState.IsLoaded && uiState->PlayerState.Sex == (_isFeminine ? 1 : 0) && isUnlocked)
         {
             var clicked = ImGui.Selectable($"{ToName(row)}##Selectable", localPlayer->TitleId == row.RowId);
 

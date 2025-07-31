@@ -93,11 +93,11 @@ public unsafe partial class AtkArrayDataTab : DebugTab
                 var stringArrayData = (StringArrayData*)arrays[arrayIndex];
                 for (var rowIndex = 0; rowIndex < arrays[arrayIndex]->Size; rowIndex++)
                 {
-                    var isNull = (nint)stringArrayData->StringArray[rowIndex] == 0;
+                    var isNull = (nint)stringArrayData->StringArray[rowIndex].Value == 0;
                     if (isNull)
                         continue;
 
-                    if (new ReadOnlySeStringSpan(stringArrayData->StringArray[rowIndex]).ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
+                    if (stringArrayData->StringArray[rowIndex].ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
                         rowsFound++;
                 }
 
@@ -301,7 +301,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
 
         for (var i = 0; i < array->Size; i++)
         {
-            var isNull = (nint)array->StringArray[i] == 0;
+            var isNull = (nint)array->StringArray[i].Value == 0;
             if (isNull && _hideUnsetStringArrayEntries)
                 continue;
 
@@ -310,7 +310,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
                 if (isNull)
                     continue;
 
-                if (!new ReadOnlySeStringSpan(array->StringArray[i]).ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
+                if (!array->StringArray[i].ExtractText().Contains(_searchTerm, StringComparison.InvariantCultureIgnoreCase))
                     continue;
             }
 
@@ -324,7 +324,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
             if (_showTextAddress)
             {
                 if (!isNull)
-                    DrawCopyableText($"0x{(nint)array->StringArray[i]:X}", "Copy text address");
+                    DrawCopyableText($"0x{(nint)array->StringArray[i].Value:X}", "Copy text address");
             }
             else
             {
@@ -334,7 +334,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
             ImGui.TableNextColumn(); // Managed
             if (!isNull)
             {
-                ImGui.TextUnformatted(((nint)array->StringArray[i] != 0 && array->ManagedStringArray[i] == array->StringArray[i]).ToString());
+                ImGui.TextUnformatted(((nint)array->StringArray[i].Value != 0 && array->ManagedStringArray[i] == array->StringArray[i]).ToString());
             }
 
             ImGui.TableNextColumn(); // Text
@@ -342,11 +342,11 @@ public unsafe partial class AtkArrayDataTab : DebugTab
             {
                 if (_showMacroString)
                 {
-                    DrawCopyableText(new ReadOnlySeStringSpan(array->StringArray[i]).ToString(), "Copy text");
+                    DrawCopyableText(array->StringArray[i].ToString(), "Copy text");
                 }
                 else
                 {
-                    _debugRenderer.DrawSeString(array->StringArray[i], new NodeOptions() { AddressPath = new AddressPath([(nint)array, (nint)array->StringArray[i]]) });
+                    _debugRenderer.DrawSeString(array->StringArray[i], new NodeOptions() { AddressPath = new AddressPath([(nint)array, (nint)array->StringArray[i].Value]) });
                 }
             }
         }
