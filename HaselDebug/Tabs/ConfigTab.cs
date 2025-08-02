@@ -123,7 +123,10 @@ public unsafe partial class ConfigTab : DebugTab
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Index
-            ImGuiUtilsEx.DrawCopyableText(option->Index.ToString());
+            if (ImGui.IsKeyDown(ImGuiKey.LeftShift))
+                ImGuiUtilsEx.DrawCopyableText(((nint)option).ToString("X"));
+            else
+                ImGuiUtilsEx.DrawCopyableText(option->Index.ToString());
 
             ImGui.TableNextColumn(); // Type
             switch (option->Type)
