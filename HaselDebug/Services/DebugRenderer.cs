@@ -14,8 +14,8 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Memory;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using Dalamud.Utility;
 using FFXIVClientStructs.Attributes;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
@@ -36,6 +36,7 @@ using InteropGenerator.Runtime;
 using InteropGenerator.Runtime.Attributes;
 using Lumina.Text.ReadOnly;
 using Microsoft.Extensions.Logging;
+using static Dalamud.Utility.StringExtensions;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkUldManager;
 using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
@@ -867,6 +868,16 @@ public unsafe partial class DebugRenderer
                 var chars = MemoryHelper.ReadString(fieldAddress, 4).ToCharArray();
                 Array.Reverse(chars);
                 ImGuiUtilsEx.DrawCopyableText(new string(chars));
+                continue;
+            }
+
+            // InventoryItem.CrafterContentId
+            if (Inherits<InventoryItem>(type) && fieldType == typeof(ulong) && fieldInfo.Name == "CrafterContentId")
+            {
+                DrawFieldName(fieldInfo);
+                DrawNumeric(fieldAddress, fieldType, fieldNodeOptions);
+                ImGui.SameLine();
+                ImGuiUtilsEx.DrawCopyableText(NameCache.Instance()->GetNameByContentId(*(ulong*)fieldAddress).ExtractText());
                 continue;
             }
 
