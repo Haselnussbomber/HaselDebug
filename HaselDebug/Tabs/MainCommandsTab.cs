@@ -1,5 +1,4 @@
 using System.Numerics;
-using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -98,7 +97,7 @@ public unsafe partial class MainCommandsTab : DebugTab
                 ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
                 ImGuiUtils.PushCursorY(4);
 
-                ImGuiHelpers.SafeTextWrapped(row.Description.ExtractText().StripSoftHyphen());
+                ImGui.TextWrapped(row.Description.ExtractText().StripSoftHyphen());
             }
         }
     }

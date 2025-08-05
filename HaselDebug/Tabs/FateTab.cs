@@ -1,5 +1,4 @@
 using Dalamud.Game.ClientState.Fates;
-using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
 using HaselDebug.Abstracts;
@@ -150,7 +149,7 @@ public partial class FateTab : DebugTab
 
     private static void DrawCopyableText(string text, string tooltipText)
     {
-        ImGuiHelpers.SafeTextWrapped(text);
+        ImGui.TextWrapped(text);
 
         if (ImGui.IsItemHovered())
         {

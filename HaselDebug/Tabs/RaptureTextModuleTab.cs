@@ -3,6 +3,7 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
@@ -110,7 +111,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
     private readonly IServiceProvider _serviceProvider;
     private readonly DebugRenderer _debugRenderer;
     private readonly WindowManager _windowManager;
-    private readonly SeStringEvaluator _seStringEvaluator;
+    private readonly ISeStringEvaluator _seStringEvaluator;
     private readonly TextService _textService;
     private readonly AddonObserver _addonObserver;
     private readonly LanguageProvider _languageProvider;

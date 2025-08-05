@@ -16,7 +16,7 @@ public partial class NameColumn : ColumnString<TripleTriadCardEntry>
 {
     private readonly DebugRenderer _debugRenderer;
     private readonly ExcelService _excelService;
-    private readonly SeStringEvaluator _seStringEvaluator;
+    private readonly ISeStringEvaluator _seStringEvaluator;
     private readonly MapService _mapService;
     private readonly UnlocksTabUtils _unlocksTabUtils;
     private readonly ITextureProvider _textureProvider;

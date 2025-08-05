@@ -5,6 +5,7 @@ using Dalamud.Game;
 using Dalamud.Game.Text.Evaluator;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -28,7 +29,7 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
 
     private WindowManager _windowManager;
     private DebugRenderer _debugRenderer;
-    private SeStringEvaluator _seStringEvaluator;
+    private ISeStringEvaluator _seStringEvaluator;
 
     private SeStringParameter[]? _localParameters = null;
     private string _macroString = string.Empty;
@@ -68,7 +69,7 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
     {
         _windowManager = _serviceProvider.GetRequiredService<WindowManager>();
         _debugRenderer = _serviceProvider.GetRequiredService<DebugRenderer>();
-        _seStringEvaluator = _serviceProvider.GetRequiredService<SeStringEvaluator>();
+        _seStringEvaluator = _serviceProvider.GetRequiredService<ISeStringEvaluator>();
     }
 
     public override void OnOpen()

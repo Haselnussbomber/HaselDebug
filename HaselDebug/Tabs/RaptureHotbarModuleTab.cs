@@ -18,7 +18,7 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
     private readonly DebugRenderer _debugRenderer;
     private readonly ExcelService _excelService;
     private readonly TextService _textService;
-    private readonly SeStringEvaluator _seStringEvaluatorService;
+    private readonly ISeStringEvaluator _seStringEvaluatorService;
     private readonly ITextureProvider _textureProvider;
 
     public override void Draw()

@@ -1,4 +1,5 @@
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using HaselCommon.Gui;
@@ -13,7 +14,7 @@ namespace HaselDebug.Services;
 public unsafe partial class ObjectTableRenderer
 {
     private readonly DebugRenderer _debugRenderer;
-    private readonly SeStringEvaluator _seStringEvaluator;
+    private readonly ISeStringEvaluator _seStringEvaluator;
     private readonly TextService _textService;
     private readonly ExcelService _excelService;
     private readonly WindowManager _windowManager;

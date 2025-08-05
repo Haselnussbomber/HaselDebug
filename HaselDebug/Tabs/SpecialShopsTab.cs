@@ -36,10 +36,14 @@ public partial class SpecialShopsTable : Table<SpecialShop>
         ];
     }
 
+    public override float CalculateLineHeight()
+    {
+        return 0;
+    }
+
     public override void LoadRows()
     {
         Rows = [.. _excelService.GetSheet<SpecialShop>()];
-        LineHeight = 0;
     }
 }
 

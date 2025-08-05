@@ -28,8 +28,11 @@ public unsafe partial class CutscenesTable : Table<CutsceneEntry>
             _pathColumn,
             _usesColumn,
         ];
+    }
 
-        LineHeight = 0;
+    public override float CalculateLineHeight()
+    {
+        return 0;
     }
 
     public override void LoadRows()

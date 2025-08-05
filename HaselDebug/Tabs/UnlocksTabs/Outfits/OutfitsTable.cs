@@ -19,7 +19,6 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly ItemService _itemService;
-    private readonly GlobalScaleObserver _globalScaleObserver;
     private readonly SetColumn _setColumn;
     private readonly ItemsColumn _itemsColumn;
 
@@ -33,20 +32,11 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
         ];
 
         Flags |= ImGuiTableFlags.SortTristate;
-
-        _globalScaleObserver.ScaleChanged += OnScaleChanged;
-        OnScaleChanged(ImGuiHelpers.GlobalScale);
     }
 
-    public new void Dispose()
+    public override float CalculateLineHeight()
     {
-        _globalScaleObserver.ScaleChanged -= OnScaleChanged;
-        base.Dispose();
-    }
-
-    private void OnScaleChanged(float scale)
-    {
-        LineHeight = IconSize * scale + ImGui.GetStyle().ItemSpacing.Y; // I honestly don't know why using ItemSpacing here works
+        return IconSize * ImGuiHelpers.GlobalScaleSafe + ImGui.GetStyle().ItemSpacing.Y; // I honestly don't know why using ItemSpacing here works
     }
 
     public override void LoadRows()

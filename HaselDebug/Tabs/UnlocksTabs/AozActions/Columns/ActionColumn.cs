@@ -1,5 +1,5 @@
+using Dalamud.Plugin.Services;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselCommon.Utils;
 using HaselDebug.Services;
 using HaselDebug.Utils;
@@ -11,7 +11,7 @@ public partial class ActionColumn : ColumnString<AozEntry>
 {
     private readonly DebugRenderer _debugRenderer;
     private readonly UnlocksTabUtils _unlocksTabUtils;
-    private readonly SeStringEvaluator _seStringEvaluator;
+    private readonly ISeStringEvaluator _seStringEvaluator;
 
     public override string ToName(AozEntry entry)
         => entry.Action.Name.ExtractText();

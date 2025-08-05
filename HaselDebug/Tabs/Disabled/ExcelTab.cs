@@ -283,7 +283,7 @@ public class ExcelTab : DebugTab
         if (excelSheetColumns.Length > 70)
         {
             using (Color.Red.Push(ImGuiCol.Text))
-                ImGuiHelpers.SafeTextWrapped("Displaying this sheet would currently crash the game (ImGui column count limitation). Please use other tools for now.");
+                ImGui.TextWrapped("Displaying this sheet would currently crash the game (ImGui column count limitation). Please use other tools for now.");
             return;
         }
 

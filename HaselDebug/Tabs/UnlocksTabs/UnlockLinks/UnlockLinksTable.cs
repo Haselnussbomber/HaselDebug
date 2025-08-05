@@ -15,7 +15,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks;
 public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposable
 {
     internal readonly ExcelService _excelService;
-    private readonly SeStringEvaluator _seStringEvaluator;
+    private readonly ISeStringEvaluator _seStringEvaluator;
     private readonly IClientState _clientState;
 
     private readonly IndexColumn _indexColumn;
@@ -32,8 +32,6 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             _unlocksColumn,
             _unlocksNameColumn,
         ];
-
-        LineHeight = 0;
 
         _clientState.Login += OnLogin;
         _clientState.Logout += OnLogout;
@@ -54,6 +52,11 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
     private void OnLogout(int type, int code)
     {
         LoadRows();
+    }
+
+    public override float CalculateLineHeight()
+    {
+        return 0;
     }
 
     public override void LoadRows()

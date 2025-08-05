@@ -395,9 +395,9 @@ public unsafe partial class DebugRenderer
 
                     case LinkMacroPayloadType.AkatsukiNote when
                         _dataManager.GetSubrowExcelSheet<AkatsukiNote>(_languageProvider.ClientLanguage).TryGetRow(u32, out var akatsukiNoteRow) &&
-                        _dataManager.GetExcelSheet<AkatsukiNoteString>(_languageProvider.ClientLanguage).TryGetRow((uint)akatsukiNoteRow[0].Unknown2, out var akatsukiNoteStringRow):
+                        akatsukiNoteRow[0].ListName.IsValid:
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(akatsukiNoteStringRow.Unknown0.ExtractText());
+                        ImGui.TextUnformatted(akatsukiNoteRow[0].ListName.Value.Text.ExtractText());
                         break;
                 }
             }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Dalamud.NET.Sdk/12.0.2">
+<Project Sdk="Dalamud.NET.Sdk/13.0.0">
   <PropertyGroup>
     <Version>1.29.1</Version>
     <OutputPath>..\bin\</OutputPath>
@@ -19,10 +19,6 @@
     <Reference Include="SharpDX.DXGI" Private="false" />
     <Reference Include="SharpDX.Direct3D11" Private="false" />
     <Reference Include="SharpDX.Mathematics" Private="false" />
-    <Reference Remove="ImGui.NET" />
-    <Reference Include="Dalamud.Bindings.ImGui" Private="false" />
-    <Reference Include="Dalamud.Bindings.ImPlot" Private="false" />
-    <Reference Include="Dalamud.Bindings.ImGuizmo" Private="false" />
     <Reference Include="Microsoft.Extensions.ObjectPool" Private="false" />
   </ItemGroup>
 

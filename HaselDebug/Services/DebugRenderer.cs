@@ -65,7 +65,7 @@ public unsafe partial class DebugRenderer
     private readonly WindowManager _windowManager;
     private readonly ITextureProvider _textureProvider;
     private readonly ImGuiContextMenuService _imGuiContextMenu;
-    private readonly SeStringEvaluator _seStringEvaluator;
+    private readonly ISeStringEvaluator _seStringEvaluator;
     private readonly TextService _textService;
     private readonly TextureService _textureService;
     private readonly IDataManager _dataManager;

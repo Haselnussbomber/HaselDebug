@@ -1,4 +1,3 @@
-using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -50,7 +49,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
 
     private static void DrawCopyableText(string text, string tooltipText)
     {
-        ImGuiHelpers.SafeTextWrapped(text);
+        ImGui.TextWrapped(text);
 
         if (ImGui.IsItemHovered())
         {

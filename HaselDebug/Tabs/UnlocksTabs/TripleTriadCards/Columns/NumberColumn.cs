@@ -1,12 +1,12 @@
+using Dalamud.Plugin.Services;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 
 namespace HaselDebug.Tabs.UnlocksTabs.TripleTriadCards.Columns;
 
 [RegisterTransient, AutoConstruct]
 public partial class NumberColumn : ColumnString<TripleTriadCardEntry>
 {
-    private readonly SeStringEvaluator _seStringEvaluator;
+    private readonly ISeStringEvaluator _seStringEvaluator;
 
     [AutoPostConstruct]
     public void Initialize()

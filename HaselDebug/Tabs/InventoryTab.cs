@@ -1,6 +1,7 @@
 using System.Numerics;
 using Dalamud.Game.Text;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.Game.WKS;
@@ -24,7 +25,7 @@ public unsafe partial class InventoryTab : DebugTab
     private readonly ExcelService _excelService;
     private readonly ItemService _itemService;
     private readonly ImGuiContextMenuService _imGuiContextMenu;
-    private readonly SeStringEvaluator _seStringEvaluator;
+    private readonly ISeStringEvaluator _seStringEvaluator;
 
     private InventoryType? _selectedInventoryType = InventoryType.Inventory1;
 

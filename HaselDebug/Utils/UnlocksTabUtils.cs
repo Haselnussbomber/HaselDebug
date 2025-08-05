@@ -35,7 +35,7 @@ public unsafe partial class UnlocksTabUtils
     private readonly IDataManager _dataManager;
     private readonly ITextureProvider _textureProvider;
     private readonly TripleTriadNumberFont _tripleTriadNumberFont;
-    private readonly SeStringEvaluator _seStringEvaluator;
+    private readonly ISeStringEvaluator _seStringEvaluator;
 
     private readonly Dictionary<uint, Vector2> _iconSizeCache = [];
     private readonly Dictionary<ushort, uint> _facePaintIconCache = [];
@@ -204,7 +204,7 @@ public unsafe partial class UnlocksTabUtils
         {
             DrawSeparator(marginTop: 1, marginBottom: 4);
 
-            ImGuiHelpers.SafeTextWrapped(description);
+            ImGui.TextWrapped(description);
         }
 
         switch ((ItemActionType)item.ItemAction.Value.Type)
@@ -241,7 +241,7 @@ public unsafe partial class UnlocksTabUtils
                     DrawSeparator();
                     _textureService.DrawIcon(obtainRow.Icon, 40 * ImGuiHelpers.GlobalScale);
                     ImGui.SameLine();
-                    ImGuiHelpers.SafeTextWrapped(_seStringEvaluator.EvaluateFromAddon(obtainRow.Icon, [
+                    ImGui.TextWrapped(_seStringEvaluator.EvaluateFromAddon(obtainRow.Icon, [
                         residentRow.Acquisition.RowId,
                     residentRow.Location.RowId
                     ]).ExtractText().StripSoftHyphen());
@@ -532,7 +532,7 @@ public unsafe partial class UnlocksTabUtils
         {
             DrawSeparator(marginTop: 1, marginBottom: 4);
 
-            ImGuiHelpers.SafeTextWrapped(itemHelp.Description.ExtractText().StripSoftHyphen());
+            ImGui.TextWrapped(itemHelp.Description.ExtractText().StripSoftHyphen());
         }
     }
 
