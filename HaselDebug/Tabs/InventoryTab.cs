@@ -1,7 +1,6 @@
 using System.Numerics;
 using Dalamud.Game.Text;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Services;
@@ -13,6 +12,7 @@ using HaselDebug.Utils;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 using Lumina.Text;
+using ItemUtil = Dalamud.Utility.ItemUtil;
 
 namespace HaselDebug.Tabs;
 
@@ -24,6 +24,7 @@ public unsafe partial class InventoryTab : DebugTab
     private readonly ExcelService _excelService;
     private readonly ItemService _itemService;
     private readonly ImGuiContextMenuService _imGuiContextMenu;
+    private readonly SeStringEvaluator _seStringEvaluator;
 
     private InventoryType? _selectedInventoryType = InventoryType.Inventory1;
 
@@ -147,6 +148,14 @@ public unsafe partial class InventoryTab : DebugTab
                     AddressPath = new AddressPath([(nint)inventoryType, slot->Slot]),
                     SeStringTitle = itemNameSeStr
                 });
+
+                if (itemId is 8575 or 8693 or 8694 or 8695 or 8696 or 8698 or 8699) // IsWeddingRelatedItemId
+                {
+                    var date =
+                        (slot->GetMateriaId(0) << 4 | (slot->GetMateriaGrade(0) & 0xF)) << 16 |
+                         slot->GetMateriaId(1) << 4 | (slot->GetMateriaGrade(1) & 0xF);
+                    ImGui.TextUnformatted("Date: " + _seStringEvaluator.EvaluateFromAddon(1551, [date]).ExtractText());
+                }
             }
         }
     }
