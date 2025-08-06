@@ -240,7 +240,7 @@ public class ExcelSheetStringColumn<T> : ExcelSheetColumn<T> where T : struct, I
 
         MatchesSearchTerm = (row) =>
         {
-            return stringGetter(row).ToString().Contains(excelTab.SearchTerm, StringComparison.InvariantCultureIgnoreCase);
+            return stringGetter(row).ToMacroString().Contains(excelTab.SearchTerm, StringComparison.InvariantCultureIgnoreCase);
         };
 
         Draw = (row) =>

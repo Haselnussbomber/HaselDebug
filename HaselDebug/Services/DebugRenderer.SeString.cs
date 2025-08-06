@@ -179,7 +179,7 @@ public unsafe partial class DebugRenderer
         }
         else
         {
-            var text = rosss.ToString();
+            var text = rosss.ToMacroString();
 
             using (ImRaii.PushColor(ImGuiCol.Text, ColorTreeNode.ToVector(), nodeOptions.RenderSeString))
                 clicked = ImGui.Selectable(text + nodeOptions.GetKey("SeStringSelectable"));
@@ -197,7 +197,7 @@ public unsafe partial class DebugRenderer
         if (clicked)
         {
             var str = new ReadOnlySeString(rosss.Data.ToArray());
-            var windowTitle = nodeOptions.Title ?? (nodeOptions.SeStringTitle ?? str).ToString();
+            var windowTitle = nodeOptions.Title ?? (nodeOptions.SeStringTitle ?? str).ToMacroString();
             var language = nodeOptions.Language ?? _languageProvider.ClientLanguage;
             _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _addonObserver, _serviceProvider)
             {
