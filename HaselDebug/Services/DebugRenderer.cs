@@ -571,8 +571,11 @@ public unsafe partial class DebugRenderer
                 else if (Inherits<GameObject>(highlightType))
                 {
                     var gameObject = (GameObject*)highlightAddress;
-                    if (gameObject != null)
-                        DrawLine(gameObject->Position);
+                    if (gameObject != null){
+                        var pos = gameObject->GetPosition();
+                        if (pos != null)
+                            DrawLine((Vector3)(*pos));
+                    }
                 }
                 else if (Inherits<AtkUnitBase>(highlightType))
                 {
