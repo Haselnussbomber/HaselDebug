@@ -1029,17 +1029,10 @@ public unsafe partial class AtkDebugRenderer
                 }
 
                 StartRow("Text Flags");
-                var textFlags = (TextFlags)textNode->TextFlags;
+                var textFlags = textNode->TextFlags;
                 if (ImGuiUtilsEx.EnumCombo("##TextFlags", ref textFlags, true))
                 {
-                    textNode->TextFlags = (byte)textFlags;
-                }
-
-                StartRow("Text Flags 2");
-                var textFlags2 = (TextFlags2)textNode->TextFlags2;
-                if (ImGuiUtilsEx.EnumCombo("##TextFlags2", ref textFlags2, true))
-                {
-                    textNode->TextFlags2 = (byte)textFlags2;
+                    textNode->TextFlags = textFlags;
                 }
 
                 break;
