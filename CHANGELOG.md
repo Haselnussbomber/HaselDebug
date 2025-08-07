@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.30.0] (2025-08-07)
+
+Update for 7.3.
+
+- **Added:** `InventoryItem.CrafterContentId` now shows a name, if available.
+- **Added:** The wedding date on InventoryItems is now displayed.
+- **Added:** Addon Factories tab was added.
+- **Updated:** Tabs now load data when they are opened for the first time, not when the plugin starts.
+- **Updated:** The address of ConfigOptions can be copied by holding shift.
+- **Temporarily:** Drag Drop Type tab is disabled due to new ImGui bindings not handling that many columns. Needs a rewrite.
+
 ## [1.29.1] (2025-07-15)
 
 - **Fixed:** The border around highlighted nodes didn't respect the user-set scaling of the addon.
@@ -451,7 +462,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.0...main
+[1.30.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.1...1.30.0
 [1.29.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.0...1.29.1
 [1.29.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.28.1...1.29.0
 [1.28.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.28.0...1.28.1
