@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.30.1] (2025-08-07)
+
+- **Fixed:** The Outfits table was empty.
+
 ## [1.30.0] (2025-08-07)
 
 Update for 7.3.
@@ -462,7 +466,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.1...main
+[1.30.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.0...1.30.1
 [1.30.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.1...1.30.0
 [1.29.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.0...1.29.1
 [1.29.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.28.1...1.29.0
