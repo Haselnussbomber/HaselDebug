@@ -29,7 +29,7 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
     private void Initialize()
     {
         _callHandlerDetour = _gameInteropProvider.HookFromSignature<CallHandler>(
-            "40 53 48 83 EC 40 48 8B 81 ?? ?? ?? ?? 48 8B DA",
+            "40 53 48 83 EC ?? 48 8B 81 ?? ?? ?? ?? 48 8B DA 48 8B 91 ?? ?? ?? ?? 48 2B C2 45 8B D0",
             CallHandlerDetour);
     }
 
