@@ -455,11 +455,6 @@ public unsafe partial class DebugRenderer
             DrawTexture(address, nodeOptions);
             return;
         }
-        else if (type == typeof(AtkTexture))
-        {
-            DrawAtkTexture(address, nodeOptions);
-            return;
-        }
         else if (type == typeof(AtkValue))
         {
             DrawAtkValue(address, nodeOptions);
@@ -946,6 +941,11 @@ public unsafe partial class DebugRenderer
 
             DrawFieldName(fieldInfo);
             DrawPointerType(fieldAddress, fieldType, fieldNodeOptions);
+
+            if (fieldType == typeof(AtkTexture))
+            {
+                DrawAtkTexture(fieldAddress, fieldNodeOptions);
+            }
         }
     }
 
