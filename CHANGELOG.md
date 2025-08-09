@@ -4,7 +4,7 @@
 
 - **Added:** In the RaptureTextModule Definitions tab, the vfunc index is now displayed.
 - **Fixed:** In the RaptureTextModule Definitions tab, the parameters displayed garbage after the TotalParamCount was reached.
-- **Fixed:** Drawing AtkTextures no longer replace the struct view, instead the texture is displayed inside the struct at the end.
+- **Fixed:** Drawing AtkTextures no longer replaces the struct view, instead the texture is displayed inside the struct at the end.
 - **Updated:** ClientStructs now at [a1b91b0b](https://github.com/aers/FFXIVClientStructs/tree/a1b91b0b) ([compare](https://github.com/aers/FFXIVClientStructs/compare/3d153390..a1b91b0b)).
 
 ## [1.30.1] (2025-08-07)
