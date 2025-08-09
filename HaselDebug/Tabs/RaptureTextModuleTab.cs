@@ -359,9 +359,12 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
             for (var i = 0; i < 7; i++)
             {
                 ImGui.TableNextColumn();
-                var character = ((char)item.Value.ParamTypes[i]).ToString();
-                if (character != "\0")
-                    ImGui.TextUnformatted(character);
+                if (i < item.Value.TotalParamCount)
+                {
+                    var character = ((char)item.Value.ParamTypes[i]).ToString();
+                    if (character != "\0")
+                        ImGui.TextUnformatted(character);
+                }
             }
 
             ImGui.TableNextColumn();
