@@ -10,40 +10,31 @@ namespace HaselDebug.Tabs;
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class DragDropTypeTab : DebugTab
 {
-    private int _selected;
-
-    public override bool DrawInChild => false;
-
     public override void Draw()
     {
-        ImGui.TextUnformatted("Disabled because ImGui can only render 64 columns.");
-        return;
-        const int count = 88;
-        using var table = ImRaii.Table("DragDropTypeTable", count, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollX | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
-        if (!table)
-            return;
-
-        ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 100);
-        for (var i = 1; i < count; i++)
-            ImGui.TableSetupColumn($"[{i}] {(DragDropType)i}", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupScrollFreeze(1, 1);
-        ImGui.TableHeadersRow();
-
-        for (var i = 1; i < count; i++)
+        for (var i = 1; i < 88; i++)
         {
-            ImGui.TableNextRow();
-            if (_selected == i)
-            {
-                ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, Color.FromVector4(new(1, 1, 1, 0.15f)).ToUInt());
-                ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg1, Color.FromVector4(new(1, 1, 1, 0.15f)).ToUInt());
-            }
-            ImGui.TableNextColumn();
-            if (ImGui.Selectable($"[{i}] {(DragDropType)i}"))
-                _selected = i;
+            using var treeNode = ImRaii.TreeNode($"[{i}] {(DragDropType)i}", ImGuiTreeNodeFlags.SpanAvailWidth);
+            if (!treeNode) continue;
 
-            for (var j = 1; j < count; j++)
+            using var table = ImRaii.Table($"DragDropTypeTable{i}", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollX | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+            if (!table)
+                return;
+
+            ImGui.TableSetupColumn("Type"u8, ImGuiTableColumnFlags.WidthFixed, 200);
+            ImGui.TableSetupColumn("Accepted"u8);
+            ImGui.TableSetupScrollFreeze(1, 1);
+            ImGui.TableHeadersRow();
+
+            for (var j = 1; j < 88; j++)
             {
+                ImGui.TableNextRow();
+
                 ImGui.TableNextColumn();
+                ImGui.Text($"[{j}] {(DragDropType)j}");
+
+                ImGui.TableNextColumn();
+
                 if (i == j)
                     continue;
 
