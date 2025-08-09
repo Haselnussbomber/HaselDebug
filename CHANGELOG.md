@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.2] (2025-08-09)
+
+- **Added:** In the RaptureTextModule Definitions tab, the vfunc index is now displayed.
+- **Fixed:** In the RaptureTextModule Definitions tab, the parameters displayed garbage after the TotalParamCount was reached.
+- **Fixed:** Drawing AtkTextures no longer replace the struct view, instead the texture is displayed inside the struct at the end.
+- **Updated:** ClientStructs now at [a1b91b0b](https://github.com/aers/FFXIVClientStructs/tree/a1b91b0b) ([compare](https://github.com/aers/FFXIVClientStructs/compare/3d153390..a1b91b0b)).
+
 ## [1.30.1] (2025-08-07)
 
 - **Fixed:** The Outfits table was empty.
@@ -14,6 +21,7 @@ Update for 7.3.
 - **Updated:** Tabs now load data when they are opened for the first time, not when the plugin starts.
 - **Updated:** The address of ConfigOptions can be copied by holding shift.
 - **Temporarily:** Drag Drop Type tab is disabled due to new ImGui bindings not handling that many columns. Needs a rewrite.
+- **Updated:** ClientStructs now at [3d153390](https://github.com/aers/FFXIVClientStructs/tree/3d153390) ([compare](https://github.com/aers/FFXIVClientStructs/compare/62ea2008..3d153390)).
 
 ## [1.29.1] (2025-07-15)
 
@@ -466,7 +474,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.2...main
+[1.30.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.1...1.30.2
 [1.30.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.0...1.30.1
 [1.30.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.1...1.30.0
 [1.29.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.0...1.29.1
