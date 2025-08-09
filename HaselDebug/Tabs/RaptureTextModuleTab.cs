@@ -359,7 +359,9 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
             for (var i = 0; i < 7; i++)
             {
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted(((char)item.Value.ParamTypes[i]).ToString());
+                var character = ((char)item.Value.ParamTypes[i]).ToString();
+                if (character != "\0")
+                    ImGui.TextUnformatted(character);
             }
 
             ImGui.TableNextColumn();
@@ -369,15 +371,16 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
                 var span = new Span<byte>((byte*)raptureTextModule->DecoderFuncs[item.Value.Id], 9);
                 var resolvedVf = nint.Zero;
+                var vfOffset = 0;
 
                 if (span.StartsWith((ReadOnlySpan<byte>)[0x48, 0x8B, 0x01, 0xFF, 0x60])) // 8-bit displacement
                 {
-                    var vfOffset = span[5];
+                    vfOffset = span[5];
                     resolvedVf = *(nint*)(*(nint*)&raptureTextModule->TextModule.MacroDecoder + vfOffset);
                 }
                 else if (span.StartsWith((ReadOnlySpan<byte>)[0x48, 0x8B, 0x01, 0xFF, 0xA0])) // 32-bit displacement
                 {
-                    var vfOffset = *(int*)span.GetPointer(5);
+                    vfOffset = *(int*)span.GetPointer(5);
                     resolvedVf = *(nint*)(*(nint*)&raptureTextModule->TextModule.MacroDecoder + vfOffset);
                 }
 
@@ -386,9 +389,18 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
                 if (resolvedVf != 0)
                 {
                     ImGui.SameLine();
-                    ImGui.TextUnformatted("->");
+                    ImGui.TextUnformatted("->"u8);
                     ImGui.SameLine();
                     _debugRenderer.DrawAddress(resolvedVf);
+                    if (vfOffset > 0)
+                    {
+                        ImGui.SameLine();
+                        ImGui.TextUnformatted("(vfunc: "u8);
+                        ImGui.SameLine(0, 0);
+                        ImGuiUtilsEx.DrawCopyableText($"{vfOffset / 8}");
+                        ImGui.SameLine(0, 0);
+                        ImGui.TextUnformatted(")"u8);
+                    }
                 }
             }
         }
