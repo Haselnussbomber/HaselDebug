@@ -17,6 +17,7 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
+using FFXIVClientStructs.FFXIV.Client.Game.Fate;
 using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
@@ -247,6 +248,22 @@ public unsafe partial class DebugRenderer
 
                     case EventHandlerContent.CustomTalk:
                         type = typeof(CustomTalkEventHandler);
+                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ExtractText();
+                        break;
+
+                    case EventHandlerContent.FateDirector:
+                        type = typeof(FateDirector);
+                        break;
+
+                    case EventHandlerContent.BattleLeveDirector:
+                        type = typeof(BattleLeveDirector);
+                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ExtractText();
+                        break;
+
+                    case EventHandlerContent.CompanyLeveDirector:
+                    case EventHandlerContent.CompanyLeveOfficer:
+                    case EventHandlerContent.GatheringLeveDirector:
+                        type = typeof(LeveDirector);
                         additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ExtractText();
                         break;
 
