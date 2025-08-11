@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.3] (2025-08-11)
+
+- **Added:** More event handler type redirects: FateDirector and BattleLeveDirector. CompanyLeveDirector, CompanyLeveOfficer and GatheringLeveDirector use LeveDirector for now.
+- **Updated:** The Drag Drop Type tab was reworked into separate lists.
+- **Updated:** The flag enum input was changed so that it shows the bit and fills in unknown values.
+- **Updated:** ClientStructs now at [08480efc](https://github.com/aers/FFXIVClientStructs/tree/08480efc) ([compare](https://github.com/aers/FFXIVClientStructs/compare/a1b91b0b..08480efc)).
+
 ## [1.30.2] (2025-08-09)
 
 - **Added:** In the RaptureTextModule Definitions tab, the vfunc index is now displayed.
@@ -474,7 +481,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.3...main
+[1.30.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.2...1.30.3
 [1.30.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.1...1.30.2
 [1.30.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.0...1.30.1
 [1.30.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.29.1...1.30.0
