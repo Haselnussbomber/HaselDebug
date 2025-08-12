@@ -1,4 +1,10 @@
 {
+  "PayloadTest": {
+    "_isSeString": "true",
+    "de": "Dies ist <italic(1)><string(lstr1)><italic(0)>.",
+    "en": "This is <italic(1)><string(lstr1)><italic(0)>."
+  },
+
   "HaselDebug.CommandHandlerHelpMessage": {
     "en": "Show/hide the HaselDebug window",
     "de": "Zeige/verstecke das HaselDebug-Fenster"
@@ -189,12 +195,5 @@
   "UnlocksTab.NotStoredInPrismBox": {
     "en": "Not stored in Glamour Dresser",
     "de": "Nicht in der Projektionskommode gelagert"
-  },
-
-  "template": {
-    "en": "",
-    "de": "",
-    "fr": "",
-    "ja": ""
   }
 }

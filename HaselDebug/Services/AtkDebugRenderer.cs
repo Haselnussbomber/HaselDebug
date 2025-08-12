@@ -27,6 +27,7 @@ public unsafe partial class AtkDebugRenderer
     private readonly LanguageProvider _languageProvider;
     private readonly AddonObserver _addonObserver;
     private readonly PinnedInstancesService _pinnedInstancesService;
+
     private string _nodeQuery = string.Empty;
 
     public void DrawAddon(ushort addonId, string addonName, List<Pointer<AtkResNode>>? nodePath = null, bool border = true)

@@ -186,7 +186,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
                 builder.Add(new ImGuiContextMenuEntry()
                 {
                     Visible = !_windowManager.Contains(win => win.WindowName == addonName),
-                    Label = _textService.Translate("ContextMenu.TabPopout"),
+                    Label = _textService.Translate("ContextMenu.TabPopoutString"),
                     ClickCallback = () =>
                     {
                         _windowManager.Open(new AddonInspectorWindow(_windowManager, _textService, _addonObserver, _atkDebugRenderer)

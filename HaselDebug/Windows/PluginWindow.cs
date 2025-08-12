@@ -20,7 +20,6 @@ public partial class PluginWindow : SimpleWindow
     private const uint SidebarWidth = 250;
 
     private readonly ILogger<PluginWindow> _logger;
-    private readonly IServiceProvider _serviceProvider;
     private readonly WindowManager _windowManager;
     private readonly PluginConfig _pluginConfig;
     private readonly TextService _textService;

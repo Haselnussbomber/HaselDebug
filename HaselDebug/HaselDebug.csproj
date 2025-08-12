@@ -4,15 +4,10 @@
     <Version>1.30.5</Version>
     <OutputPath>..\bin\</OutputPath>
     <Use_Dalamud_FFXIVClientStructs>false</Use_Dalamud_FFXIVClientStructs>
-    <InteropGenerator_InteropNamespace>HaselDebug</InteropGenerator_InteropNamespace>
-    <DefineConstants>AUTOCTOR_EMBED_ATTRIBUTES</DefineConstants>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Translations.json" />
-  </ItemGroup>
-
+  <!-- Dalamud dependencies -->
   <ItemGroup>
     <Reference Include="Reloaded.Assembler" Private="false" />
     <Reference Include="SharpDX" Private="false" />
@@ -22,20 +17,40 @@
     <Reference Include="Microsoft.Extensions.ObjectPool" Private="false" />
   </ItemGroup>
 
+  <!-- Nuget dependencies -->
+  <PropertyGroup>
+    <DefineConstants>AUTOCTOR_EMBED_ATTRIBUTES</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoCtor" Version="2.8.1" PrivateAssets="all" ExcludeAssets="compile;runtime" />
     <PackageReference Include="Iced" Version="1.21.0" />
     <PackageReference Include="Injectio" Version="5.0.0" PrivateAssets="all" />
   </ItemGroup>
 
+  <!-- Project dependencies -->
   <ItemGroup>
-    <CompilerVisibleProperty Include="InteropGenerator_InteropNamespace" />
-    <ProjectReference Include="..\FFXIVClientStructs\InteropGenerator\InteropGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\HaselCommon\HaselCommon\HaselCommon.csproj" />
     <ProjectReference Include="..\FFXIVClientStructs\FFXIVClientStructs\FFXIVClientStructs.csproj" Private="True" />
     <ProjectReference Include="..\FFXIVClientStructs\InteropGenerator.Runtime\InteropGenerator.Runtime.csproj" Private="True" />
   </ItemGroup>
 
+  <!-- TranslationGenerator -->
+  <PropertyGroup>
+    <TranslationGenerator_Namespace>HaselDebug</TranslationGenerator_Namespace>
+  </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HaselCommon\HaselCommon\HaselCommon.csproj" />
+    <AdditionalFiles Include="Translations.json" />
+    <CompilerVisibleProperty Include="TranslationGenerator_Namespace" />
+    <CompilerVisibleProperty Include="TranslationGenerator_IsInherited" />
+    <ProjectReference Include="..\HaselCommon\HaselCommon.TranslationGenerator\HaselCommon.TranslationGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <!-- InteropGenerator -->
+  <PropertyGroup>
+    <InteropGenerator_InteropNamespace>HaselDebug</InteropGenerator_InteropNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="InteropGenerator_InteropNamespace" />
+    <ProjectReference Include="..\FFXIVClientStructs\InteropGenerator\InteropGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 </Project>
