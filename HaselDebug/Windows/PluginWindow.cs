@@ -20,7 +20,6 @@ public partial class PluginWindow : SimpleWindow
     private const uint SidebarWidth = 250;
 
     private readonly ILogger<PluginWindow> _logger;
-    private readonly IServiceProvider _serviceProvider;
     private readonly WindowManager _windowManager;
     private readonly PluginConfig _pluginConfig;
     private readonly TextService _textService;
@@ -55,7 +54,7 @@ public partial class PluginWindow : SimpleWindow
             ShowTooltip = () =>
             {
                 using var tooltip = ImRaii.Tooltip();
-                ImGui.TextUnformatted(_textService.Translate($"TitleBarButton.ToggleConfig.Tooltip.{(_configWindow.IsOpen ? "Close" : "Open")}Config"));
+                ImGui.Text(_textService.Translate($"TitleBarButton.ToggleConfig.Tooltip.{(_configWindow.IsOpen ? "Close" : "Open")}Config"));
             },
             Click = (button) => _configWindow.Toggle()
         });

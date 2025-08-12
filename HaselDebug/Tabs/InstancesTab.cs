@@ -27,7 +27,7 @@ public partial class InstancesTab : DebugTab
     public override void Draw()
     {
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"u8), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         var hasSearchTerm = !string.IsNullOrWhiteSpace(_searchTerm);
 
         using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);

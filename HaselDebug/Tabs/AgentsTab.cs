@@ -56,7 +56,7 @@ public unsafe partial class AgentsTab : DebugTab
         if (!sidebarchild) return;
 
         ImGui.SetNextItemWidth(-1);
-        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _agentNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"u8), ref _agentNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         var hasSearchTerm = !string.IsNullOrWhiteSpace(_agentNameSearchTerm);
 
         using var table = ImRaii.Table("AgentsTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new Vector2(300, -1));

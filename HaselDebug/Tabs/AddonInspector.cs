@@ -60,7 +60,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
         if (!sidebarchild) return;
 
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - ImGuiUtils.GetIconButtonSize(FontAwesomeIcon.ObjectUngroup).X - ImGui.GetStyle().ItemSpacing.X);
-        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _addonNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"u8), ref _addonNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         var hasSearchTerm = !string.IsNullOrWhiteSpace(_addonNameSearchTerm);
         var hasSearchTermAutoSelected = false;
 

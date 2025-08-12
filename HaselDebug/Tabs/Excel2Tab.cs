@@ -123,7 +123,7 @@ public unsafe partial class Excel2Tab : DebugTab
         if (!sidebarchild) return;
 
         ImGui.SetNextItemWidth(-1);
-        var hasSearchTermChanged = ImGui.InputTextWithHint("##NameTextSearch", _textService.Translate("SearchBar.Hint"), ref _sheetNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTermChanged = ImGui.InputTextWithHint("##NameTextSearch", _textService.Translate("SearchBar.Hint"u8), ref _sheetNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         var hasSearchTerm = !string.IsNullOrWhiteSpace(_sheetNameSearchTerm);
 
         // TODO: checkbox Search Rows

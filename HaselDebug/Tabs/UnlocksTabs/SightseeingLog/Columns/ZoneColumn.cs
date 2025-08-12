@@ -31,9 +31,11 @@ public partial class ZoneColumn : ColumnString<AdventureEntry>
             var distance = _mapService.GetDistanceFromPlayer(level);
             if (distance is > 1f and < float.MaxValue)
             {
-                var direction = distance > 1 ? " " + _mapService.GetCompassDirection(level) : string.Empty;
+                var direction = distance > 1
+                    ? $" {_mapService.GetCompassDirectionString(level)}"
+                    : string.Empty;
                 ImGui.SameLine(0, 0);
-                ImGui.TextUnformatted($" ({distance:0}y{direction})");
+                ImGui.Text($" ({distance:0}y{direction})");
             }
         }
     }

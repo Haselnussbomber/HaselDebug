@@ -84,7 +84,7 @@ public unsafe partial class ExcelTab : DebugTab
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - LanguageSelectorWidth * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X);
         var searchTerm = SearchTerm;
         var listDirty = false;
-        if (ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll))
+        if (ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"u8), ref searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll))
         {
             SearchTerm = searchTerm;
             listDirty |= true;

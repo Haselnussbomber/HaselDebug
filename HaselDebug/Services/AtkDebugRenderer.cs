@@ -211,7 +211,7 @@ public unsafe partial class AtkDebugRenderer
             if (!nodeTree)
                 return;
 
-            ImGui.InputTextWithHint("##NodeSearch", _textService.Translate("SearchBar.Hint"), ref _nodeQuery, 256, ImGuiInputTextFlags.AutoSelectAll);
+            ImGui.InputTextWithHint("##NodeSearch", _textService.Translate("SearchBar.Hint"u8), ref _nodeQuery, 256, ImGuiInputTextFlags.AutoSelectAll);
 
             var j = 0;
             foreach (var node in unitBase->UldManager.Nodes)

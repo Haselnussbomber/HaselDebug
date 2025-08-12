@@ -53,7 +53,7 @@ public unsafe partial class ConfigTab : DebugTab
         ImGui.Separator();
 
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"u8), ref _searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
 
         using var tabBar = ImRaii.TabBar("ConfigTabs");
         if (!tabBar) return;
