@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.30.4] (2025-08-13)
+
+- **Fixed:** The signatures for generating addon name hashes in the Addon Config tab were outdated.
+- **Updated:** ClientStructs now at [48d43753](https://github.com/aers/FFXIVClientStructs/tree/48d43753) ([compare](https://github.com/aers/FFXIVClientStructs/compare/08480efc..48d43753)).
+
 ## [1.30.3] (2025-08-11)
 
 - **Added:** More event handler type redirects: FateDirector and BattleLeveDirector. CompanyLeveDirector, CompanyLeveOfficer and GatheringLeveDirector use LeveDirector for now.
@@ -482,6 +487,7 @@ Updated CS for 7.05hf1
 First release! 🥳
 
 [unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.3...main
+[1.30.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.3...v1.30.4
 [1.30.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.2...v1.30.3
 [1.30.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.1...v1.30.2
 [1.30.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.0...v1.30.1
