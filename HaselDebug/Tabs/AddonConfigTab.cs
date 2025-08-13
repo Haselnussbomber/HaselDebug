@@ -17,13 +17,13 @@ namespace HaselDebug.Tabs;
 [StructLayout(LayoutKind.Explicit, Size = 0)]
 public unsafe partial struct AddonConfigFunctions
 {
-    [MemberFunction("E8 ?? ?? ?? ?? 45 33 F6 44 8B E0")]
+    [MemberFunction("E8 ?? ?? ?? ?? 33 ED 44 8B F8 85 C0 0F 84")]
     public static partial int GetNameCount();
 
-    [MemberFunction("E8 ?? ?? ?? ?? 41 8B CE E8 ?? ?? ?? ?? 48 8B C8")]
+    [MemberFunction("E8 ?? ?? ?? ?? BA ?? ?? ?? ?? 8B CF E8")]
     public static partial CStringPointer GetNameByIndex(uint index);
 
-    [MemberFunction("E8 ?? ?? ?? ?? 3B C7 74 1E"), GenerateStringOverloads]
+    [MemberFunction("E8 ?? ?? ?? ?? 4C 8B 43 ?? 41 8B 88"), GenerateStringOverloads]
     public static partial uint GetNameHash(CStringPointer name);
 }
 
@@ -39,8 +39,10 @@ public unsafe partial class AddonConfigTab : DebugTab
     {
         void AddName(string name)
         {
-            if (name.Length < 32)
-                _addonNames[AddonConfigFunctions.GetNameHash(name)] = name;
+            if (name.Length >= 32)
+                return;
+
+            _addonNames.TryAdd(AddonConfigFunctions.GetNameHash(name), name);
         }
 
         for (var i = 0u; i < AddonConfigFunctions.GetNameCount(); i++)
