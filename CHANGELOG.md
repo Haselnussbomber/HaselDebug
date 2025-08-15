@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.30.5] (2025-08-15)
+
+- **Fixed:** There was a substantial FPS loss when displaying structs with a lot of field due to inheritance checks for type redirects. The result of inheritance checks is now cached.
+- **Fixed:** Hovering over an uninitialized `Character.CompanionObject` to highlight the position would crash the game because VirtualTable was a nullptr.
+- **Updated:** ClientStructs now at [2d10f753](https://github.com/aers/FFXIVClientStructs/tree/2d10f753) ([compare](https://github.com/aers/FFXIVClientStructs/compare/48d43753..2d10f753)).
+
 ## [1.30.4] (2025-08-13)
 
 - **Fixed:** The signatures for generating addon name hashes in the Addon Config tab were outdated.
@@ -486,7 +492,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.3...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.5...main
+[1.30.5]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.4...v1.30.5
 [1.30.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.3...v1.30.4
 [1.30.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.2...v1.30.3
 [1.30.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.1...v1.30.2
