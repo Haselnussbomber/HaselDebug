@@ -583,7 +583,8 @@ public unsafe partial class DebugRenderer
                 else if (Inherits<GameObject>(highlightType))
                 {
                     var gameObject = (GameObject*)highlightAddress;
-                    if (gameObject != null){
+                    if (gameObject != null && gameObject->VirtualTable != null) // safety-check for valid pointer to pre-allocated memory on Character.CompanionObject
+                    {
                         var pos = gameObject->GetPosition();
                         if (pos != null)
                             DrawLine((Vector3)(*pos));
