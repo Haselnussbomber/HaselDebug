@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using System.Reflection;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -9,6 +10,8 @@ namespace HaselDebug.Utils;
 
 public static unsafe class DebugUtils
 {
+    private static readonly Dictionary<(Type, Type), bool> InheritsCache = [];
+
     public static bool Inherits<T>(Type pointerType) where T : struct
     {
         var targetType = typeof(T);
@@ -16,6 +19,9 @@ public static unsafe class DebugUtils
 
         if (currentType == targetType)
             return true;
+
+        if (InheritsCache.TryGetValue((pointerType, targetType), out var result))
+            return result;
 
         do
         {
@@ -50,7 +56,9 @@ public static unsafe class DebugUtils
 
         } while (currentType != targetType);
 
-        return currentType == targetType;
+        result = currentType == targetType;
+        InheritsCache.TryAdd((pointerType, targetType), result);
+        return result;
     }
 
     public static void HighlightNode(AtkResNode* node)
