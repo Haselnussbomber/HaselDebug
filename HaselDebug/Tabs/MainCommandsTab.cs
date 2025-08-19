@@ -42,7 +42,7 @@ public unsafe partial class MainCommandsTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Id
-            ImGui.TextUnformatted(row.RowId.ToString());
+            ImGui.Text(row.RowId.ToString());
 
             ImGui.TableNextColumn(); // Name
             _debugRenderer.DrawIcon((uint)row.Icon);
@@ -81,14 +81,14 @@ public unsafe partial class MainCommandsTab : DebugTab
                 using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, ImGui.GetStyle().ItemInnerSpacing.X);
                 using var indent = ImRaii.PushIndent(1);
 
-                ImGui.TextUnformatted(row.Name.ToString());
+                ImGui.Text(row.Name.ToString());
 
                 var categoryName = _excelService.TryGetRow<MainCommandCategory>(row.MainCommandCategory.RowId, out var category) ? category.Name.ToString() : string.Empty;
                 if (!string.IsNullOrEmpty(categoryName))
                 {
                     ImGuiUtils.PushCursorY(-3);
                     using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey.ToUInt()))
-                        ImGui.TextUnformatted(categoryName);
+                        ImGui.Text(categoryName);
                 }
                 ImGuiUtils.PushCursorY(1);
 

@@ -36,7 +36,7 @@ public unsafe partial class ChatTab : DebugTab
         var start = *(int*)((nint)raptureLogModule + 0x18);
         var count = raptureLogModule->LogMessageCount - start;
 
-        ImGui.TextUnformatted($"{count} Message");
+        ImGui.Text($"{count} Message");
 
         using var table = ImRaii.Table("ChatTabTable", 5, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table)
@@ -64,16 +64,16 @@ public unsafe partial class ChatTab : DebugTab
                     ImGui.TableNextRow();
 
                     ImGui.TableNextColumn(); // Timestamp
-                    ImGui.TextUnformatted(DateTimeOffset.FromUnixTimeSeconds(time).LocalDateTime.ToString());
+                    ImGui.Text(DateTimeOffset.FromUnixTimeSeconds(time).LocalDateTime.ToString());
 
                     ImGui.TableNextColumn(); // LogKind
-                    ImGui.TextUnformatted(logKind.ToString());
+                    ImGui.Text(logKind.ToString());
 
                     ImGui.TableNextColumn(); // Caster
-                    ImGui.TextUnformatted(GetLabel(casterKind));
+                    ImGui.Text(GetLabel(casterKind));
 
                     ImGui.TableNextColumn(); // Target
-                    ImGui.TextUnformatted(GetLabel(targetKind));
+                    ImGui.Text(GetLabel(targetKind));
 
                     ImGui.TableNextColumn(); // Formatted Message
                     var senderEvaluated = _seStringEvaluator.Evaluate((ReadOnlySeStringSpan)sender);

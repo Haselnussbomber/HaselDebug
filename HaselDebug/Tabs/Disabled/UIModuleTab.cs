@@ -237,55 +237,55 @@ public unsafe class UIModuleTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(moduleName);
+            ImGui.Text(moduleName);
 
             if (_savedModules.TryGetValue(fileName, out var module))
             {
                 ImGui.TableNextColumn();
                 using (ImRaii.PushColor(ImGuiCol.Text, (uint)Colors.Green))
-                    ImGui.TextUnformatted(fileName);
+                    ImGui.Text(fileName);
 
                 ImGui.TableNextColumn();
                 using (ImRaii.PushColor(ImGuiCol.Text, (uint)(module.VfIndex == vfa.Index ? Colors.Green : Colors.Red)))
-                    ImGui.TextUnformatted(vfa.Index.ToString());
+                    ImGui.Text(vfa.Index.ToString());
 
                 ImGui.TableNextColumn();
                 using (ImRaii.PushColor(ImGuiCol.Text, (uint)(module.FileType == userFileEvent->GetFileType() ? Colors.Green : Colors.Red)))
-                    ImGui.TextUnformatted($"0x{userFileEvent->GetFileType():X}");
+                    ImGui.Text($"0x{userFileEvent->GetFileType():X}");
 
                 ImGui.TableNextColumn();
                 using (ImRaii.PushColor(ImGuiCol.Text, (uint)(module.FileSize == userFileEvent->GetFileSize() ? Colors.Green : Colors.Red)))
-                    ImGui.TextUnformatted($"0x{userFileEvent->GetFileSize():X}");
+                    ImGui.Text($"0x{userFileEvent->GetFileSize():X}");
 
                 ImGui.TableNextColumn();
                 using (ImRaii.PushColor(ImGuiCol.Text, (uint)(module.FileVersion == userFileEvent->GetFileVersion() ? Colors.Green : Colors.Red)))
-                    ImGui.TextUnformatted($"0x{userFileEvent->GetFileVersion():X}");
+                    ImGui.Text($"0x{userFileEvent->GetFileVersion():X}");
 
                 ImGui.TableNextColumn();
                 using (ImRaii.PushColor(ImGuiCol.Text, (uint)(module.DataSize == userFileEvent->GetDataSize() ? Colors.Green : Colors.Red)))
-                    ImGui.TextUnformatted($"0x{userFileEvent->GetDataSize():X}");
+                    ImGui.Text($"0x{userFileEvent->GetDataSize():X}");
 
                 ImGui.TableNextColumn();
                 using (ImRaii.PushColor(ImGuiCol.Text, (uint)(module.Offset == offset ? Colors.Green : Colors.Red)))
-                    ImGui.TextUnformatted($"0x{offset:X}");
+                    ImGui.Text($"0x{offset:X}");
             }
             else
             {
                 ImGui.TableNextColumn();
                 using (ImRaii.PushColor(ImGuiCol.Text, (uint)Colors.Red))
-                    ImGui.TextUnformatted(fileName);
+                    ImGui.Text(fileName);
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted(vfa.Index.ToString());
+                ImGui.Text(vfa.Index.ToString());
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted($"0x{userFileEvent->GetFileType():X}");
+                ImGui.Text($"0x{userFileEvent->GetFileType():X}");
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted($"0x{userFileEvent->GetFileSize():X}");
+                ImGui.Text($"0x{userFileEvent->GetFileSize():X}");
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted($"0x{userFileEvent->GetFileVersion():X}");
+                ImGui.Text($"0x{userFileEvent->GetFileVersion():X}");
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted($"0x{userFileEvent->GetDataSize():X}");
+                ImGui.Text($"0x{userFileEvent->GetDataSize():X}");
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted($"0x{offset:X}");
+                ImGui.Text($"0x{offset:X}");
             }
 
             ImGui.TableNextColumn();

@@ -19,7 +19,7 @@ public unsafe class WindowFlagTab : DebugTab
             return;
 
         var windowFlags = *(uint*)((nint)addon + 0x1C0);
-        ImGui.TextUnformatted($"{addonName} WindowFlags: {Convert.ToString(windowFlags, 2)} - 0x{windowFlags:X}");
+        ImGui.Text($"{addonName} WindowFlags: {Convert.ToString(windowFlags, 2)} - 0x{windowFlags:X}");
         using var table = ImRaii.Table("WindowFlagsTable", 5);
         if (!table) return;
 
@@ -30,13 +30,13 @@ public unsafe class WindowFlagTab : DebugTab
             var isSet = (windowFlags & bit) == bit;
             using var textColor = ImRaii.PushColor(ImGuiCol.Text, (uint)(isSet ? Colors.Green : Colors.Red));
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{i}");
+            ImGui.Text($"{i}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"0x{bit:X}");
+            ImGui.Text($"0x{bit:X}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{Enum.GetName(typeof(WindowFlag), bit)}");
+            ImGui.Text($"{Enum.GetName(typeof(WindowFlag), bit)}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isSet}");
+            ImGui.Text($"{isSet}");
             ImGui.TableNextColumn();
             textColor?.Dispose();
             if (ImGui.Button($"Toggle##ToggleFlag{i}"))

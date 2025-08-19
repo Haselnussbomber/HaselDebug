@@ -22,7 +22,7 @@ public partial class CategoryColumn : ColumnString<OrchestrionRollEntry>
     public override void DrawColumn(OrchestrionRollEntry entry)
     {
         _debugRenderer.DrawIcon(entry.UIParamRow.OrchestrionCategory.Value.Icon);
-        ImGui.TextUnformatted(ToName(entry));
+        ImGui.Text(ToName(entry));
     }
 
     public override int Compare(OrchestrionRollEntry a, OrchestrionRollEntry b)

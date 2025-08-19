@@ -215,13 +215,13 @@ public unsafe class LuaDebugTab : DebugTab
             }
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{g.Key}");
+            ImGui.Text($"{g.Key}");
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{g.Type}");
+            ImGui.Text($"{g.Type}");
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{g.Value}");
+            ImGui.Text($"{g.Value}");
         }
 
         ImGui.EndTable();

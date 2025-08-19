@@ -52,7 +52,7 @@ public partial class NameColumn : ColumnString<Ornament>
             }
             else
             {
-                ImGui.TextUnformatted(name);
+                ImGui.Text(name);
             }
         }
 

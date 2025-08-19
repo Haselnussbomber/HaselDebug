@@ -61,7 +61,7 @@ public unsafe partial class ObjectTableRenderer
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted(entries[i].Index.ToString());
+            ImGui.Text(entries[i].Index.ToString());
 
             ImGui.TableNextColumn(); // Address
             _debugRenderer.DrawAddress(gameObject);
@@ -107,40 +107,40 @@ public unsafe partial class ObjectTableRenderer
                 switch (gameObject->EventHandler->Info.EventId.ContentId)
                 {
                     case EventHandlerContent.Adventure:
-                        ImGui.TextUnformatted($"Adventure#{gameObject->EventHandler->Info.EventId.Id}");
+                        ImGui.Text($"Adventure#{gameObject->EventHandler->Info.EventId.Id}");
 
                         if (_excelService.TryGetRow<Adventure>(gameObject->EventHandler->Info.EventId.Id, out var adventure) && !adventure.Name.IsEmpty)
                         {
                             ImGuiUtils.SameLineSpace();
-                            ImGui.TextUnformatted($"({adventure.Name})");
+                            ImGui.Text($"({adventure.Name})");
                         }
                         break;
 
                     case EventHandlerContent.Quest:
-                        ImGui.TextUnformatted($"Quest#{gameObject->EventHandler->Info.EventId.EntryId + 0x10000u}");
+                        ImGui.Text($"Quest#{gameObject->EventHandler->Info.EventId.EntryId + 0x10000u}");
 
                         if (_excelService.TryGetRow<Quest>(gameObject->EventHandler->Info.EventId.EntryId + 0x10000u, out var quest) && !quest.Name.IsEmpty)
                         {
                             ImGuiUtils.SameLineSpace();
-                            ImGui.TextUnformatted($"({quest.Name})");
+                            ImGui.Text($"({quest.Name})");
                         }
                         break;
 
                     case EventHandlerContent.CustomTalk:
-                        ImGui.TextUnformatted($"CustomTalk#{gameObject->EventHandler->Info.EventId.Id}");
+                        ImGui.Text($"CustomTalk#{gameObject->EventHandler->Info.EventId.Id}");
 
                         if (_excelService.TryGetRow<CustomTalk>(gameObject->EventHandler->Info.EventId.Id, out var customTalk) && !customTalk.Name.IsEmpty)
                         {
                             ImGuiUtils.SameLineSpace();
-                            ImGui.TextUnformatted($"({customTalk.Name})");
+                            ImGui.Text($"({customTalk.Name})");
                         }
                         break;
 
                     default:
                         if (string.IsNullOrEmpty(Enum.GetName(gameObject->EventHandler->Info.EventId.ContentId)))
-                            ImGui.TextUnformatted($"0x{(ushort)gameObject->EventHandler->Info.EventId.ContentId:X4}");
+                            ImGui.Text($"0x{(ushort)gameObject->EventHandler->Info.EventId.ContentId:X4}");
                         else
-                            ImGui.TextUnformatted($"{gameObject->EventHandler->Info.EventId.ContentId}");
+                            ImGui.Text($"{gameObject->EventHandler->Info.EventId.ContentId}");
                         break;
                 }
             }

@@ -40,26 +40,26 @@ public unsafe partial class AgentMapEventMarkersTab : DebugTab
                 ImGui.Image(tex.Handle, new(ImGui.GetTextLineHeight()));
 
             ImGui.SameLine();
-            ImGui.TextUnformatted(marker.IconId.ToString());
+            ImGui.Text(marker.IconId.ToString());
 
             ImGui.TableNextColumn(); // LevelId
-            ImGui.TextUnformatted(marker.LevelId.ToString());
+            ImGui.Text(marker.LevelId.ToString());
 
             ImGui.TableNextColumn(); // ObjectiveId
-            ImGui.TextUnformatted(marker.ObjectiveId.ToString());
+            ImGui.Text(marker.ObjectiveId.ToString());
 
             ImGui.TableNextColumn(); // MapId
-            ImGui.TextUnformatted(marker.MapId.ToString());
+            ImGui.Text(marker.MapId.ToString());
 
             ImGui.TableNextColumn(); // Radius
-            ImGui.TextUnformatted(marker.Radius.ToString());
+            ImGui.Text(marker.Radius.ToString());
 
             ImGui.TableNextColumn(); // TerritoryTypeId
-            ImGui.TextUnformatted(marker.TerritoryTypeId.ToString());
+            ImGui.Text(marker.TerritoryTypeId.ToString());
 
             ImGui.TableNextColumn(); // TooltipString
             if (marker.TooltipString != null && marker.TooltipString->StringPtr.Value != null)
-                ImGui.TextUnformatted(new ReadOnlySeStringSpan(marker.TooltipString->StringPtr.Value).ToString());
+                ImGui.Text(new ReadOnlySeStringSpan(marker.TooltipString->StringPtr.Value).ToString());
         }
     }
 }

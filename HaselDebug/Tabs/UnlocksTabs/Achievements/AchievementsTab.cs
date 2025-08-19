@@ -32,7 +32,7 @@ public unsafe class AchievementsTab(AchievementsTable table) : DebugTab, IUnlock
     {
         if (!AgentLobby.Instance()->IsLoggedIn)
         {
-            ImGui.TextUnformatted("Not logged in.");
+            ImGui.Text("Not logged in.");
             return;
         }
 

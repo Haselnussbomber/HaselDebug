@@ -27,7 +27,7 @@ public unsafe partial class DebugRenderer
         if (isString)
         {
             if (fieldType == typeof(char))
-                ImGui.TextUnformatted(new string((char*)address));
+                ImGui.Text(new string((char*)address));
             else
                 DrawSeString((byte*)address, nodeOptions);
 
@@ -64,7 +64,7 @@ public unsafe partial class DebugRenderer
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted(i.ToString());
+            ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Value
             DrawPointerType(entryAddress, fieldType, new NodeOptions()

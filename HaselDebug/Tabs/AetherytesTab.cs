@@ -57,28 +57,28 @@ public partial class AetherytesTab : DebugTab
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"#{aetheryte.AetheryteId}");
+            ImGui.Text($"#{aetheryte.AetheryteId}");
 
             ImGui.TableNextColumn();
             _textureService.DrawPart("Teleport", 16, GetPartId(GetTimelineId(regionType, territory.RowId)), 40 / 2f);
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(GetRegionName(regionType));
+            ImGui.Text(GetRegionName(regionType));
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(territory.ExVersion.Value.Name.ToString());
+            ImGui.Text(territory.ExVersion.Value.Name.ToString());
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(regionName);
+            ImGui.Text(regionName);
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(mapName);
+            ImGui.Text(mapName);
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(aetheryteName);
+            ImGui.Text(aetheryteName);
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{aetheryte.GilCost}{SeIconChar.Gil.ToIconString()}");
+            ImGui.Text($"{aetheryte.GilCost}{SeIconChar.Gil.ToIconString()}");
         }
     }
 

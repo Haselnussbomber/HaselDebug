@@ -134,23 +134,23 @@ public unsafe partial class ConfigTab : DebugTab
                     break;
 
                 case 1: // Category
-                    ImGui.TextUnformatted("Category");
+                    ImGui.Text("Category");
                     break;
 
                 case 2: // UInt
-                    ImGui.TextUnformatted("UInt");
+                    ImGui.Text("UInt");
                     break;
 
                 case 3: // Float
-                    ImGui.TextUnformatted("Float");
+                    ImGui.Text("Float");
                     break;
 
                 case 4: // String
-                    ImGui.TextUnformatted("String");
+                    ImGui.Text("String");
                     break;
 
                 default:
-                    ImGui.TextUnformatted($"Unknown type {option->Type}");
+                    ImGui.Text($"Unknown type {option->Type}");
                     break;
             }
 

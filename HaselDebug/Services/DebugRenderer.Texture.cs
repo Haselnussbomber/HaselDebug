@@ -13,7 +13,7 @@ public unsafe partial class DebugRenderer
         var tex = (AtkTexture*)address;
         if (!tex->IsTextureReady())
         {
-            ImGui.TextUnformatted("Texture not ready");
+            ImGui.Text("Texture not ready");
             return;
         }
 
@@ -24,7 +24,7 @@ public unsafe partial class DebugRenderer
         var kernelTexture = tex->GetKernelTexture();
         if (kernelTexture == null)
         {
-            ImGui.TextUnformatted("No KernelTexture");
+            ImGui.Text("No KernelTexture");
             return;
         }
 
@@ -35,7 +35,7 @@ public unsafe partial class DebugRenderer
     {
         if (address == 0)
         {
-            ImGui.TextUnformatted("null");
+            ImGui.Text("null");
             return;
         }
 

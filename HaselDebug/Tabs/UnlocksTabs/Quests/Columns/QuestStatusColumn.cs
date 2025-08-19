@@ -43,7 +43,7 @@ public class QuestStatusColumn : ColumnFlags<QuestStatus, Quest>
     {
         var value = ToStatus(row);
         using (ImRaii.PushColor(ImGuiCol.Text, (value == QuestStatus.Complete ? Color.Green : value == QuestStatus.Accepted ? Color.Yellow : Color.Red).ToUInt()))
-            ImGui.TextUnformatted(Enum.GetName(value));
+            ImGui.Text(Enum.GetName(value));
     }
 
     public override unsafe int Compare(Quest a, Quest b)

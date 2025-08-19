@@ -17,7 +17,7 @@ public unsafe partial class LocalPlayerTab : DebugTab
         var localPlayer = Control.GetLocalPlayer();
         if (localPlayer == null)
         {
-            ImGui.TextUnformatted("LocalPlayer unavailable");
+            ImGui.Text("LocalPlayer unavailable");
             return;
         }
 

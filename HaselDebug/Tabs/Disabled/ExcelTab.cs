@@ -120,7 +120,7 @@ public class ExcelTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Id
-            ImGui.TextUnformatted(sheetId.ToString());
+            ImGui.Text(sheetId.ToString());
 
             ImGui.TableNextColumn(); // Name
 
@@ -264,21 +264,21 @@ public class ExcelTab : DebugTab
 
         if (excelSheet == null || excelSheetType == null)
         {
-            ImGui.TextUnformatted("ExcelSheet not loaded");
+            ImGui.Text("ExcelSheet not loaded");
             return;
         }
 
         using var hostchild = ImRaii.Child("SheetChild", new Vector2(-1), true, ImGuiWindowFlags.NoSavedSettings);
 
-        ImGui.TextUnformatted(SelectedSheetName);
+        ImGui.Text(SelectedSheetName);
         ImGui.SameLine();
-        ImGui.TextUnformatted("\u2022");
+        ImGui.Text("\u2022");
         ImGui.SameLine();
-        ImGui.TextUnformatted(string.Concat("Rows: ", excelSheetRowCount));
+        ImGui.Text(string.Concat("Rows: ", excelSheetRowCount));
         ImGui.SameLine();
-        ImGui.TextUnformatted("\u2022");
+        ImGui.Text("\u2022");
         ImGui.SameLine();
-        ImGui.TextUnformatted(string.Concat("Column: ", excelSheetColumns.Length));
+        ImGui.Text(string.Concat("Column: ", excelSheetColumns.Length));
 
         if (excelSheetColumns.Length > 70)
         {
@@ -405,7 +405,7 @@ public class ExcelTab : DebugTab
                     break;
 
                 default:
-                    ImGui.TextUnformatted(value?.ToString() ?? "???");
+                    ImGui.Text(value?.ToString() ?? "???");
                     break;
             }
         }
@@ -441,7 +441,7 @@ public class ExcelTab : DebugTab
         ImGui.TableNextRow();
 
         ImGui.TableNextColumn(); // RowId
-        ImGui.TextUnformatted(row.RowId.ToString());
+        ImGui.Text(row.RowId.ToString());
 
         ImGui.TableNextColumn(); // Text
         debugRenderer.DrawSeStringSelectable(row.Text.AsSpan(), new NodeOptions()

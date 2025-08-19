@@ -14,7 +14,7 @@ public unsafe partial class DebugRenderer
         var elementCount = *(ulong*)(address + 0x20); // MySize
         if (elementCount == 0)
         {
-            ImGui.TextUnformatted("No values");
+            ImGui.Text("No values");
             return;
         }
 
@@ -69,7 +69,7 @@ public unsafe partial class DebugRenderer
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted(i.ToString());
+            ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Value
             DrawPointerType(valueAddress, valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath.With(valueAddress) });

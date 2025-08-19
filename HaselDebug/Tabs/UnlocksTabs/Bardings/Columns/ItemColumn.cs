@@ -19,6 +19,6 @@ public partial class ItemColumn : ColumnString<BuddyEquip>
             : row.IconHead != 0
                 ? row.IconHead
                 : row.IconLegs);
-        ImGui.TextUnformatted(row.Name.ToString());
+        ImGui.Text(row.Name.ToString());
     }
 }

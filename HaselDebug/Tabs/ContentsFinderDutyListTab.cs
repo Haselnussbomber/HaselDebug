@@ -19,7 +19,7 @@ public unsafe partial class ContentsFinderDutyListTab : DebugTab
     {
         if (!TryGetAddon<AddonContentsFinder>("ContentsFinder", out var addon))
         {
-            ImGui.TextUnformatted("ContentsFinder not open");
+            ImGui.Text("ContentsFinder not open");
             if (ImGui.Button("Open"))
             {
                 UIModule.Instance()->ExecuteMainCommand(33);
@@ -49,8 +49,8 @@ public unsafe partial class ContentsFinderDutyListTab : DebugTab
             AgentContentsFinder.Instance()->ReceiveEvent(returnValue, command, 2, 0);
         }
 
-        ImGui.TextUnformatted($"ItemCount: {addon->DutyList->Items.LongCount}");
-        ImGui.TextUnformatted($"SelectedItemIndex: {addon->DutyList->AtkComponentList.SelectedItemIndex}");
+        ImGui.Text($"ItemCount: {addon->DutyList->Items.LongCount}");
+        ImGui.Text($"SelectedItemIndex: {addon->DutyList->AtkComponentList.SelectedItemIndex}");
 
         if (ImGui.Button("Deselect"))
         {
@@ -61,35 +61,35 @@ public unsafe partial class ContentsFinderDutyListTab : DebugTab
         for (var i = 0u; i < addon->DutyList->Items.LongCount; i++)
         {
             var item = addon->DutyList->Items[i].Value;
-            ImGui.TextUnformatted($"{i}:");
+            ImGui.Text($"{i}:");
             ImGui.SameLine();
             ImGuiUtilsEx.DrawCopyableText($"{(nint)item:X}");
 
             using (ImRaii.PushIndent())
             {
-                ImGui.TextUnformatted("Strings:");
+                ImGui.Text("Strings:");
                 using (ImRaii.PushIndent())
                 {
                     var j = 0;
                     foreach (var stringValue in item->StringValues)
                     {
                         if ((nint)stringValue.Value != 0)
-                            ImGui.TextUnformatted($"{j}: {MemoryHelper.ReadStringNullTerminated((nint)stringValue.Value)}");
+                            ImGui.Text($"{j}: {MemoryHelper.ReadStringNullTerminated((nint)stringValue.Value)}");
                         j++;
                     }
                 }
 
-                ImGui.TextUnformatted("UInts:");
+                ImGui.Text("UInts:");
                 using (ImRaii.PushIndent())
                 {
                     var j = 0;
                     foreach (var uintValue in item->UIntValues)
                     {
-                        ImGui.TextUnformatted($"{j}: {uintValue}");
+                        ImGui.Text($"{j}: {uintValue}");
                         if (j == 0)
                         {
                             ImGui.SameLine();
-                            ImGui.TextUnformatted($"({(AtkComponentTreeListItemType)uintValue})");
+                            ImGui.Text($"({(AtkComponentTreeListItemType)uintValue})");
                         }
                         j++;
                     }

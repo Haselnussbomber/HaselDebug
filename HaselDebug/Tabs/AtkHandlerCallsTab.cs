@@ -135,7 +135,7 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
 
         if (_callHandlerDetour == null)
         {
-            ImGui.TextUnformatted("Hook not created");
+            ImGui.Text("Hook not created");
             return;
         }
 
@@ -178,10 +178,10 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(record.Time.ToLongTimeString());
+            ImGui.Text(record.Time.ToLongTimeString());
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(record.handlerIndex switch
+            ImGui.Text(record.handlerIndex switch
             {
                 1 => "UnregisterAddonCallback",
                 2 => "AddonAgentCallback",

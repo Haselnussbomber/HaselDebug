@@ -29,14 +29,14 @@ public unsafe class PlayerStateTab : IDebugWindowTab
         {
             if (tab)
             {
-                ImGui.TextUnformatted($"OwnedMountsBitmask size: {(GetSheet<Mount>(sheetLanguage)!.Max(row => row.Order) + 7) >> 3}");
-                ImGui.TextUnformatted($"UnlockedOrnamentsBitmask size: {(GetSheet<Ornament>(sheetLanguage)!.Count() + 7) >> 3}");
-                ImGui.TextUnformatted($"CaughtFishBitmask size: {(GetSheet<FishParameter>(sheetLanguage)!.Count(row => row.IsInLog) + 7) >> 3}");
-                ImGui.TextUnformatted($"CaughtSpearfishBitmask size: {(GetSheet<SpearfishingItem>(sheetLanguage)!.RowCount + 7) >> 3}");
-                ImGui.TextUnformatted($"UnlockedSpearfishingNotebookBitmask size: {(GetSheet<SpearfishingNotebook>(sheetLanguage)!.RowCount + 7) >> 3}");
-                ImGui.TextUnformatted($"UnlockedAdventureBitmask size: {(GetSheet<Adventure>(sheetLanguage)!.RowCount + 7) >> 3}");
-                ImGui.TextUnformatted($"UnlockedAdventureExPhaseBitmask size: {(GetSheet<AdventureExPhase>(sheetLanguage)!.RowCount + 7) >> 3}");
-                ImGui.TextUnformatted($"UnlockedVVDRouteDataBitmask2 size: {(GetSheet<VVDRouteData>(sheetLanguage)!.RowCount + 7) >> 3}");
+                ImGui.Text($"OwnedMountsBitmask size: {(GetSheet<Mount>(sheetLanguage)!.Max(row => row.Order) + 7) >> 3}");
+                ImGui.Text($"UnlockedOrnamentsBitmask size: {(GetSheet<Ornament>(sheetLanguage)!.Count() + 7) >> 3}");
+                ImGui.Text($"CaughtFishBitmask size: {(GetSheet<FishParameter>(sheetLanguage)!.Count(row => row.IsInLog) + 7) >> 3}");
+                ImGui.Text($"CaughtSpearfishBitmask size: {(GetSheet<SpearfishingItem>(sheetLanguage)!.RowCount + 7) >> 3}");
+                ImGui.Text($"UnlockedSpearfishingNotebookBitmask size: {(GetSheet<SpearfishingNotebook>(sheetLanguage)!.RowCount + 7) >> 3}");
+                ImGui.Text($"UnlockedAdventureBitmask size: {(GetSheet<Adventure>(sheetLanguage)!.RowCount + 7) >> 3}");
+                ImGui.Text($"UnlockedAdventureExPhaseBitmask size: {(GetSheet<AdventureExPhase>(sheetLanguage)!.RowCount + 7) >> 3}");
+                ImGui.Text($"UnlockedVVDRouteDataBitmask2 size: {(GetSheet<VVDRouteData>(sheetLanguage)!.RowCount + 7) >> 3}");
 
                 ImGui.Separator();
 
@@ -46,7 +46,7 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                     if (playerState->IsPlayerStateFlagSet(flag))
                         playerstateflags.Add(Enum.GetName(typeof(PlayerStateFlag), flag) ?? $"{flag}");
                 }
-                ImGui.TextUnformatted($"PlayerStateFlags: {string.Join(", ", playerstateflags)}");
+                ImGui.Text($"PlayerStateFlags: {string.Join(", ", playerstateflags)}");
 
                 ImGui.Separator();
 
@@ -78,22 +78,22 @@ public unsafe class PlayerStateTab : IDebugWindowTab
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted($"{vvdRouteDataSheet.RowId}-{vvdRouteDataSheet.SubRowId}");
+                    ImGui.Text($"{vvdRouteDataSheet.RowId}-{vvdRouteDataSheet.SubRowId}");
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(series.Name);
+                    ImGui.Text(series.Name);
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(contents.Name);
+                    ImGui.Text(contents.Name);
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(vvdRouteDataSheet.Unknown0.ToString());
+                    ImGui.Text(vvdRouteDataSheet.Unknown0.ToString());
 
                     var unlocked = playerState->IsVVDRouteComplete(vvdRouteDataSheet.Unknown0 - 1u);
 
                     ImGui.TableNextColumn();
                     using (ImRaii.PushColor(ImGuiCol.Text, unlocked ? 0xFF00FF00 : 0xFF0000FF))
-                        ImGui.TextUnformatted(unlocked ? "Yes" : "No");
+                        ImGui.Text(unlocked ? "Yes" : "No");
                 }
             }
         }
@@ -102,11 +102,11 @@ public unsafe class PlayerStateTab : IDebugWindowTab
         {
             if (tab)
             {
-                ImGui.TextUnformatted($"{playerState->NumOwnedMounts} owned mounts");
+                ImGui.Text($"{playerState->NumOwnedMounts} owned mounts");
 
                 var MountSheet = GetSheet<Mount>(sheetLanguage)!;
-                ImGui.TextUnformatted($"Num Mounts: {MountSheet.Count()}");
-                ImGui.TextUnformatted($"Nax MountSheet.Order: {MountSheet.Max(row => row.Order)}");
+                ImGui.Text($"Num Mounts: {MountSheet.Count()}");
+                ImGui.Text($"Nax MountSheet.Order: {MountSheet.Max(row => row.Order)}");
 
                 using var table = ImRaii.Table("OwnedMounts", 3);
 
@@ -119,10 +119,10 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                 {
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(mount.RowId.ToString());
+                    ImGui.Text(mount.RowId.ToString());
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(mount.Singular);
+                    ImGui.Text(mount.Singular);
 
                     if (mount.Order != 0)
                     {
@@ -130,7 +130,7 @@ public unsafe class PlayerStateTab : IDebugWindowTab
 
                         ImGui.TableNextColumn();
                         using (ImRaii.PushColor(ImGuiCol.Text, unlocked ? 0xFF00FF00 : 0xFF0000FF))
-                            ImGui.TextUnformatted(unlocked ? "Yes" : "No");
+                            ImGui.Text(unlocked ? "Yes" : "No");
                     }
                 }
             }
@@ -140,10 +140,10 @@ public unsafe class PlayerStateTab : IDebugWindowTab
         {
             if (tab)
             {
-                ImGui.TextUnformatted($"{playerState->NumFishCaught} caught fish");
+                ImGui.Text($"{playerState->NumFishCaught} caught fish");
 
                 var FishParameterSheet = GetSheet<FishParameter>(sheetLanguage)!.Where(row => row.IsInLog);
-                ImGui.TextUnformatted($"Num FishParameters (IsInLog = true): {FishParameterSheet.Count()}");
+                ImGui.Text($"Num FishParameters (IsInLog = true): {FishParameterSheet.Count()}");
 
                 using var table = ImRaii.Table("CaughtFishTable", 4);
 
@@ -164,10 +164,10 @@ public unsafe class PlayerStateTab : IDebugWindowTab
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(fishParameter.RowId.ToString());
+                    ImGui.Text(fishParameter.RowId.ToString());
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(item.Name);
+                    ImGui.Text(item.Name);
 
                     if (fishParameter.IsInLog)
                     {
@@ -177,11 +177,11 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                         var caught = ((playerState->CaughtFishBitmask[offset] >> bit) & 1) == 1;
 
                         ImGui.TableNextColumn();
-                        ImGui.TextUnformatted(offset.ToString());
+                        ImGui.Text(offset.ToString());
 
                         ImGui.TableNextColumn();
                         using (ImRaii.PushColor(ImGuiCol.Text, caught ? 0xFF00FF00 : 0xFF0000FF))
-                            ImGui.TextUnformatted(caught ? "Yes" : "No");
+                            ImGui.Text(caught ? "Yes" : "No");
                     }
                 }
             }
@@ -191,10 +191,10 @@ public unsafe class PlayerStateTab : IDebugWindowTab
         {
             if (tab)
             {
-                ImGui.TextUnformatted($"{playerState->NumSpearfishCaught} caught spearfish");
+                ImGui.Text($"{playerState->NumSpearfishCaught} caught spearfish");
 
                 var spearfishingItemSheet = GetSheet<SpearfishingItem>(sheetLanguage)!;
-                ImGui.TextUnformatted($"Num SpearfishingItems: {spearfishingItemSheet.RowCount}");
+                ImGui.Text($"Num SpearfishingItems: {spearfishingItemSheet.RowCount}");
 
                 using var table = ImRaii.Table("CaughtSpearFishTable", 4);
 
@@ -215,10 +215,10 @@ public unsafe class PlayerStateTab : IDebugWindowTab
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(spearfishingItem.RowId.ToString());
+                    ImGui.Text(spearfishingItem.RowId.ToString());
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(item.Name);
+                    ImGui.Text(item.Name);
 
                     if (spearfishingItem.RowId < 30000)
                     {
@@ -228,11 +228,11 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                         var caught = ((playerState->CaughtSpearfishBitmask[offset] >> bit) & 1) == 1;
 
                         ImGui.TableNextColumn();
-                        ImGui.TextUnformatted(offset.ToString());
+                        ImGui.Text(offset.ToString());
 
                         ImGui.TableNextColumn();
                         using (ImRaii.PushColor(ImGuiCol.Text, caught ? 0xFF00FF00 : 0xFF0000FF))
-                            ImGui.TextUnformatted(caught ? "Yes" : "No");
+                            ImGui.Text(caught ? "Yes" : "No");
                     }
                 }
             }
@@ -243,7 +243,7 @@ public unsafe class PlayerStateTab : IDebugWindowTab
             if (tab)
             {
                 var spearfishingNotebookSheet = GetSheet<SpearfishingNotebook>(sheetLanguage)!;
-                ImGui.TextUnformatted($"Num SpearfishingNotebooks: {spearfishingNotebookSheet.RowCount}");
+                ImGui.Text($"Num SpearfishingNotebooks: {spearfishingNotebookSheet.RowCount}");
 
                 using var table = ImRaii.Table("SpearfishingNotebookTable", 5);
 
@@ -258,13 +258,13 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                 {
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(spearfishingNotebook.RowId.ToString());
+                    ImGui.Text(spearfishingNotebook.RowId.ToString());
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(PlaceNameSheet.GetRow(spearfishingNotebook.TerritoryType.Value?.PlaceName.Row ?? 0)?.Name ?? "");
+                    ImGui.Text(PlaceNameSheet.GetRow(spearfishingNotebook.TerritoryType.Value?.PlaceName.Row ?? 0)?.Name ?? "");
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(PlaceNameSheet.GetRow(spearfishingNotebook.PlaceName.Row)?.Name ?? "");
+                    ImGui.Text(PlaceNameSheet.GetRow(spearfishingNotebook.PlaceName.Row)?.Name ?? "");
 
                     var id = spearfishingNotebook.RowId;
                     var offset = id / 8;
@@ -272,11 +272,11 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                     var unlocked = ((playerState->UnlockedSpearfishingNotebookBitmask[offset] >> bit) & 1) == 1;
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(offset.ToString());
+                    ImGui.Text(offset.ToString());
 
                     ImGui.TableNextColumn();
                     using (ImRaii.PushColor(ImGuiCol.Text, unlocked ? 0xFF00FF00 : 0xFF0000FF))
-                        ImGui.TextUnformatted(unlocked ? "Yes" : "No");
+                        ImGui.Text(unlocked ? "Yes" : "No");
                 }
             }
         }
@@ -287,7 +287,7 @@ public unsafe class PlayerStateTab : IDebugWindowTab
             {
                 var itemSheet = GetSheet<Item>(sheetLanguage)!;
                 var adventureSheet = GetSheet<Adventure>(sheetLanguage)!;
-                ImGui.TextUnformatted($"Num Adventures: {adventureSheet.RowCount}");
+                ImGui.Text($"Num Adventures: {adventureSheet.RowCount}");
 
                 using var table = ImRaii.Table("AdventureTable", 4);
 
@@ -301,20 +301,20 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                 {
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(adventure.RowId.ToString());
+                    ImGui.Text(adventure.RowId.ToString());
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(adventure.Name);
+                    ImGui.Text(adventure.Name);
 
                     var id = adventure.RowId - 0x210000;
                     var unlocked = playerState->IsAdventureComplete(id);
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted((id / 8).ToString());
+                    ImGui.Text((id / 8).ToString());
 
                     ImGui.TableNextColumn();
                     using (ImRaii.PushColor(ImGuiCol.Text, unlocked ? 0xFF00FF00 : 0xFF0000FF))
-                        ImGui.TextUnformatted(unlocked ? "Yes" : "No");
+                        ImGui.Text(unlocked ? "Yes" : "No");
                 }
             }
         }
@@ -325,7 +325,7 @@ public unsafe class PlayerStateTab : IDebugWindowTab
             {
                 var itemSheet = GetSheet<Item>(sheetLanguage)!;
                 var adventureExPhaseSheet = GetSheet<AdventureExPhase>(sheetLanguage)!;
-                ImGui.TextUnformatted($"Num AdventureExPhases: {adventureExPhaseSheet.RowCount}");
+                ImGui.Text($"Num AdventureExPhases: {adventureExPhaseSheet.RowCount}");
 
                 using var table = ImRaii.Table("AdventureExPhaseTable", 5);
 
@@ -340,10 +340,10 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                 {
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(adventureExPhase.RowId.ToString());
+                    ImGui.Text(adventureExPhase.RowId.ToString());
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(adventureExPhase.Expansion.Value?.Name ?? "");
+                    ImGui.Text(adventureExPhase.Expansion.Value?.Name ?? "");
 
                     var id = adventureExPhase.RowId;
                     var offset = id / 8;
@@ -351,16 +351,16 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                     var unlocked = ((playerState->UnlockedAdventureExPhaseBitmask[offset] >> bit) & 1) == 1;
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(offset.ToString());
+                    ImGui.Text(offset.ToString());
 
                     ImGui.TableNextColumn();
                     using (ImRaii.PushColor(ImGuiCol.Text, unlocked ? 0xFF00FF00 : 0xFF0000FF))
-                        ImGui.TextUnformatted(unlocked ? "Yes" : "No");
+                        ImGui.Text(unlocked ? "Yes" : "No");
 
                     ImGui.TableNextColumn();
                     unlocked = playerState->IsAdventureExPhaseComplete(adventureExPhase.RowId);
                     using (ImRaii.PushColor(ImGuiCol.Text, unlocked ? 0xFF00FF00 : 0xFF0000FF))
-                        ImGui.TextUnformatted(unlocked ? "Yes" : "No");
+                        ImGui.Text(unlocked ? "Yes" : "No");
                 }
             }
         }

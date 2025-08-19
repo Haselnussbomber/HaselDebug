@@ -105,13 +105,13 @@ public unsafe partial class DebugRenderer
     {
         if (type == null)
         {
-            ImGui.TextUnformatted("");
+            ImGui.Text("");
             return;
         }
 
         if (address == 0 || address < 0x140000000)
         {
-            ImGui.TextUnformatted("null");
+            ImGui.Text("null");
             return;
         }
 
@@ -123,13 +123,13 @@ public unsafe partial class DebugRenderer
 
         if (type == null)
         {
-            ImGui.TextUnformatted("");
+            ImGui.Text("");
             return;
         }
 
         if (address == 0 || address < 0x140000000)
         {
-            ImGui.TextUnformatted("null");
+            ImGui.Text("null");
             return;
         }
 
@@ -141,7 +141,7 @@ public unsafe partial class DebugRenderer
 
         if (type.IsVoid())
         {
-            ImGui.TextUnformatted($"0x{address:X}"); // TODO: what did I do here?
+            ImGui.Text($"0x{address:X}"); // TODO: what did I do here?
             return;
         }
 
@@ -454,12 +454,12 @@ public unsafe partial class DebugRenderer
         }
         else if (type == typeof(bool))
         {
-            ImGui.TextUnformatted($"{*(bool*)address}");
+            ImGui.Text($"{*(bool*)address}");
             return;
         }
         else if (type == typeof(BitVector32))
         {
-            ImGui.TextUnformatted($"{*(BitVector32*)address}");
+            ImGui.Text($"{*(BitVector32*)address}");
             return;
         }
         else if (type == typeof(Utf8String))
@@ -533,7 +533,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        ImGui.TextUnformatted("Unsupported Type");
+        ImGui.Text("Unsupported Type");
     }
 
     public ImRaii.IEndObject DrawTreeNode(NodeOptions nodeOptions)
@@ -685,7 +685,7 @@ public unsafe partial class DebugRenderer
             if (fieldInfo.GetCustomAttribute<ObsoleteAttribute>() is ObsoleteAttribute obsoleteAttribute)
             {
                 using (ImRaii.PushColor(ImGuiCol.Text, (obsoleteAttribute.IsError ? ColorObsoleteError : ColorObsolete).ToUInt()))
-                    ImGui.TextUnformatted("[Obsolete]");
+                    ImGui.Text("[Obsolete]");
 
                 if (!string.IsNullOrEmpty(obsoleteAttribute.Message) && ImGui.IsItemHovered())
                     ImGui.SetTooltip(obsoleteAttribute.Message);
@@ -695,7 +695,7 @@ public unsafe partial class DebugRenderer
 
             if (fieldInfo.IsStatic)
             {
-                ImGui.TextUnformatted("static");
+                ImGui.Text("static");
                 ImGui.SameLine();
             }
 
@@ -976,7 +976,7 @@ public unsafe partial class DebugRenderer
         {
             var startPos = ImGui.GetWindowPos() + ImGui.GetCursorPos() - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY());
 
-            ImGui.TextUnformatted(fieldNameOverride ?? fieldInfo.Name);
+            ImGui.Text(fieldNameOverride ?? fieldInfo.Name);
 
             if (hasDoc)
             {
@@ -988,7 +988,7 @@ public unsafe partial class DebugRenderer
         if (ImGui.IsItemHovered())
         {
             using var tooltip = ImRaii.Tooltip();
-            ImGui.TextUnformatted(fieldNameOverride ?? fieldInfo.Name);
+            ImGui.Text(fieldNameOverride ?? fieldInfo.Name);
 
             if (hasDoc)
             {
@@ -999,21 +999,21 @@ public unsafe partial class DebugRenderer
                     ImGui.Separator();
 
                     if (!string.IsNullOrEmpty(doc.Sumamry))
-                        ImGui.TextUnformatted(doc.Sumamry);
+                        ImGui.Text(doc.Sumamry);
 
                     if (!string.IsNullOrEmpty(doc.Remarks))
-                        ImGui.TextUnformatted(doc.Remarks);
+                        ImGui.Text(doc.Remarks);
 
                     if (doc.Parameters.Length > 0)
                     {
                         foreach (var param in doc.Parameters)
                         {
-                            ImGui.TextUnformatted($"{param.Key}: {param.Value}");
+                            ImGui.Text($"{param.Key}: {param.Value}");
                         }
                     }
 
                     if (!string.IsNullOrEmpty(doc.Returns))
-                        ImGui.TextUnformatted(doc.Returns);
+                        ImGui.Text(doc.Returns);
                 }
             }
         }
@@ -1038,7 +1038,7 @@ public unsafe partial class DebugRenderer
         if (type.GetCustomAttribute<FlagsAttribute>() != null)
         {
             ImGui.SameLine();
-            ImGui.TextUnformatted(" - ");
+            ImGui.Text(" - ");
             var bits = Marshal.SizeOf(underlyingType) * 8;
             for (var i = 0u; i < bits; i++)
             {
@@ -1053,7 +1053,7 @@ public unsafe partial class DebugRenderer
         else
         {
             ImGui.SameLine();
-            ImGui.TextUnformatted(Enum.GetName(type, value)?.ToString() ?? "");
+            ImGui.Text(Enum.GetName(type, value)?.ToString() ?? "");
         }
     }
 
@@ -1064,7 +1064,7 @@ public unsafe partial class DebugRenderer
     {
         if (address == 0)
         {
-            ImGui.TextUnformatted("");
+            ImGui.Text("");
             return;
         }
 
@@ -1138,7 +1138,7 @@ public unsafe partial class DebugRenderer
                 break;
 
             default:
-                ImGui.TextUnformatted("null");
+                ImGui.Text("null");
                 return value;
         }
 
@@ -1170,7 +1170,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        ImGui.TextUnformatted($"Unhandled NumericType {type.FullName}");
+        ImGui.Text($"Unhandled NumericType {type.FullName}");
     }
 
     private void DrawNumericWithHex(object value, Type type, NodeOptions nodeOptions)
@@ -1310,8 +1310,8 @@ public unsafe partial class DebugRenderer
                 {
                     ImGui.BeginTooltip();
                     if (canCopy)
-                        ImGui.TextUnformatted("Click to copy IconId");
-                    ImGui.TextUnformatted($"ID: {iconId} – Size: {texture.Width}x{texture.Height}");
+                        ImGui.Text("Click to copy IconId");
+                    ImGui.Text($"ID: {iconId} – Size: {texture.Width}x{texture.Height}");
                     ImGui.Image(texture.Handle, new(texture.Width, texture.Height));
                     ImGui.EndTooltip();
                 }
@@ -1333,7 +1333,7 @@ public unsafe partial class DebugRenderer
     {
         if (span.Length == 0)
         {
-            ImGui.TextUnformatted("No values");
+            ImGui.Text("No values");
             return;
         }
 
@@ -1358,7 +1358,7 @@ public unsafe partial class DebugRenderer
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted(i.ToString());
+            ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Value
             var ptr = span.GetPointer(i);

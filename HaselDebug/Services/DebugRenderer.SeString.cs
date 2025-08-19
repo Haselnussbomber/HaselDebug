@@ -117,7 +117,7 @@ public unsafe partial class DebugRenderer
     {
         if (address == 0)
         {
-            ImGui.TextUnformatted("null");
+            ImGui.Text("null");
             return;
         }
 
@@ -126,7 +126,7 @@ public unsafe partial class DebugRenderer
         var str = (Utf8String*)address;
         if (str->StringPtr == null)
         {
-            ImGui.TextUnformatted("null");
+            ImGui.Text("null");
             return;
         }
 
@@ -137,7 +137,7 @@ public unsafe partial class DebugRenderer
     {
         if (ptr == null)
         {
-            ImGui.TextUnformatted("null");
+            ImGui.Text("null");
             return;
         }
 
@@ -257,7 +257,7 @@ public unsafe partial class DebugRenderer
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(payload.Type == ReadOnlySePayloadType.Text ? "Text" : "ToString()");
+            ImGui.Text(payload.Type == ReadOnlySePayloadType.Text ? "Text" : "ToString()");
             ImGui.TableNextColumn();
             var text = payload.ToString();
             ImGuiUtilsEx.DrawCopyableText($"\"{text}\"", text);
@@ -300,13 +300,13 @@ public unsafe partial class DebugRenderer
 
         ImGui.TableNextColumn();
         var expressionName = GetExpressionName(macroCode, subType, idx, expr);
-        ImGui.TextUnformatted($"[{idx}] " + (string.IsNullOrEmpty(expressionName) ? $"Expr {idx}" : expressionName));
+        ImGui.Text($"[{idx}] " + (string.IsNullOrEmpty(expressionName) ? $"Expr {idx}" : expressionName));
 
         ImGui.TableNextColumn();
 
         if (expr.Body.IsEmpty)
         {
-            ImGui.TextUnformatted("(?)");
+            ImGui.Text("(?)");
             return;
         }
 
@@ -331,7 +331,7 @@ public unsafe partial class DebugRenderer
                 if (!string.IsNullOrEmpty(name))
                 {
                     ImGui.SameLine();
-                    ImGui.TextUnformatted(name);
+                    ImGui.Text(name);
                 }
             }
 
@@ -352,7 +352,7 @@ public unsafe partial class DebugRenderer
                     _ => typeof(EnglishArticleType)
                 };
                 ImGui.SameLine();
-                ImGui.TextUnformatted(Enum.GetName(articleTypeEnumType, u32));
+                ImGui.Text(Enum.GetName(articleTypeEnumType, u32));
             }
 
             if (macroCode is MacroCode.Fixed && subType != null && fixedType != null && fixedType is 100 or 200 && subType == 5 && idx == 2)
@@ -370,34 +370,34 @@ public unsafe partial class DebugRenderer
                 {
                     case LinkMacroPayloadType.Item:
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(_textService.GetItemName(u32).ToString());
+                        ImGui.Text(_textService.GetItemName(u32).ToString());
                         break;
 
                     case LinkMacroPayloadType.Quest:
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(_textService.GetQuestName(u32));
+                        ImGui.Text(_textService.GetQuestName(u32));
                         break;
 
                     case LinkMacroPayloadType.Achievement when _dataManager.GetExcelSheet<Achievement>(_languageProvider.ClientLanguage).TryGetRow(u32, out var achievementRow):
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(achievementRow.Name.ToString());
+                        ImGui.Text(achievementRow.Name.ToString());
                         break;
 
                     case LinkMacroPayloadType.HowTo when _dataManager.GetExcelSheet<HowTo>(_languageProvider.ClientLanguage).TryGetRow(u32, out var howToRow):
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(howToRow.Name.ToString());
+                        ImGui.Text(howToRow.Name.ToString());
                         break;
 
                     case LinkMacroPayloadType.Status when _dataManager.GetExcelSheet<Status>(_languageProvider.ClientLanguage).TryGetRow(u32, out var statusRow):
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(statusRow.Name.ToString());
+                        ImGui.Text(statusRow.Name.ToString());
                         break;
 
                     case LinkMacroPayloadType.AkatsukiNote when
                         _dataManager.GetSubrowExcelSheet<AkatsukiNote>(_languageProvider.ClientLanguage).TryGetRow(u32, out var akatsukiNoteRow) &&
                         akatsukiNoteRow[0].ListName.IsValid:
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(akatsukiNoteRow[0].ListName.Value.Text.ToString());
+                        ImGui.Text(akatsukiNoteRow[0].ListName.Value.Text.ToString());
                         break;
                 }
             }
@@ -410,7 +410,7 @@ public unsafe partial class DebugRenderer
         if (expr.TryGetString(out var s))
         {
             DrawSeString(s, false, nodeOptions with { DefaultOpen = true });
-            // ImGui.TextUnformatted($"\"{s.ToString().Replace("\\", "\\\\").Replace("\"", "\\\"")}\"");
+            // ImGui.Text($"\"{s.ToString().Replace("\\", "\\\\").Replace("\"", "\\\"")}\"");
             return;
         }
 
@@ -418,11 +418,11 @@ public unsafe partial class DebugRenderer
         {
             if (((ExpressionType)exprType).GetNativeName() is { } nativeName)
             {
-                ImGui.TextUnformatted(nativeName);
+                ImGui.Text(nativeName);
                 return;
             }
 
-            ImGui.TextUnformatted($"?x{exprType:X02}");
+            ImGui.Text($"?x{exprType:X02}");
             return;
         }
 
@@ -430,7 +430,7 @@ public unsafe partial class DebugRenderer
         {
             if (((ExpressionType)exprType).GetNativeName() is { } nativeName)
             {
-                ImGui.TextUnformatted($"{nativeName}({e1.ToString()})");
+                ImGui.Text($"{nativeName}({e1.ToString()})");
                 return;
             }
 
@@ -441,7 +441,7 @@ public unsafe partial class DebugRenderer
         {
             if (((ExpressionType)exprType).GetNativeName() is { } nativeName)
             {
-                ImGui.TextUnformatted($"{e1.ToString()} {nativeName} {e2.ToString()}");
+                ImGui.Text($"{e1.ToString()} {nativeName} {e2.ToString()}");
                 return;
             }
 
@@ -454,7 +454,7 @@ public unsafe partial class DebugRenderer
         for (var i = 1; i < expr.Body.Length; i++)
             sb.Append($" {expr.Body[i]:X02}");
         sb.Append(')');
-        ImGui.TextUnformatted(sb.ToString());
+        ImGui.Text(sb.ToString());
     }
 
     private string GetExpressionName(MacroCode macroCode, uint? subType, int idx, ReadOnlySeExpressionSpan expr)

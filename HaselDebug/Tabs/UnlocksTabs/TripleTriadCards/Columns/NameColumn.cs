@@ -97,7 +97,7 @@ public partial class NameColumn : ColumnString<TripleTriadCardEntry>
         }
         else
         {
-            ImGui.TextUnformatted(ToName(entry));
+            ImGui.Text(ToName(entry));
         }
 
         if (_textureProvider.TryGetFromGameIcon(entry.UnlockIcon, out var iconTex) && iconTex.TryGetWrap(out _, out _))

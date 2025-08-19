@@ -6,7 +6,7 @@ public unsafe class RaptureGearsetModuleTab : DebugTab
     {
         var raptureGearsetModule = RaptureGearsetModule.Instance();
 
-        ImGui.TextUnformatted($"CurrentGearsetIndex: {raptureGearsetModule->CurrentGearsetIndex}");
+        ImGui.Text($"CurrentGearsetIndex: {raptureGearsetModule->CurrentGearsetIndex}");
 
         if (ImGui.Button("Search for Dyeable BRD items"))
         {
@@ -28,17 +28,17 @@ public unsafe class RaptureGearsetModuleTab : DebugTab
                 continue;
 
             var entry = raptureGearsetModule->GetGearset(i);
-            ImGui.TextUnformatted($"Gearset #{entry->ID}: {MemoryHelper.ReadStringNullTerminated((nint)entry->Name)}");
+            ImGui.Text($"Gearset #{entry->ID}: {MemoryHelper.ReadStringNullTerminated((nint)entry->Name)}");
 
             using var indent = ImRaii.PushIndent();
             for (var j = 0; j < 14; j++)
             {
                 ref var item = ref entry->ItemsSpan[j];
-                ImGui.TextUnformatted($"Item #{j} - {Enum.GetName(typeof(RaptureGearsetModule.GearsetItemIndex), j)}");
+                ImGui.Text($"Item #{j} - {Enum.GetName(typeof(RaptureGearsetModule.GearsetItemIndex), j)}");
                 using var itemindent = ImRaii.PushIndent();
-                ImGui.TextUnformatted($"Flags: {item.Flags}");
-                ImGui.TextUnformatted($"Item: {item.ItemID} - {GetItemName(item.ItemID)}");
-                ImGui.TextUnformatted($"Glamour: {item.GlamourId} - {GetItemName(item.GlamourId)}");
+                ImGui.Text($"Flags: {item.Flags}");
+                ImGui.Text($"Item: {item.ItemID} - {GetItemName(item.ItemID)}");
+                ImGui.Text($"Glamour: {item.GlamourId} - {GetItemName(item.GlamourId)}");
             }
         }
     }

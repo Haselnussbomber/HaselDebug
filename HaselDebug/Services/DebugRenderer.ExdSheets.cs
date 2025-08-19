@@ -14,7 +14,7 @@ public unsafe partial class DebugRenderer
     {
         if (depth > 10)
         {
-            ImGui.TextUnformatted("max depth reached");
+            ImGui.Text("max depth reached");
             return;
         }
 
@@ -54,21 +54,21 @@ public unsafe partial class DebugRenderer
         var sheet = genericGetSheet.Invoke(_dataManager.Excel, [language.ToLumina(), sheetType.GetCustomAttribute<SheetAttribute>()?.Name ?? sheetType.Name]);
         if (sheet == null)
         {
-            ImGui.TextUnformatted("sheet is null");
+            ImGui.Text("sheet is null");
             return;
         }
 
         var getRow = sheet.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).FirstOrDefault(info => info.Name == "GetRowOrDefault" && info.GetParameters().Length == 1);
         if (getRow == null)
         {
-            ImGui.TextUnformatted("Could not find GetRowOrDefault");
+            ImGui.Text("Could not find GetRowOrDefault");
             return;
         }
 
         var row = getRow?.Invoke(sheet, [rowId]);
         if (row == null)
         {
-            ImGui.TextUnformatted($"Row {rowId} is null");
+            ImGui.Text($"Row {rowId} is null");
             return;
         }
 
@@ -87,7 +87,7 @@ public unsafe partial class DebugRenderer
 
         if (value == null)
         {
-            ImGui.TextUnformatted("null");
+            ImGui.Text("null");
             return;
         }
 
@@ -107,7 +107,7 @@ public unsafe partial class DebugRenderer
         if (propType == typeof(RowRef))
         {
             var columnRowId = (uint)propType.GetProperty("RowId")?.GetValue(value)!;
-            ImGui.TextUnformatted(columnRowId.ToString());
+            ImGui.Text(columnRowId.ToString());
             return;
         }
 
@@ -116,7 +116,7 @@ public unsafe partial class DebugRenderer
             var isValid = (bool)propType.GetProperty("IsValid")?.GetValue(value)!;
             if (!isValid)
             {
-                ImGui.TextUnformatted("null");
+                ImGui.Text("null");
                 return;
             }
 
@@ -136,7 +136,7 @@ public unsafe partial class DebugRenderer
             var count = (int)propType.GetProperty("Count")?.GetValue(value)!;
             if (count == 0)
             {
-                ImGui.TextUnformatted("No values");
+                ImGui.Text("No values");
                 return;
             }
 
@@ -161,14 +161,14 @@ public unsafe partial class DebugRenderer
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn(); // Index
-                ImGui.TextUnformatted(i.ToString());
+                ImGui.Text(i.ToString());
 
                 ImGui.TableNextColumn(); // Value
 
                 var colValue = propType.GetMethod("get_Item")?.Invoke(value, [i]);
                 if (colValue == null)
                 {
-                    ImGui.TextUnformatted("null");
+                    ImGui.Text("null");
                     continue;
                 }
 
@@ -185,7 +185,7 @@ public unsafe partial class DebugRenderer
                 if (collectionType == typeof(RowRef))
                 {
                     var columnRowId = (uint)collectionType.GetProperty("RowId")?.GetValue(colValue)!;
-                    ImGui.TextUnformatted(columnRowId.ToString());
+                    ImGui.Text(columnRowId.ToString());
                     continue;
                 }
 
@@ -194,7 +194,7 @@ public unsafe partial class DebugRenderer
                     var isValid = (bool)collectionType.GetProperty("IsValid")?.GetValue(colValue)!;
                     if (!isValid)
                     {
-                        ImGui.TextUnformatted("null");
+                        ImGui.Text("null");
                         continue;
                     }
 
@@ -234,11 +234,11 @@ public unsafe partial class DebugRenderer
 
                 if (collectionType.IsPrimitive)
                 {
-                    ImGui.TextUnformatted(colValue.ToString());
+                    ImGui.Text(colValue.ToString());
                     continue;
                 }
 
-                ImGui.TextUnformatted($"Unsupported type: {collectionType.Name}");
+                ImGui.Text($"Unsupported type: {collectionType.Name}");
             }
 
             return;
@@ -249,6 +249,6 @@ public unsafe partial class DebugRenderer
             DrawIcon(value, propType);
         }
 
-        ImGui.TextUnformatted(value.ToString());
+        ImGui.Text(value.ToString());
     }
 }

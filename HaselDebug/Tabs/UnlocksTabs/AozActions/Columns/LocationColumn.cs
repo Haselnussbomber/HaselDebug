@@ -34,18 +34,18 @@ public partial class LocationColumn : ColumnString<AozEntry>
             case 1 when entry.AozActionTransient.Location.TryGetValue<PlaceName>(out var placeName):
                 _textureService.DrawPart("AozNoteBook", 7, 2, ImGui.GetTextLineHeight());
                 ImGui.SameLine();
-                ImGui.TextUnformatted(placeName.Name.ToString());
+                ImGui.Text(placeName.Name.ToString());
                 break;
 
             case 2:
                 _debugRenderer.DrawIcon(26543);
-                ImGui.TextUnformatted(_textService.GetAddonText(12269)); // Learned via Whalaqee Totem
+                ImGui.Text(_textService.GetAddonText(12269)); // Learned via Whalaqee Totem
                 break;
 
             case 3:
                 _textureService.DrawPart("AozNoteBook", 7, 2, ImGui.GetTextLineHeight());
                 ImGui.SameLine();
-                ImGui.TextUnformatted(_textService.GetAddonText(12270)); // Learned First
+                ImGui.Text(_textService.GetAddonText(12270)); // Learned First
                 break;
 
             case 4 when entry.AozActionTransient.Location.TryGetValue<ContentFinderCondition>(out var cfc):

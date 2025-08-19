@@ -21,7 +21,7 @@ public unsafe partial class GameWindowTab : DebugTab
         var i = 0;
         foreach (var arg in gameWindow->ArgumentsSpan)
         {
-            ImGui.TextUnformatted($"[{i++}] {arg.ExtractText()}");
+            ImGui.Text($"[{i++}] {arg.ExtractText()}");
         }
     }
 }

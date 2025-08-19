@@ -181,10 +181,10 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Id
-            ImGui.TextUnformatted(i.ToString());
+            ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Type
-            ImGui.TextUnformatted(item.Type.ToString());
+            ImGui.Text(item.Type.ToString());
 
             ImGui.TableNextColumn(); // ValuePtr
             _debugRenderer.DrawAddress(item.ValuePtr);
@@ -210,7 +210,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
                     }
                     else
                     {
-                        ImGui.TextUnformatted("null");
+                        ImGui.Text("null");
                     }
 
                     break;
@@ -225,7 +225,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
             }
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(i switch
+            ImGui.Text(i switch
             {
                 0 => "Player Name",
                 1 => "Temp Entity 1: Name",
@@ -352,19 +352,19 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Id
-            ImGui.TextUnformatted($"0x{item.Value.Id:X}");
+            ImGui.Text($"0x{item.Value.Id:X}");
 
             ImGui.TableNextColumn(); // Code
-            ImGui.TextUnformatted(item.Key.ToString());
+            ImGui.Text(item.Key.ToString());
 
             ImGui.TableNextColumn(); // TotalParamCount
-            ImGui.TextUnformatted(item.Value.TotalParamCount.ToString());
+            ImGui.Text(item.Value.TotalParamCount.ToString());
 
             ImGui.TableNextColumn(); // ParamCount
-            ImGui.TextUnformatted(item.Value.ParamCount.ToString());
+            ImGui.Text(item.Value.ParamCount.ToString());
 
             ImGui.TableNextColumn(); // IsTerminated
-            ImGui.TextUnformatted(item.Value.IsTerminated.ToString());
+            ImGui.Text(item.Value.IsTerminated.ToString());
 
             for (var i = 0; i < 7; i++)
             {
@@ -373,7 +373,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
                 {
                     var character = ((char)item.Value.ParamTypes[i]).ToString();
                     if (character != "\0")
-                        ImGui.TextUnformatted(character);
+                        ImGui.Text(character);
                 }
             }
 
@@ -402,17 +402,17 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
                 if (resolvedVf != 0)
                 {
                     ImGui.SameLine();
-                    ImGui.TextUnformatted("->"u8);
+                    ImGui.Text("->"u8);
                     ImGui.SameLine();
                     _debugRenderer.DrawAddress(resolvedVf);
                     if (vfOffset > 0)
                     {
                         ImGui.SameLine();
-                        ImGui.TextUnformatted("(vfunc: "u8);
+                        ImGui.Text("(vfunc: "u8);
                         ImGui.SameLine(0, 0);
                         ImGuiUtilsEx.DrawCopyableText($"{vfOffset / 8}");
                         ImGui.SameLine(0, 0);
-                        ImGui.TextUnformatted(")"u8);
+                        ImGui.Text(")"u8);
                     }
                 }
             }
@@ -438,17 +438,17 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{i}");
+            ImGui.Text($"{i}");
 
             ImGui.TableNextColumn();
             _textureService.DrawGfd(iconMapping[i].IconId, ImGui.GetTextLineHeightWithSpacing());
             ImGui.SameLine();
-            ImGui.TextUnformatted($"{iconMapping[i].IconId}");
+            ImGui.Text($"{iconMapping[i].IconId}");
 
             ImGui.TableNextColumn();
             _textureService.DrawGfd(iconMapping[i].RemappedIconId, ImGui.GetTextLineHeightWithSpacing());
             ImGui.SameLine();
-            ImGui.TextUnformatted($"{iconMapping[i].RemappedIconId}");
+            ImGui.Text($"{iconMapping[i].RemappedIconId}");
         }
     }
 
@@ -584,7 +584,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
         }
 
         if (!raptureTextModule->MacroEncoder.EncoderError.IsEmpty)
-            ImGui.TextUnformatted(raptureTextModule->MacroEncoder.EncoderError.ToString()); // TODO: EncoderError doesn't clear
+            ImGui.Text(raptureTextModule->MacroEncoder.EncoderError.ToString()); // TODO: EncoderError doesn't clear
 
         using var table = ImRaii.Table("StringMakerTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;

@@ -43,12 +43,12 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         ImGui.TableNextColumn();
                         ImGuiUtilsEx.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
-                        ImGui.TextUnformatted(item.SpecialId.ToString());
+                        ImGui.Text(item.SpecialId.ToString());
                         ImGui.TableNextColumn();
-                        ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
+                        ImGui.Text($"{item.Count} / {item.MaxCount}");
                         ImGui.TableNextColumn();
                         if (currencyManager->IsItemLimited(itemId))
-                            ImGui.TextUnformatted(currencyManager->GetItemCountRemaining(itemId).ToString());
+                            ImGui.Text(currencyManager->GetItemCountRemaining(itemId).ToString());
                         ImGui.TableNextColumn();
                         ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ToString());
                     }
@@ -76,12 +76,12 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         ImGui.TableNextColumn();
                         ImGuiUtilsEx.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
-                        ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
+                        ImGui.Text($"{item.Count} / {item.MaxCount}");
                         ImGui.TableNextColumn();
                         if (currencyManager->IsItemLimited(itemId))
-                            ImGui.TextUnformatted(currencyManager->GetItemCountRemaining(itemId).ToString());
+                            ImGui.Text(currencyManager->GetItemCountRemaining(itemId).ToString());
                         ImGui.TableNextColumn();
-                        ImGui.TextUnformatted(item.IsUnlimited.ToString());
+                        ImGui.Text(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
                         ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ToString());
                     }
@@ -109,12 +109,12 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         ImGui.TableNextColumn();
                         ImGuiUtilsEx.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
-                        ImGui.TextUnformatted($"{item.Count} / {item.MaxCount}");
+                        ImGui.Text($"{item.Count} / {item.MaxCount}");
                         ImGui.TableNextColumn();
                         if (currencyManager->IsItemLimited(itemId))
-                            ImGui.TextUnformatted(currencyManager->GetItemCountRemaining(itemId).ToString());
+                            ImGui.Text(currencyManager->GetItemCountRemaining(itemId).ToString());
                         ImGui.TableNextColumn();
-                        ImGui.TextUnformatted(item.IsUnlimited.ToString());
+                        ImGui.Text(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
                         ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ToString());
                     }

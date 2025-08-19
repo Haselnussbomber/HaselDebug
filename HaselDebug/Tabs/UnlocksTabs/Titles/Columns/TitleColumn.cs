@@ -63,7 +63,7 @@ public partial class TitleColumn : ColumnString<Title>
         }
         else
         {
-            ImGui.TextUnformatted(ToName(row));
+            ImGui.Text(ToName(row));
         }
     }
 }

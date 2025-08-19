@@ -171,7 +171,7 @@ public unsafe class StoreItemsTab(
                 {
                     var isUnlocked = ItemService.IsUnlocked(row.Item.Row);
                     using (ImRaii.PushColor(ImGuiCol.Text, (uint)(isUnlocked ? Color.Green : Color.Red)))
-                        ImGui.TextUnformatted(isUnlocked.ToString());
+                        ImGui.Text(isUnlocked.ToString());
                 }
             }
         }

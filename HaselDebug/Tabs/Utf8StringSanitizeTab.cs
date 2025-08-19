@@ -220,7 +220,7 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
             using var node = ImRaii.TreeNode($"U+{entry.Range.FirstCodePoint:X4}-U+{entry.Range.FirstCodePoint + entry.Range.Length - 1:X4} - {entry.Name}###{entry.Name}", ImGuiTreeNodeFlags.SpanFullWidth);
             if (!node) continue;
 
-            ImGui.TextUnformatted("Input:");
+            ImGui.Text("Input:");
             ImGui.SameLine();
             ImGuiUtilsEx.DrawCopyableText(entry.Input);
 
@@ -235,7 +235,7 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
             for (var i = 0; i < entry.Output.Length; i++)
             {
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted($"{(AllowedEntities)(1 << i)}");
+                ImGui.Text($"{(AllowedEntities)(1 << i)}");
                 ImGui.TableNextColumn();
                 ImGuiUtilsEx.DrawCopyableText(entry.Output[i]);
             }

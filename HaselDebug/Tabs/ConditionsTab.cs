@@ -31,10 +31,10 @@ public unsafe partial class ConditionsTab : DebugTab
             var value = *(bool*)((nint)conditions + offset);
             if (!value) continue;
 
-            ImGui.TextUnformatted($"#{offset}:");
+            ImGui.Text($"#{offset}:");
             ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
             var startPos = ImGui.GetWindowPos() + ImGui.GetCursorPos() - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY());
-            ImGui.TextUnformatted(fieldInfo.Name);
+            ImGui.Text(fieldInfo.Name);
 
             var fullName = (fieldInfo.DeclaringType != null ? fieldInfo.DeclaringType.FullName + "." : string.Empty) + fieldInfo.Name;
 
@@ -54,25 +54,25 @@ public unsafe partial class ConditionsTab : DebugTab
                 continue;
 
             using var font = _pluginInterface.UiBuilder.MonoFontHandle.Push();
-            ImGui.TextUnformatted(fieldInfo.Name);
+            ImGui.Text(fieldInfo.Name);
             ImGui.Separator();
 
             if (!string.IsNullOrEmpty(doc.Sumamry))
-                ImGui.TextUnformatted(doc.Sumamry);
+                ImGui.Text(doc.Sumamry);
 
             if (!string.IsNullOrEmpty(doc.Remarks))
-                ImGui.TextUnformatted(doc.Remarks);
+                ImGui.Text(doc.Remarks);
 
             if (doc.Parameters.Length > 0)
             {
                 foreach (var param in doc.Parameters)
                 {
-                    ImGui.TextUnformatted($"{param.Key}: {param.Value}");
+                    ImGui.Text($"{param.Key}: {param.Value}");
                 }
             }
 
             if (!string.IsNullOrEmpty(doc.Returns))
-                ImGui.TextUnformatted(doc.Returns);
+                ImGui.Text(doc.Returns);
         }
     }
 }

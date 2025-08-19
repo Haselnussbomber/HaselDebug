@@ -14,7 +14,7 @@ public unsafe partial class DebugRenderer
         var size = valueType.SizeOf();
         if (size == 0)
         {
-            ImGui.TextUnformatted($"Can't get size of {valueType.Name}");
+            ImGui.Text($"Can't get size of {valueType.Name}");
             return;
         }
 
@@ -23,7 +23,7 @@ public unsafe partial class DebugRenderer
         var elementCount = (lastElement - firstElement) / size;
         if (elementCount == 0)
         {
-            ImGui.TextUnformatted("No values");
+            ImGui.Text("No values");
             return;
         }
 
@@ -61,7 +61,7 @@ public unsafe partial class DebugRenderer
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted(i.ToString());
+            ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Value
             DrawPointerType((nint)(firstElement + i * size), valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath, IsIconIdField = nodeOptions.IsIconIdField });

@@ -27,7 +27,7 @@ public unsafe class OutfitsTab(OutfitsTable table) : DebugTab, IUnlockTab
     public override void Draw()
     {
         var numCollectedSets = table.Rows.Count(row => ItemFinderModule.Instance()->GlamourDresserItemIds.Contains(row.RowId));
-        ImGui.TextUnformatted($"{numCollectedSets} out of {table.Rows.Count} filtered sets collected");
+        ImGui.Text($"{numCollectedSets} out of {table.Rows.Count} filtered sets collected");
 
         table.Draw();
     }

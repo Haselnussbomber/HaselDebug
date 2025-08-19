@@ -39,7 +39,7 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
             using var node = ImRaii.TreeNode($"##Hotbar{i}", ImGuiTreeNodeFlags.SpanAvailWidth);
 
             ImGui.SameLine(ImGui.GetStyle().FramePadding.X * 3f + ImGui.GetFontSize(), 0);
-            ImGui.TextUnformatted($"Hotbar {i}");
+            ImGui.Text($"Hotbar {i}");
             ImGui.SameLine(0, ImGui.GetStyle().FramePadding.X * 3);
 
             for (var j = 0; j < hotbar.Slots.Length; j++)
@@ -71,13 +71,13 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
 
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn(); // Slot
-                ImGui.TextUnformatted(j.ToString());
+                ImGui.Text(j.ToString());
 
                 ImGui.TableNextColumn(); // CommandType
-                ImGui.TextUnformatted(slot->CommandType.ToString());
+                ImGui.Text(slot->CommandType.ToString());
 
                 ImGui.TableNextColumn(); // CommandId
-                ImGui.TextUnformatted(slot->CommandId.ToString());
+                ImGui.Text(slot->CommandId.ToString());
 
                 ImGui.TableNextColumn(); // Name
                 if (!slot->IsEmpty)

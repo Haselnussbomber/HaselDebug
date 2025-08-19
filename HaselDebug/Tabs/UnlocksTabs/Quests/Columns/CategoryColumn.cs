@@ -30,7 +30,7 @@ public partial class CategoryColumn : ColumnString<Quest>
         if (row.JournalGenre.RowId != 0 && row.JournalGenre.IsValid)
         {
             _debugRenderer.DrawIcon((uint)row.JournalGenre.Value.Icon);
-            ImGui.TextUnformatted(ToName(row));
+            ImGui.Text(ToName(row));
         }
     }
 }

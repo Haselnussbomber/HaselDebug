@@ -14,7 +14,7 @@ public unsafe partial class DebugRenderer
         var elementCount = *(ulong*)(address + 0x8);
         if (elementCount == 0)
         {
-            ImGui.TextUnformatted("No values");
+            ImGui.Text("No values");
             return;
         }
 

@@ -43,7 +43,7 @@ public unsafe partial class SatisfactionSupplyTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted(row.RowId.ToString());
+            ImGui.Text(row.RowId.ToString());
 
             ImGui.TableNextColumn(); // Name
             _debugRenderer.DrawIcon((uint)row.RankParams[rank].ImageId);
@@ -56,7 +56,7 @@ public unsafe partial class SatisfactionSupplyTab : DebugTab
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                     using var tooltip = ImRaii.Tooltip();
-                    ImGui.TextUnformatted($"Teleport to: {_textService.GetPlaceName(aetheryte.PlaceName.RowId)}");
+                    ImGui.Text($"Teleport to: {_textService.GetPlaceName(aetheryte.PlaceName.RowId)}");
                 }
                 if (clicked)
                 {
@@ -65,17 +65,17 @@ public unsafe partial class SatisfactionSupplyTab : DebugTab
             }
             else
             {
-                ImGui.TextUnformatted(_textService.GetENpcResidentName(row.Npc.RowId));
+                ImGui.Text(_textService.GetENpcResidentName(row.Npc.RowId));
             }
 
             ImGui.TableNextColumn(); // Satisfaction
-            ImGui.TextUnformatted($"{satisfactionSupply->Satisfaction[index]}/{row.SatisfactionNpcParams[rank].SatisfactionRequired}");
+            ImGui.Text($"{satisfactionSupply->Satisfaction[index]}/{row.SatisfactionNpcParams[rank].SatisfactionRequired}");
 
             ImGui.TableNextColumn(); // Rank
-            ImGui.TextUnformatted(rank.ToString());
+            ImGui.Text(rank.ToString());
 
             ImGui.TableNextColumn(); // UsedAllowance
-            ImGui.TextUnformatted(satisfactionSupply->UsedAllowances[index].ToString());
+            ImGui.Text(satisfactionSupply->UsedAllowances[index].ToString());
         }
     }
 }

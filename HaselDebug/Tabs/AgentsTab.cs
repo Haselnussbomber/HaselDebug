@@ -81,7 +81,7 @@ public unsafe partial class AgentsTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Id
-            ImGui.TextUnformatted(i.ToString());
+            ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Name
 
@@ -127,7 +127,7 @@ public unsafe partial class AgentsTab : DebugTab
             });
 
             ImGui.TableNextColumn(); // Active
-            ImGui.TextUnformatted(agent.Value->IsAgentActive().ToString());
+            ImGui.Text(agent.Value->IsAgentActive().ToString());
         }
     }
 

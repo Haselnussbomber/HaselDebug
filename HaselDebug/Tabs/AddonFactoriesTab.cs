@@ -134,7 +134,7 @@ public unsafe partial class AddonFactoriesTab : DebugTab
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted(i.ToString());
+            ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Create
             _debugRenderer.DrawAddress(entry.CtorAddress);
@@ -147,7 +147,7 @@ public unsafe partial class AddonFactoriesTab : DebugTab
             {
                 using var color = ImRaii.PushColor(ImGuiCol.Text, (uint)entry.VTableAddress | 0xFF000000);
                 ImGui.SameLine();
-                ImGui.TextUnformatted($"({count})");
+                ImGui.Text($"({count})");
             }
 
             ImGui.TableNextColumn(); // Inheritance
@@ -218,19 +218,19 @@ public unsafe partial class AddonFactoriesTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Idx
-            ImGui.TextUnformatted(i.ToString());
+            ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Address
             _debugRenderer.DrawAddress((nint)instr.IP + _sigScanner.Module.BaseAddress);
 
             ImGui.TableNextColumn(); // Assembly
-            ImGui.TextUnformatted(_output.ToString());
+            ImGui.Text(_output.ToString());
 
             ImGui.TableNextColumn(); // FlowControl
-            ImGui.TextUnformatted(instr.FlowControl.ToString());
+            ImGui.Text(instr.FlowControl.ToString());
 
             ImGui.TableNextColumn(); // Code
-            ImGui.TextUnformatted(instr.Code.ToString());
+            ImGui.Text(instr.Code.ToString());
 
             for (var j = 0; j < 2; j++)
             {
@@ -242,18 +242,18 @@ public unsafe partial class AddonFactoriesTab : DebugTab
                 if (kind == OpKind.Register && register == Register.None)
                     continue;
 
-                ImGui.TextUnformatted(instr.GetOpKind(j).ToString());
+                ImGui.Text(instr.GetOpKind(j).ToString());
 
                 if (register != Register.None)
                 {
                     ImGui.SameLine();
-                    ImGui.TextUnformatted($"({register})");
+                    ImGui.Text($"({register})");
                 }
 
                 if (kind == OpKind.Memory)
                 {
                     ImGui.SameLine();
-                    ImGui.TextUnformatted($"({instr.MemoryBase})");
+                    ImGui.Text($"({instr.MemoryBase})");
                 }
             }
         }

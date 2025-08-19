@@ -87,11 +87,11 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
 
         ImGui.Separator();
 
-        ImGui.TextUnformatted($"CurrentContentType: {EventFramework.GetCurrentContentType()}");
-        ImGui.TextUnformatted($"CurrentContentId: {EventFramework.GetCurrentContentId()}");
+        ImGui.Text($"CurrentContentType: {EventFramework.GetCurrentContentType()}");
+        ImGui.Text($"CurrentContentId: {EventFramework.GetCurrentContentId()}");
 
         if (eventFramework->DirectorModule.ActiveContentDirector != null)
-            ImGui.TextUnformatted($"ActiveContentDirector: 0x{(nint)eventFramework->DirectorModule.ActiveContentDirector:X}");
+            ImGui.Text($"ActiveContentDirector: 0x{(nint)eventFramework->DirectorModule.ActiveContentDirector:X}");
     }
 
     private void DrawDirectorsTab()
@@ -132,7 +132,7 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
             _debugRenderer.DrawAddress(eventHandler);
             ImGui.SameLine(110);
 
-            ImGui.TextUnformatted(kv.Item1.ToString("X4"));
+            ImGui.Text(kv.Item1.ToString("X4"));
             ImGui.SameLine(155);
 
             _debugRenderer.DrawPointerType(eventHandler, typeof(EventHandler), new NodeOptions() { UseSimpleEventHandlerName = true });
@@ -152,24 +152,24 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
         using var child = ImRaii.Child("TasksTab", new Vector2(-1), true, ImGuiWindowFlags.NoSavedSettings);
         if (!child) return;
 
-        ImGui.TextUnformatted("Current Tasks:");
+        ImGui.Text("Current Tasks:");
 
         foreach (EventSceneTaskInterface* task in tasks)
         {
             _debugRenderer.DrawAddress(task);
             ImGui.SameLine();
-            ImGui.TextUnformatted($"Type: {task->Type}, Flags: {task->Flags}");
+            ImGui.Text($"Type: {task->Type}, Flags: {task->Flags}");
         }
 
         ImGui.Separator();
 
         ImGui.Checkbox("Enable Logging", ref _logEnabled);
 
-        ImGui.TextUnformatted("History:");
+        ImGui.Text("History:");
 
         foreach (var (time, _, task) in _taskTypeHistory)
         {
-            ImGui.TextUnformatted($"[{time}] Type: {task.Type}, Flags: {task.Flags}");
+            ImGui.Text($"[{time}] Type: {task.Type}, Flags: {task.Flags}");
         }
 
         if (ImGui.Button("Reset History"))
@@ -203,7 +203,7 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted(i.ToString());
+            ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Object
             _debugRenderer.DrawPointerType(eventObject.Value, typeof(GameObject), new NodeOptions());

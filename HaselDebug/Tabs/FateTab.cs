@@ -19,7 +19,7 @@ public partial class FateTab : DebugTab
 
         if (fateTable.Length == 0)
         {
-            ImGui.TextUnformatted("No fates or data not ready.");
+            ImGui.Text("No fates or data not ready.");
             return;
         }
 
@@ -50,7 +50,7 @@ public partial class FateTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted($"#{i}");
+            ImGui.Text($"#{i}");
 
             ImGui.TableNextColumn(); // Address
             DrawCopyableText($"0x{fate.Address:X}", "Click to copy Address");
@@ -59,17 +59,17 @@ public partial class FateTab : DebugTab
             DrawCopyableText(fate.FateId.ToString(), "Click to copy FateId (RowId of Fate sheet)");
 
             ImGui.TableNextColumn(); // State
-            ImGui.TextUnformatted(fate.State.ToString());
+            ImGui.Text(fate.State.ToString());
 
             ImGui.TableNextColumn(); // Level
 
             if (fate.Level == fate.MaxLevel)
             {
-                ImGui.TextUnformatted($"{fate.Level}");
+                ImGui.Text($"{fate.Level}");
             }
             else
             {
-                ImGui.TextUnformatted($"{fate.Level}-{fate.MaxLevel}");
+                ImGui.Text($"{fate.Level}-{fate.MaxLevel}");
             }
 
             ImGui.TableNextColumn(); // Icon
@@ -84,8 +84,8 @@ public partial class FateTab : DebugTab
                     {
                         ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                         ImGui.BeginTooltip();
-                        ImGui.TextUnformatted("Click to copy IconId");
-                        ImGui.TextUnformatted($"ID: {fate.IconId} – Size: {texture.Width}x{texture.Height}");
+                        ImGui.Text("Click to copy IconId");
+                        ImGui.Text($"ID: {fate.IconId} – Size: {texture.Width}x{texture.Height}");
                         ImGui.Image(texture.Handle, new(texture.Width, texture.Height));
                         ImGui.EndTooltip();
                     }
@@ -109,8 +109,8 @@ public partial class FateTab : DebugTab
                     {
                         ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                         ImGui.BeginTooltip();
-                        ImGui.TextUnformatted("Click to copy MapIconId");
-                        ImGui.TextUnformatted($"ID: {fate.MapIconId} – Size: {texture.Width}x{texture.Height}");
+                        ImGui.Text("Click to copy MapIconId");
+                        ImGui.Text($"ID: {fate.MapIconId} – Size: {texture.Width}x{texture.Height}");
                         ImGui.Image(texture.Handle, new(texture.Width, texture.Height));
                         ImGui.EndTooltip();
                     }
@@ -127,17 +127,17 @@ public partial class FateTab : DebugTab
             DrawCopyableText(fate.Name.ToString(), "Click to copy Name");
 
             ImGui.TableNextColumn(); // Progress
-            ImGui.TextUnformatted($"{fate.Progress}%");
+            ImGui.Text($"{fate.Progress}%");
 
             ImGui.TableNextColumn(); // TimeRemaining
 
             if (fate.State == FateState.Running)
             {
-                ImGui.TextUnformatted($"{TimeSpan.FromSeconds(fate.TimeRemaining):mm\\:ss} / {TimeSpan.FromSeconds(fate.Duration):mm\\:ss}");
+                ImGui.Text($"{TimeSpan.FromSeconds(fate.TimeRemaining):mm\\:ss} / {TimeSpan.FromSeconds(fate.Duration):mm\\:ss}");
             }
 
             ImGui.TableNextColumn(); // HasBonus
-            ImGui.TextUnformatted(fate.HasBonus.ToString());
+            ImGui.Text(fate.HasBonus.ToString());
 
             ImGui.TableNextColumn(); // Position
             DrawCopyableText(fate.Position.ToString(), "Click to copy Position");
@@ -155,7 +155,7 @@ public partial class FateTab : DebugTab
         {
             ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
             ImGui.BeginTooltip();
-            ImGui.TextUnformatted(tooltipText);
+            ImGui.Text(tooltipText);
             ImGui.EndTooltip();
         }
 

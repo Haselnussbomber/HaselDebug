@@ -11,7 +11,7 @@ public unsafe class FashionCheckManagerTab : DebugTab
 
         if (manager == null)
         {
-            ImGui.TextUnformatted("Manager not available");
+            ImGui.Text("Manager not available");
             return;
         }
 
@@ -19,12 +19,12 @@ public unsafe class FashionCheckManagerTab : DebugTab
 
         ImGui.Separator();
 
-        ImGui.TextUnformatted($"RemainingTries: {manager->RemainingTries}");
-        ImGui.TextUnformatted($"Highscore: {manager->Highscore}");
+        ImGui.Text($"RemainingTries: {manager->RemainingTries}");
+        ImGui.Text($"Highscore: {manager->Highscore}");
 
         ImGui.Separator();
 
-        ImGui.TextUnformatted($"Weekly Theme: {GetSheet<FashionCheckWeeklyTheme>()!.GetRow(manager->WeeklyTheme)?.Name ?? ""}");
+        ImGui.Text($"Weekly Theme: {GetSheet<FashionCheckWeeklyTheme>()!.GetRow(manager->WeeklyTheme)?.Name ?? ""}");
 
         using var table = ImRaii.Table("FashionCheckManagerTable", 3, ImGuiTableFlags.RowBg);
         if (!table)
@@ -39,11 +39,11 @@ public unsafe class FashionCheckManagerTab : DebugTab
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(((FashioCheckEquipSlotName)i).ToString());
+            ImGui.Text(((FashioCheckEquipSlotName)i).ToString());
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(GetSheet<FashionCheckThemeCategory>()!.GetRow(manager->EquipmentThemes[i])?.Name ?? "");
+            ImGui.Text(GetSheet<FashionCheckThemeCategory>()!.GetRow(manager->EquipmentThemes[i])?.Name ?? "");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(((FashionCheckEquipEvaluation)manager->EquipmentEvaluations[i]).ToString());
+            ImGui.Text(((FashionCheckEquipEvaluation)manager->EquipmentEvaluations[i]).ToString());
         }
     }
 }

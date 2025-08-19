@@ -32,7 +32,7 @@ public partial class UnlocksTab : DebugTab
     {
         if (!AgentLobby.Instance()->IsLoggedIn || SubTabs == null)
         {
-            ImGui.TextUnformatted("Not logged in.");
+            ImGui.Text("Not logged in.");
             return;
         }
 
@@ -57,7 +57,7 @@ public partial class UnlocksTab : DebugTab
             }
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(canShowProgress
+            ImGui.Text(canShowProgress
                 ? $"{progress.NumUnlocked} / {progress.TotalUnlocks} ({progress.NumUnlocked / (float)progress.TotalUnlocks * 100f:0.00}%)"
                 : "Missing Data");
         }

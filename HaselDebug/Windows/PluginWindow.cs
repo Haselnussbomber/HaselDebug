@@ -55,7 +55,7 @@ public partial class PluginWindow : SimpleWindow
             ShowTooltip = () =>
             {
                 using var tooltip = ImRaii.Tooltip();
-                ImGui.TextUnformatted(_textService.Translate($"TitleBarButton.ToggleConfig.Tooltip.{(_configWindow.IsOpen ? "Close" : "Open")}Config"));
+                ImGui.Text(_textService.Translate($"TitleBarButton.ToggleConfig.Tooltip.{(_configWindow.IsOpen ? "Close" : "Open")}Config"));
             },
             Click = (button) => _configWindow.Toggle()
         });
@@ -207,7 +207,7 @@ public partial class PluginWindow : SimpleWindow
                     });
 
                     ImGui.SameLine(0, lineHeight);
-                    ImGui.TextUnformatted(subTab.Title);
+                    ImGui.Text(subTab.Title);
 
                     var linePos = ImGui.GetWindowPos() + pos
                         - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY())

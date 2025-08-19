@@ -48,7 +48,7 @@ public unsafe partial class AtkDebugRenderer
 
         if (unitBase == null)
         {
-            ImGui.TextUnformatted($"Could not find addon with id {addonId} or name {addonName}");
+            ImGui.Text($"Could not find addon with id {addonId} or name {addonName}");
             return;
         }
 
@@ -69,7 +69,7 @@ public unsafe partial class AtkDebugRenderer
         var isVisible = unitBase->IsVisible;
         using (ImRaii.PushColor(ImGuiCol.Text, isVisible ? 0xFF00FF00 : Color.From(ImGuiCol.TextDisabled).ToUInt()))
         {
-            ImGui.TextUnformatted(isVisible ? "Visible" : "Not Visible");
+            ImGui.Text(isVisible ? "Visible" : "Not Visible");
         }
         if (ImGui.IsItemHovered())
         {
@@ -95,7 +95,7 @@ public unsafe partial class AtkDebugRenderer
             if (agent == null || agent->AddonId != unitBase->Id)
                 continue;
 
-            ImGui.TextUnformatted($"Used by Agent{agentId}");
+            ImGui.Text($"Used by Agent{agentId}");
             ImGui.SameLine();
 
             if (!_debugRenderer.AgentTypes.TryGetValue(agentId, out var agentType))
@@ -143,7 +143,7 @@ public unsafe partial class AtkDebugRenderer
             var host = unitManager->GetAddonById(unitBase->HostId);
             if (host != null)
             {
-                ImGui.TextUnformatted($"Embedded by Addon{host->NameString}");
+                ImGui.Text($"Embedded by Addon{host->NameString}");
                 ImGui.SameLine();
 
                 if (!_debugRenderer.AddonTypes.TryGetValue(host->NameString, out var hostType))
@@ -272,7 +272,7 @@ public unsafe partial class AtkDebugRenderer
         var unitBase = unitManager->GetAddonByNode(node);
         if (unitBase == null)
         {
-            ImGui.TextUnformatted($"Could not find addon with node {(nint)node:X}");
+            ImGui.Text($"Could not find addon with node {(nint)node:X}");
             return;
         }
 
@@ -336,13 +336,13 @@ public unsafe partial class AtkDebugRenderer
         if (nodePath != null && nodePath.Count > 0 && node == nodePath.Last())
             ImGui.SetScrollHereY();
 
-        ImGui.TextUnformatted("Node: ");
+        ImGui.Text("Node: ");
         ImGui.SameLine();
         _debugRenderer.DrawAddress(node);
         ImGui.SameLine();
         _debugRenderer.DrawPointerType((nint)node, typeof(AtkResNode), nodeOptions);
 
-        ImGui.TextUnformatted("NodeId:");
+        ImGui.Text("NodeId:");
         ImGui.SameLine();
         _debugRenderer.DrawNumeric(node->NodeId, typeof(uint), new NodeOptions() { HexOnShift = true });
 
@@ -396,13 +396,13 @@ public unsafe partial class AtkDebugRenderer
         if (nodePath != null && nodePath.Count > 0 && node == nodePath.Last())
             ImGui.SetScrollHereY();
 
-        ImGui.TextUnformatted("Node:");
+        ImGui.Text("Node:");
         ImGui.SameLine();
         _debugRenderer.DrawAddress(node);
         ImGui.SameLine();
         _debugRenderer.DrawPointerType((nint)node, typeof(AtkComponentNode), nodeOptions.WithAddress(1));
 
-        ImGui.TextUnformatted("Component:");
+        ImGui.Text("Component:");
         ImGui.SameLine();
         _debugRenderer.DrawAddress(component);
         ImGui.SameLine();
@@ -480,17 +480,17 @@ public unsafe partial class AtkDebugRenderer
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{evt->State.EventType}");
+            ImGui.Text($"{evt->State.EventType}");
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{evt->Param}");
+            ImGui.Text($"{evt->Param}");
 
             if (hasDifferentTarget)
             {
                 ImGui.TableNextColumn();
                 if (evt->Target == node)
                 {
-                    ImGui.TextUnformatted("Node");
+                    ImGui.Text("Node");
                 }
                 else
                 {
@@ -503,7 +503,7 @@ public unsafe partial class AtkDebugRenderer
                 ImGui.TableNextColumn();
                 if ((nint)evt->Listener == unitBaseAddress)
                 {
-                    ImGui.TextUnformatted("UnitBase");
+                    ImGui.Text("UnitBase");
                 }
                 else
                 {
@@ -563,25 +563,25 @@ public unsafe partial class AtkDebugRenderer
             var keyFrame = keyFrameGroup.KeyFrames[i];
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{keyFrame.FrameIdx}");
+            ImGui.Text($"{keyFrame.FrameIdx}");
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{keyFrame.SpeedCoefficient1:F2}");
+            ImGui.Text($"{keyFrame.SpeedCoefficient1:F2}");
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{keyFrame.SpeedCoefficient2:F2}");
+            ImGui.Text($"{keyFrame.SpeedCoefficient2:F2}");
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{keyFrame.Interpolation}");
+            ImGui.Text($"{keyFrame.Interpolation}");
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{keyFrame.Value.Label.LabelId}");
+            ImGui.Text($"{keyFrame.Value.Label.LabelId}");
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{keyFrame.Value.Label.JumpBehavior}");
+            ImGui.Text($"{keyFrame.Value.Label.JumpBehavior}");
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{keyFrame.Value.Label.JumpLabelId}");
+            ImGui.Text($"{keyFrame.Value.Label.JumpLabelId}");
         }
     }
 
@@ -711,7 +711,7 @@ public unsafe partial class AtkDebugRenderer
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 ImGui.AlignTextToFramePadding();
-                ImGui.TextUnformatted(frameIndex.ToString());
+                ImGui.Text(frameIndex.ToString());
 
                 for (var groupSelector = 0; groupSelector < 8; groupSelector++)
                 {
@@ -1132,7 +1132,7 @@ public unsafe partial class AtkDebugRenderer
         ImGui.TableNextRow();
         ImGui.TableNextColumn();
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted(label);
+        ImGui.Text(label);
         ImGui.TableNextColumn();
         ImGui.SetNextItemWidth(200);
     }

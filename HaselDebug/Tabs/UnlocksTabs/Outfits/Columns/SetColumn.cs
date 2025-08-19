@@ -61,7 +61,7 @@ public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
                 ImGui.SameLine();
                 ImGuiUtils.PushCursorY(textureWrap.Height / 2f - ImGui.GetTextLineHeight() / 2f);
             }
-            ImGui.TextUnformatted(ToName(row));
+            ImGui.Text(ToName(row));
         }
 
         if (isSetCollected)
@@ -84,6 +84,6 @@ public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
 
         ImGui.SameLine(IconSize * ImGuiHelpers.GlobalScale + ImGui.GetStyle().ItemSpacing.X, 0);
         ImGuiUtils.PushCursorY(IconSize * ImGuiHelpers.GlobalScale / 2f - ImGui.GetTextLineHeight() / 2f);
-        ImGui.TextUnformatted(_textService.GetItemName(row.RowId).ToString());
+        ImGui.Text(_textService.GetItemName(row.RowId).ToString());
     }
 }

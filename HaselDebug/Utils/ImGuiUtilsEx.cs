@@ -172,7 +172,7 @@ public static unsafe class ImGuiUtilsEx
 
     public static void PrintFieldValuePair(string fieldName, string value, bool copy = true)
     {
-        ImGui.TextUnformatted(fieldName + ":");
+        ImGui.Text(fieldName + ":");
         ImGuiUtils.SameLineSpace();
         if (copy)
         {
@@ -180,7 +180,7 @@ public static unsafe class ImGuiUtilsEx
         }
         else
         {
-            ImGui.TextUnformatted(value);
+            ImGui.Text(value);
         }
     }
 
@@ -191,7 +191,7 @@ public static unsafe class ImGuiUtilsEx
             if (i != 0)
             {
                 ImGui.SameLine();
-                ImGui.TextUnformatted("\u2022");
+                ImGui.Text("\u2022");
                 ImGui.SameLine();
             }
 
@@ -229,23 +229,23 @@ public static unsafe class ImGuiUtilsEx
             var pos = text.IndexOf(highligtedText, StringComparison.InvariantCultureIgnoreCase);
             if (pos != -1)
             {
-                ImGui.TextUnformatted(text[..pos]);
+                ImGui.Text(text[..pos]);
                 ImGui.SameLine(0, 0);
 
                 using (Color.Yellow.Push(ImGuiCol.Text))
-                    ImGui.TextUnformatted(text[pos..(pos + highligtedText.Length)]);
+                    ImGui.Text(text[pos..(pos + highligtedText.Length)]);
 
                 ImGui.SameLine(0, 0);
-                ImGui.TextUnformatted(text[(pos + highligtedText.Length)..]);
+                ImGui.Text(text[(pos + highligtedText.Length)..]);
             }
             else
             {
-                ImGui.TextUnformatted(text);
+                ImGui.Text(text);
             }
         }
         else
         {
-            ImGui.TextUnformatted(text);
+            ImGui.Text(text);
         }
 
         color?.Pop();

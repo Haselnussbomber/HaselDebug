@@ -14,14 +14,14 @@ public unsafe partial class DebugRenderer
     {
         if (*(nint*)address == 0)
         {
-            ImGui.TextUnformatted("Not initialized");
+            ImGui.Text("Not initialized");
             return;
         }
 
         var elementCount = *(ulong*)(address + 0x8);
         if (elementCount == 0)
         {
-            ImGui.TextUnformatted("No values");
+            ImGui.Text("No values");
             return;
         }
 
@@ -74,7 +74,7 @@ public unsafe partial class DebugRenderer
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted(i.ToString());
+            ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Value
             DrawPointerType(_current + valueOffset, valueType, new NodeOptions() { AddressPath = nodeOptions.AddressPath, IsIconIdField = nodeOptions.IsIconIdField });

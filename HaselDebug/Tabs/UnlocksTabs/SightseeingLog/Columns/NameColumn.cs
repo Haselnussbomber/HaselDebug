@@ -40,7 +40,7 @@ public partial class NameColumn : ColumnString<AdventureEntry>
         }
         else
         {
-            ImGui.TextUnformatted(ToName(entry));
+            ImGui.Text(ToName(entry));
         }
 
         if (_textureProvider.TryGetFromGameIcon(entry.Row.IconDiscovered, out var imageTex) && imageTex.TryGetWrap(out var image, out _))

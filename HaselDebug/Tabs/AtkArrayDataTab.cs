@@ -55,7 +55,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
         {
             ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
             ImGui.BeginTooltip();
-            ImGui.TextUnformatted(tooltipText);
+            ImGui.Text(tooltipText);
             ImGui.EndTooltip();
         }
 
@@ -114,7 +114,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
             ImGui.TableNextColumn(); // Type
             if (arrayType != null && Enum.IsDefined(arrayType, arrayIndex))
             {
-                ImGui.TextUnformatted(Enum.GetName(arrayType, arrayIndex));
+                ImGui.Text(Enum.GetName(arrayType, arrayIndex));
             }
             else if (inUse && arrays[arrayIndex]->SubscribedAddonsCount > 0)
             {
@@ -126,41 +126,41 @@ public unsafe partial class AtkArrayDataTab : DebugTab
                         continue;
 
                     using (ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF))
-                        ImGui.TextUnformatted(raptureAtkUnitManager->GetAddonById(arrays[arrayIndex]->SubscribedAddons[j])->NameString);
+                        ImGui.Text(raptureAtkUnitManager->GetAddonById(arrays[arrayIndex]->SubscribedAddons[j])->NameString);
                     break;
                 }
             }
 
             ImGui.TableNextColumn(); // Size
             if (inUse)
-                ImGui.TextUnformatted((rowsFound > 0 ? rowsFound : arrays[arrayIndex]->Size).ToString());
+                ImGui.Text((rowsFound > 0 ? rowsFound : arrays[arrayIndex]->Size).ToString());
         }
     }
 
     private void DrawArrayHeader(Type? arrayType, string type, int index, AtkArrayData* array)
     {
-        ImGui.TextUnformatted($"{type} Array #{index}");
+        ImGui.Text($"{type} Array #{index}");
 
         if (arrayType != null && Enum.IsDefined(arrayType, index))
         {
             ImGui.SameLine(0, 0);
-            ImGui.TextUnformatted($" ({Enum.GetName(arrayType, index)})");
+            ImGui.Text($" ({Enum.GetName(arrayType, index)})");
         }
 
         ImGui.SameLine();
-        ImGui.TextUnformatted("–");
+        ImGui.Text("–");
         ImGui.SameLine();
-        ImGui.TextUnformatted("Address: ");
+        ImGui.Text("Address: ");
         ImGui.SameLine(0, 0);
         DrawCopyableText($"0x{(nint)array:X}", "Copy address");
 
         if (array->SubscribedAddonsCount > 0)
         {
             ImGui.SameLine();
-            ImGui.TextUnformatted("–");
+            ImGui.Text("–");
             ImGui.SameLine();
             using (ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF))
-                ImGui.TextUnformatted($"{array->SubscribedAddonsCount} Subscribed Addon" + (array->SubscribedAddonsCount > 1 ? 's' : string.Empty));
+                ImGui.Text($"{array->SubscribedAddonsCount} Subscribed Addon" + (array->SubscribedAddonsCount > 1 ? 's' : string.Empty));
 
             if (ImGui.IsItemHovered())
             {
@@ -174,7 +174,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
                         if (array->SubscribedAddons[j] == 0)
                             continue;
 
-                        ImGui.TextUnformatted(raptureAtkUnitManager->GetAddonById(array->SubscribedAddons[j])->NameString);
+                        ImGui.Text(raptureAtkUnitManager->GetAddonById(array->SubscribedAddons[j])->NameString);
                     }
                 }
             }
@@ -223,7 +223,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted($"#{i}");
+            ImGui.Text($"#{i}");
 
             var ptr = &array->IntArray[i];
 
@@ -317,7 +317,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted($"#{i}");
+            ImGui.Text($"#{i}");
 
             ImGui.TableNextColumn(); // Address
             if (_showTextAddress)
@@ -333,7 +333,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
             ImGui.TableNextColumn(); // Managed
             if (!isNull)
             {
-                ImGui.TextUnformatted(((nint)array->StringArray[i].Value != 0 && array->ManagedStringArray[i] == array->StringArray[i]).ToString());
+                ImGui.Text(((nint)array->StringArray[i].Value != 0 && array->ManagedStringArray[i] == array->StringArray[i]).ToString());
             }
 
             ImGui.TableNextColumn(); // Text
@@ -395,7 +395,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Index
-            ImGui.TextUnformatted($"#{i}");
+            ImGui.Text($"#{i}");
 
             ImGui.TableNextColumn(); // Address
             DrawCopyableText($"0x{(nint)(&array->DataArray[i]):X}", "Copy entry address");

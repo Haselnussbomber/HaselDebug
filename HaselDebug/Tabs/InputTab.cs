@@ -55,15 +55,15 @@ public unsafe partial class InputTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{seVirtualKey}");
+            ImGui.Text($"{seVirtualKey}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isPress}");
+            ImGui.Text($"{isPress}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isDown}");
+            ImGui.Text($"{isDown}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isHeld}");
+            ImGui.Text($"{isHeld}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isReleased}");
+            ImGui.Text($"{isReleased}");
         }
     }
 
@@ -97,15 +97,15 @@ public unsafe partial class InputTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{inputId}");
+            ImGui.Text($"{inputId}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isPress}");
+            ImGui.Text($"{isPress}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isDown}");
+            ImGui.Text($"{isDown}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isHeld}");
+            ImGui.Text($"{isHeld}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isReleased}");
+            ImGui.Text($"{isReleased}");
         }
     }
 
@@ -137,17 +137,17 @@ public unsafe partial class InputTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{i}");
+            ImGui.Text($"{i}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{(InputId)i}");
+            ImGui.Text($"{(InputId)i}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isPress}");
+            ImGui.Text($"{isPress}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isDown}");
+            ImGui.Text($"{isDown}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isHeld}");
+            ImGui.Text($"{isHeld}");
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{isReleased}");
+            ImGui.Text($"{isReleased}");
         }
     }
 }

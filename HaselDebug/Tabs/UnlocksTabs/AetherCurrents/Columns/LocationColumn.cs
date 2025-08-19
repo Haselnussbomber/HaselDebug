@@ -79,7 +79,7 @@ public partial class LocationColumn : ColumnString<AetherCurrentEntry>
         _debugRenderer.DrawIcon(quest.EventIconType.Value!.MapIconAvailable + 1, canCopy: false);
         ImGuiUtils.TextUnformattedColored(Color.Yellow, $"[#{index}] {_textService.GetQuestName(quest.RowId)}");
         ImGui.SameLine();
-        ImGui.TextUnformatted($"{GetHumanReadableCoords(quest.IssuerLocation.Value)} | {_textService.GetENpcResidentName(quest.IssuerStart.RowId)}");
+        ImGui.Text($"{GetHumanReadableCoords(quest.IssuerLocation.Value)} | {_textService.GetENpcResidentName(quest.IssuerStart.RowId)}");
     }
 
     private void DrawEObject(int index, AetherCurrent aetherCurrent)
@@ -93,7 +93,7 @@ public partial class LocationColumn : ColumnString<AetherCurrentEntry>
         _debugRenderer.DrawIcon(60033, canCopy: false);
         ImGuiUtils.TextUnformattedColored(Color.Green, $"[#{index}] {_textService.GetEObjName(eobj.RowId)}");
         ImGui.SameLine();
-        ImGui.TextUnformatted(GetHumanReadableCoords(level));
+        ImGui.Text(GetHumanReadableCoords(level));
     }
 
     private bool TryGetFixedQuest(AetherCurrent aetherCurrent, out Quest quest)

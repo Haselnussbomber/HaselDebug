@@ -29,7 +29,7 @@ public class ItemColumn(DebugRenderer debugRenderer) : ColumnString<Emote>
         }
         else
         {
-            ImGui.TextUnformatted(ToName(row));
+            ImGui.Text(ToName(row));
         }
     }
 }

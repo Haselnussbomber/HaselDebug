@@ -70,7 +70,7 @@ public unsafe partial class DebugRenderer
             }
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(sb.ToString());
+            ImGui.Text(sb.ToString());
 
             pos += numColumns;
             if (pos > length)

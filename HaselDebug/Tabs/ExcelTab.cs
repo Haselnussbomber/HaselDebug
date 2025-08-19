@@ -213,7 +213,7 @@ public class ExcelSheetTab<T> : IExcelSheetTab where T : struct, IExcelRow<T>
         ImGui.TableNextRow();
 
         ImGui.TableNextColumn(); // RowId
-        ImGui.TextUnformatted(row.RowId.ToString());
+        ImGui.Text(row.RowId.ToString());
 
         foreach (var column in Columns)
         {

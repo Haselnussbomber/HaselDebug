@@ -16,7 +16,7 @@ public unsafe class AddonsTab : DebugTab
 {
     public override void Draw()
     {
-        ImGui.TextUnformatted($"RaptureAtkModule.IsUiVisible: {RaptureAtkModule.Instance()->IsUiVisible}");
+        ImGui.Text($"RaptureAtkModule.IsUiVisible: {RaptureAtkModule.Instance()->IsUiVisible}");
 
         using var tabs = ImRaii.TabBar("Addons");
         if (!tabs) return;
@@ -28,7 +28,7 @@ public unsafe class AddonsTab : DebugTab
             if (tab)
             {
                 var addonNamesCount = addonNames.LongCount;
-                ImGui.TextUnformatted($"Num Addons: {addonNamesCount}");
+                ImGui.Text($"Num Addons: {addonNamesCount}");
 
                 if (ImGui.Button("Copy py list"))
                 {
@@ -119,7 +119,7 @@ public unsafe class AddonsTab : DebugTab
                     DebugUtils.DrawCopyableText($"{addon->DrawOrderIndex}");
 
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(name);
+                    ImGui.Text(name);
                     if (!Framework.Instance()->WindowInactive && ImGui.IsItemHovered())
                     {
                         addon->GetWindowBounds(windowBounds);

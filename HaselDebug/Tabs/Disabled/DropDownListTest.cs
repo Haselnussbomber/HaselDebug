@@ -9,8 +9,8 @@ public unsafe class DropDownListTest : DebugTab
 
         var dropdown = addon->DropDownList;
 
-        ImGui.TextUnformatted($"ItemCount: {dropdown->List->GetItemCount()}");
-        ImGui.TextUnformatted($"SelectedItemIndex: {dropdown->List->SelectedItemIndex}");
+        ImGui.Text($"ItemCount: {dropdown->List->GetItemCount()}");
+        ImGui.Text($"SelectedItemIndex: {dropdown->List->SelectedItemIndex}");
         if (dropdown->List->SelectedItemIndex != -1)
         {
             ImGui.SameLine();
@@ -23,7 +23,7 @@ public unsafe class DropDownListTest : DebugTab
         for (var i = 0; i < dropdown->List->GetItemCount(); i++)
         {
             var listItemRenderer = dropdown->List->GetListItemRenderer(i);
-            ImGui.TextUnformatted($"{i}: {MemoryHelper.ReadSeStringNullTerminated((nint)dropdown->List->GetItemPreviewText(i))}");
+            ImGui.Text($"{i}: {MemoryHelper.ReadSeStringNullTerminated((nint)dropdown->List->GetItemPreviewText(i))}");
 
             if (dropdown->List->IsItemDisabled(i))
             {

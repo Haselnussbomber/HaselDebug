@@ -135,7 +135,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Id
-            ImGui.TextUnformatted(addonId.ToString());
+            ImGui.Text(addonId.ToString());
 
             ImGui.TableNextColumn(); // Name
             using (ImRaii.PushColor(ImGuiCol.Text, ImGui.GetColorU32(ImGuiCol.TextDisabled), !unitBase->IsVisible))
@@ -290,12 +290,12 @@ public unsafe partial class AddonInspectorTab : DebugTab
         var nodeIndex = 0;
         foreach (var (depthLayer, addons) in hoveredDepthLayerAddonNodes)
         {
-            ImGui.TextUnformatted($"Depth Layer {depthLayer}:");
+            ImGui.Text($"Depth Layer {depthLayer}:");
 
             using var indent = ImRaii.PushIndent();
             foreach (var (unitBase, nodes) in addons)
             {
-                ImGui.TextUnformatted($"{unitBase.Value->NameString}:");
+                ImGui.Text($"{unitBase.Value->NameString}:");
 
                 using var indent2 = ImRaii.PushIndent();
 
@@ -307,7 +307,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
                     if (_nodePickerSelectionIndex == nodeIndex)
                     {
                         using (ImRaii.PushFont(UiBuilder.IconFont))
-                            ImGui.TextUnformatted(FontAwesomeIcon.CaretRight.ToIconString());
+                            ImGui.Text(FontAwesomeIcon.CaretRight.ToIconString());
                         ImGui.SameLine(0, 0);
 
                         ImGui.GetForegroundDrawList().AddRectFilled(
@@ -337,7 +337,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
                     if ((int)node->Type < 1000)
                     {
-                        ImGui.TextUnformatted($"[0x{(nint)node:X}] [{node->NodeId}] {node->Type} Node");
+                        ImGui.Text($"[0x{(nint)node:X}] [{node->NodeId}] {node->Type} Node");
                     }
                     else
                     {
@@ -345,7 +345,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
                         var componentInfo = compNode->Component->UldManager;
                         var objectInfo = (AtkUldComponentInfo*)componentInfo.Objects;
                         if (objectInfo == null) continue;
-                        ImGui.TextUnformatted($"[0x{(nint)node:X}] [{node->NodeId}] {objectInfo->ComponentType} Component Node");
+                        ImGui.Text($"[0x{(nint)node:X}] [{node->NodeId}] {objectInfo->ComponentType} Component Node");
                     }
 
                     nodeIndex++;

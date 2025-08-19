@@ -68,7 +68,7 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
 
         if (_dispatchEventHook == null)
         {
-            ImGui.TextUnformatted("Hook not created");
+            ImGui.Text("Hook not created");
             return;
         }
 
@@ -102,11 +102,11 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(time.ToLongTimeString());
+            ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn();
             var eventType = ((AtkEventDispatcher.Event*)evt)->State.EventType;
-            ImGui.TextUnformatted(eventType.ToString() + (Enum.GetName(eventType) != null ? $" ({(int)eventType})" : string.Empty));
+            ImGui.Text(eventType.ToString() + (Enum.GetName(eventType) != null ? $" ({(int)eventType})" : string.Empty));
 
             ImGui.TableNextColumn();
 

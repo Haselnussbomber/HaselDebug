@@ -186,7 +186,7 @@ public unsafe partial class UnlocksTabUtils
         using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
         using var indent = ImRaii.PushIndent(1);
 
-        ImGui.TextUnformatted(title);
+        ImGui.Text(title);
 
         if (isUnlocked)
             ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 40 * ImGuiHelpers.GlobalScale / 2f - 3); // wtf
@@ -196,7 +196,7 @@ public unsafe partial class UnlocksTabUtils
         {
             ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
             using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey.ToUInt()))
-                ImGui.TextUnformatted(category);
+                ImGui.Text(category);
         }
 
         var description = descriptionOverride ?? (!item.Description.IsEmpty ? item.Description.ToString() : null);
@@ -281,7 +281,7 @@ public unsafe partial class UnlocksTabUtils
 
         var infoText = $"{_seStringEvaluator.EvaluateFromAddon(addonRowId, [order]).ToString()} - {card.Name}";
         ImGui.SetCursorPosX(ImGui.GetCursorPosX() - ImGui.GetStyle().IndentSpacing + ImGui.GetContentRegionAvail().X / 2f - ImGui.CalcTextSize(infoText).X / 2f);
-        ImGui.TextUnformatted(infoText);
+        ImGui.Text(infoText);
 
         var cardSizeScaled = ImGuiHelpers.ScaledVector2(208, 256);
         var cardStartPosX = ImGui.GetCursorPosX() - ImGui.GetStyle().IndentSpacing + ImGui.GetContentRegionAvail().X / 2f - cardSizeScaled.X / 2f;
@@ -382,23 +382,23 @@ public unsafe partial class UnlocksTabUtils
         // outline
         ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(-1));
         using (outlineColor.Push(ImGuiCol.Text))
-            ImGui.TextUnformatted(text);
+            ImGui.Text(text);
 
         ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(1));
         using (outlineColor.Push(ImGuiCol.Text))
-            ImGui.TextUnformatted(text);
+            ImGui.Text(text);
 
         ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(1, -1));
         using (outlineColor.Push(ImGuiCol.Text))
-            ImGui.TextUnformatted(text);
+            ImGui.Text(text);
 
         ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(-1, 1));
         using (outlineColor.Push(ImGuiCol.Text))
-            ImGui.TextUnformatted(text);
+            ImGui.Text(text);
 
         // text
         ImGui.SetCursorPos(position);
-        ImGui.TextUnformatted(text);
+        ImGui.Text(text);
     }
 
     private static void DrawShadow(Vector2 pos, Vector2 size, int layers, Vector4 shadowColor)
@@ -510,7 +510,7 @@ public unsafe partial class UnlocksTabUtils
         using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
         using var indent = ImRaii.PushIndent(1);
 
-        ImGui.TextUnformatted(title);
+        ImGui.Text(title);
 
         if (item.Category.RowId != 0 && _excelService.TryGetRow<EventItemCategory>(item.Category.RowId, out var itemCategoy) && !itemCategoy.Unknown0.IsEmpty)
         {
@@ -524,7 +524,7 @@ public unsafe partial class UnlocksTabUtils
             {
                 ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
                 using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey.ToUInt()))
-                    ImGui.TextUnformatted(text.ToString());
+                    ImGui.Text(text.ToString());
             }
         }
 
@@ -575,14 +575,14 @@ public unsafe partial class UnlocksTabUtils
         using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
         using var indent = ImRaii.PushIndent(1);
 
-        ImGui.TextUnformatted(title);
+        ImGui.Text(title);
 
         var text = quest.JournalGenre.IsValid ? quest.JournalGenre.Value.Name.ToString() : null;
         if (!string.IsNullOrWhiteSpace(text))
         {
             ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
             using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey.ToUInt()))
-                ImGui.TextUnformatted(text);
+                ImGui.Text(text);
         }
 
         var iconId = quest.Icon;
@@ -645,17 +645,17 @@ public unsafe partial class UnlocksTabUtils
         ImGui.TableSetupColumn("Title", ImGuiTableColumnFlags.WidthFixed, rightColumnWidth);
 
         ImGui.TableNextColumn(); // Index
-        ImGui.TextUnformatted(indexStr);
+        ImGui.Text(indexStr);
 
         ImGui.TableNextColumn(); // Title
         using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
         using var indent = ImRaii.PushIndent(1);
-        ImGui.TextUnformatted(title);
+        ImGui.Text(title);
 
         var text = _textService.GetPlaceName(adventure.PlaceName.RowId);
         ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
         using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey.ToUInt()))
-            ImGui.TextUnformatted(text);
+            ImGui.Text(text);
 
         indent.Dispose();
         indentSpacing.Dispose();
