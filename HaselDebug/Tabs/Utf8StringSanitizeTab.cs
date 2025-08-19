@@ -220,15 +220,15 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
             using var node = ImRaii.TreeNode($"U+{entry.Range.FirstCodePoint:X4}-U+{entry.Range.FirstCodePoint + entry.Range.Length - 1:X4} - {entry.Name}###{entry.Name}", ImGuiTreeNodeFlags.SpanFullWidth);
             if (!node) continue;
 
-            ImGui.Text("Input:");
+            ImGui.Text("Input:"u8);
             ImGui.SameLine();
             ImGuiUtilsEx.DrawCopyableText(entry.Input);
 
             using var table = ImRaii.Table(entry.Name + "Table", 2, ImGuiTableFlags.Borders);
             if (!table) continue;
 
-            ImGui.TableSetupColumn("Flag", ImGuiTableColumnFlags.WidthFixed, 150);
-            ImGui.TableSetupColumn("Output", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("Flag"u8, ImGuiTableColumnFlags.WidthFixed, 150);
+            ImGui.TableSetupColumn("Output"u8, ImGuiTableColumnFlags.WidthStretch);
             ImGui.TableSetupScrollFreeze(0, 1);
             ImGui.TableHeadersRow();
 

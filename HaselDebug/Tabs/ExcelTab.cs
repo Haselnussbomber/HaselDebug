@@ -194,10 +194,10 @@ public class ExcelSheetTab<T> : IExcelSheetTab where T : struct, IExcelRow<T>
 
         using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
-        using var table = ImRaii.Table("RowTable", 1 + Columns.Length, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("RowTable"u8, 1 + Columns.Length, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("RowId"u8, ImGuiTableColumnFlags.WidthFixed, 40);
 
         foreach (var column in Columns)
             ImGui.TableSetupColumn(column.Name, column.TableColumnFlags, column.TableColumnWidth);

@@ -152,7 +152,7 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
         using var child = ImRaii.Child("TasksTab", new Vector2(-1), true, ImGuiWindowFlags.NoSavedSettings);
         if (!child) return;
 
-        ImGui.Text("Current Tasks:");
+        ImGui.Text("Current Tasks:"u8);
 
         foreach (EventSceneTaskInterface* task in tasks)
         {
@@ -165,7 +165,7 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
 
         ImGui.Checkbox("Enable Logging", ref _logEnabled);
 
-        ImGui.Text("History:");
+        ImGui.Text("History:"u8);
 
         foreach (var (time, _, task) in _taskTypeHistory)
         {
@@ -192,8 +192,8 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
         if (!table)
             return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Object", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Object"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(3, 1);
         ImGui.TableHeadersRow();
 

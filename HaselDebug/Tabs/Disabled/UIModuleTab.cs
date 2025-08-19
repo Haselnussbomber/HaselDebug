@@ -196,21 +196,21 @@ public unsafe class UIModuleTab : DebugTab
         var uiModule = HaselDebugUIModuleModules.Instance();
         if (uiModule == null)
         {
-            ImGui.Text("No UIModule");
+            ImGui.Text("No UIModule"u8);
             return;
         }
 
-        using var table = ImRaii.Table("UIModuleModules", 9);
+        using var table = ImRaii.Table("UIModuleModules"u8, 9);
         if (!table) return;
 
         ImGui.TableSetupColumn("ModuleName");
         ImGui.TableSetupColumn("FileName");
-        ImGui.TableSetupColumn("VfIndex", ImGuiTableColumnFlags.WidthFixed, 50);
-        ImGui.TableSetupColumn("FileType", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("FileSize", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("FileVersion", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("DataSize", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Offset", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("VfIndex"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("FileType"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("FileSize"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("FileVersion"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("DataSize"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Offset"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableHeadersRow();
          
         foreach (var methodInfo in _modules)

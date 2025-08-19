@@ -20,7 +20,7 @@ public unsafe class WindowFlagTab : DebugTab
 
         var windowFlags = *(uint*)((nint)addon + 0x1C0);
         ImGui.Text($"{addonName} WindowFlags: {Convert.ToString(windowFlags, 2)} - 0x{windowFlags:X}");
-        using var table = ImRaii.Table("WindowFlagsTable", 5);
+        using var table = ImRaii.Table("WindowFlagsTable"u8, 5);
         if (!table) return;
 
         for (var i = 0; i < 31; i++)

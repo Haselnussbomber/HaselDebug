@@ -53,14 +53,14 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
                 continue;
             titleColor?.Dispose();
 
-            using var table = ImRaii.Table("RaptureHotbarModuleTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
+            using var table = ImRaii.Table("RaptureHotbarModuleTable"u8, 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
             if (!table) return;
 
-            ImGui.TableSetupColumn("Slot", ImGuiTableColumnFlags.WidthFixed, 60);
-            ImGui.TableSetupColumn("CommandType", ImGuiTableColumnFlags.WidthFixed, 100);
-            ImGui.TableSetupColumn("CommandId", ImGuiTableColumnFlags.WidthFixed, 100);
-            ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-            ImGui.TableSetupColumn("Execute", ImGuiTableColumnFlags.WidthFixed, 100);
+            ImGui.TableSetupColumn("Slot"u8, ImGuiTableColumnFlags.WidthFixed, 60);
+            ImGui.TableSetupColumn("CommandType"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+            ImGui.TableSetupColumn("CommandId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+            ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("Execute"u8, ImGuiTableColumnFlags.WidthFixed, 100);
             ImGui.TableSetupScrollFreeze(5, 1);
             ImGui.TableHeadersRow();
 

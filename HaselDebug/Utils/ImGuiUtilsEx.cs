@@ -191,7 +191,7 @@ public static unsafe class ImGuiUtilsEx
             if (i != 0)
             {
                 ImGui.SameLine();
-                ImGui.Text("\u2022");
+                ImGui.Text("\u2022"u8);
                 ImGui.SameLine();
             }
 

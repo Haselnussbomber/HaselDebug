@@ -111,7 +111,7 @@ public unsafe partial class DebugRenderer
 
         if (address == 0 || address < 0x140000000)
         {
-            ImGui.Text("null");
+            ImGui.Text("null"u8);
             return;
         }
 
@@ -129,7 +129,7 @@ public unsafe partial class DebugRenderer
 
         if (address == 0 || address < 0x140000000)
         {
-            ImGui.Text("null");
+            ImGui.Text("null"u8);
             return;
         }
 
@@ -533,7 +533,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        ImGui.Text("Unsupported Type");
+        ImGui.Text("Unsupported Type"u8);
     }
 
     public ImRaii.IEndObject DrawTreeNode(NodeOptions nodeOptions)
@@ -685,7 +685,7 @@ public unsafe partial class DebugRenderer
             if (fieldInfo.GetCustomAttribute<ObsoleteAttribute>() is ObsoleteAttribute obsoleteAttribute)
             {
                 using (ImRaii.PushColor(ImGuiCol.Text, (obsoleteAttribute.IsError ? ColorObsoleteError : ColorObsolete).ToUInt()))
-                    ImGui.Text("[Obsolete]");
+                    ImGui.Text("[Obsolete]"u8);
 
                 if (!string.IsNullOrEmpty(obsoleteAttribute.Message) && ImGui.IsItemHovered())
                     ImGui.SetTooltip(obsoleteAttribute.Message);
@@ -695,7 +695,7 @@ public unsafe partial class DebugRenderer
 
             if (fieldInfo.IsStatic)
             {
-                ImGui.Text("static");
+                ImGui.Text("static"u8);
                 ImGui.SameLine();
             }
 
@@ -1038,7 +1038,7 @@ public unsafe partial class DebugRenderer
         if (type.GetCustomAttribute<FlagsAttribute>() != null)
         {
             ImGui.SameLine();
-            ImGui.Text(" - ");
+            ImGui.Text(" - "u8);
             var bits = Marshal.SizeOf(underlyingType) * 8;
             for (var i = 0u; i < bits; i++)
             {
@@ -1138,7 +1138,7 @@ public unsafe partial class DebugRenderer
                 break;
 
             default:
-                ImGui.Text("null");
+                ImGui.Text("null"u8);
                 return value;
         }
 
@@ -1310,7 +1310,7 @@ public unsafe partial class DebugRenderer
                 {
                     ImGui.BeginTooltip();
                     if (canCopy)
-                        ImGui.Text("Click to copy IconId");
+                        ImGui.Text("Click to copy IconId"u8);
                     ImGui.Text($"ID: {iconId} – Size: {texture.Width}x{texture.Height}");
                     ImGui.Image(texture.Handle, new(texture.Width, texture.Height));
                     ImGui.EndTooltip();
@@ -1333,7 +1333,7 @@ public unsafe partial class DebugRenderer
     {
         if (span.Length == 0)
         {
-            ImGui.Text("No values");
+            ImGui.Text("No values"u8);
             return;
         }
 
@@ -1347,7 +1347,7 @@ public unsafe partial class DebugRenderer
         using var table = ImRaii.Table(nodeOptions.GetKey("Array"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupColumn("Value");
         ImGui.TableSetupScrollFreeze(2, 1);
         ImGui.TableHeadersRow();

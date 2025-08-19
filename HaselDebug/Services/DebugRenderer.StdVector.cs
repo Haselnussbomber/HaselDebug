@@ -23,7 +23,7 @@ public unsafe partial class DebugRenderer
         var elementCount = (lastElement - firstElement) / size;
         if (elementCount == 0)
         {
-            ImGui.Text("No values");
+            ImGui.Text("No values"u8);
             return;
         }
 
@@ -52,7 +52,7 @@ public unsafe partial class DebugRenderer
         using var table = ImRaii.Table(nodeOptions.GetKey("StdVectorTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupColumn("Value");
         ImGui.TableSetupScrollFreeze(2, 1);
         ImGui.TableHeadersRow();

@@ -135,7 +135,7 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
 
         if (_callHandlerDetour == null)
         {
-            ImGui.Text("Hook not created");
+            ImGui.Text("Hook not created"u8);
             return;
         }
 
@@ -163,12 +163,12 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
             _calls.Clear();
         }
 
-        using var table = ImRaii.Table("CallTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable);
+        using var table = ImRaii.Table("CallTable"u8, 3, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Time", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Handler", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Values", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Time"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Handler"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Values"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 

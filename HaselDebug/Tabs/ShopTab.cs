@@ -21,7 +21,7 @@ public unsafe partial class ShopTab : DebugTab
     {
         if (!TryGetAddon<AddonShop>("Shop", out var addon))
         {
-            ImGui.Text("No Shop open!");
+            ImGui.Text("No Shop open!"u8);
             return;
         }
 

@@ -68,7 +68,7 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
 
         if (_dispatchEventHook == null)
         {
-            ImGui.Text("Hook not created");
+            ImGui.Text("Hook not created"u8);
             return;
         }
 
@@ -87,12 +87,12 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
         ImGui.SameLine();
         if (ImGui.Button("Clear")) _events.Clear();
 
-        using var table = ImRaii.Table("EventTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable);
+        using var table = ImRaii.Table("EventTable"u8, 3, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Time", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed, 150);
-        ImGui.TableSetupColumn("EventData", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Time"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Type"u8, ImGuiTableColumnFlags.WidthFixed, 150);
+        ImGui.TableSetupColumn("EventData"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 

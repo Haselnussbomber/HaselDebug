@@ -67,12 +67,12 @@ public unsafe partial class AtkArrayDataTab : DebugTab
 
     private void DrawArrayList(Type? arrayType, int arrayCount, short* arrayKeys, AtkArrayData** arrays, ref int selectedIndex)
     {
-        using var table = ImRaii.Table("ArkArrayTable", 3, ImGuiTableFlags.ScrollY | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings, new Vector2(300, -1));
+        using var table = ImRaii.Table("ArkArrayTable"u8, 3, ImGuiTableFlags.ScrollY | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings, new Vector2(300, -1));
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 30);
-        ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("Size", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 30);
+        ImGui.TableSetupColumn("Type"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Size"u8, ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupScrollFreeze(3, 1);
         ImGui.TableHeadersRow();
 
@@ -148,16 +148,16 @@ public unsafe partial class AtkArrayDataTab : DebugTab
         }
 
         ImGui.SameLine();
-        ImGui.Text("–");
+        ImGui.Text("–"u8);
         ImGui.SameLine();
-        ImGui.Text("Address: ");
+        ImGui.Text("Address: "u8);
         ImGui.SameLine(0, 0);
         DrawCopyableText($"0x{(nint)array:X}", "Copy address");
 
         if (array->SubscribedAddonsCount > 0)
         {
             ImGui.SameLine();
-            ImGui.Text("–");
+            ImGui.Text("–"u8);
             ImGui.SameLine();
             using (ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF))
                 ImGui.Text($"{array->SubscribedAddonsCount} Subscribed Addon" + (array->SubscribedAddonsCount > 1 ? 's' : string.Empty));
@@ -206,16 +206,16 @@ public unsafe partial class AtkArrayDataTab : DebugTab
         var array = atkArrayDataHolder.NumberArrays[_selectedNumberArray];
         DrawArrayHeader(_numberType, "Number", _selectedNumberArray, (AtkArrayData*)array);
 
-        using var table = ImRaii.Table("NumberArrayDataTable", 7, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("NumberArrayDataTable"u8, 7, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Entry Address", ImGuiTableColumnFlags.WidthFixed, 120);
-        ImGui.TableSetupColumn("Integer", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Short", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Byte", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Float", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Hex", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Entry Address"u8, ImGuiTableColumnFlags.WidthFixed, 120);
+        ImGui.TableSetupColumn("Integer"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Short"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Byte"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Float"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Hex"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupScrollFreeze(7, 1);
         ImGui.TableHeadersRow();
 
@@ -286,13 +286,13 @@ public unsafe partial class AtkArrayDataTab : DebugTab
         ImGui.SameLine();
         ImGui.Checkbox("Show macro string##RenderStringsCheckbox", ref _showMacroString);
 
-        using var table = ImRaii.Table("StringArrayDataTable", 4, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("StringArrayDataTable"u8, 4, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupColumn(_showTextAddress ? "Text Address" : "Entry Address", ImGuiTableColumnFlags.WidthFixed, 120);
-        ImGui.TableSetupColumn("Managed", ImGuiTableColumnFlags.WidthFixed, 60);
-        ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Managed"u8, ImGuiTableColumnFlags.WidthFixed, 60);
+        ImGui.TableSetupColumn("Text"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(4, 1);
         ImGui.TableHeadersRow();
 
@@ -376,12 +376,12 @@ public unsafe partial class AtkArrayDataTab : DebugTab
         DrawArrayHeader(null, "Extend", _selectedExtendArray, (AtkArrayData*)array);
         ImGui.Checkbox("Hide unset entries##HideUnsetExtendArrayEntriesCheckbox", ref _hideUnsetExtendArrayEntries);
 
-        using var table = ImRaii.Table("ExtendArrayDataTable", 3, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("ExtendArrayDataTable"u8, 3, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Entry Address", ImGuiTableColumnFlags.WidthFixed, 120);
-        ImGui.TableSetupColumn("Pointer", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Entry Address"u8, ImGuiTableColumnFlags.WidthFixed, 120);
+        ImGui.TableSetupColumn("Pointer"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(3, 1);
         ImGui.TableHeadersRow();
 

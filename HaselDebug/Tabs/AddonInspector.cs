@@ -71,10 +71,10 @@ public unsafe partial class AddonInspectorTab : DebugTab
             _nodePickerSelectionIndex = 0;
         }
 
-        using var table = ImRaii.Table("AddonsTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable, new Vector2(-1));
+        using var table = ImRaii.Table("AddonsTable"u8, 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable, new Vector2(-1));
         if (!table) return;
 
-        ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.PreferSortDescending, 40);
+        ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.PreferSortDescending, 40);
         ImGui.TableSetupColumn("Name");
         ImGui.TableSetupScrollFreeze(2, 1);
         ImGui.TableHeadersRow();

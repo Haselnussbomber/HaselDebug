@@ -63,7 +63,7 @@ public unsafe partial class Excel2Tab : DebugTab
         using var hostChild = ImRaii.Child("Host", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
         if (!hostChild) return;
 
-        ImGui.Text("Work in progress!");
+        ImGui.Text("Work in progress!"u8);
 
         if (_nextSheetWrapper != null)
         {
@@ -109,7 +109,7 @@ public unsafe partial class Excel2Tab : DebugTab
 
         if (_sheetWrapper == null)
         {
-            ImGui.Text("No sheet selected.");
+            ImGui.Text("No sheet selected."u8);
         }
         else
         {
@@ -128,7 +128,7 @@ public unsafe partial class Excel2Tab : DebugTab
 
         // TODO: checkbox Search Rows
 
-        using var table = ImRaii.Table("SheetTable", 1, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new Vector2(300, -1));
+        using var table = ImRaii.Table("SheetTable"u8, 1, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new Vector2(300, -1));
         if (!table) return;
 
         ImGui.TableSetupColumn("Name");
@@ -425,7 +425,7 @@ public partial class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
 
         if (value == null)
         {
-            ImGui.Text("null");
+            ImGui.Text("null"u8);
             return;
         }
 

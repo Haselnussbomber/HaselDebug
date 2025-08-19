@@ -17,7 +17,7 @@ public unsafe partial class TargetTab : DebugTab
         var target = TargetSystem.Instance()->GetTargetObject();
         if (target == null)
         {
-            ImGui.Text("No Target");
+            ImGui.Text("No Target"u8);
             return;
         }
 

@@ -104,11 +104,11 @@ public partial class PluginWindow : SimpleWindow
         if (!child || !child.Success)
             return;
 
-        using var table = ImRaii.Table("SidebarTable", 1, ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("SidebarTable"u8, 1, ImGuiTableFlags.NoSavedSettings);
         if (!table || !table.Success)
             return;
 
-        ImGui.TableSetupColumn("Tab Name", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Tab Name"u8, ImGuiTableColumnFlags.WidthStretch);
 
         if (_pinnedInstances.Count > 0)
         {

@@ -72,13 +72,13 @@ public unsafe class StoreItemsTab(
         }
 
         // i really need to make a sortable, searchable table soon
-        using var table = ImRaii.Table("StoreItemsTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("StoreItemsTable"u8, 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Item Id", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Item Category", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.DefaultSort, 200);
+        ImGui.TableSetupColumn("Item Id"u8, ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Item Category"u8, ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.DefaultSort, 200);
         ImGui.TableSetupColumn("Item");
-        ImGui.TableSetupColumn("Collected", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort, 100);
+        ImGui.TableSetupColumn("Collected"u8, ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort, 100);
         ImGui.TableSetupScrollFreeze(3, 1);
         ImGui.TableHeadersRow();
 

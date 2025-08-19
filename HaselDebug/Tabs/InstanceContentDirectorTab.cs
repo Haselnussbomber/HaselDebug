@@ -48,12 +48,12 @@ public unsafe partial class InstanceContentDirectorTab : DebugTab
             _debugRenderer.DrawPointerType(directorPtr.Value, typeof(Director), new NodeOptions() { AddressPath = new([1, (nint)directorPtr.Value]) });
         }
 
-        ImGui.Text("ContentDirector:");
+        ImGui.Text("ContentDirector:"u8);
         ImGui.SameLine();
         var contentDirector = EventFramework.Instance()->GetContentDirector();
         if (contentDirector == null)
         {
-            ImGui.Text("None active");
+            ImGui.Text("None active"u8);
         }
         else
         {
@@ -62,12 +62,12 @@ public unsafe partial class InstanceContentDirectorTab : DebugTab
 
         ImGui.Separator();
 
-        ImGui.Text("CraftLeveEventHandler:");
+        ImGui.Text("CraftLeveEventHandler:"u8);
         ImGui.SameLine();
         var craftLeveEventHandler = EventFramework.Instance()->EventHandlerModule.CraftLeveEventHandler;
         if (craftLeveEventHandler == null)
         {
-            ImGui.Text("None active");
+            ImGui.Text("None active"u8);
         }
         else
         {
@@ -76,12 +76,12 @@ public unsafe partial class InstanceContentDirectorTab : DebugTab
 
         ImGui.Separator();
 
-        ImGui.Text("PublicContentDirector:");
+        ImGui.Text("PublicContentDirector:"u8);
         ImGui.SameLine();
         var publicContentDirector = EventFramework.Instance()->GetPublicContentDirector();
         if (publicContentDirector == null)
         {
-            ImGui.Text("None active");
+            ImGui.Text("None active"u8);
         }
         else
         {
@@ -90,12 +90,12 @@ public unsafe partial class InstanceContentDirectorTab : DebugTab
 
         ImGui.Separator();
 
-        ImGui.Text("InstanceContentDirector:");
+        ImGui.Text("InstanceContentDirector:"u8);
         ImGui.SameLine();
         var instanceContentDirector = EventFramework.Instance()->GetInstanceContentDirector();
         if (instanceContentDirector == null)
         {
-            ImGui.Text("None active");
+            ImGui.Text("None active"u8);
         }
         else
         {

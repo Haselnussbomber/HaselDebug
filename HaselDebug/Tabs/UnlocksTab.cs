@@ -32,15 +32,15 @@ public partial class UnlocksTab : DebugTab
     {
         if (!AgentLobby.Instance()->IsLoggedIn || SubTabs == null)
         {
-            ImGui.Text("Not logged in.");
+            ImGui.Text("Not logged in."u8);
             return;
         }
 
-        using var table = ImRaii.Table("UnlocksTable", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg, new Vector2(-1));
+        using var table = ImRaii.Table("UnlocksTable"u8, 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg, new Vector2(-1));
         if (!table) return;
 
-        ImGui.TableSetupColumn("Tab", ImGuiTableColumnFlags.WidthFixed, 200);
-        ImGui.TableSetupColumn("Progress", ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupColumn("Tab"u8, ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupColumn("Progress"u8, ImGuiTableColumnFlags.WidthFixed, 200);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 

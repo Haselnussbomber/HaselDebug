@@ -62,13 +62,13 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                 var VVDNotebookSeriesSheet = GetSheet<VVDNotebookSeries>(sheetLanguage)!;
                 var VVDNotebookContentsSheet = GetSheet<VVDNotebookContents>(sheetLanguage)!;
 
-                using var table = ImRaii.Table("VVDRouteData", 5);
+                using var table = ImRaii.Table("VVDRouteData"u8, 5);
 
-                ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
-                ImGui.TableSetupColumn("Series", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("Record", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("Number", ImGuiTableColumnFlags.WidthFixed, 75);
-                ImGui.TableSetupColumn("UnlockedFn", ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+                ImGui.TableSetupColumn("Series"u8, ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("Record"u8, ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("Number"u8, ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("UnlockedFn"u8, ImGuiTableColumnFlags.WidthFixed, 75);
                 ImGui.TableHeadersRow();
 
                 foreach (var vvdRouteDataSheet in VVDRouteDataSheet)
@@ -108,11 +108,11 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                 ImGui.Text($"Num Mounts: {MountSheet.Count()}");
                 ImGui.Text($"Nax MountSheet.Order: {MountSheet.Max(row => row.Order)}");
 
-                using var table = ImRaii.Table("OwnedMounts", 3);
+                using var table = ImRaii.Table("OwnedMounts"u8, 3);
 
-                ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("UnlockedFn", ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+                ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("UnlockedFn"u8, ImGuiTableColumnFlags.WidthFixed, 75);
                 ImGui.TableHeadersRow();
 
                 foreach (var mount in MountSheet)
@@ -145,12 +145,12 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                 var FishParameterSheet = GetSheet<FishParameter>(sheetLanguage)!.Where(row => row.IsInLog);
                 ImGui.Text($"Num FishParameters (IsInLog = true): {FishParameterSheet.Count()}");
 
-                using var table = ImRaii.Table("CaughtFishTable", 4);
+                using var table = ImRaii.Table("CaughtFishTable"u8, 4);
 
-                ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("Offset", ImGuiTableColumnFlags.WidthFixed, 75);
-                ImGui.TableSetupColumn("Caught", ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+                ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("Offset"u8, ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("Caught"u8, ImGuiTableColumnFlags.WidthFixed, 75);
                 ImGui.TableHeadersRow();
 
                 foreach (var fishParameter in FishParameterSheet)
@@ -196,12 +196,12 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                 var spearfishingItemSheet = GetSheet<SpearfishingItem>(sheetLanguage)!;
                 ImGui.Text($"Num SpearfishingItems: {spearfishingItemSheet.RowCount}");
 
-                using var table = ImRaii.Table("CaughtSpearFishTable", 4);
+                using var table = ImRaii.Table("CaughtSpearFishTable"u8, 4);
 
-                ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("Offset", ImGuiTableColumnFlags.WidthFixed, 75);
-                ImGui.TableSetupColumn("Caught", ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+                ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("Offset"u8, ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("Caught"u8, ImGuiTableColumnFlags.WidthFixed, 75);
                 ImGui.TableHeadersRow();
 
                 foreach (var spearfishingItem in spearfishingItemSheet)
@@ -245,13 +245,13 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                 var spearfishingNotebookSheet = GetSheet<SpearfishingNotebook>(sheetLanguage)!;
                 ImGui.Text($"Num SpearfishingNotebooks: {spearfishingNotebookSheet.RowCount}");
 
-                using var table = ImRaii.Table("SpearfishingNotebookTable", 5);
+                using var table = ImRaii.Table("SpearfishingNotebookTable"u8, 5);
 
-                ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
-                ImGui.TableSetupColumn("Territory", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("PlaceName", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("Offset", ImGuiTableColumnFlags.WidthFixed, 75);
-                ImGui.TableSetupColumn("Unlocked", ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+                ImGui.TableSetupColumn("Territory"u8, ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("PlaceName"u8, ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("Offset"u8, ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("Unlocked"u8, ImGuiTableColumnFlags.WidthFixed, 75);
                 ImGui.TableHeadersRow();
 
                 foreach (var spearfishingNotebook in spearfishingNotebookSheet)
@@ -289,12 +289,12 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                 var adventureSheet = GetSheet<Adventure>(sheetLanguage)!;
                 ImGui.Text($"Num Adventures: {adventureSheet.RowCount}");
 
-                using var table = ImRaii.Table("AdventureTable", 4);
+                using var table = ImRaii.Table("AdventureTable"u8, 4);
 
-                ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("Offset", ImGuiTableColumnFlags.WidthFixed, 75);
-                ImGui.TableSetupColumn("UnlockedFn", ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+                ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("Offset"u8, ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("UnlockedFn"u8, ImGuiTableColumnFlags.WidthFixed, 75);
                 ImGui.TableHeadersRow();
 
                 foreach (var adventure in adventureSheet)
@@ -327,13 +327,13 @@ public unsafe class PlayerStateTab : IDebugWindowTab
                 var adventureExPhaseSheet = GetSheet<AdventureExPhase>(sheetLanguage)!;
                 ImGui.Text($"Num AdventureExPhases: {adventureExPhaseSheet.RowCount}");
 
-                using var table = ImRaii.Table("AdventureExPhaseTable", 5);
+                using var table = ImRaii.Table("AdventureExPhaseTable"u8, 5);
 
-                ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
-                ImGui.TableSetupColumn("Expansion", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("Offset", ImGuiTableColumnFlags.WidthFixed, 75);
-                ImGui.TableSetupColumn("Unlocked", ImGuiTableColumnFlags.WidthFixed, 75);
-                ImGui.TableSetupColumn("UnlockedFn", ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+                ImGui.TableSetupColumn("Expansion"u8, ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("Offset"u8, ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("Unlocked"u8, ImGuiTableColumnFlags.WidthFixed, 75);
+                ImGui.TableSetupColumn("UnlockedFn"u8, ImGuiTableColumnFlags.WidthFixed, 75);
                 ImGui.TableHeadersRow();
 
                 foreach (var adventureExPhase in adventureExPhaseSheet)

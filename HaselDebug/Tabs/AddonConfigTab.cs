@@ -106,11 +106,11 @@ public unsafe partial class AddonConfigTab : DebugTab
 
     private void DrawTable(Span<AddonConfigEntry> configEntries)
     {
-        using var table = ImRaii.Table("AddonConfigTable", 14, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("AddonConfigTable"u8, 14, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 50);
-        ImGui.TableSetupColumn("Addon", ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("Addon"u8, ImGuiTableColumnFlags.WidthFixed, 200);
         ImGui.TableSetupColumn("X");
         ImGui.TableSetupColumn("Y");
         ImGui.TableSetupColumn("Scale");
@@ -134,11 +134,11 @@ public unsafe partial class AddonConfigTab : DebugTab
 
     private void DrawHudLayoutTable(Span<AddonConfigEntry> configEntries, int hudLayoutIndex)
     {
-        using var table = ImRaii.Table("AddonConfigTable", 14, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("AddonConfigTable"u8, 14, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 50);
-        ImGui.TableSetupColumn("Addon", ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("Addon"u8, ImGuiTableColumnFlags.WidthFixed, 200);
         ImGui.TableSetupColumn("X");
         ImGui.TableSetupColumn("Y");
         ImGui.TableSetupColumn("Scale");

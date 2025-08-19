@@ -99,10 +99,10 @@ public class ExcelTab : DebugTab
 
         // TODO: dropdown filter
 
-        using var table = ImRaii.Table("SheetListTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable | ImGuiTableFlags.NoSavedSettings, new Vector2(-1));
+        using var table = ImRaii.Table("SheetListTable"u8, 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable | ImGuiTableFlags.NoSavedSettings, new Vector2(-1));
         if (!table) return;
 
-        ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupColumn("Name");
         ImGui.TableSetupScrollFreeze(2, 1);
         ImGui.TableHeadersRow();
@@ -264,7 +264,7 @@ public class ExcelTab : DebugTab
 
         if (excelSheet == null || excelSheetType == null)
         {
-            ImGui.Text("ExcelSheet not loaded");
+            ImGui.Text("ExcelSheet not loaded"u8);
             return;
         }
 
@@ -272,11 +272,11 @@ public class ExcelTab : DebugTab
 
         ImGui.Text(SelectedSheetName);
         ImGui.SameLine();
-        ImGui.Text("\u2022");
+        ImGui.Text("\u2022"u8);
         ImGui.SameLine();
         ImGui.Text(string.Concat("Rows: ", excelSheetRowCount));
         ImGui.SameLine();
-        ImGui.Text("\u2022");
+        ImGui.Text("\u2022"u8);
         ImGui.SameLine();
         ImGui.Text(string.Concat("Column: ", excelSheetColumns.Length));
 
@@ -323,7 +323,7 @@ public class ExcelTab : DebugTab
         using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
         // i hate these tables!
-        using var table = ImRaii.Table("SheetRowTable", excelSheetColumns.Length,
+        using var table = ImRaii.Table("SheetRowTable"u8, excelSheetColumns.Length,
             ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY |
             ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible | ImGuiTableFlags.Resizable, new Vector2(-1));
 

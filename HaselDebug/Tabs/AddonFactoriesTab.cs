@@ -116,13 +116,13 @@ public unsafe partial class AddonFactoriesTab : DebugTab
 
         ImGui.Text("Don't trust anything you see here."u8);
 
-        using var table = ImRaii.Table("AddonsTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("AddonsTable"u8, 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 50);
-        ImGui.TableSetupColumn("Ctor", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("VTable", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Inheritance", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("Ctor"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("VTable"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Inheritance"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupColumn("Name");
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
@@ -181,13 +181,13 @@ public unsafe partial class AddonFactoriesTab : DebugTab
         using var table = ImRaii.Table(addr.ToString("X") + "DecodedTable", 7, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 50);
-        ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Assembly", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("FlowControl", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Code", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Op0", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Op1", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("Address"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Assembly"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("FlowControl"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Code"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Op0"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Op1"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 

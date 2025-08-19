@@ -25,11 +25,11 @@ public unsafe partial class MainCommandsTab : DebugTab
     {
         var agentHud = AgentHUD.Instance();
 
-        using var table = ImRaii.Table("MainCommandsTable", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("MainCommandsTable"u8, 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table.Success) return;
 
-        ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(2, 1);
         ImGui.TableHeadersRow();
 
@@ -67,11 +67,11 @@ public unsafe partial class MainCommandsTab : DebugTab
                 if (!tooltip) return;
 
                 using var disabled = ImRaii.Disabled(!isEnabled);
-                using var popuptable = ImRaii.Table("PopupTable", 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
+                using var popuptable = ImRaii.Table("PopupTable"u8, 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
                 if (!popuptable) return;
 
-                ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 40 + ImGui.GetStyle().ItemInnerSpacing.X);
-                ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, 300);
+                ImGui.TableSetupColumn("Icon"u8, ImGuiTableColumnFlags.WidthFixed, 40 + ImGui.GetStyle().ItemInnerSpacing.X);
+                ImGui.TableSetupColumn("Text"u8, ImGuiTableColumnFlags.WidthFixed, 300);
 
                 ImGui.TableNextColumn(); // Icon
                 _textureService.DrawIcon(row.Icon, 40);

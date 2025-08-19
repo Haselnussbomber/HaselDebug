@@ -14,7 +14,7 @@ public unsafe partial class DebugRenderer
         var elementCount = *(ulong*)(address + 0x8);
         if (elementCount == 0)
         {
-            ImGui.Text("No values");
+            ImGui.Text("No values"u8);
             return;
         }
 
@@ -83,8 +83,8 @@ public unsafe partial class DebugRenderer
         using var table = ImRaii.Table(nodeOptions.GetKey("StdMapTable"), 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthFixed, 120);
-        ImGui.TableSetupColumn("Key", ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupColumn("Address"u8, ImGuiTableColumnFlags.WidthFixed, 120);
+        ImGui.TableSetupColumn("Key"u8, ImGuiTableColumnFlags.WidthFixed, 200);
         ImGui.TableSetupColumn("Value");
         ImGui.TableSetupScrollFreeze(3, 1);
         ImGui.TableHeadersRow();

@@ -32,14 +32,14 @@ public unsafe class TitlesTab(TitlesTable table) : DebugTab, IUnlockTab
     {
         if (!AgentLobby.Instance()->IsLoggedIn)
         {
-            ImGui.Text("Not logged in.");
+            ImGui.Text("Not logged in."u8);
             return;
         }
 
         var localPlayer = Control.GetLocalPlayer();
         if (localPlayer == null)
         {
-            ImGui.Text("LocalPlayer unavailable.");
+            ImGui.Text("LocalPlayer unavailable."u8);
             return;
         }
 

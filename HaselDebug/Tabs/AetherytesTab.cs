@@ -20,17 +20,17 @@ public partial class AetherytesTab : DebugTab
 
     public override void Draw()
     {
-        using var table = ImRaii.Table("AetheryteListTable", 8, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("AetheryteListTable"u8, 8, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("ID", ImGuiTableColumnFlags.WidthFixed, 50);
-        ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 20);
-        ImGui.TableSetupColumn("Region Category", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("Expansion Category", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("Region Name", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("Map Name", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("Aetheryte Name", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("Gil Cost", ImGuiTableColumnFlags.WidthFixed, 80);
+        ImGui.TableSetupColumn("ID"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("Icon"u8, ImGuiTableColumnFlags.WidthFixed, 20);
+        ImGui.TableSetupColumn("Region Category"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Expansion Category"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Region Name"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Map Name"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Aetheryte Name"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Gil Cost"u8, ImGuiTableColumnFlags.WidthFixed, 80);
 
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();

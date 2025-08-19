@@ -336,13 +336,13 @@ public unsafe partial class AtkDebugRenderer
         if (nodePath != null && nodePath.Count > 0 && node == nodePath.Last())
             ImGui.SetScrollHereY();
 
-        ImGui.Text("Node: ");
+        ImGui.Text("Node: "u8);
         ImGui.SameLine();
         _debugRenderer.DrawAddress(node);
         ImGui.SameLine();
         _debugRenderer.DrawPointerType((nint)node, typeof(AtkResNode), nodeOptions);
 
-        ImGui.Text("NodeId:");
+        ImGui.Text("NodeId:"u8);
         ImGui.SameLine();
         _debugRenderer.DrawNumeric(node->NodeId, typeof(uint), new NodeOptions() { HexOnShift = true });
 
@@ -396,13 +396,13 @@ public unsafe partial class AtkDebugRenderer
         if (nodePath != null && nodePath.Count > 0 && node == nodePath.Last())
             ImGui.SetScrollHereY();
 
-        ImGui.Text("Node:");
+        ImGui.Text("Node:"u8);
         ImGui.SameLine();
         _debugRenderer.DrawAddress(node);
         ImGui.SameLine();
         _debugRenderer.DrawPointerType((nint)node, typeof(AtkComponentNode), nodeOptions.WithAddress(1));
 
-        ImGui.Text("Component:");
+        ImGui.Text("Component:"u8);
         ImGui.SameLine();
         _debugRenderer.DrawAddress(component);
         ImGui.SameLine();
@@ -464,14 +464,14 @@ public unsafe partial class AtkDebugRenderer
         if (hasDifferentTarget) columns += 1;
         if (hasDifferentListener) columns += 1;
 
-        using var table = ImRaii.Table("EventTable", columns, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+        using var table = ImRaii.Table("EventTable"u8, columns, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
         if (!table) return;
 
-        ImGui.TableSetupColumn("EventType", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Param", ImGuiTableColumnFlags.WidthFixed, 50);
-        if (hasDifferentTarget) ImGui.TableSetupColumn("Target", ImGuiTableColumnFlags.WidthFixed, 100);
-        if (hasDifferentListener) ImGui.TableSetupColumn("Listener", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Event", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("EventType"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Param"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+        if (hasDifferentTarget) ImGui.TableSetupColumn("Target"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        if (hasDifferentListener) ImGui.TableSetupColumn("Listener"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Event"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
@@ -490,7 +490,7 @@ public unsafe partial class AtkDebugRenderer
                 ImGui.TableNextColumn();
                 if (evt->Target == node)
                 {
-                    ImGui.Text("Node");
+                    ImGui.Text("Node"u8);
                 }
                 else
                 {
@@ -503,7 +503,7 @@ public unsafe partial class AtkDebugRenderer
                 ImGui.TableNextColumn();
                 if ((nint)evt->Listener == unitBaseAddress)
                 {
-                    ImGui.Text("UnitBase");
+                    ImGui.Text("UnitBase"u8);
                 }
                 else
                 {
@@ -545,16 +545,16 @@ public unsafe partial class AtkDebugRenderer
 
         var keyFrameGroup = labelSets->LabelKeyGroup;
 
-        using var table = ImRaii.Table("LabelSetKeyFrameTable", 7, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoHostExtendX);
+        using var table = ImRaii.Table("LabelSetKeyFrameTable"u8, 7, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoHostExtendX);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Frame ID", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("Speed Start", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("Speed End", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("Interpolation", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("Label ID", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("Jump Behavior", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("Target Label ID", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Frame ID"u8, ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Speed Start"u8, ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Speed End"u8, ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Interpolation"u8, ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Label ID"u8, ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Jump Behavior"u8, ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Target Label ID"u8, ImGuiTableColumnFlags.WidthFixed);
 
         ImGui.TableHeadersRow();
 
@@ -634,55 +634,55 @@ public unsafe partial class AtkDebugRenderer
 
             if (!groupHasAnyFrames)
             {
-                ImGui.Text("Group has no keyframes");
+                ImGui.Text("Group has no keyframes"u8);
                 continue;
             }
 
-            using var keyFrameTable = ImRaii.Table("AnimationKeyFrameTable", tableColumnCount, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoHostExtendX);
+            using var keyFrameTable = ImRaii.Table("AnimationKeyFrameTable"u8, tableColumnCount, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoHostExtendX);
             if (!keyFrameTable) return;
 
-            ImGui.TableSetupColumn("Frame ID", ImGuiTableColumnFlags.WidthFixed);
+            ImGui.TableSetupColumn("Frame ID"u8, ImGuiTableColumnFlags.WidthFixed);
 
             if (hasPosition)
             {
-                ImGui.TableSetupColumn("X", ImGuiTableColumnFlags.WidthFixed);
-                ImGui.TableSetupColumn("Y", ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("X"u8, ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("Y"u8, ImGuiTableColumnFlags.WidthFixed);
             }
 
             if (hasRotation)
             {
-                ImGui.TableSetupColumn("Rotation", ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("Rotation"u8, ImGuiTableColumnFlags.WidthFixed);
             }
 
             if (hasScale)
             {
-                ImGui.TableSetupColumn("Scale", ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("Scale"u8, ImGuiTableColumnFlags.WidthFixed);
             }
 
             if (hasAlpha)
             {
-                ImGui.TableSetupColumn("Alpha", ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("Alpha"u8, ImGuiTableColumnFlags.WidthFixed);
             }
 
             if (hasTint)
             {
-                ImGui.TableSetupColumn("Add Color", ImGuiTableColumnFlags.WidthFixed);
-                ImGui.TableSetupColumn("Multiply Color", ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("Add Color"u8, ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("Multiply Color"u8, ImGuiTableColumnFlags.WidthFixed);
             }
 
             if (hasPartId)
             {
-                ImGui.TableSetupColumn("Part ID", ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("Part ID"u8, ImGuiTableColumnFlags.WidthFixed);
             }
 
             if (hasTextEdge)
             {
-                ImGui.TableSetupColumn("Text Edge", ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("Text Edge"u8, ImGuiTableColumnFlags.WidthFixed);
             }
 
             if (hasTextLabel)
             {
-                ImGui.TableSetupColumn("Text Label", ImGuiTableColumnFlags.WidthFixed);
+                ImGui.TableSetupColumn("Text Label"u8, ImGuiTableColumnFlags.WidthFixed);
             }
 
             ImGui.TableHeadersRow();
@@ -883,11 +883,11 @@ public unsafe partial class AtkDebugRenderer
         using var treeNode = ImRaii.TreeNode("Properties", ImGuiTreeNodeFlags.SpanAvailWidth);
         if (!treeNode) return;
 
-        using var infoTable = ImRaii.Table("NodeInfoTable", 2, ImGuiTableFlags.NoSavedSettings);
+        using var infoTable = ImRaii.Table("NodeInfoTable"u8, 2, ImGuiTableFlags.NoSavedSettings);
         if (!infoTable) return;
 
-        ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Label"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Value"u8, ImGuiTableColumnFlags.WidthStretch);
 
         StartRow("Visible");
         var visible = node->NodeFlags.HasFlag(NodeFlags.Visible);

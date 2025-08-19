@@ -29,11 +29,11 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                 using var table = ImRaii.Table(nameof(CurrencyManager.SpecialItemBucket) + "Table", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
                 if (table)
                 {
-                    ImGui.TableSetupColumn("ItemId", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("SpecialId", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("Count", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("Remaining", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableSetupColumn("ItemId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("SpecialId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Count"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Remaining"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
                     ImGui.TableHeadersRow();
 
                     foreach (var (itemId, item) in currencyManager->SpecialItemBucket)
@@ -62,11 +62,11 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                 using var table = ImRaii.Table(nameof(CurrencyManager.ItemBucket) + "Table", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
                 if (table)
                 {
-                    ImGui.TableSetupColumn("ItemId", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("Count", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("Remaining", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("IsUnlimited", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableSetupColumn("ItemId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Count"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Remaining"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("IsUnlimited"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
                     ImGui.TableHeadersRow();
 
                     foreach (var (itemId, item) in currencyManager->ItemBucket)
@@ -95,11 +95,11 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                 using var table = ImRaii.Table(nameof(CurrencyManager.ContentItemBucket) + "Table", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
                 if (table)
                 {
-                    ImGui.TableSetupColumn("ItemId", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("Count", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("Remaining", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("IsUnlimited", ImGuiTableColumnFlags.WidthFixed, 100);
-                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableSetupColumn("ItemId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Count"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Remaining"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("IsUnlimited"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+                    ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
                     ImGui.TableHeadersRow();
 
                     foreach (var (itemId, item) in currencyManager->ContentItemBucket)

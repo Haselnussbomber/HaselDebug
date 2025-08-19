@@ -27,12 +27,12 @@ public unsafe partial class DebugRenderer
 
         using var font = ImRaii.PushFont(UiBuilder.MonoFont);
 
-        ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize(address.ToString("X")).X);
+        ImGui.TableSetupColumn("Address"u8, ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize(address.ToString("X")).X);
 
         for (var column = 0; column < numColumns; column++)
             ImGui.TableSetupColumn(column.ToString("X"), ImGuiTableColumnFlags.WidthFixed, 14 + (column % 8 == 7 ? 3 : 0));
 
-        ImGui.TableSetupColumn("Data", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Data"u8, ImGuiTableColumnFlags.WidthFixed);
 
         ImGui.TableHeadersRow();
 

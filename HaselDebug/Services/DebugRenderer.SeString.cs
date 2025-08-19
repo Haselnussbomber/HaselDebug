@@ -116,7 +116,7 @@ public unsafe partial class DebugRenderer
     {
         if (address == 0)
         {
-            ImGui.Text("null");
+            ImGui.Text("null"u8);
             return;
         }
 
@@ -125,7 +125,7 @@ public unsafe partial class DebugRenderer
         var str = (Utf8String*)address;
         if (str->StringPtr == null)
         {
-            ImGui.Text("null");
+            ImGui.Text("null"u8);
             return;
         }
 
@@ -136,7 +136,7 @@ public unsafe partial class DebugRenderer
     {
         if (ptr == null)
         {
-            ImGui.Text("null");
+            ImGui.Text("null"u8);
             return;
         }
 
@@ -251,8 +251,8 @@ public unsafe partial class DebugRenderer
             using var table = ImRaii.Table($"##Payload{payloadIdx}_{payload.GetHashCode()}Table", 2);
             if (!table) return;
 
-            ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 120);
-            ImGui.TableSetupColumn("Tree", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("Label"u8, ImGuiTableColumnFlags.WidthFixed, 120);
+            ImGui.TableSetupColumn("Tree"u8, ImGuiTableColumnFlags.WidthStretch);
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
@@ -305,7 +305,7 @@ public unsafe partial class DebugRenderer
 
         if (expr.Body.IsEmpty)
         {
-            ImGui.Text("(?)");
+            ImGui.Text("(?)"u8);
             return;
         }
 

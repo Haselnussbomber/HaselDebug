@@ -191,9 +191,9 @@ public unsafe class LuaDebugTab : DebugTab
             return;
         ImGui.TableSetupScrollFreeze(0, 1);
 
-        ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Type"u8, ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Value"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableHeadersRow();
 
         var filterType = Enum.Parse<LuaType>(TypeFilterStrings[TypeFilter]);

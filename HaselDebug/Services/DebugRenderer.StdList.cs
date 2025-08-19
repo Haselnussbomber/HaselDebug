@@ -14,14 +14,14 @@ public unsafe partial class DebugRenderer
     {
         if (*(nint*)address == 0)
         {
-            ImGui.Text("Not initialized");
+            ImGui.Text("Not initialized"u8);
             return;
         }
 
         var elementCount = *(ulong*)(address + 0x8);
         if (elementCount == 0)
         {
-            ImGui.Text("No values");
+            ImGui.Text("No values"u8);
             return;
         }
 
@@ -64,7 +64,7 @@ public unsafe partial class DebugRenderer
         using var table = ImRaii.Table(nodeOptions.GetKey("StdListTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupColumn("Value");
         ImGui.TableSetupScrollFreeze(2, 1);
         ImGui.TableHeadersRow();

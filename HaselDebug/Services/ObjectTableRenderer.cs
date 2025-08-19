@@ -25,13 +25,13 @@ public unsafe partial class ObjectTableRenderer
         using var table = ImRaii.Table(key, 7, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable | ImGuiTableFlags.Hideable | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 30);
-        ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthFixed, 110);
-        ImGui.TableSetupColumn("EntityId", ImGuiTableColumnFlags.WidthFixed, 110);
-        ImGui.TableSetupColumn("ObjectId", ImGuiTableColumnFlags.WidthFixed, 110);
-        ImGui.TableSetupColumn("ObjectKind", ImGuiTableColumnFlags.WidthFixed, 90);
-        ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("EventHandler", ImGuiTableColumnFlags.WidthFixed, 300);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 30);
+        ImGui.TableSetupColumn("Address"u8, ImGuiTableColumnFlags.WidthFixed, 110);
+        ImGui.TableSetupColumn("EntityId"u8, ImGuiTableColumnFlags.WidthFixed, 110);
+        ImGui.TableSetupColumn("ObjectId"u8, ImGuiTableColumnFlags.WidthFixed, 110);
+        ImGui.TableSetupColumn("ObjectKind"u8, ImGuiTableColumnFlags.WidthFixed, 90);
+        ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("EventHandler"u8, ImGuiTableColumnFlags.WidthFixed, 300);
         ImGui.TableSetupScrollFreeze(5, 1);
         ImGui.TableHeadersRow();
 

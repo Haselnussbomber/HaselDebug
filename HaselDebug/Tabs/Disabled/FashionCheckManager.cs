@@ -11,7 +11,7 @@ public unsafe class FashionCheckManagerTab : DebugTab
 
         if (manager == null)
         {
-            ImGui.Text("Manager not available");
+            ImGui.Text("Manager not available"u8);
             return;
         }
 
@@ -26,7 +26,7 @@ public unsafe class FashionCheckManagerTab : DebugTab
 
         ImGui.Text($"Weekly Theme: {GetSheet<FashionCheckWeeklyTheme>()!.GetRow(manager->WeeklyTheme)?.Name ?? ""}");
 
-        using var table = ImRaii.Table("FashionCheckManagerTable", 3, ImGuiTableFlags.RowBg);
+        using var table = ImRaii.Table("FashionCheckManagerTable"u8, 3, ImGuiTableFlags.RowBg);
         if (!table)
             return;
 

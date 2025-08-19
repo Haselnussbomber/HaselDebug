@@ -40,7 +40,7 @@ public unsafe class AddonsTab : DebugTab
                     ImGui.SetClipboardText(sb.ToString());
                 }
 
-                using var table = ImRaii.Table("AddonsTable", 3);
+                using var table = ImRaii.Table("AddonsTable"u8, 3);
                 if (!table) return;
 
                 for (var i = 0u; i < addonNamesCount; i++)
@@ -70,15 +70,15 @@ public unsafe class AddonsTab : DebugTab
         {
             if (tab)
             {
-                using var table = ImRaii.Table("OpenAddonsTable", 6);
+                using var table = ImRaii.Table("OpenAddonsTable"u8, 6);
                 if (!table) return;
 
                 AtkUnitBase* hoveredAddon = null;
 
-                ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
-                ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthFixed, 80);
-                ImGui.TableSetupColumn("DepthLayer", ImGuiTableColumnFlags.WidthFixed, 40);
-                ImGui.TableSetupColumn("DrawOrderIndex", ImGuiTableColumnFlags.WidthFixed, 40);
+                ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+                ImGui.TableSetupColumn("Address"u8, ImGuiTableColumnFlags.WidthFixed, 80);
+                ImGui.TableSetupColumn("DepthLayer"u8, ImGuiTableColumnFlags.WidthFixed, 40);
+                ImGui.TableSetupColumn("DrawOrderIndex"u8, ImGuiTableColumnFlags.WidthFixed, 40);
                 ImGui.TableSetupColumn("Name");
                 ImGui.TableSetupColumn("Actions");
                 ImGui.TableHeadersRow();

@@ -23,14 +23,14 @@ public unsafe partial class SatisfactionSupplyTab : DebugTab
     {
         var satisfactionSupply = SatisfactionSupplyManager.Instance();
 
-        using var table = ImRaii.Table("SatisfactionSupply", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("SatisfactionSupply"u8, 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
-        ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("Satisfaction", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Rank", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Used Allowance", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Satisfaction"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Rank"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Used Allowance"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableHeadersRow();
 
         foreach (var row in _excelService.GetSheet<SatisfactionNpc>())

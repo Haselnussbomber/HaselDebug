@@ -20,7 +20,7 @@ public unsafe partial class HousingTab : DebugTab
         var housingManager = HousingManager.Instance();
         if (housingManager == null)
         {
-            ImGui.Text("HousingManager unavailable");
+            ImGui.Text("HousingManager unavailable"u8);
             return;
         }
 
@@ -66,17 +66,17 @@ public unsafe partial class HousingTab : DebugTab
         {
             if (node)
             {
-                using var table = ImRaii.Table("OwnedHouseIdsTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+                using var table = ImRaii.Table("OwnedHouseIdsTable"u8, 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
                 if (table)
                 {
-                    ImGui.TableSetupColumn("EstateType", ImGuiTableColumnFlags.WidthFixed, 160);
-                    ImGui.TableSetupColumn("HouseId (long)", ImGuiTableColumnFlags.WidthFixed, 160);
-                    ImGui.TableSetupColumn("HouseId (struct)", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableSetupColumn("EstateType"u8, ImGuiTableColumnFlags.WidthFixed, 160);
+                    ImGui.TableSetupColumn("HouseId (long)"u8, ImGuiTableColumnFlags.WidthFixed, 160);
+                    ImGui.TableSetupColumn("HouseId (struct)"u8, ImGuiTableColumnFlags.WidthStretch);
                     ImGui.TableHeadersRow();
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.Text("FreeCompanyEstate");
+                    ImGui.Text("FreeCompanyEstate"u8);
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.FreeCompanyEstate);
                     ImGuiUtilsEx.DrawCopyableText($"{(ulong)houseId}");
@@ -85,7 +85,7 @@ public unsafe partial class HousingTab : DebugTab
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.Text("PersonalChambers");
+                    ImGui.Text("PersonalChambers"u8);
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.PersonalChambers);
                     ImGuiUtilsEx.DrawCopyableText($"{(ulong)houseId}");
@@ -94,7 +94,7 @@ public unsafe partial class HousingTab : DebugTab
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.Text("PersonalEstate");
+                    ImGui.Text("PersonalEstate"u8);
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.PersonalEstate);
                     ImGuiUtilsEx.DrawCopyableText($"{(ulong)houseId}");
@@ -103,7 +103,7 @@ public unsafe partial class HousingTab : DebugTab
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.Text("Unknown3");
+                    ImGui.Text("Unknown3"u8);
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.Unknown3);
                     ImGuiUtilsEx.DrawCopyableText($"{(ulong)houseId}");
@@ -112,7 +112,7 @@ public unsafe partial class HousingTab : DebugTab
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.Text("SharedEstate 0");
+                    ImGui.Text("SharedEstate 0"u8);
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 0);
                     ImGuiUtilsEx.DrawCopyableText($"{(ulong)houseId}");
@@ -121,7 +121,7 @@ public unsafe partial class HousingTab : DebugTab
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.Text("SharedEstate 1");
+                    ImGui.Text("SharedEstate 1"u8);
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.SharedEstate, 1);
                     ImGuiUtilsEx.DrawCopyableText($"{(ulong)houseId}");
@@ -130,7 +130,7 @@ public unsafe partial class HousingTab : DebugTab
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.Text("ApartmentBuilding");
+                    ImGui.Text("ApartmentBuilding"u8);
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.ApartmentBuilding);
                     ImGuiUtilsEx.DrawCopyableText($"{(ulong)houseId}");
@@ -139,7 +139,7 @@ public unsafe partial class HousingTab : DebugTab
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.Text("ApartmentRoom");
+                    ImGui.Text("ApartmentRoom"u8);
                     ImGui.TableNextColumn();
                     houseId = HousingManager.GetOwnedHouseId(EstateType.ApartmentRoom);
                     ImGuiUtilsEx.DrawCopyableText($"{(ulong)houseId}");

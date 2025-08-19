@@ -16,18 +16,18 @@ public unsafe class AllocFunctions : IDebugTab
     {
         var raptureAtkModule = RaptureAtkModule.Instance();
 
-        using var table = ImRaii.Table("AllocFunctions", 3 /*9* /);
+        using var table = ImRaii.Table("AllocFunctions"u8, 3 /*9* /);
         if (!table.Success) return;
 
-        ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 50);
-        ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-        //ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthFixed, 150);
-        //ImGui.TableSetupColumn("Unk8", ImGuiTableColumnFlags.WidthFixed, 100);
-        //ImGui.TableSetupColumn("UnkC", ImGuiTableColumnFlags.WidthFixed, 100);
-        //ImGui.TableSetupColumn("Dependencies", ImGuiTableColumnFlags.WidthFixed, 100);
-        //ImGui.TableSetupColumn("NumDependencies", ImGuiTableColumnFlags.WidthFixed, 100);
-        //ImGui.TableSetupColumn("Unk1C", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("AlwaysLoaded", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
+        //ImGui.TableSetupColumn("Address"u8, ImGuiTableColumnFlags.WidthFixed, 150);
+        //ImGui.TableSetupColumn("Unk8"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        //ImGui.TableSetupColumn("UnkC"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        //ImGui.TableSetupColumn("Dependencies"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        //ImGui.TableSetupColumn("NumDependencies"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        //ImGui.TableSetupColumn("Unk1C"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("AlwaysLoaded"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableHeadersRow();
 
         var addonAllocators = new Span<AddonAllocator>((void*)((nint)raptureAtkModule + 0x87F8), 873);

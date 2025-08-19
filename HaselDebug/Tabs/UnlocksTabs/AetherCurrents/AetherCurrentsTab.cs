@@ -28,7 +28,7 @@ public unsafe class AetherCurrentsTab(AetherCurrentsTable table) : DebugTab, IUn
     {
         if (!AgentLobby.Instance()->IsLoggedIn)
         {
-            ImGui.Text("Not logged in.");
+            ImGui.Text("Not logged in."u8);
             return;
         }
 

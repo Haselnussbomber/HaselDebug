@@ -38,15 +38,15 @@ public unsafe partial class ChatTab : DebugTab
 
         ImGui.Text($"{count} Message");
 
-        using var table = ImRaii.Table("ChatTabTable", 5, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("ChatTabTable"u8, 5, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table)
             return;
 
-        ImGui.TableSetupColumn("Timestamp", ImGuiTableColumnFlags.WidthFixed, 120);
-        ImGui.TableSetupColumn("LogKind", ImGuiTableColumnFlags.WidthFixed, 50);
-        ImGui.TableSetupColumn("Caster", ImGuiTableColumnFlags.WidthFixed, 150);
-        ImGui.TableSetupColumn("Target", ImGuiTableColumnFlags.WidthFixed, 150);
-        ImGui.TableSetupColumn("Formatted Message", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Timestamp"u8, ImGuiTableColumnFlags.WidthFixed, 120);
+        ImGui.TableSetupColumn("LogKind"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("Caster"u8, ImGuiTableColumnFlags.WidthFixed, 150);
+        ImGui.TableSetupColumn("Target"u8, ImGuiTableColumnFlags.WidthFixed, 150);
+        ImGui.TableSetupColumn("Formatted Message"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(5, 1);
         ImGui.TableHeadersRow();
 

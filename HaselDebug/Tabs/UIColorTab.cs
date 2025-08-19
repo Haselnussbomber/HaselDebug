@@ -19,10 +19,10 @@ public unsafe partial class UIColorTab : DebugTab
 
     public override void Draw()
     {
-        using var table = ImRaii.Table("UIColorTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("UIColorTable"u8, 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Id", ImGuiTableColumnFlags.WidthFixed, 30);
+        ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 30);
         ImGui.TableSetupColumn(_textService.GetAddonText(4232)); // Dark
         ImGui.TableSetupColumn(_textService.GetAddonText(4233)); // Light
         ImGui.TableSetupColumn(_textService.GetAddonText(4234)); // Classic FF

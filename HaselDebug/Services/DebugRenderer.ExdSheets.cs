@@ -14,7 +14,7 @@ public unsafe partial class DebugRenderer
     {
         if (depth > 10)
         {
-            ImGui.Text("max depth reached");
+            ImGui.Text("max depth reached"u8);
             return;
         }
 
@@ -54,14 +54,14 @@ public unsafe partial class DebugRenderer
         var sheet = genericGetSheet.Invoke(_dataManager.Excel, [language.ToLumina(), sheetType.GetCustomAttribute<SheetAttribute>()?.Name ?? sheetType.Name]);
         if (sheet == null)
         {
-            ImGui.Text("sheet is null");
+            ImGui.Text("sheet is null"u8);
             return;
         }
 
         var getRow = sheet.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).FirstOrDefault(info => info.Name == "GetRowOrDefault" && info.GetParameters().Length == 1);
         if (getRow == null)
         {
-            ImGui.Text("Could not find GetRowOrDefault");
+            ImGui.Text("Could not find GetRowOrDefault"u8);
             return;
         }
 
@@ -87,7 +87,7 @@ public unsafe partial class DebugRenderer
 
         if (value == null)
         {
-            ImGui.Text("null");
+            ImGui.Text("null"u8);
             return;
         }
 
@@ -116,7 +116,7 @@ public unsafe partial class DebugRenderer
             var isValid = (bool)propType.GetProperty("IsValid")?.GetValue(value)!;
             if (!isValid)
             {
-                ImGui.Text("null");
+                ImGui.Text("null"u8);
                 return;
             }
 
@@ -136,7 +136,7 @@ public unsafe partial class DebugRenderer
             var count = (int)propType.GetProperty("Count")?.GetValue(value)!;
             if (count == 0)
             {
-                ImGui.Text("No values");
+                ImGui.Text("No values"u8);
                 return;
             }
 
@@ -151,7 +151,7 @@ public unsafe partial class DebugRenderer
             using var table = ImRaii.Table(propNodeOptions.GetKey("CollectionTable"), 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
             if (!table) return;
 
-            ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 40);
+            ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 40);
             ImGui.TableSetupColumn("Value");
             ImGui.TableSetupScrollFreeze(2, 1);
             ImGui.TableHeadersRow();
@@ -168,7 +168,7 @@ public unsafe partial class DebugRenderer
                 var colValue = propType.GetMethod("get_Item")?.Invoke(value, [i]);
                 if (colValue == null)
                 {
-                    ImGui.Text("null");
+                    ImGui.Text("null"u8);
                     continue;
                 }
 
@@ -194,7 +194,7 @@ public unsafe partial class DebugRenderer
                     var isValid = (bool)collectionType.GetProperty("IsValid")?.GetValue(colValue)!;
                     if (!isValid)
                     {
-                        ImGui.Text("null");
+                        ImGui.Text("null"u8);
                         continue;
                     }
 

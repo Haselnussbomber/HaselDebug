@@ -30,14 +30,14 @@ public unsafe partial class InputTab : DebugTab
         using var tab = ImRaii.TabItem("KeyState states");
         if (!tab) return;
 
-        using var table = ImRaii.Table("KeyStateTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("KeyStateTable"u8, 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("SeVirtualKey", ImGuiTableColumnFlags.WidthFixed, 300);
-        ImGui.TableSetupColumn("Press", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Down", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Held", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Released", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("SeVirtualKey"u8, ImGuiTableColumnFlags.WidthFixed, 300);
+        ImGui.TableSetupColumn("Press"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Down"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Held"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Released"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
@@ -72,14 +72,14 @@ public unsafe partial class InputTab : DebugTab
         using var tab = ImRaii.TabItem("InputId states");
         if (!tab) return;
 
-        using var table = ImRaii.Table("FnStateTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("FnStateTable"u8, 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.ScrollY);
         if (!table) return;
 
-        ImGui.TableSetupColumn("InputId", ImGuiTableColumnFlags.WidthFixed, 300);
-        ImGui.TableSetupColumn("Press", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Down", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Held", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Released", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("InputId"u8, ImGuiTableColumnFlags.WidthFixed, 300);
+        ImGui.TableSetupColumn("Press"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Down"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Held"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Released"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
@@ -114,15 +114,15 @@ public unsafe partial class InputTab : DebugTab
         using var tab = ImRaii.TabItem("Inputs");
         if (!tab) return;
 
-        using var table = ImRaii.Table("InputsTable", 6, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("InputsTable"u8, 6, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.ScrollY);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("InputId", ImGuiTableColumnFlags.WidthFixed, 300);
-        ImGui.TableSetupColumn("Press", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Down", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Held", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Released", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("InputId"u8, ImGuiTableColumnFlags.WidthFixed, 300);
+        ImGui.TableSetupColumn("Press"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Down"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Held"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Released"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 

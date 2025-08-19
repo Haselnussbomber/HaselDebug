@@ -96,16 +96,16 @@ public unsafe partial class ConfigTab : DebugTab
         using var tab = ImRaii.TabItem(tabTitle);
         if (!tab) return;
 
-        using var table = ImRaii.Table("ConfigOptionTable", 7, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings, ImGui.GetContentRegionAvail());
+        using var table = ImRaii.Table("ConfigOptionTable"u8, 7, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings, ImGui.GetContentRegionAvail());
         if (!table) return;
 
-        ImGui.TableSetupColumn("Index", ImGuiTableColumnFlags.WidthFixed, 50);
-        ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed, 60);
-        ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("Default", ImGuiTableColumnFlags.WidthFixed, 160);
-        ImGui.TableSetupColumn("Min", ImGuiTableColumnFlags.WidthFixed, 160);
-        ImGui.TableSetupColumn("Max", ImGuiTableColumnFlags.WidthFixed, 160);
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("Type"u8, ImGuiTableColumnFlags.WidthFixed, 60);
+        ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Value"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Default"u8, ImGuiTableColumnFlags.WidthFixed, 160);
+        ImGui.TableSetupColumn("Min"u8, ImGuiTableColumnFlags.WidthFixed, 160);
+        ImGui.TableSetupColumn("Max"u8, ImGuiTableColumnFlags.WidthFixed, 160);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
@@ -134,19 +134,19 @@ public unsafe partial class ConfigTab : DebugTab
                     break;
 
                 case 1: // Category
-                    ImGui.Text("Category");
+                    ImGui.Text("Category"u8);
                     break;
 
                 case 2: // UInt
-                    ImGui.Text("UInt");
+                    ImGui.Text("UInt"u8);
                     break;
 
                 case 3: // Float
-                    ImGui.Text("Float");
+                    ImGui.Text("Float"u8);
                     break;
 
                 case 4: // String
-                    ImGui.Text("String");
+                    ImGui.Text("String"u8);
                     break;
 
                 default:

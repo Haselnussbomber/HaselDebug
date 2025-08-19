@@ -19,7 +19,7 @@ public unsafe partial class ContentsFinderDutyListTab : DebugTab
     {
         if (!TryGetAddon<AddonContentsFinder>("ContentsFinder", out var addon))
         {
-            ImGui.Text("ContentsFinder not open");
+            ImGui.Text("ContentsFinder not open"u8);
             if (ImGui.Button("Open"))
             {
                 UIModule.Instance()->ExecuteMainCommand(33);
@@ -67,7 +67,7 @@ public unsafe partial class ContentsFinderDutyListTab : DebugTab
 
             using (ImRaii.PushIndent())
             {
-                ImGui.Text("Strings:");
+                ImGui.Text("Strings:"u8);
                 using (ImRaii.PushIndent())
                 {
                     var j = 0;
@@ -79,7 +79,7 @@ public unsafe partial class ContentsFinderDutyListTab : DebugTab
                     }
                 }
 
-                ImGui.Text("UInts:");
+                ImGui.Text("UInts:"u8);
                 using (ImRaii.PushIndent())
                 {
                     var j = 0;

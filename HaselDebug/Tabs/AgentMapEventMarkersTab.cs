@@ -18,15 +18,15 @@ public unsafe partial class AgentMapEventMarkersTab : DebugTab
     {
         var agent = AgentMap.Instance();
 
-        using var table = ImRaii.Table("AgentMapEventMarkersTable", 7, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("AgentMapEventMarkersTable"u8, 7, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("LevelId", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("ObjectiveId", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("MapId", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("Radius", ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("TerritoryTypeId", ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Icon"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("LevelId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("ObjectiveId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("MapId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Radius"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("TerritoryTypeId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupColumn("TooltipString");
         ImGui.TableSetupScrollFreeze(6, 1);
         ImGui.TableHeadersRow();
