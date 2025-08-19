@@ -22,7 +22,7 @@ public partial class NameColumn : ColumnString<AdventureEntry>
     }
 
     public override string ToName(AdventureEntry entry)
-        => entry.Row.Name.ExtractText();
+        => entry.Row.Name.ToString();
 
     public override unsafe void DrawColumn(AdventureEntry entry)
     {

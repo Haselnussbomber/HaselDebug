@@ -11,5 +11,5 @@ public class PathColumn : ColumnString<CutsceneEntry>
     }
 
     public override string ToName(CutsceneEntry entry)
-        => entry.Row.Path.ExtractText();
+        => entry.Row.Path.ToString();
 }

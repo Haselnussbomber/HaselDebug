@@ -28,7 +28,7 @@ public partial class NameColumn : ColumnString<TripleTriadCardEntry>
     }
 
     public override string ToName(TripleTriadCardEntry entry)
-        => entry.Row.Name.ExtractText().StripSoftHyphen();
+        => entry.Row.Name.ToString();
 
     public string ToSearchName(TripleTriadCardEntry entry)
     {
@@ -42,7 +42,7 @@ public partial class NameColumn : ColumnString<TripleTriadCardEntry>
             str += "\n" + _seStringEvaluator.EvaluateFromAddon(obtainRow.Text.RowId, [
                 residentRow.Acquisition.RowId,
                     residentRow.Location.RowId
-            ]).ExtractText();
+            ]).ToString();
         }
 
         return str;

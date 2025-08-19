@@ -54,11 +54,11 @@ public partial class SpecialShopsRowColumn : ColumnString<SpecialShop>
 
     public override string ToName(SpecialShop row)
     {
-        return row.Name.ExtractText();
+        return row.Name.ToString();
     }
 
     public override void DrawColumn(SpecialShop row)
     {
-        _debugRenderer.DrawExdRow(typeof(SpecialShop), row.RowId, 0, new Utils.NodeOptions() { Title = row.Name.ExtractText() });
+        _debugRenderer.DrawExdRow(typeof(SpecialShop), row.RowId, 0, new Utils.NodeOptions() { Title = row.Name.ToString() });
     }
 }

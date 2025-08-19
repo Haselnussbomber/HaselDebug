@@ -23,7 +23,7 @@ public partial class NameColumn : ColumnString<SpearfishingItem>
     }
 
     public override string ToName(SpearfishingItem row)
-        => _textService.GetItemName(row.Item.RowId).ExtractText().StripSoftHyphen();
+        => _textService.GetItemName(row.Item.RowId).ToString();
 
     public override unsafe void DrawColumn(SpearfishingItem row)
     {

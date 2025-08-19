@@ -14,13 +14,13 @@ public partial class ActionColumn : ColumnString<AozEntry>
     private readonly ISeStringEvaluator _seStringEvaluator;
 
     public override string ToName(AozEntry entry)
-        => entry.Action.Name.ExtractText();
+        => entry.Action.Name.ToString();
 
     public override unsafe void DrawColumn(AozEntry entry)
     {
         ImGui.BeginGroup();
         _debugRenderer.DrawIcon(entry.AozActionTransient.Icon, noTooltip: true);
-        ImGuiUtilsEx.DrawCopyableText(entry.Action.Name.ExtractText(), noTooltip: true);
+        ImGuiUtilsEx.DrawCopyableText(entry.Action.Name.ToString(), noTooltip: true);
         ImGui.EndGroup();
 
         if (ImGui.IsItemHovered())

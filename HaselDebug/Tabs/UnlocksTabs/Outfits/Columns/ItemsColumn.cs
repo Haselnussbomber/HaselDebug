@@ -39,7 +39,7 @@ public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
         _stringBuilder.Clear();
 
         for (var i = 1; i < row.Items.Count; i++)
-            _stringBuilder.AppendLine(_textService.GetItemName(row.Items[i].RowId).ExtractText().StripSoftHyphen());
+            _stringBuilder.AppendLine(_textService.GetItemName(row.Items[i].RowId).ToString());
 
         return _stringBuilder.ToString();
     }

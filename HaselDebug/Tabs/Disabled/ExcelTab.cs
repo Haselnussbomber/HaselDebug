@@ -427,7 +427,7 @@ public class ExcelTab : DebugTab
             var row = Rows[i];
             if (row.RowId.ToString().Contains(SearchTerm)
              || row.Text.ToString().Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase)
-             || row.Text.ExtractText().Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase))
+             || row.Text.ToString().Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase))
             {
                 list.Add(row);
             }

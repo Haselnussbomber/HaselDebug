@@ -370,7 +370,7 @@ public unsafe partial class DebugRenderer
                 {
                     case LinkMacroPayloadType.Item:
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(_textService.GetItemName(u32).ExtractText().StripSoftHyphen());
+                        ImGui.TextUnformatted(_textService.GetItemName(u32).ToString());
                         break;
 
                     case LinkMacroPayloadType.Quest:
@@ -380,24 +380,24 @@ public unsafe partial class DebugRenderer
 
                     case LinkMacroPayloadType.Achievement when _dataManager.GetExcelSheet<Achievement>(_languageProvider.ClientLanguage).TryGetRow(u32, out var achievementRow):
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(achievementRow.Name.ExtractText());
+                        ImGui.TextUnformatted(achievementRow.Name.ToString());
                         break;
 
                     case LinkMacroPayloadType.HowTo when _dataManager.GetExcelSheet<HowTo>(_languageProvider.ClientLanguage).TryGetRow(u32, out var howToRow):
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(howToRow.Name.ExtractText());
+                        ImGui.TextUnformatted(howToRow.Name.ToString());
                         break;
 
                     case LinkMacroPayloadType.Status when _dataManager.GetExcelSheet<Status>(_languageProvider.ClientLanguage).TryGetRow(u32, out var statusRow):
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(statusRow.Name.ExtractText());
+                        ImGui.TextUnformatted(statusRow.Name.ToString());
                         break;
 
                     case LinkMacroPayloadType.AkatsukiNote when
                         _dataManager.GetSubrowExcelSheet<AkatsukiNote>(_languageProvider.ClientLanguage).TryGetRow(u32, out var akatsukiNoteRow) &&
                         akatsukiNoteRow[0].ListName.IsValid:
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(akatsukiNoteRow[0].ListName.Value.Text.ExtractText());
+                        ImGui.TextUnformatted(akatsukiNoteRow[0].ListName.Value.Text.ToString());
                         break;
                 }
             }

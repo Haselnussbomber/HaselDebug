@@ -155,7 +155,7 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
         {
             if (_localParameters[i].IsString)
             {
-                var str = _localParameters[i].StringValue.ExtractText();
+                var str = _localParameters[i].StringValue.ToString();
                 if (ImGui.InputText($"lstr({i + 1})", ref str, 255))
                 {
                     _localParameters[i] = new(str);

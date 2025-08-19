@@ -59,7 +59,7 @@ public unsafe partial class AgentMapEventMarkersTab : DebugTab
 
             ImGui.TableNextColumn(); // TooltipString
             if (marker.TooltipString != null && marker.TooltipString->StringPtr.Value != null)
-                ImGui.TextUnformatted(new ReadOnlySeStringSpan(marker.TooltipString->StringPtr.Value).ExtractText());
+                ImGui.TextUnformatted(new ReadOnlySeStringSpan(marker.TooltipString->StringPtr.Value).ToString());
         }
     }
 }

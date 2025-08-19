@@ -30,9 +30,9 @@ public record AchievementEntry : IUnlockEntry
     public bool CanShowDescription => CanShow || (!IsHiddenName && !IsHiddenCategory && !IsHiddenAchievement); // idk actually
     public bool CanShowAchievement => CanShow || !IsHiddenAchievement;
 
-    public string Name => CanShowAchievement && CanShowName ? Row.Name.ExtractText().StripSoftHyphen() : "???";
-    public string CategoryName => CanShowAchievement && CanShowCategory ? Row.AchievementCategory.Value.Name.ExtractText().StripSoftHyphen() : "???";
-    public string Description => CanShowAchievement && CanShowDescription ? Row.Description.ExtractText().StripSoftHyphen() : "???";
+    public string Name => CanShowAchievement && CanShowName ? Row.Name.ToString() : "???";
+    public string CategoryName => CanShowAchievement && CanShowCategory ? Row.AchievementCategory.Value.Name.ToString() : "???";
+    public string Description => CanShowAchievement && CanShowDescription ? Row.Description.ToString() : "???";
 
     public AchievementEntry(AchievementsTable table, AchievementSheet row)
     {

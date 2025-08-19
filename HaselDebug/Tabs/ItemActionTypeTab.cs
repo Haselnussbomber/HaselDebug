@@ -50,7 +50,7 @@ public unsafe partial class ItemActionTypeTab : DebugTab
                 _debugRenderer.DrawExdRow(typeof(Item), item.RowId, 0, new NodeOptions()
                 {
                     AddressPath = new AddressPath([(nint)type]),
-                    Title = $"[Item#{item.RowId}] {item.Name.ExtractText().StripSoftHyphen()}"
+                    Title = $"[Item#{item.RowId}] {item.Name.ToString()}"
                 });
             }
         }

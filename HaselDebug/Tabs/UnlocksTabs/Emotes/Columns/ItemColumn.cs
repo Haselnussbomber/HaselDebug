@@ -10,7 +10,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.Emotes.Columns;
 public class ItemColumn(DebugRenderer debugRenderer) : ColumnString<Emote>
 {
     public override string ToName(Emote row)
-        => row.Name.ExtractText();
+        => row.Name.ToString();
 
     public override unsafe void DrawColumn(Emote row)
     {

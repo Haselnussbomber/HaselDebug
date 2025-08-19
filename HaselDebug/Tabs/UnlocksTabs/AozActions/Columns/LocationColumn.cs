@@ -21,8 +21,8 @@ public partial class LocationColumn : ColumnString<AozEntry>
     {
         return entry.AozActionTransient.LocationKey switch
         {
-            1 when entry.AozActionTransient.Location.TryGetValue<PlaceName>(out var placeName) => placeName.Name.ExtractText().StripSoftHyphen(),
-            4 when entry.AozActionTransient.Location.TryGetValue<ContentFinderCondition>(out var cfc) => cfc.Name.ExtractText().StripSoftHyphen(),
+            1 when entry.AozActionTransient.Location.TryGetValue<PlaceName>(out var placeName) => placeName.Name.ToString(),
+            4 when entry.AozActionTransient.Location.TryGetValue<ContentFinderCondition>(out var cfc) => cfc.Name.ToString(),
             _ => string.Empty,
         };
     }
@@ -34,7 +34,7 @@ public partial class LocationColumn : ColumnString<AozEntry>
             case 1 when entry.AozActionTransient.Location.TryGetValue<PlaceName>(out var placeName):
                 _textureService.DrawPart("AozNoteBook", 7, 2, ImGui.GetTextLineHeight());
                 ImGui.SameLine();
-                ImGui.TextUnformatted(placeName.Name.ExtractText().StripSoftHyphen());
+                ImGui.TextUnformatted(placeName.Name.ToString());
                 break;
 
             case 2:
@@ -50,7 +50,7 @@ public partial class LocationColumn : ColumnString<AozEntry>
 
             case 4 when entry.AozActionTransient.Location.TryGetValue<ContentFinderCondition>(out var cfc):
                 _debugRenderer.DrawIcon(cfc.ContentType.Value.Icon);
-                if (ImGui.Selectable(_seStringEvaluator.EvaluateFromAddon(12277, [cfc.Name]).ExtractText().StripSoftHyphen()))
+                if (ImGui.Selectable(_seStringEvaluator.EvaluateFromAddon(12277, [cfc.Name]).ToString()))
                 {
                     AgentContentsFinder.Instance()->OpenRegularDuty(cfc.RowId);
                 }

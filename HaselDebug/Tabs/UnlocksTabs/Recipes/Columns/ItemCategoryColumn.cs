@@ -13,5 +13,5 @@ public class ItemCategoryColumn : ColumnString<Recipe>
     }
 
     public override string ToName(Recipe row)
-        => row.ItemResult.Value.ItemUICategory.Value.Name.ExtractText().StripSoftHyphen();
+        => row.ItemResult.Value.ItemUICategory.Value.Name.ToString();
 }

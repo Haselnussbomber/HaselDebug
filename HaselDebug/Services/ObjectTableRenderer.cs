@@ -41,12 +41,12 @@ public unsafe partial class ObjectTableRenderer
             if (gameObject == null) continue;
 
             var objectKind = gameObject->GetObjectKind();
-            var objectName = new ReadOnlySeStringSpan(gameObject->GetName().AsSpan()).ExtractText();
+            var objectName = new ReadOnlySeStringSpan(gameObject->GetName().AsSpan()).ToString();
 
             var title = objectName;
             if (objectKind == ObjectKind.EventNpc && _excelService.TryGetRow<ENpcResident>(gameObject->BaseId, out var resident) && !resident.Title.IsEmpty)
             {
-                var evaluated = _seStringEvaluator.EvaluateFromAddon(37, [resident.Title]).ExtractText();
+                var evaluated = _seStringEvaluator.EvaluateFromAddon(37, [resident.Title]).ToString();
                 if (!string.IsNullOrWhiteSpace(evaluated))
                 {
                     if (!string.IsNullOrEmpty(evaluated))

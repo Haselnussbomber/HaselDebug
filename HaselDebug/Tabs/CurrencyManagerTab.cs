@@ -50,7 +50,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         if (currencyManager->IsItemLimited(itemId))
                             ImGui.TextUnformatted(currencyManager->GetItemCountRemaining(itemId).ToString());
                         ImGui.TableNextColumn();
-                        ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
+                        ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ToString());
                     }
                 }
             }
@@ -83,7 +83,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
-                        ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
+                        ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ToString());
                     }
                 }
             }
@@ -116,7 +116,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         ImGui.TableNextColumn();
                         ImGui.TextUnformatted(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
-                        ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ExtractText().StripSoftHyphen());
+                        ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ToString());
                     }
                 }
             }

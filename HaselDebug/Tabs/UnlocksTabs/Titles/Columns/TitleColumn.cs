@@ -33,7 +33,7 @@ public partial class TitleColumn : ColumnString<Title>
             _excelService.TryGetRow(row.RowId, ClientLanguage.English, out row);
         }
 
-        return (_isFeminine ? row.Feminine : row.Masculine).ExtractText().StripSoftHyphen();
+        return (_isFeminine ? row.Feminine : row.Masculine).ToString();
     }
 
     public override unsafe void DrawColumn(Title row)

@@ -155,7 +155,7 @@ public unsafe partial class InventoryTab : DebugTab
                     var date =
                         (slot->GetMateriaId(0) << 4 | (slot->GetMateriaGrade(0) & 0xF)) << 16 |
                          slot->GetMateriaId(1) << 4 | (slot->GetMateriaGrade(1) & 0xF);
-                    ImGui.TextUnformatted("Date: " + _seStringEvaluator.EvaluateFromAddon(1551, [date]).ExtractText());
+                    ImGui.TextUnformatted("Date: " + _seStringEvaluator.EvaluateFromAddon(1551, [date]).ToString());
                 }
             }
         }

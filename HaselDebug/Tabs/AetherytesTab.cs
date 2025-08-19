@@ -66,7 +66,7 @@ public partial class AetherytesTab : DebugTab
             ImGui.TextUnformatted(GetRegionName(regionType));
 
             ImGui.TableNextColumn();
-            ImGui.TextUnformatted(territory.ExVersion.Value.Name.ExtractText());
+            ImGui.TextUnformatted(territory.ExVersion.Value.Name.ToString());
 
             ImGui.TableNextColumn();
             ImGui.TextUnformatted(regionName);
@@ -121,9 +121,9 @@ public partial class AetherytesTab : DebugTab
     {
         return region switch
         {
-            AetheryteRegion.LaNoscea => _excelService.TryGetRow<PlaceName>(22, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // La Noscea
-            AetheryteRegion.TheBlackShroud => _excelService.TryGetRow<PlaceName>(23, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // The Black Shroud
-            AetheryteRegion.Thanalan => _excelService.TryGetRow<PlaceName>(24, out var placeName) ? placeName.Name.ExtractText() : string.Empty, // Thanalan
+            AetheryteRegion.LaNoscea => _excelService.TryGetRow<PlaceName>(22, out var placeName) ? placeName.Name.ToString() : string.Empty, // La Noscea
+            AetheryteRegion.TheBlackShroud => _excelService.TryGetRow<PlaceName>(23, out var placeName) ? placeName.Name.ToString() : string.Empty, // The Black Shroud
+            AetheryteRegion.Thanalan => _excelService.TryGetRow<PlaceName>(24, out var placeName) ? placeName.Name.ToString() : string.Empty, // Thanalan
             AetheryteRegion.Coerthas or AetheryteRegion.Dravania or AetheryteRegion.AbalathiasSpine => _textService.GetAddonText(8486), // Ishgard and Surrounding Areas
             AetheryteRegion.GyrAbania => _textService.GetAddonText(8488), // Gyr Abania
             AetheryteRegion.Hingashi or AetheryteRegion.Othard => _textService.GetAddonText(8489), // Othard

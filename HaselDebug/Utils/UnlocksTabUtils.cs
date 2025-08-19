@@ -49,7 +49,7 @@ public unsafe partial class UnlocksTabUtils
 
     public bool DrawSelectableItem(Item item, ImGuiId id, bool drawIcon = true, bool isHq = false, float? iconSize = null)
     {
-        var itemName = _textService.GetItemName(item.RowId).ExtractText().StripSoftHyphen();
+        var itemName = _textService.GetItemName(item.RowId).ToString();
         var isHovered = false;
         iconSize ??= ImGui.GetTextLineHeight();
 
@@ -162,7 +162,7 @@ public unsafe partial class UnlocksTabUtils
         if (!popuptable) return;
 
         var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
-        var title = _textService.GetItemName(item.RowId).ExtractText().StripSoftHyphen();
+        var title = _textService.GetItemName(item.RowId).ToString();
 
         ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale + itemInnerSpacing.X);
         ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
@@ -191,7 +191,7 @@ public unsafe partial class UnlocksTabUtils
         if (isUnlocked)
             ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 40 * ImGuiHelpers.GlobalScale / 2f - 3); // wtf
 
-        var category = item.ItemUICategory.IsValid ? item.ItemUICategory.Value.Name.ExtractText().StripSoftHyphen() : null;
+        var category = item.ItemUICategory.IsValid ? item.ItemUICategory.Value.Name.ToString() : null;
         if (!string.IsNullOrEmpty(category))
         {
             ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
@@ -199,7 +199,7 @@ public unsafe partial class UnlocksTabUtils
                 ImGui.TextUnformatted(category);
         }
 
-        var description = descriptionOverride ?? (!item.Description.IsEmpty ? item.Description.ExtractText().StripSoftHyphen() : null);
+        var description = descriptionOverride ?? (!item.Description.IsEmpty ? item.Description.ToString() : null);
         if (!string.IsNullOrEmpty(description))
         {
             DrawSeparator(marginTop: 1, marginBottom: 4);
@@ -244,7 +244,7 @@ public unsafe partial class UnlocksTabUtils
                     ImGui.TextWrapped(_seStringEvaluator.EvaluateFromAddon(obtainRow.Icon, [
                         residentRow.Acquisition.RowId,
                     residentRow.Location.RowId
-                    ]).ExtractText().StripSoftHyphen());
+                    ]).ToString());
                 }
 
                 DrawTripleTriadCard(item);
@@ -279,7 +279,7 @@ public unsafe partial class UnlocksTabUtils
         var order = (uint)cardResident.Order;
         var addonRowId = isEx ? 9773u : 9772;
 
-        var infoText = $"{_seStringEvaluator.EvaluateFromAddon(addonRowId, [order]).ExtractText()} - {card.Name}";
+        var infoText = $"{_seStringEvaluator.EvaluateFromAddon(addonRowId, [order]).ToString()} - {card.Name}";
         ImGui.SetCursorPosX(ImGui.GetCursorPosX() - ImGui.GetStyle().IndentSpacing + ImGui.GetContentRegionAvail().X / 2f - ImGui.CalcTextSize(infoText).X / 2f);
         ImGui.TextUnformatted(infoText);
 
@@ -498,7 +498,7 @@ public unsafe partial class UnlocksTabUtils
         if (!popuptable) return;
 
         var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
-        var title = _textService.GetItemName(item.RowId).ExtractText().StripSoftHyphen();
+        var title = _textService.GetItemName(item.RowId).ToString();
 
         ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale + itemInnerSpacing.X);
         ImGui.TableSetupColumn("Text", ImGuiTableColumnFlags.WidthFixed, Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
@@ -524,7 +524,7 @@ public unsafe partial class UnlocksTabUtils
             {
                 ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
                 using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey.ToUInt()))
-                    ImGui.TextUnformatted(text.ExtractText());
+                    ImGui.TextUnformatted(text.ToString());
             }
         }
 
@@ -532,7 +532,7 @@ public unsafe partial class UnlocksTabUtils
         {
             DrawSeparator(marginTop: 1, marginBottom: 4);
 
-            ImGui.TextWrapped(itemHelp.Description.ExtractText().StripSoftHyphen());
+            ImGui.TextWrapped(itemHelp.Description.ToString());
         }
     }
 
@@ -577,7 +577,7 @@ public unsafe partial class UnlocksTabUtils
 
         ImGui.TextUnformatted(title);
 
-        var text = quest.JournalGenre.IsValid ? quest.JournalGenre.Value.Name.ExtractText() : null;
+        var text = quest.JournalGenre.IsValid ? quest.JournalGenre.Value.Name.ToString() : null;
         if (!string.IsNullOrWhiteSpace(text))
         {
             ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
@@ -603,12 +603,12 @@ public unsafe partial class UnlocksTabUtils
             ImGui.Image(image.Handle, new Vector2(newWidth, newHeight));
         }
 
-        var questText = _excelService.GetSheet<QuestText>($"quest/{(quest.RowId - 0x10000) / 100:000}/{quest.Id.ExtractText()}");
+        var questText = _excelService.GetSheet<QuestText>($"quest/{(quest.RowId - 0x10000) / 100:000}/{quest.Id.ToString()}");
         var questSequence = QuestManager.GetQuestSequence((ushort)(quest.RowId - 0x10000));
         if (questSequence == 0xFF) questSequence = 1;
         for (var seq = questSequence == 0 ? 0 : 1; seq <= questSequence; seq++)
         {
-            if (questText.TryGetFirst(kvRow => kvRow.LuaKey.ExtractText() == $"TEXT_{quest.Id.ExtractText().ToUpper()}_SEQ_{seq:00}", out var seqText) && !seqText.Text.IsEmpty)
+            if (questText.TryGetFirst(kvRow => kvRow.LuaKey.ToString() == $"TEXT_{quest.Id.ToString().ToUpper()}_SEQ_{seq:00}", out var seqText) && !seqText.Text.IsEmpty)
             {
                 DrawSeparator(marginTop: 1, marginBottom: 4);
                 ImGuiHelpers.SeStringWrapped(_seStringEvaluator.Evaluate(seqText.Text));
@@ -629,7 +629,7 @@ public unsafe partial class UnlocksTabUtils
 
         var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
         var indexStr = $"#{index:000}";
-        var title = adventure.Name.ExtractText();
+        var title = adventure.Name.ToString();
 
         var leftColumnWidth = ImGui.CalcTextSize(indexStr).X + itemInnerSpacing.X;
         var rightColumnWidth = Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale);

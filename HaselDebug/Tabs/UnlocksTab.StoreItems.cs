@@ -45,7 +45,7 @@ public unsafe class StoreItemsTab(
             .GroupBy(row => row.FittingShopItemSetId)
             .SelectMany(group => group)
             .DistinctBy(row => row.Item.Value)
-            .OrderBy(row => row.Item.Value!.ItemUICategory.Value.Name.ExtractText())
+            .OrderBy(row => row.Item.Value!.ItemUICategory.Value.Name.ToString())
             .ThenBy(row => TextService.GetItemName(row.Item.RowId))
             .ToList();
 
@@ -89,8 +89,8 @@ public unsafe class StoreItemsTab(
             {
                 0 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Ascending => (int)(a.ItemId - b.ItemId),
                 0 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending => (int)(b.ItemId - a.ItemId),
-                1 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Ascending => (a.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty).CompareTo(b.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty),
-                1 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending => (b.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty).CompareTo(a.Item.Value!.ItemUICategory.Value!.Name.ExtractText() ?? string.Empty),
+                1 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Ascending => (a.Item.Value!.ItemUICategory.Value!.Name.ToString() ?? string.Empty).CompareTo(b.Item.Value!.ItemUICategory.Value!.Name.ToString() ?? string.Empty),
+                1 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending => (b.Item.Value!.ItemUICategory.Value!.Name.ToString() ?? string.Empty).CompareTo(a.Item.Value!.ItemUICategory.Value!.Name.ToString() ?? string.Empty),
                 2 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Ascending => TextService.GetItemName(a.Item.RowId).CompareTo(TextService.GetItemName(b.Item.RowId)),
                 2 when sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending => TextService.GetItemName(b.Item.RowId).CompareTo(TextService.GetItemName(a.Item.RowId)),
                 _ => 0,
@@ -119,7 +119,7 @@ public unsafe class StoreItemsTab(
                 DebugRenderer.DrawCopyableText(row.ItemId.ToString());
 
                 ImGui.TableNextColumn(); // Item Category
-                DebugRenderer.DrawCopyableText(row.Item.Value!.ItemUICategory.Value!.Name.ExtractText().StripSoftHypen() ?? string.Empty);
+                DebugRenderer.DrawCopyableText(row.Item.Value!.ItemUICategory.Value!.Name.ToString().StripSoftHypen() ?? string.Empty);
 
                 ImGui.TableNextColumn(); // Item
                 UnlocksTabUtils.DrawSelectableItem(row.Item.Value, $"StoreItemsList{i}");

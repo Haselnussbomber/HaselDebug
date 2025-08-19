@@ -235,7 +235,7 @@ public unsafe partial class DebugRenderer
 
                     case EventHandlerContent.Shop:
                         type = typeof(ShopEventHandler);
-                        additionalName = new ReadOnlySeStringSpan(((ShopEventHandler*)address)->ShopName.AsSpan()).ExtractText();
+                        additionalName = new ReadOnlySeStringSpan(((ShopEventHandler*)address)->ShopName.AsSpan()).ToString();
                         break;
 
                     case EventHandlerContent.Aetheryte:
@@ -248,7 +248,7 @@ public unsafe partial class DebugRenderer
 
                     case EventHandlerContent.CustomTalk:
                         type = typeof(CustomTalkEventHandler);
-                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ExtractText();
+                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ToString();
                         break;
 
                     case EventHandlerContent.FateDirector:
@@ -257,14 +257,14 @@ public unsafe partial class DebugRenderer
 
                     case EventHandlerContent.BattleLeveDirector:
                         type = typeof(BattleLeveDirector);
-                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ExtractText();
+                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ToString();
                         break;
 
                     case EventHandlerContent.CompanyLeveDirector:
                     case EventHandlerContent.CompanyLeveOfficer:
                     case EventHandlerContent.GatheringLeveDirector:
                         type = typeof(LeveDirector);
-                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ExtractText();
+                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ToString();
                         break;
 
                     case EventHandlerContent.InstanceContentDirector:
@@ -892,7 +892,7 @@ public unsafe partial class DebugRenderer
                 DrawFieldName(fieldInfo);
                 DrawNumeric(fieldAddress, fieldType, fieldNodeOptions);
                 ImGui.SameLine();
-                ImGuiUtilsEx.DrawCopyableText(NameCache.Instance()->GetNameByContentId(*(ulong*)fieldAddress).ExtractText());
+                ImGuiUtilsEx.DrawCopyableText(NameCache.Instance()->GetNameByContentId(*(ulong*)fieldAddress).ToString());
                 continue;
             }
 
