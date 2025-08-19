@@ -2,7 +2,6 @@ using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;

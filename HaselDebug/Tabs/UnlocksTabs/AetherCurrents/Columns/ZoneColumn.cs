@@ -1,4 +1,3 @@
-using Dalamud.Utility;
 using HaselCommon.Gui.ImGuiTable;
 
 namespace HaselDebug.Tabs.UnlocksTabs.AetherCurrents.Columns;

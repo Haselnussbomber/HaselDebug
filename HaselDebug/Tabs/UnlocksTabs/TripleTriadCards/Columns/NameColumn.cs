@@ -1,5 +1,4 @@
 using Dalamud.Plugin.Services;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Graphics;

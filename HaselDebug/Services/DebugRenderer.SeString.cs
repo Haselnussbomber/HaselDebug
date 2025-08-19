@@ -6,7 +6,6 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using HaselCommon.Services;

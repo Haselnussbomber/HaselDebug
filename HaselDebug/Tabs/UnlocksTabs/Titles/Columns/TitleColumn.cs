@@ -1,5 +1,4 @@
 using Dalamud.Game;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.System.String;

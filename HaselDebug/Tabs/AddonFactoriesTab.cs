@@ -80,14 +80,14 @@ public unsafe partial class AddonFactoriesTab : DebugTab
 
                 if (entry.VTableAddress == 0)
                 {
-                    sb.AppendLine( "    funcs:");
+                    sb.AppendLine("    funcs:");
                     sb.AppendLine($"      0x{entry.CtorAddress - _sigScanner.Module.BaseAddress + 0x140000000:X}: ctor");
                     continue;
                 }
 
                 usedVTables.Add(entry.VTableAddress);
 
-                sb.AppendLine( "    vtbls:");
+                sb.AppendLine("    vtbls:");
                 sb.AppendLine($"      - ea: 0x{entry.VTableAddress - _sigScanner.Module.BaseAddress + 0x140000000:X}");
                 if (entry.InheritanceVtableAddress == _atkUnitBaseVtableAddress)
                 {
@@ -105,7 +105,7 @@ public unsafe partial class AddonFactoriesTab : DebugTab
                         sb.AppendLine($"        base: 0x{entry.InheritanceVtableAddress - _sigScanner.Module.BaseAddress + 0x140000000:X}");
                     }
                 }
-                sb.AppendLine( "    funcs:");
+                sb.AppendLine("    funcs:");
                 sb.AppendLine($"      0x{entry.CtorAddress - _sigScanner.Module.BaseAddress + 0x140000000:X}: ctor");
             }
 

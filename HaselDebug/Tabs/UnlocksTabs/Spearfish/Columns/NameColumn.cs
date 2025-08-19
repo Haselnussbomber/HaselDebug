@@ -1,4 +1,3 @@
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;

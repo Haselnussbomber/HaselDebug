@@ -32,12 +32,12 @@ public unsafe partial class AddonConfigTab : DebugTab
 
             _addonNames.TryAdd(UIGlobals.ComputeAddonNameHash(name), name);
         }
-        
+
         foreach (ref var addon in HudLayoutAddon.GetSpan())
         {
             AddName(addon.AddonName);
         }
-        
+
         foreach (var addonName in RaptureAtkModule.Instance()->AddonNames)
         {
             var addonNameString = addonName.StringPtr.ToString();

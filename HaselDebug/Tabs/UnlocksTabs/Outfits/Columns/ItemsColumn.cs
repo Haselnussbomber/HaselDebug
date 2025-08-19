@@ -1,7 +1,6 @@
 using System.Numerics;
 using System.Text;
 using Dalamud.Interface.Utility;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;

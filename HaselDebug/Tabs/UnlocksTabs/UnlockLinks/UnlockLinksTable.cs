@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Plugin.Services;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Game.Enums;
 using HaselCommon.Gui.ImGuiTable;
