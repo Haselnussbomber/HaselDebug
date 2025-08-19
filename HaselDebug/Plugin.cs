@@ -25,7 +25,7 @@ public class Plugin : IDalamudPlugin
         _pluginInterface = pluginInterface;
 
         FFXIVClientStructs.Interop.Generated.Addresses.Register();
-        Addresses.Register();
+        // Addresses.Register();
         Resolver.GetInstance.Setup(
             sigScanner.SearchBase,
             dataManager.GameData.Repositories["ffxiv"].Version,

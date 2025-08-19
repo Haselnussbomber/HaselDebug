@@ -3,35 +3,23 @@ using System.Globalization;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using InteropGenerator.Runtime;
-using InteropGenerator.Runtime.Attributes;
+using Lumina.Excel.Sheets;
 using Microsoft.Extensions.Logging;
 
 namespace HaselDebug.Tabs;
 
-[GenerateInterop]
-[StructLayout(LayoutKind.Explicit, Size = 0)]
-public unsafe partial struct AddonConfigFunctions
-{
-    [MemberFunction("E8 ?? ?? ?? ?? 33 ED 44 8B F8 85 C0 0F 84")]
-    public static partial int GetNameCount();
-
-    [MemberFunction("E8 ?? ?? ?? ?? BA ?? ?? ?? ?? 8B CF E8")]
-    public static partial CStringPointer GetNameByIndex(uint index);
-
-    [MemberFunction("E8 ?? ?? ?? ?? 4C 8B 43 ?? 41 8B 88"), GenerateStringOverloads]
-    public static partial uint GetNameHash(CStringPointer name);
-}
-
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class AddonConfigTab : DebugTab
 {
-    private readonly DebugRenderer _debugRenderer;
     private readonly ILogger<AddonConfigTab> _logger;
+    private readonly DebugRenderer _debugRenderer;
+    private readonly ExcelService _excelService;
+
     private readonly Dictionary<uint, string> _addonNames = [];
     private bool _isInitialized;
 
@@ -42,14 +30,14 @@ public unsafe partial class AddonConfigTab : DebugTab
             if (name.Length >= 32)
                 return;
 
-            _addonNames.TryAdd(AddonConfigFunctions.GetNameHash(name), name);
+            _addonNames.TryAdd(UIGlobals.ComputeAddonNameHash(name), name);
         }
-
-        for (var i = 0u; i < AddonConfigFunctions.GetNameCount(); i++)
+        
+        foreach (ref var addon in HudLayoutAddon.GetSpan())
         {
-            AddName(AddonConfigFunctions.GetNameByIndex(i));
+            AddName(addon.AddonName);
         }
-
+        
         foreach (var addonName in RaptureAtkModule.Instance()->AddonNames)
         {
             var addonNameString = addonName.StringPtr.ToString();
@@ -72,15 +60,18 @@ public unsafe partial class AddonConfigTab : DebugTab
         }
 
         var addonConfig = AddonConfig.Instance();
+        if (addonConfig == null || addonConfig->ActiveDataSet == null)
+            return;
 
         using var tabbar = ImRaii.TabBar("AddonConfigTabBar");
-        if (!tabbar) return;
+        if (!tabbar)
+            return;
 
         using (var tab = ImRaii.TabItem("Global Configs"))
         {
             if (tab)
             {
-                DrawTable(addonConfig->ModuleData->ConfigEntries);
+                DrawTable(addonConfig->ActiveDataSet->ConfigEntries);
             }
         }
 
@@ -96,12 +87,21 @@ public unsafe partial class AddonConfigTab : DebugTab
                         using var hudLayoutTab = ImRaii.TabItem($"HudLayout {i}");
                         if (hudLayoutTab)
                         {
-                            DrawHudLayoutTable(addonConfig->ModuleData->HudLayoutConfigEntries, i);
+                            DrawHudLayoutTable(addonConfig->ActiveDataSet->HudLayoutConfigEntries, i);
                         }
                     }
                 }
             }
         }
+
+        using (var tab = ImRaii.TabItem("HudLayout Addons"))
+        {
+            if (tab)
+            {
+                DrawHudLayoutAddonsTab();
+            }
+        }
+
     }
 
     private void DrawTable(Span<AddonConfigEntry> configEntries)
@@ -208,5 +208,47 @@ public unsafe partial class AddonConfigTab : DebugTab
 
         ImGui.TableNextColumn();
         ImGuiUtilsEx.DrawCopyableText(configEntry->IsOpen.ToString());
+    }
+
+    public void DrawHudLayoutAddonsTab()
+    {
+        var span = HudLayoutAddon.GetSpan();
+
+        using var table = ImRaii.Table("DrawHudLayoutAddonsTable"u8, 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable);
+        if (!table) return;
+
+        ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 50);
+        ImGui.TableSetupColumn("Addon Name"u8);
+        ImGui.TableSetupColumn("Addon Name Hash"u8, ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupColumn("Hud RowId and Display Name"u8);
+        ImGui.TableSetupColumn("Flags"u8, ImGuiTableColumnFlags.WidthFixed, 200);
+        ImGui.TableSetupScrollFreeze(0, 1);
+        ImGui.TableHeadersRow();
+
+        for (var i = 0; i < span.Length; i++)
+        {
+            var entry = span[i];
+
+            ImGui.TableNextRow();
+
+            ImGui.TableNextColumn(); // Index
+            ImGuiUtilsEx.DrawCopyableText(i.ToString());
+
+            ImGui.TableNextColumn(); // AddonName
+            ImGuiUtilsEx.DrawCopyableText(entry.AddonName.ToString());
+
+            ImGui.TableNextColumn(); // Hash
+            ImGuiUtilsEx.DrawCopyableText($"0x{UIGlobals.ComputeAddonNameHash(entry.AddonName):X8}");
+
+            ImGui.TableNextColumn(); // HudRowId
+
+            if (_excelService.TryGetRow<Hud>(entry.HudRowId, out var hudRow))
+                ImGuiUtilsEx.DrawCopyableText($"[Hud#{entry.HudRowId}] {hudRow.Unknown0}");
+            else
+                ImGuiUtilsEx.DrawCopyableText($"[Hud#{entry.HudRowId}]");
+
+            ImGui.TableNextColumn(); // Flags
+            ImGuiUtilsEx.DrawCopyableText($"0x{entry.Flags:X2}");
+        }
     }
 }
