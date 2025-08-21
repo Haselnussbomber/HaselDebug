@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [fc396330](https://github.com/aers/FFXIVClientStructs/tree/fc396330) ([compare](https://github.com/aers/FFXIVClientStructs/compare/2d10f753..fc396330)).
+
 ## [1.30.5] (2025-08-15)
 
 - **Fixed:** There was a substantial FPS loss when displaying structs with a lot of field due to inheritance checks for type redirects. The result of inheritance checks is now cached.
