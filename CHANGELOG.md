@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.31.0] (2025-08-1265)
 
 - **Added:** Keybinds are now displayed in the Input tab.
 - **Added:** The Addon Config tab now has a sub-tab that lists all HudLayout configurable addons.
@@ -499,7 +499,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.5...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.31.0...main
+[1.31.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.5...v1.31.0
 [1.30.5]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.4...v1.30.5
 [1.30.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.3...v1.30.4
 [1.30.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.2...v1.30.3
