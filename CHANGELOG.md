@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- **Added:** Keybinds are now displayed in the Input tab.
 - **Updated:** ClientStructs now at [0e5c2ea3](https://github.com/aers/FFXIVClientStructs/tree/0e5c2ea3) ([compare](https://github.com/aers/FFXIVClientStructs/compare/2d10f753..0e5c2ea3)).
 
 ## [1.30.5] (2025-08-15)
