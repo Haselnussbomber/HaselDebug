@@ -3,6 +3,8 @@
 ## [Unreleased]
 
 - **Added:** Keybinds are now displayed in the Input tab.
+- **Added:** The Addon Config tab now has a sub-tab that lists all HudLayout configurable addons.
+- **Updated:** The GlobalParameters list in the RaptureTextModule tab was updated.
 - **Updated:** ClientStructs now at [0e5c2ea3](https://github.com/aers/FFXIVClientStructs/tree/0e5c2ea3) ([compare](https://github.com/aers/FFXIVClientStructs/compare/2d10f753..0e5c2ea3)).
 
 ## [1.30.5] (2025-08-15)
