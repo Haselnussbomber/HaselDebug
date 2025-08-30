@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** Permissions tab. 🤷‍♂️
+
 ## [1.31.0] (2025-08-1265)
 
 - **Added:** Keybinds are now displayed in the Input tab.
