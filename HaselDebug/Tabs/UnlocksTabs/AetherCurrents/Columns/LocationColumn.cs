@@ -77,7 +77,7 @@ public partial class LocationColumn : ColumnString<AetherCurrentEntry>
             return;
 
         _debugRenderer.DrawIcon(quest.EventIconType.Value!.MapIconAvailable + 1, canCopy: false);
-        ImGuiUtils.TextUnformattedColored(Color.Yellow, $"[#{index}] {_textService.GetQuestName(quest.RowId)}");
+        ImGui.TextColored(Color.Yellow, $"[#{index}] {_textService.GetQuestName(quest.RowId)}");
         ImGui.SameLine();
         ImGui.Text($"{GetHumanReadableCoords(quest.IssuerLocation.Value)} | {_textService.GetENpcResidentName(quest.IssuerStart.RowId)}");
     }
@@ -91,7 +91,7 @@ public partial class LocationColumn : ColumnString<AetherCurrentEntry>
             return;
 
         _debugRenderer.DrawIcon(60033, canCopy: false);
-        ImGuiUtils.TextUnformattedColored(Color.Green, $"[#{index}] {_textService.GetEObjName(eobj.RowId)}");
+        ImGui.TextColored(Color.Green, $"[#{index}] {_textService.GetEObjName(eobj.RowId)}");
         ImGui.SameLine();
         ImGui.Text(GetHumanReadableCoords(level));
     }

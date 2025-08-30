@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - **Added:** Permissions tab. 🤷‍♂️
+- **Updated:** ClientStructs now at [73f41906](https://github.com/aers/FFXIVClientStructs/tree/73f41906) ([compare](https://github.com/aers/FFXIVClientStructs/compare/0e5c2ea3..73f41906)).
 
 ## [1.31.0] (2025-08-1265)
 

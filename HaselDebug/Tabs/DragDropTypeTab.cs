@@ -39,7 +39,7 @@ public unsafe partial class DragDropTypeTab : DebugTab
                     continue;
 
                 var accepted = ((DragDropType)i).Accepts((DragDropType)j);
-                ImGuiUtils.TextUnformattedColored(accepted ? Color.Green : Color.Red, $"{accepted}");
+                ImGui.TextColored(accepted ? Color.Green : Color.Red, $"{accepted}");
             }
         }
     }
