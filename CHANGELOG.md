@@ -1,11 +1,11 @@
 # Changelog
 
-## [Unreleased]
+## [1.32.0] (2025-09-01)
 
 - **Added:** A Permissions tab to check which Permissions match the current Conditions.
 - **Updated:** ClientStructs now at [24edbea0](https://github.com/aers/FFXIVClientStructs/tree/24edbea0) ([compare](https://github.com/aers/FFXIVClientStructs/compare/0e5c2ea3..24edbea0)).
 
-## [1.31.0] (2025-08-1265)
+## [1.31.0] (2025-08-26)
 
 - **Added:** Keybinds are now displayed in the Input tab.
 - **Added:** The Addon Config tab now has a sub-tab that lists all HudLayout configurable addons.
