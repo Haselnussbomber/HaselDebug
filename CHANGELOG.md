@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [834d3cc9](https://github.com/aers/FFXIVClientStructs/tree/834d3cc9) ([compare](https://github.com/aers/FFXIVClientStructs/compare/24edbea0..834d3cc9)).
+
 ## [1.32.0] (2025-09-01)
 
 - **Added:** A Permissions tab to check which Permissions match the current Conditions.
