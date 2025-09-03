@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.32.2] (2025-09-04)
+
+- **Updated:** ClientStructs now at [dd9edd91](https://github.com/aers/FFXIVClientStructs/tree/dd9edd91) ([compare](https://github.com/aers/FFXIVClientStructs/compare/834d3cc9..dd9edd91)).
+
 ## [1.32.1] (2025-09-02)
 
 - **Updated:** ClientStructs now at [834d3cc9](https://github.com/aers/FFXIVClientStructs/tree/834d3cc9) ([compare](https://github.com/aers/FFXIVClientStructs/compare/24edbea0..834d3cc9)).
@@ -508,7 +512,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.2...main
+[1.32.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.1...v1.32.2
 [1.32.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.0...v1.32.1
 [1.32.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.31.0...v1.32.0
 [1.31.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.30.5...v1.31.0
