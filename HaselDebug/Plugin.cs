@@ -1,12 +1,9 @@
-using System.IO;
-using Dalamud.Game;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using HaselCommon.Commands;
 using HaselCommon.Services;
 using HaselDebug.Config;
 using HaselDebug.Windows;
-using InteropGenerator.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug;
@@ -16,21 +13,10 @@ public class Plugin : IDalamudPlugin
     private readonly IDalamudPluginInterface _pluginInterface;
     private readonly ServiceProvider _serviceProvider;
 
-    public Plugin(
-        IDalamudPluginInterface pluginInterface,
-        ISigScanner sigScanner,
-        IDataManager dataManager,
-        IFramework framework)
+    public Plugin(IDalamudPluginInterface pluginInterface, IFramework framework)
     {
         _pluginInterface = pluginInterface;
-
-        FFXIVClientStructs.Interop.Generated.Addresses.Register();
-        Addresses.Register();
-        Resolver.GetInstance.Setup(
-            sigScanner.SearchBase,
-            dataManager.GameData.Repositories["ffxiv"].Version,
-            new FileInfo(Path.Join(pluginInterface.ConfigDirectory.FullName, "SigCache.json")));
-        Resolver.GetInstance.Resolve();
+        _pluginInterface.InitializeCustomClientStructs();
 
         _serviceProvider = new ServiceCollection()
             .AddDalamud(pluginInterface)

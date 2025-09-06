@@ -115,7 +115,8 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
     private readonly TextService _textService;
     private readonly AddonObserver _addonObserver;
     private readonly LanguageProvider _languageProvider;
-    private readonly TextureService _textureService;
+    private readonly GfdService _gfdService;
+    private readonly UldService _uldService;
 
     private SeStringInspectorWindow? _inspectorWindow;
     private bool _isInitialized;
@@ -441,12 +442,12 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
             ImGui.Text($"{i}");
 
             ImGui.TableNextColumn();
-            _textureService.DrawGfd(iconMapping[i].IconId, ImGui.GetTextLineHeightWithSpacing());
+            _gfdService.Draw(iconMapping[i].IconId, ImGui.GetTextLineHeightWithSpacing());
             ImGui.SameLine();
             ImGui.Text($"{iconMapping[i].IconId}");
 
             ImGui.TableNextColumn();
-            _textureService.DrawGfd(iconMapping[i].RemappedIconId, ImGui.GetTextLineHeightWithSpacing());
+            _gfdService.Draw(iconMapping[i].RemappedIconId, ImGui.GetTextLineHeightWithSpacing());
             ImGui.SameLine();
             ImGui.Text($"{iconMapping[i].RemappedIconId}");
         }

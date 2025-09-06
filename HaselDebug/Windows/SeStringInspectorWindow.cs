@@ -33,13 +33,15 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
 
     private SeStringParameter[]? _localParameters = null;
     private string _macroString = string.Empty;
+    private ReadOnlySeString _string;
+    private Utf8String* _utf8string;
 
     public ReadOnlySeString String
     {
-        get;
+        get => _string;
         set
         {
-            field = value;
+            _string = value;
             _localParameters = null;
         }
     }
@@ -51,10 +53,10 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
     public AtkResNode* Node { get; set; }
     public Utf8String* Utf8String
     {
-        get;
+        get => _utf8string;
         set
         {
-            field = value;
+            _utf8string = value;
             _macroString = value != null ? new ReadOnlySeStringSpan(value->AsSpan()).ToString() : string.Empty;
         }
     }

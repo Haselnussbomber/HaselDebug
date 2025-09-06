@@ -17,7 +17,6 @@ public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
     private const float IconSize = OutfitsTable.IconSize;
 
     private readonly TextService _textService;
-    private readonly TextureService _textureService;
     private readonly ITextureProvider _textureProvider;
     private readonly ImGuiContextMenuService _imGuiContextMenuService;
 
@@ -39,9 +38,8 @@ public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
         ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
         ImGui.SameLine(0, 0);
         ImGuiUtils.PushCursorX(-IconSize * ImGuiHelpers.GlobalScale);
-        _textureService.DrawIcon(
-            row.Set.Value.Icon,
-            false,
+        _textureProvider.DrawIcon(
+            (uint)row.Set.Value.Icon,
             new(IconSize * ImGuiHelpers.GlobalScale)
             {
                 TintColor = isSetCollected

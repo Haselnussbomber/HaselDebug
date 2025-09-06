@@ -313,7 +313,7 @@ public unsafe partial class DebugRenderer
         {
             if (macroCode is MacroCode.Icon or MacroCode.Icon2 && idx == 0)
             {
-                _textureService.DrawGfd(u32, ImGui.GetTextLineHeight());
+                _gfdService.Draw(u32, ImGui.GetTextLineHeight());
                 ImGui.SameLine();
             }
 

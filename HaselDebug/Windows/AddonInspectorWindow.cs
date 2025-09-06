@@ -8,13 +8,14 @@ namespace HaselDebug.Windows;
 public partial class AddonInspectorWindow : SimpleWindow
 {
     private readonly AtkDebugRenderer _atkDebugRenderer;
+    private string _addonName;
 
     public ushort AddonId { get; internal set; }
 
     public string AddonName
     {
-        get;
-        set { field = value; WindowName = value; }
+        get => _addonName;
+        set { _addonName = value; WindowName = value; }
     }
 
     public override void OnOpen()

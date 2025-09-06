@@ -10,7 +10,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.AozActions.Columns;
 [RegisterTransient, AutoConstruct]
 public partial class LocationColumn : ColumnString<AozEntry>
 {
-    private readonly TextureService _textureService;
+    private readonly UldService _uldService;
     private readonly DebugRenderer _debugRenderer;
     private readonly ExcelService _excelService;
     private readonly TextService _textService;
@@ -31,7 +31,7 @@ public partial class LocationColumn : ColumnString<AozEntry>
         switch (entry.AozActionTransient.LocationKey)
         {
             case 1 when entry.AozActionTransient.Location.TryGetValue<PlaceName>(out var placeName):
-                _textureService.DrawPart("AozNoteBook", 7, 2, ImGui.GetTextLineHeight());
+                _uldService.DrawPart("AozNoteBook", 7, 2, ImGui.GetTextLineHeight());
                 ImGui.SameLine();
                 ImGui.Text(placeName.Name.ToString());
                 break;
@@ -42,7 +42,7 @@ public partial class LocationColumn : ColumnString<AozEntry>
                 break;
 
             case 3:
-                _textureService.DrawPart("AozNoteBook", 7, 2, ImGui.GetTextLineHeight());
+                _uldService.DrawPart("AozNoteBook", 7, 2, ImGui.GetTextLineHeight());
                 ImGui.SameLine();
                 ImGui.Text(_textService.GetAddonText(12270)); // Learned First
                 break;

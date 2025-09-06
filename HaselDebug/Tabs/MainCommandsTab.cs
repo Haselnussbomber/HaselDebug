@@ -1,5 +1,6 @@
 using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Graphics;
@@ -15,9 +16,9 @@ namespace HaselDebug.Tabs;
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class MainCommandsTab : DebugTab
 {
+    private readonly ITextureProvider _textureProvider;
     private readonly DebugRenderer _debugRenderer;
     private readonly ExcelService _excelService;
-    private readonly TextureService _textureService;
 
     public override bool DrawInChild => false;
 
@@ -74,7 +75,7 @@ public unsafe partial class MainCommandsTab : DebugTab
                 ImGui.TableSetupColumn("Text"u8, ImGuiTableColumnFlags.WidthFixed, 300);
 
                 ImGui.TableNextColumn(); // Icon
-                _textureService.DrawIcon(row.Icon, 40);
+                _textureProvider.DrawIcon(row.Icon, 40);
 
                 ImGui.TableNextColumn(); // Text
                 using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, ImGui.GetStyle().ItemInnerSpacing.X);

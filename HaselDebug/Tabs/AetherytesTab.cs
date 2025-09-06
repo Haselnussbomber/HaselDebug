@@ -14,7 +14,7 @@ public partial class AetherytesTab : DebugTab
     private readonly IAetheryteList _aetheryteList;
     private readonly TextService _textService;
     private readonly ExcelService _excelService;
-    private readonly TextureService _textureService;
+    private readonly UldService _uldService;
 
     public override bool DrawInChild => false;
 
@@ -60,7 +60,7 @@ public partial class AetherytesTab : DebugTab
             ImGui.Text($"#{aetheryte.AetheryteId}");
 
             ImGui.TableNextColumn();
-            _textureService.DrawPart("Teleport", 16, GetPartId(GetTimelineId(regionType, territory.RowId)), 40 / 2f);
+            _uldService.DrawPart("Teleport", 16, GetPartId(GetTimelineId(regionType, territory.RowId)), 40 / 2f);
 
             ImGui.TableNextColumn();
             ImGui.Text(GetRegionName(regionType));

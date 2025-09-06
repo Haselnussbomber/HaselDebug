@@ -31,6 +31,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
+using HaselCommon.Utils;
 using HaselDebug.Utils;
 using InteropGenerator.Runtime;
 using InteropGenerator.Runtime.Attributes;
@@ -68,7 +69,8 @@ public unsafe partial class DebugRenderer
     private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly ISeStringEvaluator _seStringEvaluator;
     private readonly TextService _textService;
-    private readonly TextureService _textureService;
+    private readonly GfdService _gfdService;
+    private readonly UldService _uldService;
     private readonly IDataManager _dataManager;
     private readonly ISigScanner _sigScanner;
     private readonly IGameGui _gameGui;
