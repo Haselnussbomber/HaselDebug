@@ -2,7 +2,10 @@
 
 ## [Unreleased]
 
-- **Updated:** The Main Commands tab now displays stats recorded by the McAggreModule.
+- **Added:** The agent context menu in the Agents tab now has a "Show Agent"/"Hide Agent" option when the agent is activatable. Use at your own risk!
+- **Added:** Visible agents in the Agents tab are now listed in green.
+- **Added:** The Main Commands tab now displays stats recorded by the McAggreModule.
+- **Fixed:** Agents with an Unk entry in the AgentId enum are now once again using the addon name as fallback when it's open.
 - **Updated:** ClientStructs now at [59feea87](https://github.com/aers/FFXIVClientStructs/tree/59feea87) ([compare](https://github.com/aers/FFXIVClientStructs/compare/dd9edd91..59feea87)).
 
 ## [1.32.2] (2025-09-04)
