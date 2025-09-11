@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [59feea87](https://github.com/aers/FFXIVClientStructs/tree/59feea87) ([compare](https://github.com/aers/FFXIVClientStructs/compare/dd9edd91..59feea87)).
+
 ## [1.32.2] (2025-09-04)
 
 - **Updated:** ClientStructs now at [dd9edd91](https://github.com/aers/FFXIVClientStructs/tree/dd9edd91) ([compare](https://github.com/aers/FFXIVClientStructs/compare/834d3cc9..dd9edd91)).
