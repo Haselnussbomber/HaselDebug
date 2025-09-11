@@ -63,10 +63,20 @@
     "de": "In neuem Fenster öffnen"
   },
   "ContextMenu.GameObject.DisableDraw": {
-    "en": "Disable draw"
+    "en": "Disable draw",
+    "de": "Ausblenden"
   },
   "ContextMenu.GameObject.EnableDraw": {
-    "en": "Enable draw"
+    "en": "Enable draw",
+    "de": "Einblenden"
+  },
+  "ContextMenu.Agent.Show": {
+    "en": "Show Agent",
+    "de": "Agent einblenden"
+  },
+  "ContextMenu.Agent.Hide": {
+    "en": "Hide Agent",
+    "de": "Agent ausblenden"
   },
 
   "UnlockedColumn.Label": {

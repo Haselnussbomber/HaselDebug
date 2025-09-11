@@ -124,6 +124,20 @@ public unsafe partial class AgentsTab : DebugTab
                     Label = _textService.Translate("ContextMenu.PinnedInstances.Unpin"),
                     ClickCallback = () => _pinnedInstances.Remove(agentType)
                 });
+
+                builder.Add(new ImGuiContextMenuEntry()
+                {
+                    Visible = agent.Value->IsActivatable() && !agent.Value->IsAddonShown(),
+                    Label = _textService.Translate("ContextMenu.Agent.Show"),
+                    ClickCallback = () => agent.Value->Show()
+                });
+
+                builder.Add(new ImGuiContextMenuEntry()
+                {
+                    Visible = agent.Value->IsActivatable() && agent.Value->IsAddonShown(),
+                    Label = _textService.Translate("ContextMenu.Agent.Hide"),
+                    ClickCallback = () => agent.Value->Hide()
+                });
             });
 
             ImGui.TableNextColumn(); // Active
