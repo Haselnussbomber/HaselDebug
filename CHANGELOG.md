@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- **Updated:** The Main Commands tab now displays stats recorded by the McAggreModule.
 - **Updated:** ClientStructs now at [59feea87](https://github.com/aers/FFXIVClientStructs/tree/59feea87) ([compare](https://github.com/aers/FFXIVClientStructs/compare/dd9edd91..59feea87)).
 
 ## [1.32.2] (2025-09-04)

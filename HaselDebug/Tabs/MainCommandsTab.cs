@@ -25,13 +25,16 @@ public unsafe partial class MainCommandsTab : DebugTab
     public override void Draw()
     {
         var agentHud = AgentHUD.Instance();
+        var mcAggreModule = UIModule.Instance()->GetMcAggreModule();
 
-        using var table = ImRaii.Table("MainCommandsTable"u8, 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("MainCommandsTable"u8, 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table.Success) return;
 
         ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Used"u8, ImGuiTableColumnFlags.WidthFixed, 40);
+        ImGui.TableSetupColumn("Failed"u8, ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupScrollFreeze(2, 1);
+        ImGui.TableSetupScrollFreeze(4, 1);
         ImGui.TableHeadersRow();
 
         foreach (var row in _excelService.GetSheet<MainCommand>())
@@ -43,6 +46,14 @@ public unsafe partial class MainCommandsTab : DebugTab
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Id
             ImGui.Text(row.RowId.ToString());
+
+            ImGui.TableNextColumn(); // Used
+            if (row.Unknown0 > 0 && row.Unknown0 < mcAggreModule->Usages.Length)
+                ImGui.Text($"{mcAggreModule->Usages[row.Unknown0]}");
+
+            ImGui.TableNextColumn(); // Failed
+            if (row.Unknown0 > 0 && row.Unknown0 < mcAggreModule->FailedUsages.Length)
+                ImGui.Text($"{mcAggreModule->FailedUsages[row.Unknown0]}");
 
             ImGui.TableNextColumn(); // Name
             _debugRenderer.DrawIcon((uint)row.Icon);
