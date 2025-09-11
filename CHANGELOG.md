@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.33.0] (2025-09-11)
 
 - **Added:** The agent context menu in the Agents tab now has a "Show Agent"/"Hide Agent" option when the agent is activatable. Use at your own risk!
 - **Added:** Visible agents in the Agents tab are now listed in green.
@@ -520,7 +520,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.33.0...main
+[1.33.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.2...v1.33.0
 [1.32.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.1...v1.32.2
 [1.32.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.0...v1.32.1
 [1.32.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.31.0...v1.32.0
