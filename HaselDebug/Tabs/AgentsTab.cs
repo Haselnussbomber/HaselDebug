@@ -75,16 +75,19 @@ public unsafe partial class AgentsTab : DebugTab
             var agent = agentModule->Agents[i];
             var agentId = (AgentId)i;
             var (agentName, isAgentNameAddonName) = GetAgentName(agentId);
+            var isActive = agent.Value->IsAgentActive();
 
             if (hasSearchTerm && !agentName.Contains(_agentNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
                 continue;
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Id
-            ImGui.Text(i.ToString());
+            using (Color.Green.Push(ImGuiCol.Text, isActive))
+                ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Name
 
+            using (Color.Green.Push(ImGuiCol.Text, isActive))
             using (Color.Yellow.Push(ImGuiCol.Text, isAgentNameAddonName))
             {
                 if (ImGui.Selectable(agentName + $"###AgentSelectable{i}", _selectedAgentId == agentId, ImGuiSelectableFlags.SpanAllColumns))
@@ -141,7 +144,8 @@ public unsafe partial class AgentsTab : DebugTab
             });
 
             ImGui.TableNextColumn(); // Active
-            ImGui.Text(agent.Value->IsAgentActive().ToString());
+            using (Color.Green.Push(ImGuiCol.Text, isActive))
+                ImGui.Text(isActive.ToString());
         }
     }
 
