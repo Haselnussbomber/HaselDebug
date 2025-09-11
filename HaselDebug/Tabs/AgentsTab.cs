@@ -152,7 +152,7 @@ public unsafe partial class AgentsTab : DebugTab
     private (string, bool) GetAgentName(AgentId agentId)
     {
         var name = Enum.GetName(agentId);
-        if (!string.IsNullOrEmpty(name))
+        if (!string.IsNullOrEmpty(name) && !name.StartsWith("Unk"))
             return (name, false);
 
         if (TryGetAddon<AtkUnitBase>(agentId, out var addon) && !string.IsNullOrEmpty(addon->NameString))
