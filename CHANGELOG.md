@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** Unlock tabs "Chocobo Taxi Stands" and "HowTos".
+- **Added:** An "Unlock Span Length Test" tab to quickly validate most bit arrays in UIState and PlayerState.
+- **Updated:** ClientStructs now at [fefa7bfb](https://github.com/aers/FFXIVClientStructs/tree/fefa7bfb) ([compare](https://github.com/aers/FFXIVClientStructs/compare/59feea87..fefa7bfb)).
+
 ## [1.33.0] (2025-09-11)
 
 - **Added:** The agent context menu in the Agents tab now has a "Show Agent"/"Hide Agent" option when the agent is activatable. Use at your own risk!
