@@ -679,6 +679,118 @@ public unsafe partial class UnlocksTabUtils
         ImGuiHelpers.SeStringWrapped(_seStringEvaluator.Evaluate(adventure.Description));
     }
 
+    public void DrawHowToTooltip(HowTo howTo)
+    {
+        using var id = ImRaii.PushId($"HowToTooltip{howTo.RowId}");
+
+        using var tooltip = ImRaii.Tooltip();
+        if (!tooltip) return;
+
+        var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
+        const float MaxImageWidth = 200f;
+
+        using var popuptitletable = ImRaii.Table("PopupTitleTableRow"u8, 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
+        if (!popuptitletable) return;
+
+        ImGui.TableSetupColumn("Icon"u8, ImGuiTableColumnFlags.WidthFixed, ImGui.GetTextLineHeight() * 2);
+        ImGui.TableSetupColumn("Text"u8, ImGuiTableColumnFlags.WidthStretch);
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn(); // Icon
+
+        _uldService.DrawPart("HowTo", 8, 2, ImGui.GetTextLineHeight() * 2);
+
+        ImGui.TableNextColumn(); // Text
+
+        ImGui.Text(howTo.Name.ToString());
+
+        var category = howTo.Category.ValueNullable?.Category.ToString() ?? string.Empty;
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            ImGuiUtils.PushCursorY(-3 * ImGuiHelpers.GlobalScale);
+            using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey.ToUInt()))
+                ImGui.Text(category);
+        }
+
+        DrawSeparator(marginTop: 1, marginBottom: 5);
+
+        var playerState = PlayerState.Instance();
+
+        var i = 0;
+        foreach (var page in howTo.HowToPagePC)
+        {
+            if (page.RowId == 0 || !page.IsValid) continue;
+
+            if (i > 0)
+                DrawSeparator(marginTop: -1);
+
+            var iconOffsetType = page.Value.IconType switch
+            {
+                1 when playerState->IsLoaded => playerState->StartTown - 1,
+                2 when playerState->IsLoaded => playerState->GrandCompany - 1,
+                _ => 0,
+            };
+            var iconOffset = new int[] { 0, 3000, 6000 }[iconOffsetType];
+            var iconId = page.Value.Image + iconOffset;
+
+            var textIndex = page.Value.TextType switch
+            {
+                1 when playerState->IsLoaded => playerState->StartTown - 1,
+                2 when playerState->IsLoaded => playerState->GrandCompany - 1,
+                _ => 0,
+            };
+            var text = page.Value.Text[textIndex];
+
+            if (text.IsEmpty)
+            {
+                var maxWidth = Math.Max(ImGui.GetContentRegionAvail().X, 640);
+
+                if (_textureProvider.TryGetFromGameIcon(iconId, out var texture2) && texture2.TryGetWrap(out var textureWrap2, out _))
+                {
+                    var size = textureWrap2.Size;
+
+                    if (size.X > maxWidth)
+                        size *= maxWidth / size.X;
+
+                    textureWrap2.Draw(size);
+                }
+                else
+                {
+                    ImGui.Dummy(new Vector2(maxWidth, 1));
+                }
+
+                continue;
+            }
+
+            using var popuptable = ImRaii.Table($"PopupTableRow{i++}", 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
+            if (!popuptable) return;
+
+            ImGui.TableSetupColumn("Icon"u8, ImGuiTableColumnFlags.WidthFixed, MaxImageWidth * ImGuiHelpers.GlobalScale + itemInnerSpacing.X);
+            ImGui.TableSetupColumn("Text"u8, ImGuiTableColumnFlags.WidthFixed, 360 * ImGuiHelpers.GlobalScale);
+
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn(); // Icon
+
+            if (_textureProvider.TryGetFromGameIcon(iconId, out var texture) && texture.TryGetWrap(out var textureWrap, out _))
+            {
+                var size = textureWrap.Size;
+
+                if (size.X > MaxImageWidth)
+                    size *= MaxImageWidth / size.X;
+
+                textureWrap.Draw(size * ImGuiHelpers.GlobalScale);
+            }
+            else
+            {
+                ImGui.Dummy(new Vector2(280, 1));
+            }
+
+            ImGui.TableNextColumn(); // Text
+
+            ImGuiHelpers.SeStringWrapped(_seStringEvaluator.Evaluate(text));
+        }
+    }
+
     private static void DrawSeparator(float marginTop = 2, float marginBottom = 5)
     {
         ImGuiUtils.PushCursorY(marginTop * ImGuiHelpers.GlobalScale);
