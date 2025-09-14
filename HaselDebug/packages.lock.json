@@ -313,6 +313,11 @@
         "resolved": "9.0.8",
         "contentHash": "tizSIOEsIgSNSSh+hKeUVPK7xmTIjR8s+mJWOu1KXV3htvNQiPMFRMO17OdI1y/4ZApdBVk49u/08QGC9yvLug=="
       },
+      "R3": {
+        "type": "Transitive",
+        "resolved": "1.3.0",
+        "contentHash": "c4bL37HGimYon/qfRTZOJE41M3cgdMJn/p4O5Jq+WHTJGNXUb1x2DlVI+iZk5phCBwq3ERfrgbaPu9WdG2OS+w=="
+      },
       "System.Diagnostics.EventLog": {
         "type": "Transitive",
         "resolved": "9.0.8",
@@ -331,7 +336,8 @@
           "InteropGenerator.Runtime": "[1.0.0, )",
           "Microsoft.Extensions.DependencyInjection": "[9.0.8, )",
           "Microsoft.Extensions.Hosting": "[9.0.8, )",
-          "Microsoft.Extensions.Logging": "[9.0.8, )"
+          "Microsoft.Extensions.Logging": "[9.0.8, )",
+          "R3": "[1.3.0, )"
         }
       },
       "interopgenerator.runtime": {
