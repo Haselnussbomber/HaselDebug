@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.34.0] (2025-09-17)
 
 - **Added:** An "Event Object Manager" tab.
 - **Added:** New unlock tabs "Chocobo Taxi Stands" and "HowTos".
@@ -528,7 +528,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.33.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.0...main
+[1.34.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.33.0...v1.34.0
 [1.33.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.2...v1.33.0
 [1.32.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.1...v1.32.2
 [1.32.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.0...v1.32.1
