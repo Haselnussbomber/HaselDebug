@@ -4,7 +4,7 @@
 
 - **Added:** Unlock tabs "Chocobo Taxi Stands" and "HowTos".
 - **Added:** An "Unlock Span Length Test" tab to quickly validate most bit arrays in UIState and PlayerState.
-- **Updated:** ClientStructs now at [fefa7bfb](https://github.com/aers/FFXIVClientStructs/tree/fefa7bfb) ([compare](https://github.com/aers/FFXIVClientStructs/compare/59feea87..fefa7bfb)).
+- **Updated:** ClientStructs now at [c5652dd3](https://github.com/aers/FFXIVClientStructs/tree/c5652dd3) ([compare](https://github.com/aers/FFXIVClientStructs/compare/59feea87..c5652dd3)).
 
 ## [1.33.0] (2025-09-11)
 
