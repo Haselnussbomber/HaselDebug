@@ -19,7 +19,7 @@ public unsafe class EmotesTab(EmotesTable table) : DebugTab, IUnlockTab
         return new UnlockProgress()
         {
             TotalUnlocks = table.Rows.Count,
-            NumUnlocked = table.Rows.Count(row => row.UnlockLink == 0 || UIState.Instance()->IsUnlockLinkUnlocked((ushort)row.UnlockLink)),
+            NumUnlocked = table.Rows.Count(row => row.UnlockLink == 0 || UIState.Instance()->IsUnlockLinkUnlockedOrQuestCompleted(row.UnlockLink)),
         };
     }
 
