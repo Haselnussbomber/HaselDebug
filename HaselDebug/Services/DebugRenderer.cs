@@ -135,6 +135,12 @@ public unsafe partial class DebugRenderer
             return;
         }
 
+        if (type.IsPointer && type.GetElementType() == typeof(void))
+        {
+            DrawAddress(*(nint*)address);
+            return;
+        }
+
         nodeOptions = nodeOptions.WithAddress(address) with
         {
             HighlightAddress = address,
@@ -143,7 +149,7 @@ public unsafe partial class DebugRenderer
 
         if (type.IsVoid())
         {
-            ImGui.Text($"0x{address:X}"); // TODO: what did I do here?
+            ImGui.Text("");
             return;
         }
 
