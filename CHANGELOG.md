@@ -2,8 +2,10 @@
 
 ## [Unreleased]
 
-- **Added:** Unlock tabs "Chocobo Taxi Stands" and "HowTos".
+- **Added:** An "Event Object Manager" tab.
+- **Added:** New unlock tabs "Chocobo Taxi Stands" and "HowTos".
 - **Added:** An "Unlock Span Length Test" tab to quickly validate most bit arrays in UIState and PlayerState.
+- **Fixed:** `void*` no longer show their own address. Instead, the address it points to is shown.
 - **Updated:** ClientStructs now at [c5652dd3](https://github.com/aers/FFXIVClientStructs/tree/c5652dd3) ([compare](https://github.com/aers/FFXIVClientStructs/compare/59feea87..c5652dd3)).
 
 ## [1.33.0] (2025-09-11)
