@@ -616,7 +616,8 @@ public unsafe partial class AtkDebugRenderer
             var hasScale = animation.KeyGroups[2].KeyFrameCount > 0;
             var hasAlpha = animation.KeyGroups[3].KeyFrameCount > 0;
             var hasTint = animation.KeyGroups[4].KeyFrameCount > 0;
-            var hasPartId = animation.KeyGroups[5].KeyFrameCount > 0;
+            var hasPartId = node->Type is NodeType.Image or NodeType.NineGrid or NodeType.ClippingMask && animation.KeyGroups[5].KeyFrameCount > 0;
+            var hasTextColor = node->Type == NodeType.Text && animation.KeyGroups[5].KeyFrameCount > 0;
             var hasTextEdge = animation.KeyGroups[6].KeyFrameCount > 0;
             var hasTextLabel = animation.KeyGroups[7].KeyFrameCount > 0;
 
@@ -627,10 +628,11 @@ public unsafe partial class AtkDebugRenderer
             if (hasAlpha) tableColumnCount += 1;
             if (hasTint) tableColumnCount += 2;
             if (hasPartId) tableColumnCount += 1;
+            if (hasTextColor) tableColumnCount += 1;
             if (hasTextEdge) tableColumnCount += 1;
             if (hasTextLabel) tableColumnCount += 1;
 
-            var groupHasAnyFrames = hasPosition || hasRotation || hasScale || hasAlpha || hasTint || hasPartId || hasTextEdge || hasTextLabel;
+            var groupHasAnyFrames = hasPosition || hasRotation || hasScale || hasAlpha || hasTint || hasPartId || hasTextColor || hasTextEdge || hasTextLabel;
 
             if (!groupHasAnyFrames)
             {
@@ -673,6 +675,11 @@ public unsafe partial class AtkDebugRenderer
             if (hasPartId)
             {
                 ImGui.TableSetupColumn("Part ID"u8, ImGuiTableColumnFlags.WidthFixed);
+            }
+
+            if (hasTextColor)
+            {
+                ImGui.TableSetupColumn("Text Color"u8, ImGuiTableColumnFlags.WidthFixed);
             }
 
             if (hasTextEdge)
@@ -776,11 +783,18 @@ public unsafe partial class AtkDebugRenderer
                                 ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.UShort.ToString(CultureInfo.InvariantCulture));
                                 break;
 
+                            case 5 when hasTextColor: // TextColor
+                                ImGui.TableNextColumn();
+                                var textColor = new Vector3(keyFrame.Value.RGB.R, keyFrame.Value.RGB.G, keyFrame.Value.RGB.B) / 255f;
+                                ImGui.SetNextItemWidth(ColorEditWidth);
+                                ImGui.ColorEdit3(numericNodeOptions.GetKey("TextColor"), ref textColor);
+                                break;
+
                             case 6 when hasTextEdge: // TextEdge
                                 ImGui.TableNextColumn();
-                                var outlineColor = new Vector3(keyFrame.Value.RGB.R, keyFrame.Value.RGB.G, keyFrame.Value.RGB.B) / 255f;
+                                var edgeColor = new Vector3(keyFrame.Value.RGB.R, keyFrame.Value.RGB.G, keyFrame.Value.RGB.B) / 255f;
                                 ImGui.SetNextItemWidth(ColorEditWidth);
-                                ImGui.ColorEdit3(numericNodeOptions.GetKey("OutlineColor"), ref outlineColor);
+                                ImGui.ColorEdit3(numericNodeOptions.GetKey("TextEdgeColor"), ref edgeColor);
                                 break;
 
                             case 7 when hasTextLabel: // TextLabel
