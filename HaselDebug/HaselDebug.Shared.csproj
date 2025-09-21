@@ -5,7 +5,7 @@
   <PropertyGroup>
     <AssemblyName>HaselDebug</AssemblyName>
     <RootNamespace>$(AssemblyName)</RootNamespace>
-    <Version>1.34.1</Version>
+    <Version>1.34.2</Version>
     <OutputPath>..\bin\</OutputPath>
     <DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
     <DefineConstants>$(DefineConstants);AUTOCTOR_EMBED_ATTRIBUTES</DefineConstants>

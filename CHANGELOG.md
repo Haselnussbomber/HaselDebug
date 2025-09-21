@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.34.2] (2025-09-21)
+
+- **Fixed:** In the Addon Inspector, the "Export Timeline" button now also supports Text Color keyframes. I forgot to add this last update.
+
 ## [1.34.1] (2025-09-21)
 
 - **Fixed:** In the Addon Inspector, Text Nodes now correctly show Text Color keyframes instead of Part ID keyframes.
@@ -533,7 +537,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.2...main
+[1.34.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.1...v1.34.2
 [1.34.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.0...v1.34.1
 [1.34.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.33.0...v1.34.0
 [1.33.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.2...v1.33.0
