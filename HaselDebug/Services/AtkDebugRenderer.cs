@@ -534,7 +534,7 @@ public unsafe partial class AtkDebugRenderer
 
         if (ImGui.Button($"Export Timeline##{(nint)node:X}"))
         {
-            ExportTimeline(node->Timeline);
+            ExportTimeline(node);
         }
 
         var labelSets = node->Timeline->Resource->LabelSets;
@@ -601,7 +601,7 @@ public unsafe partial class AtkDebugRenderer
 
         if (ImGui.Button($"Export Timeline##{(nint)node:X}"))
         {
-            ExportTimeline(node->Timeline);
+            ExportTimeline(node);
         }
 
         for (var i = 0; i < node->Timeline->Resource->AnimationCount; i++)
@@ -809,13 +809,14 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
-    private void ExportTimeline(AtkTimeline* timeline)
+    private void ExportTimeline(AtkResNode* node)
     {
-        if (timeline == null ||
-            timeline->Resource == null)
-        {
+        if (node == null)
             return;
-        }
+
+        var timeline = node->Timeline;
+        if (timeline == null || timeline->Resource == null)
+            return;
 
         var timelineResource = timeline->Resource;
         var codeString = "new TimelineBuilder()\n";
@@ -870,7 +871,8 @@ public unsafe partial class AtkDebugRenderer
                             2 => $"scale: new Vector2({keyFrameValue.Float2.Item1}, {keyFrameValue.Float2.Item2}))\n",
                             3 => $"alpha: {keyFrameValue.Byte})\n",
                             4 => $"addColor: new Vector3({keyFrameValue.NodeTint.AddR}, {keyFrameValue.NodeTint.AddG}, {keyFrameValue.NodeTint.AddB}), multiplyColor: new Vector3({keyFrameValue.NodeTint.MultiplyRGB.R}, {keyFrameValue.NodeTint.MultiplyRGB.G}, {keyFrameValue.NodeTint.MultiplyRGB.B}))\n",
-                            5 => $"partId: {keyFrameValue.UShort})\n",
+                            5 when node->Type is NodeType.Image or NodeType.NineGrid or NodeType.ClippingMask => $"partId: {keyFrameValue.UShort})\n",
+                            5 when node->Type == NodeType.Text => $"textColor: new Vector3({keyFrameValue.RGB.R}, {keyFrameValue.RGB.G}, {keyFrameValue.RGB.B})))\n",
                             6 => $"textOutlineColor: new Vector3({keyFrameValue.RGB.R}, {keyFrameValue.RGB.G}, {keyFrameValue.RGB.B})))\n",
                             7 => string.Empty, // Not implemented yet
                             _ => string.Empty,
