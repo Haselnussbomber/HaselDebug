@@ -828,18 +828,18 @@ public unsafe partial class AtkDebugRenderer
             {
                 var labelSet = timelineResource->LabelSets[i];
 
-                codeString += $".BeginFrameSet({labelSet.StartFrameIdx}, {labelSet.EndFrameIdx})\n";
+                codeString += $"\t.BeginFrameSet({labelSet.StartFrameIdx}, {labelSet.EndFrameIdx})\n";
 
                 for (var j = 0; j < labelSet.LabelKeyGroup.KeyFrameCount; j++)
                 {
                     var keyFrame = labelSet.LabelKeyGroup.KeyFrames[j];
 
                     var label = keyFrame.Value.Label;
-                    codeString += $".AddLabel({keyFrame.FrameIdx}, {label.LabelId}, AtkTimelineJumpBehavior.{label.JumpBehavior}, {label.JumpLabelId})\n";
+                    codeString += $"\t\t.AddLabel({keyFrame.FrameIdx}, {label.LabelId}, AtkTimelineJumpBehavior.{label.JumpBehavior}, {label.JumpLabelId})\n";
                 }
             }
 
-            codeString += $".EndFrameSet()\n";
+            codeString += $"\t.EndFrameSet()\n";
         }
 
         // Build Timeline Animations
@@ -849,7 +849,7 @@ public unsafe partial class AtkDebugRenderer
             {
                 var animation = timeline->Resource->Animations[i];
 
-                codeString += $".BeginFrameSet({animation.StartFrameIdx}, {animation.EndFrameIdx})\n";
+                codeString += $"\t.BeginFrameSet({animation.StartFrameIdx}, {animation.EndFrameIdx})\n";
                 var frameSetHasFrames = false;
 
                 for (var groupSelector = 0; groupSelector < 8; groupSelector++)
@@ -862,7 +862,7 @@ public unsafe partial class AtkDebugRenderer
                         var keyFrameValue = keyFrame.Value;
                         frameSetHasFrames = true;
 
-                        codeString += $".AddFrame({keyFrame.FrameIdx}, ";
+                        codeString += $"\t\t.AddFrame({keyFrame.FrameIdx}, ";
 
                         codeString += groupSelector switch
                         {
@@ -872,8 +872,8 @@ public unsafe partial class AtkDebugRenderer
                             3 => $"alpha: {keyFrameValue.Byte})\n",
                             4 => $"addColor: new Vector3({keyFrameValue.NodeTint.AddR}, {keyFrameValue.NodeTint.AddG}, {keyFrameValue.NodeTint.AddB}), multiplyColor: new Vector3({keyFrameValue.NodeTint.MultiplyRGB.R}, {keyFrameValue.NodeTint.MultiplyRGB.G}, {keyFrameValue.NodeTint.MultiplyRGB.B}))\n",
                             5 when node->Type is NodeType.Image or NodeType.NineGrid or NodeType.ClippingMask => $"partId: {keyFrameValue.UShort})\n",
-                            5 when node->Type == NodeType.Text => $"textColor: new Vector3({keyFrameValue.RGB.R}, {keyFrameValue.RGB.G}, {keyFrameValue.RGB.B})))\n",
-                            6 => $"textOutlineColor: new Vector3({keyFrameValue.RGB.R}, {keyFrameValue.RGB.G}, {keyFrameValue.RGB.B})))\n",
+                            5 when node->Type == NodeType.Text => $"textColor: new Vector3({keyFrameValue.RGB.R}, {keyFrameValue.RGB.G}, {keyFrameValue.RGB.B}))\n",
+                            6 => $"textOutlineColor: new Vector3({keyFrameValue.RGB.R}, {keyFrameValue.RGB.G}, {keyFrameValue.RGB.B}))\n",
                             7 => string.Empty, // Not implemented yet
                             _ => string.Empty,
                         };
@@ -882,14 +882,14 @@ public unsafe partial class AtkDebugRenderer
 
                 if (!frameSetHasFrames)
                 {
-                    codeString += $".AddEmptyFrame({animation.StartFrameIdx})\n";
+                    codeString += $"\t\t.AddEmptyFrame({animation.StartFrameIdx})\n";
                 }
 
-                codeString += $".EndFrameSet()\n";
+                codeString += $"\t.EndFrameSet()\n";
             }
         }
 
-        codeString += $".Build();\n";
+        codeString += $"\t.Build();\n";
 
         ImGui.SetClipboardText(codeString);
     }
