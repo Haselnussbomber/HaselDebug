@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** The "Export Timeline" button now code that is indented using tabs.
+- **Fixed:** When using the "Export Timeline" button, `textColor` and `textOutlineColor` parameters had a closing bracket too much after the value.
+
 ## [1.34.2] (2025-09-21)
 
 - **Fixed:** In the Addon Inspector, the "Export Timeline" button now also supports Text Color keyframes. I forgot to add this last update.
