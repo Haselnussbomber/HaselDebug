@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.34.1] (2025-09-21)
+
+- **Fixed:** In the Addon Inspector, Text Nodes now correctly show Text Color keyframes instead of Part ID keyframes.
+- **Updated:** ClientStructs now at [e6a625a0](https://github.com/aers/FFXIVClientStructs/tree/e6a625a0) ([compare](https://github.com/aers/FFXIVClientStructs/compare/c5652dd3..e6a625a0)).
+
 ## [1.34.0] (2025-09-17)
 
 - **Added:** An "Event Object Manager" tab.
@@ -528,7 +533,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.1...main
+[1.34.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.0...v1.34.1
 [1.34.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.33.0...v1.34.0
 [1.33.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.2...v1.33.0
 [1.32.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.32.1...v1.32.2
