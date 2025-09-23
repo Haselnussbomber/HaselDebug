@@ -153,7 +153,7 @@ nextRow:;
         }
 
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _textSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
+        var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _textSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         var hasSearchTerm = !string.IsNullOrWhiteSpace(_textSearchTerm);
 
         using var hostchild = ImRaii.Child("CompletionTabChild", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
@@ -170,7 +170,9 @@ nextRow:;
                     continue;
             }
 
-            using var node = ImRaii.TreeNode($"{category.Row.Text} ({numEntries})###Completion{category.Row.RowId}_{category.SheetName}", ImGuiTreeNodeFlags.SpanAvailWidth | (hasSearchTerm ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None));
+            if (hasSearchTermChanged && hasSearchTerm)
+                ImGui.SetNextItemOpen(true);
+            using var node = ImRaii.TreeNode($"{category.Row.Text} ({numEntries})###Completion{category.Row.RowId}_{category.SheetName}", ImGuiTreeNodeFlags.SpanAvailWidth);
             if (!node)
                 continue;
 
@@ -207,6 +209,7 @@ nextRow:;
                             var match = text.Substring(matchIndex, _textSearchTerm.Length);
                             var after = text[(matchIndex + _textSearchTerm.Length)..];
 
+                            ImGui.BeginGroup();
                             ImGui.Text(before);
 
                             ImGui.SameLine(0, 0);
@@ -215,10 +218,19 @@ nextRow:;
 
                             ImGui.SameLine(0, 0);
                             ImGui.TextUnformatted(after);
+                            ImGui.EndGroup();
+                            if (ImGui.IsItemHovered())
+                                ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                            if (ImGui.IsItemClicked())
+                                ImGui.SetClipboardText(text);
                             continue;
                         }
 
                         ImGui.Text(text.ToString());
+                        if (ImGui.IsItemHovered())
+                            ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                        if (ImGui.IsItemClicked())
+                            ImGui.SetClipboardText(text);
                     }
                 }
             }
