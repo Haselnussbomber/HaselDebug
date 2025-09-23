@@ -1,9 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [1.35.0] (2025-09-23)
 
-- **Updated:** The "Export Timeline" button now code that is indented using tabs.
+- **Added:** A Completion tab to search through auto-translate texts.
+- **Updated:** The "Export Timeline" button now copies code that is indented using tabs.
+- **Updated:** Updated Link macro expression names and added names for Description, WKSPioneeringTrail and MKDLore links.
 - **Fixed:** When using the "Export Timeline" button, `textColor` and `textOutlineColor` parameters had a closing bracket too much after the value.
+- **Updated:** ClientStructs now at [775e4363](https://github.com/aers/FFXIVClientStructs/tree/775e4363) ([compare](https://github.com/aers/FFXIVClientStructs/compare/e6a625a0..775e4363)).
 
 ## [1.34.2] (2025-09-21)
 
@@ -542,7 +545,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.0...main
+[1.35.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.2...v1.35.0
 [1.34.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.1...v1.34.2
 [1.34.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.0...v1.34.1
 [1.34.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.33.0...v1.34.0
