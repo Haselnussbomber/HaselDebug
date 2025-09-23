@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.35.1] (2025-09-23)
+
+- **Updated:** Text in the "Completion" tab is now copyable.
+- **Fixed:** The categories in the "Completion" tab are now correctly force-opened when the search term has changed and exists.
+
 ## [1.35.0] (2025-09-23)
 
 - **Added:** A Completion tab to search through auto-translate texts.
@@ -545,7 +550,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.1...main
+[1.35.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.1...v1.35.1
 [1.35.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.2...v1.35.0
 [1.34.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.1...v1.34.2
 [1.34.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.0...v1.34.1
