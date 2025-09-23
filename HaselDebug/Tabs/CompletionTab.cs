@@ -219,14 +219,12 @@ nextRow:;
                             ImGui.SameLine(0, 0);
                             ImGui.TextUnformatted(after);
                             ImGui.EndGroup();
-                            if (ImGui.IsItemHovered())
-                                ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                            if (ImGui.IsItemClicked())
-                                ImGui.SetClipboardText(text);
-                            continue;
+                        }
+                        else
+                        {
+                            ImGui.Text(text.ToString());
                         }
 
-                        ImGui.Text(text.ToString());
                         if (ImGui.IsItemHovered())
                             ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                         if (ImGui.IsItemClicked())
