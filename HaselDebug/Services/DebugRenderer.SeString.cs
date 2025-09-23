@@ -86,14 +86,17 @@ public unsafe partial class DebugRenderer
         { LinkMacroPayloadType.Character, ["Flags", "WorldId"] },
         { LinkMacroPayloadType.Item, ["ItemId", "Rarity"] },
         { LinkMacroPayloadType.MapPosition, ["TerritoryType/MapId", "RawX", "RawY"] },
-        { LinkMacroPayloadType.Quest, ["QuestId"] },
-        { LinkMacroPayloadType.Achievement, ["AchievementId"] },
-        { LinkMacroPayloadType.HowTo, ["HowToId"] },
+        { LinkMacroPayloadType.Quest, ["RowId"] },
+        { LinkMacroPayloadType.Achievement, ["RowId"] },
+        { LinkMacroPayloadType.HowTo, ["RowId"] },
         // PartyFinderNotification
         { LinkMacroPayloadType.Status, ["StatusId"] },
         { LinkMacroPayloadType.PartyFinder, ["ListingId", string.Empty, "WorldId"] },
-        { LinkMacroPayloadType.AkatsukiNote, ["AkatsukiNoteId"] },
-        { DalamudLinkType, ["CommandId", "Extra1", "Extra2", "ExtraString"] }
+        { LinkMacroPayloadType.AkatsukiNote, ["RowId"] },
+        { LinkMacroPayloadType.Description, ["RowId"] },
+        { LinkMacroPayloadType.WKSPioneeringTrail, ["RowId", "SubrowId"] },
+        { LinkMacroPayloadType.MKDLore, ["RowId"] },
+        { DalamudLinkType, ["CommandId", "Extra1", "Extra2", "ExtraString"] },
     };
 
     private readonly Dictionary<uint, string[]> _fixedExpressionNames = new()
