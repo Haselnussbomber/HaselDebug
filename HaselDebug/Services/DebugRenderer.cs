@@ -19,6 +19,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Fate;
 using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
+using FFXIVClientStructs.FFXIV.Client.Game.MassivePcContent;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
@@ -298,6 +299,10 @@ public unsafe partial class DebugRenderer
 
                     case EventHandlerContent.GoldSaucerDirector:
                         type = typeof(GoldSaucerDirector);
+                        break;
+
+                    case EventHandlerContent.MassivePcContentDirector:
+                        type = typeof(MassivePcContentDirector);
                         break;
                 }
 
