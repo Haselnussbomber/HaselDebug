@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - **Added:** Type redirect for MassivePcContentDirector.
+- **Added:** ByteColor structs how also show the color in CSS hex color notation (8 digits), the UIColor RowId (if found for the current theme) and a small visual preview.
 - **Updated:** ClientStructs now at [abf68541](https://github.com/aers/FFXIVClientStructs/tree/abf68541) ([compare](https://github.com/aers/FFXIVClientStructs/compare/775e4363..abf68541)).
 
 ## [1.35.1] (2025-09-23)

@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
@@ -21,11 +22,13 @@ using FFXIVClientStructs.FFXIV.Client.Game.Fate;
 using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 using FFXIVClientStructs.FFXIV.Client.Game.MassivePcContent;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine.Group;
 using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -36,11 +39,13 @@ using HaselCommon.Utils;
 using HaselDebug.Utils;
 using InteropGenerator.Runtime;
 using InteropGenerator.Runtime.Attributes;
+using Lumina.Excel;
 using Lumina.Text.ReadOnly;
 using Microsoft.Extensions.Logging;
 using static Dalamud.Utility.StringExtensions;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkUldManager;
 using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
+using InstanceContentType = FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.InstanceContentType;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
 namespace HaselDebug.Services;
@@ -77,6 +82,7 @@ public unsafe partial class DebugRenderer
     private readonly IGameGui _gameGui;
     private readonly LanguageProvider _languageProvider;
     private readonly AddonObserver _addonObserver;
+    private readonly ExcelService _excelService;
 
     public ImmutableSortedDictionary<string, Type> AddonTypes { get; private set; }
     public ImmutableSortedDictionary<AgentId, Type> AgentTypes { get; private set; }
@@ -500,6 +506,11 @@ public unsafe partial class DebugRenderer
             ImGuiUtilsEx.DrawCopyableText(((StdString*)address)->ToString());
             return;
         }
+        else if (type == typeof(StdString))
+        {
+            ImGuiUtilsEx.DrawCopyableText(((StdString*)address)->ToString());
+            return;
+        }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdVector<>))
         {
             DrawStdVector(address, type.GenericTypeArguments[0], nodeOptions);
@@ -884,6 +895,36 @@ public unsafe partial class DebugRenderer
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<AtkTimelineKeyFrame>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->KeyFrameCount), fieldNodeOptions);
+                continue;
+            }
+
+            // ByteColor.RGBA
+            if (type == typeof(ByteColor) && fieldType == typeof(uint) && fieldInfo.Name == "RGBA")
+            {
+                var color = *(ByteColor*)fieldAddress;
+
+                DrawFieldName(fieldInfo);
+                DrawNumeric(fieldAddress, fieldType, fieldNodeOptions);
+
+                ImGui.SameLine();
+                ImGuiUtilsEx.DrawCopyableText($"#{color.RGBA:X8}");
+
+                var abgr = BinaryPrimitives.ReverseEndianness(color.RGBA);
+                var currentTheme = RaptureAtkModule.Instance()->AtkUIColorHolder.ActiveColorThemeType;
+
+                if (_excelService.TryFindRow<RawRow>("UIColor", row => row.ReadUInt32Column(currentTheme) == abgr, out var row))
+                {
+                    ImGui.SameLine();
+                    ImGuiUtilsEx.DrawCopyableText($"UIColor#{row.RowId}");
+                }
+
+                ImGui.SameLine();
+                ImGui.Dummy(new Vector2(ImGui.GetTextLineHeight()));
+                ImGui.GetWindowDrawList().AddRectFilled(
+                    ImGui.GetItemRectMin(),
+                    ImGui.GetItemRectMax(),
+                    color.RGBA,
+                    3);
                 continue;
             }
 
