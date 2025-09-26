@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** Type redirect for MassivePcContentDirector.
+- **Updated:** ClientStructs now at [abf68541](https://github.com/aers/FFXIVClientStructs/tree/abf68541) ([compare](https://github.com/aers/FFXIVClientStructs/compare/775e4363..abf68541)).
+
 ## [1.35.1] (2025-09-23)
 
 - **Updated:** Text in the "Completion" tab is now copyable.
