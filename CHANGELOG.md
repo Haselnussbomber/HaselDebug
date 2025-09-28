@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.36.0] (2025-09-29)
 
 - **Added:** Golden Agent/Addon navigation links in the Addon Inspector and Agents tabs.
 - **Added:** The Addon Inspector now shows the callback handler, including EventKind.
@@ -558,8 +558,9 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.1...main
-[1.35.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.1...v1.35.1
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.36.0...main
+[1.36.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.1...v1.36.0
+[1.35.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.0...v1.35.1
 [1.35.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.2...v1.35.0
 [1.34.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.1...v1.34.2
 [1.34.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.0...v1.34.1
