@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+- **Added:** Golden Agent/Addon navigation links in the Addon Inspector and Agents tabs.
+- **Added:** The Addon Inspector now shows the callback handler, including EventKind.
+- **Added:** ByteColor structs now also show the color in CSS hex color notation (8 digits), the UIColor RowId (if found for the current theme) and a small visual preview.
 - **Added:** Type redirect for MassivePcContentDirector.
-- **Added:** ByteColor structs how also show the color in CSS hex color notation (8 digits), the UIColor RowId (if found for the current theme) and a small visual preview.
-- **Updated:** ClientStructs now at [abf68541](https://github.com/aers/FFXIVClientStructs/tree/abf68541) ([compare](https://github.com/aers/FFXIVClientStructs/compare/775e4363..abf68541)).
+- **Updated:** ClientStructs now at [b41eccb6](https://github.com/aers/FFXIVClientStructs/tree/b41eccb6) ([compare](https://github.com/aers/FFXIVClientStructs/compare/775e4363..b41eccb6)).
 
 ## [1.35.1] (2025-09-23)
 

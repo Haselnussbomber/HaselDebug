@@ -24,10 +24,12 @@ public unsafe partial class AgentsTab : DebugTab
     private readonly IServiceProvider _serviceProvider;
     private readonly TextService _textService;
     private readonly LanguageProvider _languageProvider;
+    private readonly TypeService _typeService;
     private readonly DebugRenderer _debugRenderer;
     private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly PinnedInstancesService _pinnedInstances;
     private readonly WindowManager _windowManager;
+    private readonly NavigationService _navigationService;
 
     private ImmutableSortedDictionary<AgentId, (Pointer<AgentInterface> Address, Type Type)>? _agents;
     private AgentId _selectedAgentId = AgentId.Lobby;
@@ -42,6 +44,12 @@ public unsafe partial class AgentsTab : DebugTab
             .ToImmutableSortedDictionary(
                 type => type.GetCustomAttribute<AgentAttribute>()!.Id,
                 type => ((Pointer<AgentInterface>)AgentModule.Instance()->GetAgentByInternalId(type.GetCustomAttribute<AgentAttribute>()!.Id), type));
+
+        if (_navigationService.CurrentNavigation is AgentNavigation agentNav)
+        {
+            _selectedAgentId = agentNav.AgentId;
+            _navigationService.Reset();
+        }
 
         DrawAgentsList();
 
@@ -97,7 +105,7 @@ public unsafe partial class AgentsTab : DebugTab
             }
             _imGuiContextMenu.Draw($"ContextMenuAgent{i}", builder =>
             {
-                if (!_debugRenderer.AgentTypes.TryGetValue(agentId, out var agentType))
+                if (!_typeService.AgentTypes.TryGetValue(agentId, out var agentType))
                     agentType = typeof(AgentInterface);
 
                 var isPinned = _pinnedInstances.Contains(agentType);

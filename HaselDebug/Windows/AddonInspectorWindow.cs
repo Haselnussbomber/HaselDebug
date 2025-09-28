@@ -39,6 +39,11 @@ public partial class AddonInspectorWindow : SimpleWindow
 
     public override void Draw()
     {
-        _atkDebugRenderer.DrawAddon(AddonId, AddonName, border: false);
+        _atkDebugRenderer.DrawAddon(new DrawAddonParams()
+        {
+            AddonId = AddonId,
+            AddonName = AddonName,
+            Border = false
+        });
     }
 }

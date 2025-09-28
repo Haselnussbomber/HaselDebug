@@ -15,7 +15,6 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Memory;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Fate;
@@ -83,29 +82,7 @@ public unsafe partial class DebugRenderer
     private readonly LanguageProvider _languageProvider;
     private readonly AddonObserver _addonObserver;
     private readonly ExcelService _excelService;
-
-    public ImmutableSortedDictionary<string, Type> AddonTypes { get; private set; }
-    public ImmutableSortedDictionary<AgentId, Type> AgentTypes { get; private set; }
-
-    [AutoPostConstruct]
-    public void Initialize()
-    {
-        var csAssembly = typeof(AddonAttribute).Assembly;
-
-        AddonTypes = csAssembly.GetTypes()
-            .Where(type => type.GetCustomAttribute<AddonAttribute>() != null)
-            .SelectMany(type => type.GetCustomAttribute<AddonAttribute>()!.AddonIdentifiers, (type, addonName) => (type, addonName))
-            .ToImmutableSortedDictionary(
-                tuple => tuple.addonName,
-                tuple => tuple.type);
-
-        AgentTypes = csAssembly.GetTypes()
-            .Where(type => type.GetCustomAttribute<AgentAttribute>() != null)
-            .Select(type => (type, agentId: type.GetCustomAttribute<AgentAttribute>()!.Id))
-            .ToImmutableSortedDictionary(
-                tuple => tuple.agentId,
-                tuple => tuple.type);
-    }
+    private readonly NavigationService _navigationService;
 
     public void DrawPointerType(void* obj, Type? type, NodeOptions nodeOptions)
         => DrawPointerType((nint)obj, type, nodeOptions);
@@ -792,8 +769,22 @@ public unsafe partial class DebugRenderer
                 continue;
             }
 
+            // AgentInterface.AddonId
+            if (Inherits<AgentInterface>(type) && fieldType == typeof(uint) && fieldInfo.Name == nameof(AgentInterface.AddonId))
+            {
+                DrawFieldName(fieldInfo);
+                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions);
+                var unitBase = RaptureAtkUnitManager.Instance()->GetAddonById(*(ushort*)fieldAddress);
+                if (unitBase != null)
+                {
+                    ImGui.SameLine();
+                    _navigationService.DrawAddonLink(unitBase->Id, unitBase->NameString);
+                }
+                continue;
+            }
+
             // AtkUnitBase.AtkValues
-            if (Inherits<AtkUnitBase>(type) && fieldType == typeof(AtkValue*) && fieldInfo.Name == "AtkValues")
+            if (Inherits<AtkUnitBase>(type) && fieldType == typeof(AtkValue*) && fieldInfo.Name == nameof(AtkUnitBase.AtkValues))
             {
                 DrawFieldName(fieldInfo);
                 DrawAtkValues(*(AtkValue**)fieldAddress, ((AtkUnitBase*)address)->AtkValuesCount, fieldNodeOptions);
@@ -801,7 +792,7 @@ public unsafe partial class DebugRenderer
             }
 
             // AtkUldManager.Assets
-            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkUldAsset*) && fieldInfo.Name == "Assets")
+            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkUldAsset*) && fieldInfo.Name == nameof(AtkUldManager.Assets))
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<AtkUldAsset>(*(nint**)fieldAddress, ((AtkUldManager*)address)->AssetCount), fieldNodeOptions);
@@ -809,7 +800,7 @@ public unsafe partial class DebugRenderer
             }
 
             // AtkUldManager.PartsList
-            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkUldPartsList*) && fieldInfo.Name == "PartsList")
+            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkUldPartsList*) && fieldInfo.Name == nameof(AtkUldManager.PartsList))
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<AtkUldPartsList>(*(nint**)fieldAddress, ((AtkUldManager*)address)->PartsListCount), fieldNodeOptions);
@@ -817,7 +808,7 @@ public unsafe partial class DebugRenderer
             }
 
             // AtkUldManager.NodeList
-            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkResNode**) && fieldInfo.Name == "NodeList")
+            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkResNode**) && fieldInfo.Name == nameof(AtkUldManager.NodeList))
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<Pointer<AtkResNode>>(*(nint**)fieldAddress, ((AtkUldManager*)address)->NodeListCount), fieldNodeOptions);
@@ -825,7 +816,7 @@ public unsafe partial class DebugRenderer
             }
 
             // AtkUldManager.Objects
-            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkUldObjectInfo*) && fieldInfo.Name == "Objects")
+            if (Inherits<AtkUldManager>(type) && fieldType == typeof(AtkUldObjectInfo*) && fieldInfo.Name == nameof(AtkUldManager.Objects))
             {
                 DrawFieldName(fieldInfo);
                 var uldManager = (AtkUldManager*)address;
@@ -851,7 +842,7 @@ public unsafe partial class DebugRenderer
             }
 
             // AtkUldWidgetInfo.NodeList
-            if (type == typeof(AtkUldWidgetInfo) && fieldType == typeof(AtkResNode**) && fieldInfo.Name == "NodeList")
+            if (type == typeof(AtkUldWidgetInfo) && fieldType == typeof(AtkResNode**) && fieldInfo.Name == nameof(AtkUldWidgetInfo.NodeList))
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<Pointer<AtkResNode>>(*(nint**)fieldAddress, ((AtkUldWidgetInfo*)address)->NodeCount), fieldNodeOptions);
@@ -859,7 +850,7 @@ public unsafe partial class DebugRenderer
             }
 
             // DuplicateObjectList.NodeList
-            if (type == typeof(DuplicateObjectList) && fieldType == typeof(AtkComponentNode*) && fieldInfo.Name == "NodeList")
+            if (type == typeof(DuplicateObjectList) && fieldType == typeof(AtkComponentNode*) && fieldInfo.Name == nameof(DuplicateObjectList.NodeList))
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<AtkComponentNode>(*(nint**)fieldAddress, (int)((DuplicateObjectList*)address)->NodeCount), fieldNodeOptions);
@@ -867,7 +858,7 @@ public unsafe partial class DebugRenderer
             }
 
             // AtkTimelineManager.Timelines
-            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimeline*) && fieldInfo.Name == "Timelines")
+            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimeline*) && fieldInfo.Name == nameof(AtkTimelineManager.Timelines))
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<AtkTimeline>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->TimelineCount), fieldNodeOptions);
@@ -875,7 +866,7 @@ public unsafe partial class DebugRenderer
             }
 
             // AtkTimelineManager.Animations
-            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimelineAnimation*) && fieldInfo.Name == "Animations")
+            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimelineAnimation*) && fieldInfo.Name == nameof(AtkTimelineManager.Animations))
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<AtkTimelineAnimation>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->AnimationCount), fieldNodeOptions);
@@ -883,7 +874,7 @@ public unsafe partial class DebugRenderer
             }
 
             // AtkTimelineManager.LabelSets
-            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimelineLabelSet*) && fieldInfo.Name == "LabelSets")
+            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimelineLabelSet*) && fieldInfo.Name == nameof(AtkTimelineManager.LabelSets))
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<AtkTimelineLabelSet>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->LabelSetCount), fieldNodeOptions);
@@ -891,7 +882,7 @@ public unsafe partial class DebugRenderer
             }
 
             // AtkTimelineManager.KeyFrames
-            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimelineKeyFrame*) && fieldInfo.Name == "KeyFrames")
+            if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimelineKeyFrame*) && fieldInfo.Name == nameof(AtkTimelineManager.KeyFrames))
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<AtkTimelineKeyFrame>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->KeyFrameCount), fieldNodeOptions);
@@ -899,7 +890,7 @@ public unsafe partial class DebugRenderer
             }
 
             // ByteColor.RGBA
-            if (type == typeof(ByteColor) && fieldType == typeof(uint) && fieldInfo.Name == "RGBA")
+            if (type == typeof(ByteColor) && fieldType == typeof(uint) && fieldInfo.Name == nameof(ByteColor.RGBA))
             {
                 var color = *(ByteColor*)fieldAddress;
 
@@ -929,7 +920,7 @@ public unsafe partial class DebugRenderer
             }
 
             // ResourceHandle.FileType
-            if (Inherits<ResourceHandle>(type) && fieldType == typeof(uint) && fieldInfo.Name == "FileType")
+            if (Inherits<ResourceHandle>(type) && fieldType == typeof(uint) && fieldInfo.Name == nameof(ResourceHandle.FileType))
             {
                 DrawFieldName(fieldInfo);
                 DrawNumeric(fieldAddress, fieldType, fieldNodeOptions);
@@ -941,7 +932,7 @@ public unsafe partial class DebugRenderer
             }
 
             // InventoryItem.CrafterContentId
-            if (Inherits<InventoryItem>(type) && fieldType == typeof(ulong) && fieldInfo.Name == "CrafterContentId")
+            if (Inherits<InventoryItem>(type) && fieldType == typeof(ulong) && fieldInfo.Name == nameof(InventoryItem.CrafterContentId))
             {
                 DrawFieldName(fieldInfo);
                 DrawNumeric(fieldAddress, fieldType, fieldNodeOptions);
