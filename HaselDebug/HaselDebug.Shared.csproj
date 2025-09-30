@@ -40,7 +40,7 @@
   <!-- NuGet dependencies -->
   <ItemGroup>
     <PackageReference Include="AutoCtor" Version="2.8.1" PrivateAssets="all" ExcludeAssets="compile;runtime" />
-    <PackageReference Include="Injectio" Version="5.0.0" PrivateAssets="all" />
+    <PackageReference Include="Injectio" Version="5.1.0" PrivateAssets="all" />
     <PackageReference Include="Iced" Version="1.21.0" />
   </ItemGroup>
 
