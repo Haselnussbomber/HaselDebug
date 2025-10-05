@@ -14,6 +14,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
 {
     private readonly DebugRenderer _debugRenderer;
     private readonly TextService _textService;
+    private readonly ItemService _itemService;
 
     public override string Title => "CurrencyManager";
 
@@ -49,6 +50,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         if (currencyManager->IsItemLimited(itemId))
                             ImGui.Text(currencyManager->GetItemCountRemaining(itemId).ToString());
                         ImGui.TableNextColumn();
+                        _debugRenderer.DrawIcon(_itemService.GetIconId(itemId));
                         ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ToString());
                     }
                 }
@@ -82,6 +84,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         ImGui.TableNextColumn();
                         ImGui.Text(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
+                        _debugRenderer.DrawIcon(_itemService.GetIconId(itemId));
                         ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ToString());
                     }
                 }
@@ -115,6 +118,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                         ImGui.TableNextColumn();
                         ImGui.Text(item.IsUnlimited.ToString());
                         ImGui.TableNextColumn();
+                        _debugRenderer.DrawIcon(_itemService.GetIconId(itemId));
                         ImGuiUtilsEx.DrawCopyableText(_textService.GetItemName(itemId, ImGui.IsKeyDown(ImGuiKey.LeftShift) ? ClientLanguage.English : null).ToString());
                     }
                 }
