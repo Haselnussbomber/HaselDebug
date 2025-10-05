@@ -62,6 +62,9 @@ public unsafe partial class UnlocksTabUtils
         var clicked = ImGui.Selectable(itemName);
         isHovered |= ImGui.IsItemHovered();
 
+        if (string.IsNullOrWhiteSpace(itemName))
+            return false;
+
         if (isHovered && !ImGui.IsKeyDown(ImGuiKey.LeftAlt))
         {
             DrawItemTooltip(item);
@@ -71,6 +74,7 @@ public unsafe partial class UnlocksTabUtils
         {
             builder.AddTryOn(item.RowId);
             builder.AddItemFinder(item.RowId);
+            builder.AddLinkItem(item.RowId);
             builder.AddCopyItemName(item.RowId);
             builder.AddItemSearch(item.RowId);
             builder.AddOpenOnGarlandTools("item", item.RowId);
