@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [baa4d0bc](https://github.com/aers/FFXIVClientStructs/tree/baa4d0bc) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b41eccb6..baa4d0bc)).
+
 ## [1.36.0] (2025-09-29)
 
 - **Added:** Golden Agent/Addon navigation links in the Addon Inspector and Agents tabs.
