@@ -27,7 +27,7 @@ public unsafe partial class EmotesTable : Table<Emote>
     public override void LoadRows()
     {
         Rows = _excelService.GetSheet<Emote>()
-            .Where(row => row.RowId != 0 && !row.Name.IsEmpty)
+            .Where(row => row.RowId != 0 && !row.Name.IsEmpty && row.Order != 0)
             .ToList();
     }
 }
