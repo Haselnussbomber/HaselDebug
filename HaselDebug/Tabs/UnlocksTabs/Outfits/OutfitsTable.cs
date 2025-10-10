@@ -2,6 +2,7 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Gui;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
@@ -18,7 +19,6 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
 
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
-    private readonly ItemService _itemService;
     private readonly SetColumn _setColumn;
     private readonly ItemsColumn _itemsColumn;
 
@@ -39,8 +39,9 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
         return IconSize * ImGuiHelpers.GlobalScaleSafe + ImGui.GetStyle().ItemSpacing.Y; // I honestly don't know why using ItemSpacing here works
     }
 
-    public override void LoadRows()
+    public override unsafe void LoadRows()
     {
+        var agent = AgentTryon.Instance();
         var cabinetSheet = _excelService.GetSheet<Cabinet>().Select(row => row.Item.RowId).ToArray();
         foreach (var row in _excelService.GetSheet<CustomMirageStoreSetItem>())
         {
@@ -57,7 +58,7 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
                 continue;
 
             // does not only consist of items that can't be worn
-            if (row.Items.Where(i => i.RowId != 0).All(i => !_itemService.CanTryOn(i.Value.RowId)))
+            if (row.Items.Where(i => i.RowId != 0).All(i => !agent->CanTryOn(i.Value.RowId)))
                 continue;
 
             Rows.Add(row);

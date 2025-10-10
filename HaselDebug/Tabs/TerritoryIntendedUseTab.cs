@@ -20,16 +20,16 @@ public unsafe partial class TerritoryIntendedUseTab : DebugTab
     private readonly TextService _textService;
     private readonly DebugRenderer _debugRenderer;
 
-    private ImmutableSortedDictionary<uint, List<(TerritoryType, ContentFinderCondition[])>> _dict;
+    private ImmutableSortedDictionary<uint, List<(TerritoryType, IReadOnlyList<ContentFinderCondition>)>> _dict;
     private bool _isInitialized;
 
     private void Initialize()
     {
-        var dict = new Dictionary<uint, List<(TerritoryType, ContentFinderCondition[])>>();
+        var dict = new Dictionary<uint, List<(TerritoryType, IReadOnlyList<ContentFinderCondition>)>>();
 
         foreach (var territoryTypes in _excelService.GetSheet<TerritoryType>().GroupBy(row => row.TerritoryIntendedUse.RowId))
         {
-            var list = new List<(TerritoryType, ContentFinderCondition[])>();
+            var list = new List<(TerritoryType, IReadOnlyList<ContentFinderCondition>)>();
 
             foreach (var territoryType in territoryTypes)
             {
@@ -81,7 +81,7 @@ public unsafe partial class TerritoryIntendedUseTab : DebugTab
                     Title = $"[TerritoryType#{kv2.Item1.RowId}]{placeName}{zoneName}"
                 });
 
-                if (kv2.Item2.Length == 0)
+                if (kv2.Item2.Count == 0)
                     continue;
 
                 using var indent = ImRaii.PushIndent();

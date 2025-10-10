@@ -143,7 +143,7 @@ public unsafe partial class InventoryTab : DebugTab
                     .PopColorType()
                     .ToReadOnlySeString();
 
-                _debugRenderer.DrawIcon(_itemService.GetIconId(itemId), ItemUtil.IsHighQuality(itemId));
+                _debugRenderer.DrawIcon(_itemService.GetItemIcon(itemId), ItemUtil.IsHighQuality(itemId));
                 _debugRenderer.DrawPointerType(slot, inventoryType is InventoryType.Cosmopouch1 or InventoryType.Cosmopouch2 ? typeof(WKSContentInventoryItem) : typeof(InventoryItem), new NodeOptions()
                 {
                     AddressPath = new AddressPath([(nint)inventoryType, slot->Slot]),

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Dalamud.Interface.Utility.Raii;
@@ -17,7 +18,7 @@ public unsafe partial class ItemActionTypeTab : DebugTab
     private readonly ExcelService _excelService;
     private readonly DebugRenderer _debugRenderer;
 
-    private ImmutableSortedDictionary<ushort, Item[]> _dict;
+    private ImmutableSortedDictionary<ushort, IReadOnlyList<Item>> _dict;
     private bool _isInitialized;
 
     private void Initialize()
@@ -41,7 +42,7 @@ public unsafe partial class ItemActionTypeTab : DebugTab
 
         foreach (var (type, items) in _dict)
         {
-            using var node = ImRaii.TreeNode($"[{type}] {(ItemActionType)type} ({items.Length})", ImGuiTreeNodeFlags.SpanAvailWidth);
+            using var node = ImRaii.TreeNode($"[{type}] {(ItemActionType)type} ({items.Count})", ImGuiTreeNodeFlags.SpanAvailWidth);
             if (!node) continue;
 
             foreach (var item in items)
