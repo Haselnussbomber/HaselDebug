@@ -1374,6 +1374,58 @@ public unsafe partial class DebugRenderer
             ImGui.SameLine();
     }
 
+    public void DrawTexture(string path, bool sameLine = true, DrawInfo drawInfo = default, bool canCopy = true, bool noTooltip = false)
+    {
+        drawInfo.DrawSize ??= new Vector2(ImGui.GetTextLineHeight());
+
+        if (string.IsNullOrEmpty(path))
+        {
+            ImGui.Dummy(drawInfo.DrawSize.Value);
+            if (sameLine)
+                ImGui.SameLine();
+            return;
+        }
+
+        if (!ImGui.IsRectVisible(drawInfo.DrawSize.Value))
+        {
+            ImGui.Dummy(drawInfo.DrawSize.Value);
+            if (sameLine)
+                ImGui.SameLine();
+            return;
+        }
+
+        if (_textureProvider.GetFromGame(path).TryGetWrap(out var texture, out _))
+        {
+            ImGui.Image(texture.Handle, drawInfo.DrawSize.Value);
+
+            if (ImGui.IsItemHovered())
+            {
+                if (canCopy)
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+
+                if (!noTooltip)
+                {
+                    ImGui.BeginTooltip();
+                    if (canCopy)
+                        ImGui.Text("Click to copy IconId"u8);
+                    ImGui.Text($"Path: {path} – Size: {texture.Width}x{texture.Height}");
+                    ImGui.Image(texture.Handle, new(texture.Width, texture.Height));
+                    ImGui.EndTooltip();
+                }
+            }
+
+            if (canCopy && ImGui.IsItemClicked())
+                ImGui.SetClipboardText(path.ToString());
+        }
+        else
+        {
+            ImGui.Dummy(drawInfo.DrawSize.Value);
+        }
+
+        if (sameLine)
+            ImGui.SameLine();
+    }
+
     public void DrawArray<T>(Span<T> span, NodeOptions nodeOptions) where T : unmanaged
     {
         if (span.Length == 0)

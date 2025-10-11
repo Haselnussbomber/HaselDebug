@@ -445,6 +445,23 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             });
         }
 
+        foreach (var row in _excelService.GetSheet<EventTutorial>())
+        {
+            if (row.Unknown2 == 0)
+                continue;
+
+            if (!dict.TryGetValue(row.Unknown2, out var names))
+                dict.Add(row.Unknown2, names = []);
+
+            names.Add(new UnlockEntry()
+            {
+                RowType = typeof(EventTutorial),
+                RowId = row.RowId,
+                TexturePath = "ui/uld/EventTutorial_hr1.tex",
+                Label = row.Unknown0.ToString(),
+            });
+        }
+
         Rows = dict
             .Select(kv => new UnlockLinkEntry(kv.Key, [.. kv.Value]))
             .ToList();

@@ -36,6 +36,7 @@ public unsafe partial class UnlocksTabUtils
     private readonly IDataManager _dataManager;
     private readonly TripleTriadNumberFont _tripleTriadNumberFont;
     private readonly ISeStringEvaluator _seStringEvaluator;
+    private readonly DebugRenderer _debugRenderer;
 
     private readonly Dictionary<uint, Vector2> _iconSizeCache = [];
     private readonly Dictionary<ushort, uint> _facePaintIconCache = [];
@@ -48,9 +49,8 @@ public unsafe partial class UnlocksTabUtils
 
         if (drawIcon)
         {
-            _textureProvider.DrawIcon(new(item.Icon, isHq), (float)iconSize);
+            _debugRenderer.DrawIcon(item.Icon, isHq, drawInfo: (float)iconSize, noTooltip: true);
             isHovered |= ImGui.IsItemHovered();
-            ImGui.SameLine();
         }
         var clicked = ImGui.Selectable(itemName);
         isHovered |= ImGui.IsItemHovered();
@@ -92,10 +92,18 @@ public unsafe partial class UnlocksTabUtils
         if (!_textureProvider.TryGetFromGameIcon(iconId, out var tex) || !tex.TryGetWrap(out var texture, out _))
             return;
 
-        DrawTooltip(texture, title, category, description);
+        DrawTooltip(texture, default, title, category, description);
     }
 
-    public void DrawTooltip(IDalamudTextureWrap icon, ReadOnlySeString title, ReadOnlySeString category = default, ReadOnlySeString description = default)
+    public void DrawTooltip(string texturePath, DrawInfo drawInfo, ReadOnlySeString title, ReadOnlySeString category = default, ReadOnlySeString description = default)
+    {
+        if (!_textureProvider.GetFromGame(texturePath).TryGetWrap(out var texture, out _))
+            return;
+
+        DrawTooltip(texture, drawInfo, title, category, description);
+    }
+
+    public void DrawTooltip(IDalamudTextureWrap icon, DrawInfo drawInfo, ReadOnlySeString title, ReadOnlySeString category = default, ReadOnlySeString description = default)
     {
         using var tooltip = ImRaii.Tooltip();
         if (!tooltip) return;
@@ -110,7 +118,8 @@ public unsafe partial class UnlocksTabUtils
         ImGui.TableSetupColumn("Text"u8, ImGuiTableColumnFlags.WidthFixed, Math.Max(drawResult.Size.X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
 
         ImGui.TableNextColumn(); // Icon
-        ImGui.Image(icon.Handle, ImGuiHelpers.ScaledVector2(40));
+        drawInfo.DrawSize ??= ImGuiHelpers.ScaledVector2(40);
+        icon.Draw(drawInfo);
 
         ImGui.TableNextColumn(); // Text
         using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, itemInnerSpacing.X);
