@@ -1,6 +1,5 @@
 using System.Globalization;
 using HaselCommon.Graphics;
-using HaselCommon.Gui;
 using HaselCommon.Gui.ImGuiTable;
 using HaselCommon.Services;
 using HaselDebug.Services;

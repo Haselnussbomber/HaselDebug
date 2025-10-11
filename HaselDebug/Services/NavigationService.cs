@@ -104,7 +104,7 @@ public unsafe partial class NavigationService
         {
             CurrentNavigation = new AddonNavigation(addonId, addonName);
         }
-        
+
         _imGuiContextMenu.Draw($"AddonNavigationContextMenu{_tooltipIndex++}", (builder) =>
         {
             if (!_typeService.AddonTypes.TryGetValue(addonName, out var type))
