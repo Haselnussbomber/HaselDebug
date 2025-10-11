@@ -24,21 +24,7 @@ public unsafe partial class HousingTab : DebugTab
             return;
         }
 
-        HouseId houseId = 0;
-
-        switch (housingManager->GetCurrentHousingTerritoryType())
-        {
-            case HousingTerritoryType.Outdoor:
-                houseId = housingManager->OutdoorTerritory->HouseId;
-                break;
-            case HousingTerritoryType.Indoor:
-                houseId = housingManager->IndoorTerritory->HouseId;
-                break;
-            case HousingTerritoryType.Workshop:
-                houseId = housingManager->WorkshopTerritory->HouseId;
-                break;
-        }
-
+        var houseId = housingManager->GetCurrentHouseId();
         if (houseId != 0)
         {
             ImGui.Text($"Current HouseId ({housingManager->GetCurrentHousingTerritoryType()})");
@@ -56,7 +42,8 @@ public unsafe partial class HousingTab : DebugTab
             }
             else
             {
-                ImGuiUtilsEx.DrawCopyableText($"PlotIndex: {houseId.PlotIndex}");
+                if (houseId.PlotIndex < 60)
+                    ImGuiUtilsEx.DrawCopyableText($"PlotIndex: {houseId.PlotIndex}");
                 ImGuiUtilsEx.DrawCopyableText($"WardIndex: {houseId.WardIndex}");
                 ImGuiUtilsEx.DrawCopyableText($"RoomNumber: {houseId.RoomNumber}");
             }
