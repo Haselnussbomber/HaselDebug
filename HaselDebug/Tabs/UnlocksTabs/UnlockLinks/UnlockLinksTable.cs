@@ -68,24 +68,6 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
         var tribeId = isLoggedIn ? playerState->Tribe : 1;
         var sexId = isLoggedIn ? playerState->Sex : 1;
 
-        foreach (var row in _excelService.GetSheet<GeneralAction>())
-        {
-            if (row.UnlockLink > 0)
-            {
-                if (!dict.TryGetValue(row.UnlockLink, out var names))
-                    dict.Add(row.UnlockLink, names = []);
-
-                names.Add(new UnlockEntry()
-                {
-                    RowType = typeof(GeneralAction),
-                    RowId = row.RowId,
-                    IconId = (uint)row.Icon,
-                    Label = row.Name.ToString(),
-                    Category = "General Action"
-                });
-            }
-        }
-
         foreach (var row in _excelService.GetSheet<Lumina.Excel.Sheets.Action>())
         {
             if (row.UnlockLink.RowId is > 0 and < 65536)
@@ -104,76 +86,27 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             }
         }
 
-        foreach (var row in _excelService.GetSheet<BuddyAction>())
+        // no entries
+        /*
+        foreach (var row in _excelService.GetSubrowSheet<BGMSwitch>())
         {
-            if (row.UnlockLink != 0)
+            foreach (var subrow in row)
             {
-                if (!dict.TryGetValue(row.UnlockLink - 1u, out var names))
-                    dict.Add(row.UnlockLink - 1u, names = []);
-
-                names.Add(new UnlockEntry()
+                if (subrow.BGMSystemDefine.RowId == 2 && subrow.Quest.RowId is > 0 and < 65536)
                 {
-                    RowType = typeof(BuddyAction),
-                    RowId = row.RowId,
-                    IconId = (uint)row.Icon,
-                    Label = row.Name.ToString(),
-                    Category = "Pet Action"
-                });
+                    if (!dict.TryGetValue(subrow.Quest.RowId, out var names))
+                        dict.Add(subrow.Quest.RowId, names = []);
+
+                    names.Add(new UnlockEntry()
+                    {
+                        RowType = typeof(BGMSwitch),
+                        RowId = row.RowId,
+                        SubrowId = subrow.RowId
+                    });
+                }
             }
         }
-
-        foreach (var row in _excelService.GetSheet<CraftAction>())
-        {
-            if (row.QuestRequirement.RowId is > 0 and < 65536)
-            {
-                if (!dict.TryGetValue(row.QuestRequirement.RowId, out var names))
-                    dict.Add(row.QuestRequirement.RowId, names = []);
-
-                names.Add(new UnlockEntry()
-                {
-                    RowType = typeof(CraftAction),
-                    RowId = row.RowId,
-                    IconId = row.Icon,
-                    Label = row.Name.ToString(),
-                    Category = "Crafting Action"
-                });
-            }
-        }
-
-        foreach (var row in _excelService.GetSheet<Emote>())
-        {
-            if (row.UnlockLink is > 0 and < 65536)
-            {
-                if (!dict.TryGetValue(row.UnlockLink, out var names))
-                    dict.Add(row.UnlockLink, names = []);
-
-                names.Add(new UnlockEntry()
-                {
-                    RowType = typeof(Emote),
-                    RowId = row.RowId,
-                    IconId = row.Icon,
-                    Label = row.Name.ToString()
-                });
-            }
-        }
-
-        foreach (var row in _excelService.GetSheet<Perform>())
-        {
-            if (row.UnlockLink > 0)
-            {
-                if (!dict.TryGetValue((uint)row.UnlockLink, out var names))
-                    dict.Add((uint)row.UnlockLink, names = []);
-
-                names.Add(new UnlockEntry()
-                {
-                    RowType = typeof(Perform),
-                    RowId = row.RowId,
-                    Label = row.Name.ToString()
-                });
-            }
-        }
-
-        // Skipping DescriptionPage which is too complex
+        */
 
         foreach (var row in _excelService.GetSheet<BannerCondition>())
         {
@@ -245,6 +178,41 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
                     Category = _textService.GetAddonText(14690)
                 });
             }
+        }
+
+        foreach (var row in _excelService.GetSheet<BuddyAction>())
+        {
+            if (row.UnlockLink != 0)
+            {
+                if (!dict.TryGetValue(row.UnlockLink - 1u, out var names))
+                    dict.Add(row.UnlockLink - 1u, names = []);
+
+                names.Add(new UnlockEntry()
+                {
+                    RowType = typeof(BuddyAction),
+                    RowId = row.RowId,
+                    IconId = (uint)row.Icon,
+                    Label = row.Name.ToString(),
+                    Category = "Pet Action"
+                });
+            }
+        }
+
+        foreach (var row in _excelService.GetSheet<CSBonusContentType>())
+        {
+            if (row.UnlockLink == 0)
+                continue;
+
+            if (!dict.TryGetValue(row.UnlockLink, out var names))
+                dict.Add(row.UnlockLink, names = []);
+
+            names.Add(new UnlockEntry()
+            {
+                RowType = typeof(CSBonusContentType),
+                RowId = row.RowId,
+                IconId = row.ContentType.Value.Icon,
+                Label = row.ContentType.Value.Name.ToString()
+            });
         }
 
         HairMakeType hairMakeType = default;
@@ -328,6 +296,141 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             });
         }
 
+        foreach (var row in _excelService.GetSheet<CraftAction>())
+        {
+            if (row.QuestRequirement.RowId is > 0 and < 65536)
+            {
+                if (!dict.TryGetValue(row.QuestRequirement.RowId, out var names))
+                    dict.Add(row.QuestRequirement.RowId, names = []);
+
+                names.Add(new UnlockEntry()
+                {
+                    RowType = typeof(CraftAction),
+                    RowId = row.RowId,
+                    IconId = row.Icon,
+                    Label = row.Name.ToString(),
+                    Category = "Crafting Action"
+                });
+            }
+        }
+
+        foreach (var row in _excelService.GetSubrowSheet<DescriptionSection>())
+        {
+            foreach (var sectionRow in row)
+            {
+                foreach (var pageRow in sectionRow.Page.Value)
+                {
+                    var isValid = pageRow.Unknown1 switch
+                    {
+                        2 => pageRow.Quest.RowId is > 0 and < 65536,
+                        4 => pageRow.Quest.RowId is > 0 and < 65536 || pageRow.Unknown2 is > 0 and < 65536,
+                        _ => false,
+                    };
+                    if (isValid)
+                    {
+                        if (!dict.TryGetValue(pageRow.Quest.RowId, out var names))
+                            dict.Add(pageRow.Quest.RowId, names = []);
+
+                        if (names.Any(entry => entry.RowType == typeof(DescriptionPage) && entry.RowId == sectionRow.Page.RowId && entry.SubrowId == pageRow.RowId))
+                            continue;
+
+                        names.Add(new UnlockEntry()
+                        {
+                            RowType = typeof(DescriptionPage),
+                            RowId = sectionRow.Page.RowId,
+                            SubrowId = pageRow.RowId,
+                            Label = sectionRow.String.Value.Text.ToString()
+                        });
+                    }
+                }
+            }
+        }
+
+        foreach (var row in _excelService.GetSheet<EmjVoiceNpc>())
+        {
+            if (row.Unknown26 == 0)
+                continue;
+
+            if (!dict.TryGetValue(row.Unknown26, out var names))
+                dict.Add(row.Unknown26, names = []);
+
+            names.Add(new UnlockEntry()
+            {
+                RowType = typeof(EmjVoiceNpc),
+                RowId = row.RowId,
+                Label = row.Unknown24.ToString(),
+            });
+        }
+
+        foreach (var row in _excelService.GetSheet<Emote>())
+        {
+            if (row.UnlockLink is > 0 and < 65536)
+            {
+                if (!dict.TryGetValue(row.UnlockLink, out var names))
+                    dict.Add(row.UnlockLink, names = []);
+
+                names.Add(new UnlockEntry()
+                {
+                    RowType = typeof(Emote),
+                    RowId = row.RowId,
+                    IconId = row.Icon,
+                    Label = row.Name.ToString()
+                });
+            }
+        }
+
+        foreach (var row in _excelService.GetSheet<EventTutorial>())
+        {
+            if (row.Unknown2 == 0)
+                continue;
+
+            if (!dict.TryGetValue(row.Unknown2, out var names))
+                dict.Add(row.Unknown2, names = []);
+
+            names.Add(new UnlockEntry()
+            {
+                RowType = typeof(EventTutorial),
+                RowId = row.RowId,
+                TexturePath = "ui/uld/EventTutorial_hr1.tex",
+                Label = row.Unknown0.ToString(),
+            });
+        }
+
+        foreach (var row in _excelService.GetSheet<GeneralAction>())
+        {
+            if (row.UnlockLink > 0)
+            {
+                if (!dict.TryGetValue(row.UnlockLink, out var names))
+                    dict.Add(row.UnlockLink, names = []);
+
+                names.Add(new UnlockEntry()
+                {
+                    RowType = typeof(GeneralAction),
+                    RowId = row.RowId,
+                    IconId = (uint)row.Icon,
+                    Label = row.Name.ToString(),
+                    Category = "General Action"
+                });
+            }
+        }
+
+        foreach (var row in _excelService.GetSheet<Item>())
+        {
+            if (row.ItemAction.RowId == 0 || !row.ItemAction.IsValid || (ItemActionType)row.ItemAction.Value.Type is not (ItemActionType.UnlockLink or ItemActionType.OccultRecord))
+                continue;
+
+            if (!dict.TryGetValue(row.ItemAction.Value.Data[0], out var names))
+                dict.Add(row.ItemAction.Value.Data[0], names = []);
+
+            names.Add(new UnlockEntry()
+            {
+                RowType = typeof(Item),
+                RowId = row.RowId,
+                IconId = row.Icon,
+                Label = _textService.GetItemName(row.RowId).ToString()
+            });
+        }
+
         foreach (var row in _excelService.GetSheet<MJILandmark>())
         {
             if (row.UnlockLink == 0)
@@ -346,20 +449,20 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             });
         }
 
-        foreach (var row in _excelService.GetSheet<CSBonusContentType>())
+        foreach (var row in _excelService.GetSheet<MKDLore>())
         {
-            if (row.UnlockLink == 0)
+            if (row.Unknown2 == 0)
                 continue;
 
-            if (!dict.TryGetValue(row.UnlockLink, out var names))
-                dict.Add(row.UnlockLink, names = []);
+            if (!dict.TryGetValue(row.Unknown2, out var names))
+                dict.Add(row.Unknown2, names = []);
 
             names.Add(new UnlockEntry()
             {
-                RowType = typeof(CSBonusContentType),
+                RowType = typeof(MKDLore),
                 RowId = row.RowId,
-                IconId = row.ContentType.Value.Icon,
-                Label = row.ContentType.Value.Name.ToString()
+                IconId = row.Image,
+                Label = row.Name.ToString(),
             });
         }
 
@@ -379,20 +482,33 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             }
         }
 
-        foreach (var row in _excelService.GetSheet<Trait>())
+        foreach (var row in _excelService.GetSheet<PatchMark>())
         {
-            if (row.Quest.RowId is > 0 and < 65536)
+            if (row.Unknown2 != 4)
+                continue;
+
+            if (!dict.TryGetValue(row.Unknown0, out var names))
+                dict.Add(row.Unknown0, names = []);
+
+            names.Add(new UnlockEntry()
             {
-                if (!dict.TryGetValue(row.Quest.RowId, out var names))
-                    dict.Add(row.Quest.RowId, names = []);
+                RowType = typeof(PatchMark),
+                RowId = row.RowId
+            });
+        }
+
+        foreach (var row in _excelService.GetSheet<Perform>())
+        {
+            if (row.UnlockLink > 0)
+            {
+                if (!dict.TryGetValue((uint)row.UnlockLink, out var names))
+                    dict.Add((uint)row.UnlockLink, names = []);
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(Trait),
+                    RowType = typeof(Perform),
                     RowId = row.RowId,
-                    IconId = (uint)row.Icon,
-                    Label = row.Name.ToString(),
-                    Category = _textService.GetAddonText(102478)
+                    Label = row.Name.ToString()
                 });
             }
         }
@@ -428,38 +544,22 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             }
         }
 
-        foreach (var row in _excelService.GetSheet<Item>())
+        foreach (var row in _excelService.GetSheet<Trait>())
         {
-            if (row.ItemAction.RowId == 0 || !row.ItemAction.IsValid || row.ItemAction.Value.Type != (uint)ItemActionType.UnlockLink)
-                continue;
-
-            if (!dict.TryGetValue(row.ItemAction.Value.Data[0], out var names))
-                dict.Add(row.ItemAction.Value.Data[0], names = []);
-
-            names.Add(new UnlockEntry()
+            if (row.Quest.RowId is > 0 and < 65536)
             {
-                RowType = typeof(Item),
-                RowId = row.RowId,
-                IconId = row.Icon,
-                Label = _textService.GetItemName(row.RowId).ToString()
-            });
-        }
+                if (!dict.TryGetValue(row.Quest.RowId, out var names))
+                    dict.Add(row.Quest.RowId, names = []);
 
-        foreach (var row in _excelService.GetSheet<EventTutorial>())
-        {
-            if (row.Unknown2 == 0)
-                continue;
-
-            if (!dict.TryGetValue(row.Unknown2, out var names))
-                dict.Add(row.Unknown2, names = []);
-
-            names.Add(new UnlockEntry()
-            {
-                RowType = typeof(EventTutorial),
-                RowId = row.RowId,
-                TexturePath = "ui/uld/EventTutorial_hr1.tex",
-                Label = row.Unknown0.ToString(),
-            });
+                names.Add(new UnlockEntry()
+                {
+                    RowType = typeof(Trait),
+                    RowId = row.RowId,
+                    IconId = (uint)row.Icon,
+                    Label = row.Name.ToString(),
+                    Category = _textService.GetAddonText(102478)
+                });
+            }
         }
 
         Rows = dict
