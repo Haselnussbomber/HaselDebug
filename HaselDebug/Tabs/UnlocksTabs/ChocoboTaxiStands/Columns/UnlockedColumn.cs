@@ -14,5 +14,5 @@ public class UnlockedColumn : ColumnBool<ChocoboTaxiStand>
     }
 
     public override unsafe bool ToBool(ChocoboTaxiStand row)
-        => UIState.Instance()->IsChocoboTaxiStandUnlocked(row.RowId - 1179648);
+        => UIState.Instance()->IsChocoboTaxiStandUnlocked(row.RowId);
 }

@@ -5,7 +5,7 @@
 - **Added:** Gaiji Fontdata (gfd) tab.
 - **Added:** Furniture Catalog tab.
 - **Updated:** Currency Manager tab now shows currency icons and items have a context menu.
-- **Updated:** ClientStructs now at [360b5cca](https://github.com/aers/FFXIVClientStructs/tree/360b5cca) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b41eccb6..360b5cca)).
+- **Updated:** ClientStructs now at [b1dabe8d](https://github.com/aers/FFXIVClientStructs/tree/b1dabe8d) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b41eccb6..b1dabe8d)).
 
 ## [1.36.0] (2025-09-29)
 
