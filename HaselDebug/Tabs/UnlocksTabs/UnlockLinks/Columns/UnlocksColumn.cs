@@ -19,7 +19,7 @@ public partial class UnlocksColumn : ColumnString<UnlockLinkEntry>
     [AutoPostConstruct]
     public void Initialize()
     {
-        SetFixedWidth(300);
+        SetFixedWidth(320);
     }
 
     public override string ToName(UnlockLinkEntry entry)
