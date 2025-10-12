@@ -1,4 +1,5 @@
 using HaselCommon.Gui.ImGuiTable;
+using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks.Columns;
 
@@ -16,4 +17,7 @@ public class IndexColumn : ColumnNumber<UnlockLinkEntry>
 
     public override int ToValue(UnlockLinkEntry entry)
         => (int)entry.Index;
+
+    public override void DrawColumn(UnlockLinkEntry row)
+        => ImGuiUtilsEx.DrawCopyableText(ToName(row));
 }
