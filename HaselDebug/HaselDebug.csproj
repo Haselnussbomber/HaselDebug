@@ -2,7 +2,7 @@
 <Project Sdk="Dalamud.NET.Sdk/13.1.0">
   <!-- Project settings -->
   <PropertyGroup>
-    <Version>1.36.0</Version>
+    <Version>1.37.0</Version>
     <OutputPath>..\bin\</OutputPath>
     <DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
     <DefineConstants>$(DefineConstants);AUTOCTOR_EMBED_ATTRIBUTES</DefineConstants>

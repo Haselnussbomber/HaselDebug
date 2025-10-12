@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.37.0] (2025-10-13)
 
 - **Added:** A Furniture Catalog tab to preview all indoor and outdoor furniture, including those that aren't listed in the games list.
 - **Added:** A Gaiji Fontdata (gfd) tab, including names of Dalamuds BitmapFontIcon.
@@ -570,7 +570,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.36.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.37.0...main
+[1.37.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.36.0...v1.37.0
 [1.36.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.1...v1.36.0
 [1.35.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.0...v1.35.1
 [1.35.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.34.2...v1.35.0
