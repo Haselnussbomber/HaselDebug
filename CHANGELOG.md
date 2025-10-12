@@ -2,10 +2,15 @@
 
 ## [Unreleased]
 
-- **Added:** Gaiji Fontdata (gfd) tab.
-- **Added:** Furniture Catalog tab.
+- **Added:** A Furniture Catalog tab to preview all indoor and outdoor furniture, including those that aren't listed in the games list.
+- **Added:** A Gaiji Fontdata (gfd) tab, including names of Dalamuds BitmapFontIcon.
 - **Updated:** Currency Manager tab now shows currency icons and items have a context menu.
+- **Updated:** Added support for the following sheets to the Unlock Links table: BGMSwitch, DescriptionSection, EmjVoiceNpc, EventTutorial, MKDLore and PatchMark.
+- **Updated:** Added support for Occult Record Items to the Unlock Links table.
 - **Updated:** ClientStructs now at [b1dabe8d](https://github.com/aers/FFXIVClientStructs/tree/b1dabe8d) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b41eccb6..b1dabe8d)).
+- **Fixed:** The width of the Sheet/Row column in the Unlock Links table has been increased slightly to fit the text.
+- **Fixed:** Filtered out 3 unobtainable Chocobo Taxi Stands.
+- **Fixed:** Filtered out Emotes without a value in the Order column.
 
 ## [1.36.0] (2025-09-29)
 
