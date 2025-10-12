@@ -44,9 +44,8 @@ public partial class AddonNameTable : Table<AddonNameEntry>, IDisposable
     {
         public IndexColumn()
         {
-            Label = "Index";
-            Flags = ImGuiTableColumnFlags.WidthFixed;
-            Width = 60;
+            LabelKey = "IndexColumn.Label";
+            SetFixedWidth(60);
         }
 
         public override int ToValue(AddonNameEntry row)
@@ -65,7 +64,7 @@ public partial class AddonNameTable : Table<AddonNameEntry>, IDisposable
     {
         public NameColumn()
         {
-            Label = "Name";
+            LabelKey = "NameColumn.Label";
         }
 
         public override string ToName(AddonNameEntry row)

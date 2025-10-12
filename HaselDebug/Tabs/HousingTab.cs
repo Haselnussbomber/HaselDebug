@@ -144,7 +144,5 @@ public unsafe partial class HousingTab : DebugTab
             Language = _languageProvider.ClientLanguage
         });
         ImGui.Separator();
-
-        _debugRenderer.DrawPointerType(housingManager, typeof(HousingManager), new NodeOptions() { DefaultOpen = true });
     }
 }

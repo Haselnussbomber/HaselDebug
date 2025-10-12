@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Graphics;
 using HaselCommon.Gui;
+using HaselCommon.Services;
 
 namespace HaselDebug.Utils;
 
@@ -259,5 +262,49 @@ public static unsafe class ImGuiUtilsEx
 
         if (ImGui.IsItemClicked())
             ImGui.SetClipboardText(textCopy);
+    }
+
+    public static EndUnconditionally AlertBox(string id, Color color, Vector2 size)
+    {
+        var colors = ImRaii
+            .PushColor(ImGuiCol.ChildBg, (color with { A = 0.1f }).ToUInt())
+            .Push(ImGuiCol.Border, (color with { A = 0.4f }).ToUInt());
+        var style = ImRaii.PushStyle(ImGuiStyleVar.ChildRounding, 3);
+        var child = ImRaii.Child(id, size, true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+        style.Dispose();
+        colors.Dispose();
+        return new EndUnconditionally(child.Dispose, true);
+    }
+
+    private static void DrawAlert(string id, string text, GameIconLookup icon, Color color)
+    {
+        var size = ImGui.CalcTextSize(text, wrapWidth: ImGui.GetContentRegionMax().X);
+        size.X += ImGui.GetTextLineHeight() + ImGui.GetStyle().ItemSpacing.X * 2;
+        size += ImGui.GetStyle().ItemInnerSpacing * 4;
+
+        using (AlertBox(id, color, size))
+        {
+            if (ServiceLocator.TryGetService<ITextureProvider>(out var textureProvider))
+                textureProvider.DrawIcon(icon, ImGui.GetTextLineHeight());
+            else
+                ImGui.Dummy(new Vector2(ImGui.GetTextLineHeight()));
+            ImGui.SameLine();
+            ImGui.TextWrapped(text);
+        }
+    }
+
+    public static void DrawAlertInfo(string id, string text)
+    {
+        DrawAlert(id, text, 60071, Color.FromHSL(190, 1f, 0.5f));
+    }
+
+    public static void DrawAlertWarning(string id, string text)
+    {
+        DrawAlert(id, text, 60073, Color.FromHSL(50, 1f, 0.5f));
+    }
+
+    public static void DrawAlertError(string id, string text)
+    {
+        DrawAlert(id, text, 60074, Color.FromHSL(0, 1f, 0.5f));
     }
 }

@@ -45,7 +45,7 @@ public partial class RowIdColumn<TRow> : ColumnNumber<TRow> where TRow : struct,
             typeof(TRow)
         )
         {
-            Label = "RowId",
+            LabelKey = "RowIdColumn.Label",
             Flags = ImGuiTableColumnFlags.WidthFixed,
             Width = 60
         };

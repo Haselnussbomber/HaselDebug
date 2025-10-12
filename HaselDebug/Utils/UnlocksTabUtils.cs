@@ -41,7 +41,7 @@ public unsafe partial class UnlocksTabUtils
     private readonly Dictionary<uint, Vector2> _iconSizeCache = [];
     private readonly Dictionary<ushort, uint> _facePaintIconCache = [];
 
-    public bool DrawSelectableItem(ItemHandle item, ImGuiId id, bool drawIcon = true, bool isHq = false, float? iconSize = null)
+    public bool DrawSelectableItem(ItemHandle item, ImGuiId id, bool drawIcon = true, bool isHq = false, float? iconSize = null, bool selected = false, ImGuiSelectableFlags flags = ImGuiSelectableFlags.None)
     {
         var itemName = item.Name.ToString();
         var isHovered = false;
@@ -52,7 +52,7 @@ public unsafe partial class UnlocksTabUtils
             _debugRenderer.DrawIcon(item.Icon, isHq, drawInfo: (float)iconSize, noTooltip: true);
             isHovered |= ImGui.IsItemHovered();
         }
-        var clicked = ImGui.Selectable(itemName);
+        var clicked = ImGui.Selectable(itemName, selected, flags);
         isHovered |= ImGui.IsItemHovered();
 
         if (string.IsNullOrWhiteSpace(itemName))

@@ -48,7 +48,7 @@ public partial class EntryRowIdColumn<T, TRow> : ColumnNumber<T>
             typeof(TRow)
         )
         {
-            Label = "RowId",
+            LabelKey = "RowIdColumn.Label",
             Flags = ImGuiTableColumnFlags.WidthFixed,
             Width = 60
         };

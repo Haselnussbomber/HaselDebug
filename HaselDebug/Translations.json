@@ -80,16 +80,19 @@
   },
 
   "UnlockedColumn.Label": {
-    "en": "Unlocked"
+    "en": "Unlocked",
+    "de": "Freigeschaltet"
   },
   "CategoryColumn.Label": {
-    "en": "Category"
+    "en": "Category",
+    "de": "Kategorie"
   },
   "NameColumn.Label": {
     "en": "Name"
   },
   "CompletedColumn.Label": {
-    "en": "Completed"
+    "en": "Completed",
+    "de": "Abgeschlossen"
   },
   "IndexColumn.Label": {
     "en": "Index"
@@ -101,46 +104,69 @@
     "en": "RowId"
   },
   "CaughtColumn.Label": {
-    "en": "Caught"
+    "en": "Caught",
+    "de": "Gefangen"
+  },
+  "ItemColumn.Label": {
+    "en": "Item",
+    "de": "Gegenstand"
+  },
+  "PatchColumn.Label": {
+    "en": "Patch"
+  },
+  "HaselDebug.Tabs.SpecialShopsRowColumn.Label": {
+    "en": "Shop"
   },
   "HaselDebug.Tabs.UnlocksTabs.AetherCurrents.Columns.LocationColumn.Label": {
-    "en": "Location"
+    "en": "Location",
+    "de": "Ort"
   },
   "HaselDebug.Tabs.UnlocksTabs.AozActions.Columns.NumberColumn.Label": {
-    "en": "Number"
+    "en": "Number",
+    "de": "Nummer"
   },
   "HaselDebug.Tabs.UnlocksTabs.AozActions.Columns.ActionColumn.Label": {
-    "en": "Action"
+    "en": "Action",
+    "de": "Kommando"
   },
   "HaselDebug.Tabs.UnlocksTabs.AozActions.Columns.LocationColumn.Label": {
-    "en": "Location"
+    "en": "Where to Learn",
+    "de": "Erlernbar in"
   },
   "HaselDebug.Tabs.UnlocksTabs.Bardings.Columns.ItemColumn.Label": {
-    "en": "Item"
+    "en": "Item",
+    "de": "Gegenstand"
   },
   "HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns.PathColumn.Label": {
-    "en": "Path"
+    "en": "Path",
+    "de": "Pfad"
   },
   "HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns.SeenColumn.Label": {
-    "en": "Seen"
+    "en": "Seen",
+    "de": "Gesehen"
   },
   "HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns.UsesColumn.Label": {
-    "en": "Uses"
+    "en": "Uses",
+    "de": "Nutzungen"
   },
   "HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns.WorkIndexColumn.Label": {
     "en": "WorkIndex"
   },
   "HaselDebug.Tabs.UnlocksTabs.OrchestrionRolls.Columns.NumberColumn.Label": {
-    "en": "Number"
+    "en": "Number",
+    "de": "Nummer"
   },
   "HaselDebug.Tabs.UnlocksTabs.Emotes.Columns.CanUseColumn.Label": {
-    "en": "Can use"
+    "en": "Can use",
+    "de": "Kann benutzen"
   },
   "HaselDebug.Tabs.UnlocksTabs.Emotes.Columns.ItemColumn.Label": {
-    "en": "Item"
+    "en": "Item",
+    "de": "Gegenstand"
   },
   "HaselDebug.Tabs.UnlocksTabs.Outfits.Columns.ItemsColumn.Label": {
-    "en": "Items"
+    "en": "Items",
+    "de": "Gegenstände"
   },
   "HaselDebug.Tabs.UnlocksTabs.Outfits.Columns.SetColumn.Label": {
     "en": "Set"
@@ -152,28 +178,43 @@
     "en": "Status"
   },
   "HaselDebug.Tabs.UnlocksTabs.Quests.Columns.RepeatableColumn.Label": {
-    "en": "Repeatable"
+    "en": "Repeatable",
+    "de": "Wiederholbar"
   },
   "HaselDebug.Tabs.UnlocksTabs.Recipes.Columns.ItemCategoryColumn.Label": {
-    "en": "Item Category"
+    "en": "Item Category",
+    "de": "Gegenstandskategorie"
   },
   "FeminineTitle.Label": {
-    "en": "Feminine"
+    "en": "Feminine",
+    "de": "Feminin"
   },
   "MasculineTitle.Label": {
-    "en": "Masculine"
+    "en": "Masculine",
+    "de": "Maskulin"
   },
   "HaselDebug.Tabs.UnlocksTabs.Titles.Columns.PrefixColumn.Label": {
-    "en": "Prefix"
+    "en": "Prefix",
+    "de": "Präfix"
   },
   "HaselDebug.Tabs.UnlocksTabs.TripleTriadCards.Columns.NumberColumn.Label": {
-    "en": "Number"
+    "en": "Number",
+    "de": "Nummer"
   },
   "HaselDebug.Tabs.UnlocksTabs.UnlockLinks.Columns.UnlocksColumn.Label": {
     "en": "Sheet/Row"
   },
   "HaselDebug.Tabs.UnlocksTabs.UnlockLinks.Columns.UnlocksNameColumn.Label": {
     "en": "Name"
+  },
+
+  "FurnitureCatalogTab.OpenButton.Label": {
+    "en": "Open {0}",
+    "de": "Öffne {0}"
+  },
+  "FurnitureCatalogTab.AlertText": {
+    "en": "Items are placeable once the corresponding preview window is opened.",
+    "de": "Gegenstände sind platzierbar sobald das Katalog-Fenster geöffnet ist."
   },
 
   "UnlocksTab.CabinetNotLoaded": {
