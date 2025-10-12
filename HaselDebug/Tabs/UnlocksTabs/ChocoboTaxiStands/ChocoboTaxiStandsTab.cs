@@ -6,7 +6,7 @@ using HaselDebug.Interfaces;
 namespace HaselDebug.Tabs.UnlocksTabs.ChocoboTaxiStands;
 
 [RegisterSingleton<IUnlockTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class ChocoboTaxiStandsTab(AdventuresTable table) : DebugTab, IUnlockTab
+public unsafe class ChocoboTaxiStandsTab(ChocoboTaxiStandsTable table) : DebugTab, IUnlockTab
 {
     public override string Title => "Chocobo Taxi Stands";
     public override bool DrawInChild => false;
