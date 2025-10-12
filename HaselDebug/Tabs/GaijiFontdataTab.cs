@@ -145,5 +145,10 @@ public partial class GaijiFontdataTable : Table<GfdEntry>, IDisposable
         {
             return _getValue(row);
         }
+
+        public override void DrawColumn(GfdEntry row)
+        {
+            ImGuiUtilsEx.DrawCopyableText(ToName(row));
+        }
     }
 }
