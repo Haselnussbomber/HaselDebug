@@ -20,22 +20,22 @@ public unsafe partial class TerritoryIntendedUseTab : DebugTab
     private readonly TextService _textService;
     private readonly DebugRenderer _debugRenderer;
 
-    private ImmutableSortedDictionary<uint, List<(TerritoryType, IReadOnlyList<ContentFinderCondition>)>> _dict;
+    private ImmutableSortedDictionary<uint, List<(TerritoryType, IReadOnlyList<uint>)>> _dict;
     private bool _isInitialized;
 
     private void Initialize()
     {
-        var dict = new Dictionary<uint, List<(TerritoryType, IReadOnlyList<ContentFinderCondition>)>>();
+        var dict = new Dictionary<uint, List<(TerritoryType, IReadOnlyList<uint>)>>();
 
         foreach (var territoryTypes in _excelService.GetSheet<TerritoryType>().GroupBy(row => row.TerritoryIntendedUse.RowId))
         {
-            var list = new List<(TerritoryType, IReadOnlyList<ContentFinderCondition>)>();
+            var list = new List<(TerritoryType, IReadOnlyList<uint>)>();
 
             foreach (var territoryType in territoryTypes)
             {
                 list.Add((
                     territoryType,
-                    _excelService.FindRows<ContentFinderCondition>(cfcRow => cfcRow.TerritoryType.RowId == territoryType.RowId)));
+                    [.. _excelService.FindRows<ContentFinderCondition>(cfcRow => cfcRow.TerritoryType.RowId == territoryType.RowId).Select(row => row.RowId)]));
             }
 
             dict[territoryTypes.Key] = list;
@@ -86,12 +86,15 @@ public unsafe partial class TerritoryIntendedUseTab : DebugTab
 
                 using var indent = ImRaii.PushIndent();
 
-                foreach (var cfc in kv2.Item2)
+                foreach (var cfcRowId in kv2.Item2)
                 {
-                    _debugRenderer.DrawExdRow(typeof(ContentFinderCondition), cfc.RowId, 0, new NodeOptions()
+                    if (!_excelService.TryGetRow<ContentFinderCondition>(cfcRowId, out var cfcRow))
+                        continue;
+
+                    _debugRenderer.DrawExdRow(typeof(ContentFinderCondition), cfcRowId, 0, new NodeOptions()
                     {
                         AddressPath = new AddressPath([(nint)territoryIntendedUse]),
-                        Title = $"[ContentFinderCondition#{cfc.RowId}] {cfc.Name.ToString().FirstCharToUpper()}"
+                        Title = $"[ContentFinderCondition#{cfcRowId}] {cfcRow.Name.ToString().FirstCharToUpper()}"
                     });
                 }
             }
