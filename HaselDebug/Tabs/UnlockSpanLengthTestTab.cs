@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Graphics;
 using HaselCommon.Services;
@@ -190,5 +191,50 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
             "UIState.UnlockedTripleTriadCards",
             UIState.Instance()->UnlockedTripleTriadCardsBitArray,
             _excelService.GetRowCount<TripleTriadCard>()));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "QuestManager.CompletedQuests",
+            QuestManager.Instance()->CompletedQuestsBitArray,
+            _excelService.GetRowCount<Quest>()));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "QuestManager.UnlockedMapMarkers",
+            QuestManager.Instance()->UnlockedMapMarkersBitArray,
+            _excelService.GetSubrowSheet<MapMarker>().Count));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "QuestManager.QuestRepeatFlags",
+            QuestManager.Instance()->QuestRepeatFlagsBitArray,
+            _excelService.GetRowCount<QuestRepeatFlag>()));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "QuestManager.CompletedLegacyQuestsBitArray",
+            QuestManager.Instance()->CompletedLegacyQuestsBitArray,
+            _excelService.GetRowCount<LegacyQuest>()));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "QuestManager.SeenGatheringNotebookDivisionLevelRanges",
+            QuestManager.Instance()->SeenGatheringNotebookDivisionLevelRangesBitArray,
+            _excelService.GetRowCount<NotebookDivision>()));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "QuestManager.GatheredGatheringItems",
+            QuestManager.Instance()->GatheredGatheringItemsBitArray,
+            _excelService.GetRowCount<GatheringItem>()));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "QuestManager.SeenCraftingNotebookDivisionLevelRanges",
+            QuestManager.Instance()->SeenCraftingNotebookDivisionLevelRangesBitArray,
+            _excelService.GetSheet<NotebookDivision>().Where(row => row.CraftOpeningLevel is not 0 or 255).Count() * 8));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "QuestManager.CompletedRecipes",
+            QuestManager.Instance()->CompletedRecipesBitArray,
+            (int)_excelService.GetSheet<Recipe>().Where(row => row.RowId < 30000).Max(row => row.RowId)));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "QuestManager.CompletedLeveQuests",
+            QuestManager.Instance()->CompletedLeveQuestsBitArray,
+            _excelService.GetRowCount<Leve>()));
     }
 }
