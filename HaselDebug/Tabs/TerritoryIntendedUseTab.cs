@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
 using HaselCommon.Services;
@@ -21,9 +23,9 @@ public unsafe partial class TerritoryIntendedUseTab : DebugTab
     private readonly DebugRenderer _debugRenderer;
 
     private ImmutableSortedDictionary<uint, List<(TerritoryType, IReadOnlyList<uint>)>> _dict;
-    private bool _isInitialized;
+    private Task? _loadTask;
 
-    private void Initialize()
+    private void LoadData()
     {
         var dict = new Dictionary<uint, List<(TerritoryType, IReadOnlyList<uint>)>>();
 
@@ -46,10 +48,18 @@ public unsafe partial class TerritoryIntendedUseTab : DebugTab
 
     public override void Draw()
     {
-        if (!_isInitialized)
+        _loadTask ??= Task.Run(LoadData);
+
+        if (!_loadTask.IsCompleted)
         {
-            Initialize();
-            _isInitialized = true;
+            ImGui.Text("Loading...");
+            return;
+        }
+
+        if (_loadTask.IsFaulted)
+        {
+            ImGuiUtilsEx.DrawAlertError("TaskError", _loadTask.Exception?.ToString() ?? "Error loading data :(");
+            return;
         }
 
         foreach (var territoryIntendedUse in Enum.GetValues<TerritoryIntendedUseEnum>())

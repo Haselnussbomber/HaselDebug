@@ -278,9 +278,10 @@ public static unsafe class ImGuiUtilsEx
 
     private static void DrawAlert(string id, string text, GameIconLookup icon, Color color)
     {
-        var size = ImGui.CalcTextSize(text, wrapWidth: ImGui.GetContentRegionMax().X);
-        size.X += ImGui.GetTextLineHeight() + ImGui.GetStyle().ItemSpacing.X * 2;
-        size += ImGui.GetStyle().ItemInnerSpacing * 4;
+        var maxWidth = ImGui.GetContentRegionAvail().X;
+        var innerTextWidth = maxWidth - ImGui.GetStyle().FramePadding.X * 2 - ImGui.GetStyle().ItemInnerSpacing.X * 2 - ImGui.GetTextLineHeight();
+        var textSize = ImGui.CalcTextSize(text, wrapWidth: innerTextWidth);
+        var size = new Vector2(maxWidth, textSize.Y + ImGui.GetStyle().FramePadding.Y * 2 + ImGui.GetStyle().ItemInnerSpacing.Y * 2);
 
         using (AlertBox(id, color, size))
         {
