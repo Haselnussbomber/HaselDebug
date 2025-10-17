@@ -1,6 +1,6 @@
 using Dalamud.Plugin.Services;
+using Dalamud.Utility;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Utils;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 
