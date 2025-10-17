@@ -1,12 +1,5 @@
-using System.Collections.Generic;
-using System.Numerics;
 using Dalamud.Interface.Textures;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselCommon.Graphics;
-using HaselCommon.Gui;
-using HaselCommon.Services;
 
 namespace HaselDebug.Utils;
 

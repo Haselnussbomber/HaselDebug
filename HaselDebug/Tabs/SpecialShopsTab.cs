@@ -1,10 +1,8 @@
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Tabs.UnlocksTabs;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 

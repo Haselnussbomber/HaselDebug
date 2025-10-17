@@ -1,7 +1,5 @@
-using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.STD;
 using FFXIVClientStructs.STD.ContainerInterface;
-using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
@@ -31,7 +29,7 @@ public unsafe partial class DebugRenderer
         {
             DrawContextMenu = (nodeOptions, builder) =>
             {
-                builder.AddCopyAddress(_textService, address);
+                builder.AddCopyAddress(address);
                 builder.AddSeparator();
                 builder.Add(new ImGuiContextMenuEntry()
                 {

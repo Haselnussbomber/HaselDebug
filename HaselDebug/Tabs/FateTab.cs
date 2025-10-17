@@ -1,6 +1,4 @@
 using Dalamud.Game.ClientState.Fates;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 

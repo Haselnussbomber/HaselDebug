@@ -2,12 +2,9 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.FashionAccessories.Columns;
 

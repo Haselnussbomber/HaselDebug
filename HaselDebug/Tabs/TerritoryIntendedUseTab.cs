@@ -1,16 +1,10 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading.Tasks;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using Lumina.Excel.Sheets;
 using TerritoryIntendedUseEnum = HaselCommon.Game.Enums.TerritoryIntendedUse;
 
 namespace HaselDebug.Tabs;

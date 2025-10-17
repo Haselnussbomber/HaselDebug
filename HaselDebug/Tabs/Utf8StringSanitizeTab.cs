@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Text.Unicode;
-using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;

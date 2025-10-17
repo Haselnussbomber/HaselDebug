@@ -1,14 +1,7 @@
-using System.Linq;
-using System.Numerics;
-using Dalamud.Interface.Utility;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Gui;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Sheets;
 using HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits;
 

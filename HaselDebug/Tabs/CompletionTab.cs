@@ -1,16 +1,6 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
-using HaselCommon.Graphics;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using Lumina.Excel;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 

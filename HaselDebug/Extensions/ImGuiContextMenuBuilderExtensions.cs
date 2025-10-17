@@ -2,57 +2,53 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselCommon.Services;
-using HaselCommon.Utils;
 
 namespace HaselDebug.Extensions;
 
 public static unsafe class ImGuiContextMenuBuilderExtensions
 {
-    public static void AddCopyRowId(this ImGuiContextMenuBuilder builder, TextService textService, uint rowId)
+    public static void AddCopyRowId(this ImGuiContextMenuBuilder builder, uint rowId)
     {
         builder.Add(new ImGuiContextMenuEntry()
         {
             Visible = rowId != 0,
-            Label = textService.Translate("ContextMenu.CopyRowId"),
+            Label = ServiceLocator.GetService<TextService>()?.Translate("ContextMenu.CopyRowId") ?? "Copy RowId",
             ClickCallback = () => ImGui.SetClipboardText(rowId.ToString())
         });
     }
 
-    public static void AddCopyName(this ImGuiContextMenuBuilder builder, TextService textService, string name)
+    public static void AddCopyName(this ImGuiContextMenuBuilder builder, string name)
     {
         builder.Add(new ImGuiContextMenuEntry()
         {
             Visible = !string.IsNullOrEmpty(name),
-            Label = textService.Translate("ContextMenu.CopyName"),
+            Label = ServiceLocator.GetService<TextService>()?.Translate("ContextMenu.CopyName") ?? "Copy Name",
             ClickCallback = () => ImGui.SetClipboardText(name)
         });
     }
 
-    public static void AddCopyAddress(this ImGuiContextMenuBuilder builder, TextService textService, nint address)
+    public static void AddCopyAddress(this ImGuiContextMenuBuilder builder, nint address)
     {
         builder.Add(new ImGuiContextMenuEntry()
         {
             Visible = address != 0,
-            Label = textService.Translate("ContextMenu.CopyAddress"),
+            Label = ServiceLocator.GetService<TextService>()?.Translate("ContextMenu.CopyAddress") ?? "Copy Address",
             ClickCallback = () => ImGui.SetClipboardText(address.ToString("X"))
         });
     }
 
-    public static void AddViewOutfitGlamourReadyItems(this ImGuiContextMenuBuilder builder, TextService textService, ExcelService excelService, uint itemId)
+    public static void AddViewOutfitGlamourReadyItems(this ImGuiContextMenuBuilder builder, ItemHandle item)
     {
-        builder.Add(new ViewOutfitGlamourReadyItemsContextMenuEntry(textService, excelService, itemId));
+        builder.Add(new ViewOutfitGlamourReadyItemsContextMenuEntry(item));
     }
 
-    public static void AddRestoreItem(this ImGuiContextMenuBuilder builder, TextService textService, uint itemId)
+    public static void AddRestoreItem(this ImGuiContextMenuBuilder builder, ItemHandle item)
     {
-        builder.Add(new RestoreItemContextMenuEntry(textService, itemId));
+        builder.Add(new RestoreItemContextMenuEntry(item));
     }
 
-    private struct ViewOutfitGlamourReadyItemsContextMenuEntry(TextService textService, ExcelService excelService, uint itemId) : IImGuiContextMenuEntry
+    private readonly struct ViewOutfitGlamourReadyItemsContextMenuEntry(ItemHandle item) : IImGuiContextMenuEntry
     {
-        private readonly uint _itemId = itemId;
-
         public bool Visible
         {
             get
@@ -63,7 +59,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
                 if (!TryGetAddon<AtkUnitBase>("MiragePrismPrismBoxCrystallize", out _))
                     return false;
 
-                if (!excelService.GetSheet<Lumina.Excel.Sheets.MirageStoreSetItemLookup>().HasRow(_itemId))
+                if (!ServiceLocator.TryGetService<ExcelModule>(out var excelModule) || !excelModule.GetSheet<Lumina.Excel.Sheets.MirageStoreSetItemLookup>().HasRow(item))
                     return false;
 
                 return GetInventoryItem() != null;
@@ -72,7 +68,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
 
         public bool Enabled => true;
         public bool Selected => false;
-        public string Label => textService.GetAddonText(15635);
+        public string Label => ServiceLocator.GetService<TextService>()?.GetAddonText(15635) ?? "View Outfit Glamour-ready Items";
         public bool LoseFocusOnClick => false;
         public Action? ClickCallback => OnClick;
         public Action? HoverCallback => null;
@@ -101,7 +97,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
             if (!TryGetAddon<AtkUnitBase>("MiragePrismPrismBoxCrystallize", out var openerAddon))
                 return;
 
-            AgentMiragePrismPrismSetConvert.Instance()->Open(_itemId, slot->GetInventoryType(), slot->GetSlot(), openerAddon->Id, true);
+            AgentMiragePrismPrismSetConvert.Instance()->Open(item, slot->GetInventoryType(), slot->GetSlot(), openerAddon->Id, true);
         }
 
         private InventoryItem* GetInventoryItem()
@@ -118,7 +114,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
                     if (slot == null || slot->IsEmpty())
                         continue;
 
-                    if (slot->GetItemId() == _itemId)
+                    if (slot->GetItemId() == item)
                         return slot;
                 }
             }
@@ -127,7 +123,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
         }
     }
 
-    private struct RestoreItemContextMenuEntry(TextService textService, uint itemId) : IImGuiContextMenuEntry
+    private struct RestoreItemContextMenuEntry(ItemHandle item) : IImGuiContextMenuEntry
     {
         public bool Visible
         {
@@ -140,7 +136,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
                 if (!mirageManager->PrismBoxLoaded)
                     return false;
 
-                if (mirageManager->PrismBoxItemIds.IndexOf(itemId) == -1)
+                if (mirageManager->PrismBoxItemIds.IndexOf(item) == -1)
                     return false;
 
                 return true;
@@ -149,7 +145,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
 
         public bool Enabled => true;
         public bool Selected => false;
-        public string Label => textService.GetAddonText(11904);
+        public string Label => ServiceLocator.GetService<TextService>()?.GetAddonText(11904) ?? "Restore Item";
         public bool LoseFocusOnClick => false;
         public Action? ClickCallback => OnClick;
         public Action? HoverCallback => null;
@@ -174,7 +170,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
             var manager = MirageManager.Instance();
             if (!manager->PrismBoxLoaded) return;
 
-            var index = MirageManager.Instance()->PrismBoxItemIds.IndexOf(itemId);
+            var index = MirageManager.Instance()->PrismBoxItemIds.IndexOf(item);
             if (index == -1) return;
 
             MirageManager.Instance()->RestorePrismBoxItem((uint)index);

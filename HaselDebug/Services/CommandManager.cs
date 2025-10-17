@@ -1,11 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Dalamud.Plugin;
 using HaselCommon.Commands;
-using HaselCommon.Services;
 using HaselDebug.Config;
 using HaselDebug.Windows;
-using Microsoft.Extensions.Hosting;
 
 namespace HaselDebug.Services;
 

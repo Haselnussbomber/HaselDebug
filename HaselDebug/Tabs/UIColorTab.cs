@@ -1,11 +1,6 @@
-using System.Numerics;
-using Dalamud.Interface.Utility.Raii;
-using HaselCommon.Graphics;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Utils;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 

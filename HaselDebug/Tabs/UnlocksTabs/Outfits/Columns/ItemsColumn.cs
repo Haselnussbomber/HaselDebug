@@ -1,14 +1,8 @@
-using System.Numerics;
 using System.Text;
-using Dalamud.Interface.Utility;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using HaselCommon.Graphics;
-using HaselCommon.Gui;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Sheets;
 using HaselDebug.Utils;
@@ -103,13 +97,13 @@ public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
 
             _imGuiContextMenuService.Draw($"###SetItem_{row.RowId}_{item.RowId}_ItemContextMenu", builder =>
             {
-                builder.AddRestoreItem(_textService, item.RowId);
-                builder.AddViewOutfitGlamourReadyItems(_textService, _excelService, item.RowId);
-                builder.AddTryOn(item.RowId);
-                builder.AddItemFinder(item.RowId);
-                builder.AddCopyItemName(item.RowId);
-                builder.AddItemSearch(item.RowId);
-                builder.AddSearchCraftingMethod(item.RowId);
+                builder.AddRestoreItem(item);
+                builder.AddViewOutfitGlamourReadyItems(item);
+                builder.AddTryOn(item);
+                builder.AddItemFinder(item);
+                builder.AddCopyItemName(item);
+                builder.AddItemSearch(item);
+                builder.AddSearchCraftingMethod(item);
                 builder.AddOpenOnGarlandTools("item", item.RowId);
             });
 

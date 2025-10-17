@@ -1,8 +1,5 @@
-using System.Numerics;
-using HaselCommon.Gui;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Windows;
 

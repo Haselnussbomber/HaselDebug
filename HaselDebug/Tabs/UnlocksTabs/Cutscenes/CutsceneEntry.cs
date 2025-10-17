@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using Lumina.Excel.Sheets;
-
 namespace HaselDebug.Tabs.UnlocksTabs.Cutscenes;
 
 public record CutsceneEntry(

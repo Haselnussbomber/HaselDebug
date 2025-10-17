@@ -27,7 +27,6 @@
 
   <!-- References to Dalamud dependencies -->
   <ItemGroup>
-    <Reference Include="Reloaded.Assembler" Private="false" />
     <Reference Include="SharpDX" Private="false" />
     <Reference Include="SharpDX.DXGI" Private="false" />
     <Reference Include="SharpDX.Direct3D11" Private="false" />

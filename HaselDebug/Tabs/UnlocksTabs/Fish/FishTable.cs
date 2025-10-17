@@ -1,8 +1,5 @@
-using System.Linq;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Tabs.UnlocksTabs.Fish.Columns;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Fish;
 

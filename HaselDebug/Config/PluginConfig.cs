@@ -3,10 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Dalamud.Configuration;
-using Dalamud.Plugin;
-using Dalamud.Plugin.Services;
 using Dalamud.Utility;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Config;
 

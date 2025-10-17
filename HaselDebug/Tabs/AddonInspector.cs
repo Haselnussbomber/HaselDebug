@@ -1,12 +1,5 @@
-using System.Collections.Generic;
-using System.Numerics;
-using Dalamud.Interface;
-using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselCommon.Graphics;
-using HaselCommon.Gui;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
@@ -196,8 +189,8 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
                 var isPinned = _pinnedInstances.Contains(addonName);
 
-                builder.AddCopyName(_textService, addonName);
-                builder.AddCopyAddress(_textService, (nint)unitBase);
+                builder.AddCopyName(addonName);
+                builder.AddCopyAddress((nint)unitBase);
 
                 builder.AddSeparator();
 

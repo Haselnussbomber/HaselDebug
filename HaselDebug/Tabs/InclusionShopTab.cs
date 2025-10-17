@@ -3,7 +3,6 @@ using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using InteropGenerator.Runtime.Attributes;
 
 namespace HaselDebug.Tabs;
 

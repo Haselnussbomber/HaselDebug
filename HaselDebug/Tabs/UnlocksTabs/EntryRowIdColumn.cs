@@ -1,9 +1,6 @@
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Windows;
-using Lumina.Excel;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Tabs.UnlocksTabs;
 
@@ -15,7 +12,6 @@ public partial class EntryRowIdColumn<T, TRow> : ColumnNumber<T>
 
     private readonly IServiceProvider _serviceProvider;
     private readonly WindowManager _windowManager;
-    private readonly TextService _textService;
     private readonly LanguageProvider _languageProvider;
     private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly Type _rowType;
@@ -33,7 +29,7 @@ public partial class EntryRowIdColumn<T, TRow> : ColumnNumber<T>
 
         _imGuiContextMenu.Draw($"{_rowType.Name}{entry.RowId}RowIdContextMenu", builder =>
         {
-            builder.AddCopyRowId(_textService, entry.RowId);
+            builder.AddCopyRowId(entry.RowId);
         });
     }
 
@@ -42,7 +38,6 @@ public partial class EntryRowIdColumn<T, TRow> : ColumnNumber<T>
         return new(
             serviceProvider.GetRequiredService<IServiceProvider>(),
             serviceProvider.GetRequiredService<WindowManager>(),
-            serviceProvider.GetRequiredService<TextService>(),
             serviceProvider.GetRequiredService<LanguageProvider>(),
             serviceProvider.GetRequiredService<ImGuiContextMenuService>(),
             typeof(TRow)

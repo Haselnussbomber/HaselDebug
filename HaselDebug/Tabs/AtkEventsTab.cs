@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using Dalamud.Hooking;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;

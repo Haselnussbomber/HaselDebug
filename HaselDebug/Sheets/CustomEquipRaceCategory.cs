@@ -1,5 +1,3 @@
-using Lumina.Excel;
-
 namespace HaselDebug.Sheets;
 
 [Sheet("EquipRaceCategory")]

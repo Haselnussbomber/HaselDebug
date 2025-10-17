@@ -1,20 +1,14 @@
 using System.Collections.Immutable;
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselCommon.Graphics;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Tabs;
 
@@ -110,8 +104,8 @@ public unsafe partial class AgentsTab : DebugTab
 
                 var isPinned = _pinnedInstances.Contains(agentType);
 
-                builder.AddCopyName(_textService, agentId.ToString());
-                builder.AddCopyAddress(_textService, (nint)agent.Value);
+                builder.AddCopyName(agentId.ToString());
+                builder.AddCopyAddress((nint)agent.Value);
 
                 builder.AddSeparator();
 

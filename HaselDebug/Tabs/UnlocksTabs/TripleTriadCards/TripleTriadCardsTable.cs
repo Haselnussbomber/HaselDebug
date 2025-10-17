@@ -1,9 +1,6 @@
-using System.Linq;
 using HaselCommon.Game.Enums;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Tabs.UnlocksTabs.TripleTriadCards.Columns;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.TripleTriadCards;
 

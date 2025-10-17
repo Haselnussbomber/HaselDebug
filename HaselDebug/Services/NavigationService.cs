@@ -1,11 +1,8 @@
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselCommon.Graphics;
-using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Windows;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Services;
 
@@ -52,8 +49,8 @@ public unsafe partial class NavigationService
             var agentName = agentId.ToString();
             var agent = AgentModule.Instance()->GetAgentByInternalId(agentId);
 
-            builder.AddCopyName(_textService, agentName);
-            builder.AddCopyAddress(_textService, (nint)agent);
+            builder.AddCopyName(agentName);
+            builder.AddCopyAddress((nint)agent);
 
             builder.AddSeparator();
 
@@ -114,8 +111,8 @@ public unsafe partial class NavigationService
             if (unitBase == null)
                 unitBase = RaptureAtkUnitManager.Instance()->GetAddonByName(addonName);
 
-            builder.AddCopyName(_textService, addonName);
-            builder.AddCopyAddress(_textService, (nint)unitBase);
+            builder.AddCopyName(addonName);
+            builder.AddCopyAddress((nint)unitBase);
 
             builder.AddSeparator();
 

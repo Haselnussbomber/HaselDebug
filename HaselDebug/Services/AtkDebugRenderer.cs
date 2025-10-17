@@ -1,20 +1,10 @@
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Interface.Utility;
-using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselCommon.Graphics;
-using HaselCommon.Gui;
-using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
-using Lumina.Text.ReadOnly;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Services;
 
@@ -123,8 +113,8 @@ public unsafe partial class AtkDebugRenderer
                 {
                     var isPinned = _pinnedInstancesService.Contains(agentType);
 
-                    builder.AddCopyName(_textService, agentId.ToString());
-                    builder.AddCopyAddress(_textService, (nint)agent);
+                    builder.AddCopyName(agentId.ToString());
+                    builder.AddCopyAddress((nint)agent);
 
                     builder.AddSeparator();
 

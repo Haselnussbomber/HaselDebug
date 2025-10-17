@@ -1,8 +1,5 @@
 using System.Text;
-using Dalamud.Interface;
-using Dalamud.Interface.Utility.Raii;
 using Dalamud.Memory;
-using HaselCommon.Graphics;
 using HaselDebug.Utils;
 
 namespace HaselDebug.Services;

@@ -1,13 +1,8 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Windows;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Tabs;
 

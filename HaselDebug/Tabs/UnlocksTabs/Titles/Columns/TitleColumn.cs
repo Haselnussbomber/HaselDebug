@@ -1,13 +1,9 @@
-using Dalamud.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
-using Lumina.Excel.Sheets;
-using Microsoft.Extensions.Logging;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Titles.Columns;
 

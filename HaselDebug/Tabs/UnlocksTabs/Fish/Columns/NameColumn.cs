@@ -1,9 +1,7 @@
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Fish.Columns;
 

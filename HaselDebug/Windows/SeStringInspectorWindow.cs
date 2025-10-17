@@ -1,24 +1,11 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game;
 using Dalamud.Game.Text.Evaluator;
 using Dalamud.Interface.ImGuiSeStringRenderer;
-using Dalamud.Interface.Utility;
-using Dalamud.Plugin.Services;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselCommon.Graphics;
-using HaselCommon.Gui;
-using HaselCommon.Services;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using Lumina.Text.Expressions;
 using Lumina.Text.Parse;
-using Lumina.Text.ReadOnly;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Windows;
 

@@ -1,6 +1,3 @@
-using System.Numerics;
-using HaselCommon.Gui;
-using HaselCommon.Services;
 using HaselDebug.Config;
 
 namespace HaselDebug.Windows;

@@ -1,9 +1,6 @@
 using System.Globalization;
-using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Services;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.AetherCurrents.Columns;
 

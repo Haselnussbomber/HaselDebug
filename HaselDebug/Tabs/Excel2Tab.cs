@@ -1,22 +1,11 @@
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using Dalamud.Game;
-using Dalamud.Interface.Utility;
-using Dalamud.Interface.Utility.Raii;
-using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
-using Lumina.Excel;
-using Lumina.Text.ReadOnly;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace HaselDebug.Tabs;
 

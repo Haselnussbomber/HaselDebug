@@ -1,6 +1,4 @@
-using System.Numerics;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselCommon.Gui;
 using HaselDebug.Services;
 
 namespace HaselDebug.Windows;

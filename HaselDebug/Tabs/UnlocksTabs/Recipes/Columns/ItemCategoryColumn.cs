@@ -1,5 +1,4 @@
 using HaselCommon.Gui.ImGuiTable;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Recipes.Columns;
 

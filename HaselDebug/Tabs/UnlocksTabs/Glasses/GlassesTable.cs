@@ -1,6 +1,4 @@
-using System.Linq;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Tabs.UnlocksTabs.Glasses.Columns;
 using GlassesSheet = Lumina.Excel.Sheets.Glasses;
 

@@ -1,25 +1,15 @@
 using System.Globalization;
-using System.Linq;
-using System.Numerics;
 using System.Runtime.CompilerServices;
-using Dalamud.Interface.Utility;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
-using HaselCommon.Utils;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
-using Lumina.Excel.Sheets;
-using Microsoft.Extensions.DependencyInjection;
 using HousingFurniture = Lumina.Excel.Sheets.HousingFurniture;
 
 namespace HaselDebug.Tabs;
@@ -242,7 +232,7 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
 
                 _imGuiContextMenu.Draw($"{row.SheetType.Name}{row.RowId}RowIdContextMenu", builder =>
                 {
-                    builder.AddCopyRowId(_textService, row.RowId);
+                    builder.AddCopyRowId(row.RowId);
                 });
             }
         }

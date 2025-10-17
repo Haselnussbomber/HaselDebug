@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Graphics;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Services;
 using HaselDebug.Utils;

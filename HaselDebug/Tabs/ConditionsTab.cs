@@ -1,8 +1,4 @@
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;

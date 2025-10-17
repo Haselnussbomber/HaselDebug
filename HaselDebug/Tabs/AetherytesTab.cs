@@ -1,10 +1,6 @@
 using Dalamud.Game.Text;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 

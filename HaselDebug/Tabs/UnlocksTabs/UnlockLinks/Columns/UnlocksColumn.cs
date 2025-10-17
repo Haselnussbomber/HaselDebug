@@ -1,6 +1,4 @@
-using System.Linq;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Windows;
 
@@ -37,7 +35,7 @@ public partial class UnlocksColumn : ColumnString<UnlockLinkEntry>
 
             _imGuiContextMenu.Draw($"Entry{entry.Index}_{unlock.RowType.Name}{unlock.RowId}_RowIdContextMenu", builder =>
             {
-                builder.AddCopyRowId(_textService, unlock.RowId);
+                builder.AddCopyRowId(unlock.RowId);
             });
         }
     }

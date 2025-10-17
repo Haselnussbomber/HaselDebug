@@ -1,6 +1,3 @@
-using Lumina.Excel;
-using Lumina.Text.ReadOnly;
-
 namespace HaselDebug.Sheets;
 
 [Sheet]

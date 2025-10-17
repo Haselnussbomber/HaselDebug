@@ -1,9 +1,6 @@
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Tabs;
 

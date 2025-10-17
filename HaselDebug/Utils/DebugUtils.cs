@@ -1,10 +1,6 @@
-using System.Collections.Generic;
-using System.Numerics;
 using System.Reflection;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselCommon.Graphics;
-using InteropGenerator.Runtime.Attributes;
 
 namespace HaselDebug.Utils;
 

@@ -1,6 +1,3 @@
-using Lumina.Excel;
-using Lumina.Excel.Sheets;
-
 namespace HaselDebug.Sheets;
 
 [Sheet("MirageStoreSetItem")]

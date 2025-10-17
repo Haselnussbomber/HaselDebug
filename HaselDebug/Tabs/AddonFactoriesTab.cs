@@ -1,9 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Dalamud.Game;
-using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;

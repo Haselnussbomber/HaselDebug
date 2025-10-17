@@ -1,8 +1,5 @@
-using System.Collections.Generic;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Cutscenes;
 

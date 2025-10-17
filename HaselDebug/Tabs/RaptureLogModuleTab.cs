@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Dalamud.Game.Text.SeStringHandling;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselDebug.Abstracts;
@@ -31,7 +29,7 @@ public unsafe class RaptureLogModuleTab : DebugTab
             for (var i = 0; i < raptureLogModule->LogModule.LogMessageCount; i++)
             {
                 raptureLogModule->GetLogMessage(i, out var message);
-                _messages.Add(SeString.Parse(message).ToString());
+                _messages.Add(((ReadOnlySeStringSpan)message).ToMacroString());
             }
         }
 

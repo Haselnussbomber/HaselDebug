@@ -1,19 +1,12 @@
-using System.Numerics;
 using Dalamud.Game.Text;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.Game.WKS;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using Lumina.Excel.Sheets;
-using Lumina.Text;
-using ItemUtil = Dalamud.Utility.ItemUtil;
 
 namespace HaselDebug.Tabs;
 
@@ -86,8 +79,8 @@ public unsafe partial class InventoryTab : DebugTab
             {
                 var container = InventoryManager.Instance()->GetInventoryContainer(inventoryType);
 
-                builder.AddCopyName(_textService, inventoryType.ToString());
-                builder.AddCopyAddress(_textService, (nint)container);
+                builder.AddCopyName(inventoryType.ToString());
+                builder.AddCopyAddress((nint)container);
             });
 
             ImGui.TableNextColumn(); // Size

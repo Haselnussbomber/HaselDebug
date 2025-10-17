@@ -1,12 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Game.Enums;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Tabs.UnlocksTabs.UnlockLinks.Columns;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks;
 

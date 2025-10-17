@@ -1,12 +1,5 @@
-using System.Numerics;
-using Dalamud.Interface.Utility;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using HaselCommon.Graphics;
-using HaselCommon.Gui;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;

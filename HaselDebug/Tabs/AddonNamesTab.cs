@@ -1,4 +1,3 @@
-using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Gui.ImGuiTable;

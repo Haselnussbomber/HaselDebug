@@ -1,6 +1,5 @@
 using Dalamud.Interface.GameFonts;
 using Dalamud.Interface.ManagedFontAtlas;
-using Dalamud.Plugin;
 
 namespace HaselDebug.Services;
 

@@ -1,12 +1,8 @@
-using Dalamud.Interface.Utility;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Extensions;
 using HaselDebug.Utils;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Quests.Columns;
 
@@ -66,7 +62,7 @@ public partial class NameColumn : ColumnString<Quest>
 
         _imGuiContextMenu.Draw($"Quest{row.RowId}ContextMenu", builder =>
         {
-            builder.AddCopyName(_textService, ToName(row));
+            builder.AddCopyName(ToName(row));
             builder.AddOpenOnGarlandTools("quest", row.RowId);
         });
 

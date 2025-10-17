@@ -1,10 +1,6 @@
-using System.Linq;
 using System.Reflection;
-using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
 using HaselDebug.Utils;
-using Lumina.Excel;
-using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Services;
 

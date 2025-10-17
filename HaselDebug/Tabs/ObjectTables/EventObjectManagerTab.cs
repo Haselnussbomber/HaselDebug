@@ -1,4 +1,3 @@
-using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;

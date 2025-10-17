@@ -1,5 +1,3 @@
-using HaselCommon.Utils;
-
 namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks;
 
 public class UnlockEntry

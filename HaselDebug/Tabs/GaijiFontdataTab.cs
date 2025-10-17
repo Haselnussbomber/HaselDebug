@@ -1,9 +1,5 @@
-using System.Linq;
-using System.Numerics;
 using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Interface.Utility.Raii;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Utils;

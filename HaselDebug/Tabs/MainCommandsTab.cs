@@ -1,15 +1,8 @@
-using System.Numerics;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using HaselCommon.Graphics;
-using HaselCommon.Gui;
-using HaselCommon.Services;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
-using Lumina.Excel.Sheets;
 
 namespace HaselDebug.Tabs;
 

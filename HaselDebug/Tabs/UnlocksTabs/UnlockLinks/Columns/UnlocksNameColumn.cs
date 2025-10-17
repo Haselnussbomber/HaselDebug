@@ -1,5 +1,3 @@
-using System.Linq;
-using Dalamud.Plugin.Services;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Services;
 using HaselDebug.Utils;

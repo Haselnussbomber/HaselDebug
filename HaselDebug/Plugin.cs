@@ -1,7 +1,4 @@
-using Dalamud.Plugin;
 using HaselDebug.Config;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace HaselDebug;
 

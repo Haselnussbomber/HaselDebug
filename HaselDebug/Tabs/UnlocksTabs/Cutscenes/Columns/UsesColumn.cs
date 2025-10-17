@@ -1,5 +1,4 @@
-﻿using System.Data;
-using System.Linq;
+using System.Data;
 using Dalamud.Utility;
 using HaselCommon.Gui.ImGuiTable;
 

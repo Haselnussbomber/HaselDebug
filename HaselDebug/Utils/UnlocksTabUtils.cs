@@ -1,24 +1,10 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 using Dalamud.Interface.Textures.TextureWraps;
-using Dalamud.Interface.Utility;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Game.Enums;
-using HaselCommon.Graphics;
-using HaselCommon.Gui;
-using HaselCommon.Services;
-using HaselCommon.Utils;
 using HaselDebug.Services;
 using HaselDebug.Sheets;
 using Lumina.Data.Files;
-using Lumina.Excel;
-using Lumina.Excel.Sheets;
-using Lumina.Extensions;
-using Lumina.Text.ReadOnly;
 using Companion = Lumina.Excel.Sheets.Companion;
 using Ornament = Lumina.Excel.Sheets.Ornament;
 

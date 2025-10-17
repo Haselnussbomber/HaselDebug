@@ -1,17 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Interface;
-using Dalamud.Interface.Utility.Raii;
-using HaselCommon.Graphics;
-using HaselCommon.Gui;
-using HaselCommon.Services;
 using HaselDebug.Config;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Tabs;
 using HaselDebug.Utils;
-using Microsoft.Extensions.Logging;
 
 namespace HaselDebug.Windows;
 

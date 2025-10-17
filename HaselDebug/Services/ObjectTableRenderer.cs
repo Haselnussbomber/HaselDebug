@@ -1,12 +1,6 @@
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using HaselCommon.Gui;
-using HaselCommon.Services;
 using HaselDebug.Utils;
-using Lumina.Excel.Sheets;
-using Lumina.Text.ReadOnly;
 
 namespace HaselDebug.Services;
 
