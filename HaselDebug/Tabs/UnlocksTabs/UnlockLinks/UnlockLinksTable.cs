@@ -411,7 +411,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
         foreach (var row in _excelService.GetSheet<Item>())
         {
-            if (row.ItemAction.RowId == 0 || !row.ItemAction.IsValid || (ItemActionType)row.ItemAction.Value.Type is not (ItemActionType.UnlockLink or ItemActionType.OccultRecord))
+            if (row.ItemAction.RowId == 0 || !row.ItemAction.IsValid || (ItemActionType)row.ItemAction.Value.Type is not (ItemActionType.UnlockLink or ItemActionType.OccultRecords))
                 continue;
 
             if (!dict.TryGetValue(row.ItemAction.Value.Data[0], out var names))
