@@ -207,6 +207,9 @@
   "HaselDebug.Tabs.UnlocksTabs.UnlockLinks.Columns.UnlocksNameColumn.Label": {
     "en": "Name"
   },
+  "HaselDebug.Tabs.UnlocksTabs.Items.Columns.TypeColumn.Label": {
+    "en": "Type"
+  },
 
   "FurnitureCatalogTab.OpenButton.Label": {
     "en": "Open {0}",
