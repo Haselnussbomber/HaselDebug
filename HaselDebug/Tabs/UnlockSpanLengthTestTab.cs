@@ -183,7 +183,7 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
             "UIState.UnlockedTripleTriadCards",
             UIState.Instance()->UnlockedTripleTriadCardsBitArray,
             _excelService.GetRowCount<TripleTriadCard>()));
-
+        /*
         _bitArrays.Add(new BitArrayRecord(
             "QuestManager.CompletedQuests",
             QuestManager.Instance()->CompletedQuestsBitArray,
@@ -193,14 +193,14 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
             "QuestManager.UnlockedMapMarkers",
             QuestManager.Instance()->UnlockedMapMarkersBitArray,
             _excelService.GetSubrowSheet<MapMarker>().Count));
-
+        */
         _bitArrays.Add(new BitArrayRecord(
             "QuestManager.QuestRepeatFlags",
             QuestManager.Instance()->QuestRepeatFlagsBitArray,
             _excelService.GetRowCount<QuestRepeatFlag>()));
-
+        /*
         _bitArrays.Add(new BitArrayRecord(
-            "QuestManager.CompletedLegacyQuestsBitArray",
+            "QuestManager.CompletedLegacyQuests",
             QuestManager.Instance()->CompletedLegacyQuestsBitArray,
             _excelService.GetRowCount<LegacyQuest>()));
 
@@ -218,7 +218,7 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
             "QuestManager.SeenCraftingNotebookDivisionLevelRanges",
             QuestManager.Instance()->SeenCraftingNotebookDivisionLevelRangesBitArray,
             _excelService.GetSheet<NotebookDivision>().Where(row => row.CraftOpeningLevel is not 0 or 255).Count() * 8));
-
+        */
         _bitArrays.Add(new BitArrayRecord(
             "QuestManager.CompletedRecipes",
             QuestManager.Instance()->CompletedRecipesBitArray,
