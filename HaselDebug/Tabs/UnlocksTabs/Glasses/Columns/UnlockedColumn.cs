@@ -5,7 +5,7 @@ using GlassesSheet = Lumina.Excel.Sheets.Glasses;
 namespace HaselDebug.Tabs.UnlocksTabs.Glasses.Columns;
 
 [RegisterTransient]
-public class UnlockedColumn : ColumnBool<GlassesSheet>
+public class UnlockedColumn : ColumnYesNo<GlassesSheet>
 {
     public UnlockedColumn()
     {

@@ -4,7 +4,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns;
 
 [RegisterTransient]
-public class SeenColumn : ColumnBool<CutsceneEntry>
+public class SeenColumn : ColumnYesNo<CutsceneEntry>
 {
     public SeenColumn()
     {

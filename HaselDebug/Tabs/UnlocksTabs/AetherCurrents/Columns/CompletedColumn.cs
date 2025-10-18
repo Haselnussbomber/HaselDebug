@@ -4,7 +4,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.AetherCurrents.Columns;
 
 [RegisterTransient]
-public class CompletedColumn : ColumnBool<AetherCurrentEntry>
+public class CompletedColumn : ColumnYesNo<AetherCurrentEntry>
 {
     public CompletedColumn()
     {

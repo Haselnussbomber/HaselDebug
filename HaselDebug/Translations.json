@@ -157,8 +157,8 @@
     "de": "Nummer"
   },
   "HaselDebug.Tabs.UnlocksTabs.Emotes.Columns.CanUseColumn.Label": {
-    "en": "Can use",
-    "de": "Kann benutzen"
+    "en": "Usable",
+    "de": "Benutzbar"
   },
   "HaselDebug.Tabs.UnlocksTabs.Emotes.Columns.ItemColumn.Label": {
     "en": "Item",

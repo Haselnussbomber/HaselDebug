@@ -4,7 +4,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.SightseeingLog.Columns;
 
 [RegisterTransient]
-public class CompletedColumn : ColumnBool<AdventureEntry>
+public class CompletedColumn : ColumnYesNo<AdventureEntry>
 {
     public CompletedColumn()
     {

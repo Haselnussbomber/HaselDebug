@@ -4,7 +4,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.Titles.Columns;
 
 [RegisterTransient]
-public class UnlockedColumn : ColumnBool<Title>
+public class UnlockedColumn : ColumnYesNo<Title>
 {
     public UnlockedColumn()
     {

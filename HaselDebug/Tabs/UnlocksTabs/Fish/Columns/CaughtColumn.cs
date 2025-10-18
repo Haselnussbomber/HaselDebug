@@ -4,7 +4,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.Fish.Columns;
 
 [RegisterTransient]
-public class CaughtColumn : ColumnBool<FishParameter>
+public class CaughtColumn : ColumnYesNo<FishParameter>
 {
     public CaughtColumn()
     {

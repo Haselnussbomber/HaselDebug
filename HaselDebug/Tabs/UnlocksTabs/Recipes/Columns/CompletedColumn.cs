@@ -4,7 +4,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.Recipes.Columns;
 
 [RegisterTransient]
-public class CompletedColumn : ColumnBool<Recipe>
+public class CompletedColumn : ColumnYesNo<Recipe>
 {
     public CompletedColumn()
     {

@@ -3,7 +3,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.Titles.Columns;
 
 [RegisterTransient]
-public class PrefixColumn : ColumnBool<Title>
+public class PrefixColumn : ColumnYesNo<Title>
 {
     public PrefixColumn()
     {

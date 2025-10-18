@@ -3,7 +3,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.Achievements.Columns;
 
 [RegisterTransient]
-public class UnlockedColumn : ColumnBool<AchievementEntry>
+public class UnlockedColumn : ColumnYesNo<AchievementEntry>
 {
     public UnlockedColumn()
     {

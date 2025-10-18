@@ -4,7 +4,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.Spearfish.Columns;
 
 [RegisterTransient]
-public class CaughtColumn : ColumnBool<SpearfishingItem>
+public class CaughtColumn : ColumnYesNo<SpearfishingItem>
 {
     public CaughtColumn()
     {

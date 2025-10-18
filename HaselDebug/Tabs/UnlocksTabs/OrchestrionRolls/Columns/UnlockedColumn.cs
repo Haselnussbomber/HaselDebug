@@ -4,7 +4,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.OrchestrionRolls.Columns;
 
 [RegisterTransient]
-public class UnlockedColumn : ColumnBool<OrchestrionRollEntry>
+public class UnlockedColumn : ColumnYesNo<OrchestrionRollEntry>
 {
     public UnlockedColumn()
     {

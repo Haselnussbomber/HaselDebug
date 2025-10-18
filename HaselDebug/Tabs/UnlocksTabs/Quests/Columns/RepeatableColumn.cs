@@ -3,7 +3,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.Quests.Columns;
 
 [RegisterTransient]
-public class RepeatableColumn : ColumnBool<Quest>
+public class RepeatableColumn : ColumnYesNo<Quest>
 {
     public RepeatableColumn()
     {

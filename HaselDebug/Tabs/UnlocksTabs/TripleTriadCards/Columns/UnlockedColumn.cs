@@ -4,7 +4,7 @@ using HaselCommon.Gui.ImGuiTable;
 namespace HaselDebug.Tabs.UnlocksTabs.TripleTriadCards.Columns;
 
 [RegisterTransient]
-public class UnlockedColumn : ColumnBool<TripleTriadCardEntry>
+public class UnlockedColumn : ColumnYesNo<TripleTriadCardEntry>
 {
     public UnlockedColumn()
     {
