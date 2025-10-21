@@ -9,6 +9,8 @@ using HaselDebug.Windows;
 
 namespace HaselDebug.Tabs;
 
+#pragma warning disable PendingExcelSchema
+
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class Excel2Tab : DebugTab
 {
@@ -23,6 +25,7 @@ public unsafe partial class Excel2Tab : DebugTab
     private IExcelV2SheetWrapper? _sheetWrapper;
     private IExcelV2SheetWrapper? _nextSheetWrapper;
     private string _sheetNameSearchTerm = string.Empty;
+    private bool _useExperimentalSheets = true;
     private bool _isInitialized;
 
     public override string Title => "Excel (v2)";
@@ -33,11 +36,21 @@ public unsafe partial class Excel2Tab : DebugTab
     private void Initialize()
     {
         SelectedLanguage = _languageProvider.ClientLanguage;
+        LoadSheetTypes();
+    }
 
-        _sheetTypes = typeof(Lumina.Excel.Sheets.Achievement).Assembly
+    private void LoadSheetTypes()
+    {
+        var sheetsType = _useExperimentalSheets
+            ? typeof(Lumina.Excel.Sheets.Experimental.Achievement)
+            : typeof(Lumina.Excel.Sheets.Achievement);
+
+        _sheetTypes = sheetsType.Assembly
             .GetExportedTypes()
-            .Where(type => type.Namespace == "Lumina.Excel.Sheets" && !string.IsNullOrEmpty(type.GetCustomAttribute<SheetAttribute>()?.Name))
+            .Where(type => type.Namespace == sheetsType.Namespace && !string.IsNullOrEmpty(type.GetCustomAttribute<SheetAttribute>()?.Name))
             .ToDictionary(type => type.GetCustomAttribute<SheetAttribute>()!.Name!);
+
+        ChangeSheet(_nextSheetWrapper?.SheetName ?? _sheetWrapper?.SheetName ?? "Achievement");
     }
 
     public override bool DrawInChild => false;
@@ -88,6 +101,13 @@ public unsafe partial class Excel2Tab : DebugTab
                     }
                 }
             }
+        }
+
+        ImGui.SameLine();
+
+        if (ImGui.Checkbox("Use Experimental Sheets", ref _useExperimentalSheets))
+        {
+            LoadSheetTypes();
         }
 
         DrawSheetList();
