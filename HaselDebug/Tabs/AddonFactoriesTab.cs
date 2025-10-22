@@ -149,14 +149,14 @@ public unsafe partial class AddonFactoriesTab : DebugTab
             ImGui.TableNextColumn(); // Inheritance
             if (entry.InheritanceVtableAddress == _atkUnitBaseVtableAddress)
             {
-                ImGuiUtilsEx.DrawCopyableText("AtkUnitBase");
+                ImGuiUtils.DrawCopyableText("AtkUnitBase");
             }
             else
             {
                 var inheritanceEntry = entry.InheritanceVtableAddress != 0 ? _cache.FirstOrDefault(e => e.VTableAddress == entry.InheritanceVtableAddress) : null;
                 if (inheritanceEntry != null)
                 {
-                    ImGuiUtilsEx.DrawCopyableText(inheritanceEntry.Name);
+                    ImGuiUtils.DrawCopyableText(inheritanceEntry.Name);
                 }
                 else
                 {

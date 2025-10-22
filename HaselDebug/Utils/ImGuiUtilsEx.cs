@@ -119,7 +119,7 @@ public static unsafe class ImGuiUtilsEx
 
         if (texType == TextureType.Resource)
         {
-            DrawCopyableText(textureInfo->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString());
+            ImGuiUtils.DrawCopyableText(textureInfo->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString());
 
             /* explodes
             if (textureInfo->AtkTexture.Resource->IconId != 0)
@@ -172,7 +172,7 @@ public static unsafe class ImGuiUtilsEx
         ImGuiUtils.SameLineSpace();
         if (copy)
         {
-            DrawCopyableText(value);
+            ImGuiUtils.DrawCopyableText(value);
         }
         else
         {
@@ -208,53 +208,6 @@ public static unsafe class ImGuiUtilsEx
         {
             ImGui.Dummy(new(padding * ImGui.GetIO().FontGlobalScale));
         }
-    }
-
-    public static void DrawCopyableText(string text, string? textCopy = null, string? tooltipText = null, bool asSelectable = false, Color? textColor = null, string? highligtedText = null, bool noTooltip = false)
-    {
-        textCopy ??= text;
-
-        using var color = textColor?.Push(ImGuiCol.Text);
-
-        if (asSelectable)
-        {
-            ImGui.Selectable(text);
-        }
-        else if (!string.IsNullOrEmpty(highligtedText))
-        {
-            var pos = text.IndexOf(highligtedText, StringComparison.InvariantCultureIgnoreCase);
-            if (pos != -1)
-            {
-                ImGui.Text(text[..pos]);
-                ImGui.SameLine(0, 0);
-
-                using (Color.Yellow.Push(ImGuiCol.Text))
-                    ImGui.Text(text[pos..(pos + highligtedText.Length)]);
-
-                ImGui.SameLine(0, 0);
-                ImGui.Text(text[(pos + highligtedText.Length)..]);
-            }
-            else
-            {
-                ImGui.Text(text);
-            }
-        }
-        else
-        {
-            ImGui.Text(text);
-        }
-
-        color?.Pop();
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            if (!noTooltip)
-                ImGui.SetTooltip(tooltipText ?? textCopy);
-        }
-
-        if (ImGui.IsItemClicked())
-            ImGui.SetClipboardText(textCopy);
     }
 
     public static EndUnconditionally AlertBox(string id, Color color, Vector2 size)

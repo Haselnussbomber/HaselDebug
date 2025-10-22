@@ -40,7 +40,7 @@ public unsafe partial class DebugRenderer
             ImGui.TableNextColumn();
 
             using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey3.ToUInt()))
-                ImGuiUtilsEx.DrawCopyableText($"{address + line * numColumns:X}", asSelectable: true);
+                ImGuiUtils.DrawCopyableText($"{address + line * numColumns:X}", new() { AsSelectable = true });
 
             var colpos = pos;
             for (var column = 0; column < numColumns; column++)
@@ -48,10 +48,11 @@ public unsafe partial class DebugRenderer
                 ImGui.TableNextColumn();
                 if (colpos++ < length)
                 {
-                    ImGuiUtilsEx.DrawCopyableText(
-                        $"{*(byte*)(address + line * numColumns + column):X2}",
-                        $"{address + line * numColumns + column:X}",
-                        asSelectable: true);
+                    ImGuiUtils.DrawCopyableText($"{*(byte*)(address + line * numColumns + column):X2}", new()
+                    {
+                        CopyText = $"{address + line * numColumns + column:X}",
+                        AsSelectable = true,
+                    });
                 }
             }
 

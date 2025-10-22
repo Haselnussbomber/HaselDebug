@@ -34,7 +34,7 @@ public unsafe partial class ShopTab : DebugTab
             var listItemRenderer = addon->List->GetItemRenderer(i);
             ImGui.Text($"{i}:");
             ImGui.SameLine();
-            ImGuiUtilsEx.DrawCopyableText($"{(nint)listItemRenderer:X}");
+            ImGuiUtils.DrawCopyableText($"{(nint)listItemRenderer:X}");
             ImGui.SameLine();
 
             if (addon->List->ItemRendererList[i].IsDisabled)

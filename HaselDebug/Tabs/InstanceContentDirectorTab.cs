@@ -24,7 +24,7 @@ public unsafe partial class InstanceContentDirectorTab : DebugTab
         {
             foreach (var ((name, type), vtableAddr) in InstanceContentTypeVtables)
             {
-                ImGuiUtilsEx.DrawCopyableText($"{type}: {name} @", $"+0x{vtableAddr - _sigScanner.Module.BaseAddress:X} - {name}");
+                ImGuiUtils.DrawCopyableText($"{type}: {name} @", new() { CopyText = $"+0x{vtableAddr - _sigScanner.Module.BaseAddress:X} - {name}" });
                 ImGui.SameLine();
                 _debugRenderer.DrawAddress(vtableAddr);
             }

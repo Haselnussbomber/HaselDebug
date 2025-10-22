@@ -19,7 +19,7 @@ public unsafe partial class DebugRenderer
                 ImGui.Text("Null"u8);
                 break;
             case ValueType.Bool:
-                ImGuiUtilsEx.DrawCopyableText($"{value->Byte == 0x01}");
+                ImGuiUtils.DrawCopyableText($"{value->Byte == 0x01}");
                 break;
             case ValueType.Int:
                 DrawNumeric((nint)(&value->Int), typeof(int), nodeOptions);

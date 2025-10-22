@@ -120,9 +120,9 @@ public unsafe partial class ConfigTab : DebugTab
 
             ImGui.TableNextColumn(); // Index
             if (ImGui.IsKeyDown(ImGuiKey.LeftShift))
-                ImGuiUtilsEx.DrawCopyableText(((nint)option).ToString("X"));
+                ImGuiUtils.DrawCopyableText(((nint)option).ToString("X"));
             else
-                ImGuiUtilsEx.DrawCopyableText(option->Index.ToString());
+                ImGuiUtils.DrawCopyableText(option->Index.ToString());
 
             ImGui.TableNextColumn(); // Type
             switch (option->Type)
@@ -152,7 +152,7 @@ public unsafe partial class ConfigTab : DebugTab
             }
 
             ImGui.TableNextColumn(); // Name
-            ImGuiUtilsEx.DrawCopyableText(optionName, highligtedText: hasSearchTerm ? _searchTerm : null);
+            ImGuiUtils.DrawCopyableText(optionName, new() { HighlightedText = hasSearchTerm ? _searchTerm : null });
 
             switch (option->Type)
             {
@@ -190,7 +190,7 @@ public unsafe partial class ConfigTab : DebugTab
 
                 case 4: // String
                     ImGui.TableNextColumn(); // Value
-                    ImGuiUtilsEx.DrawCopyableText(option->Properties.String.DefaultValue->ToString());
+                    ImGuiUtils.DrawCopyableText(option->Properties.String.DefaultValue->ToString());
 
                     ImGui.TableNextColumn(); // Default
                     ImGui.TableNextColumn(); // Min

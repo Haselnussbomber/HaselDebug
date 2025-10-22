@@ -220,7 +220,7 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
 
             ImGui.Text("Input:"u8);
             ImGui.SameLine();
-            ImGuiUtilsEx.DrawCopyableText(entry.Input);
+            ImGuiUtils.DrawCopyableText(entry.Input);
 
             using var table = ImRaii.Table(entry.Name + "Table", 2, ImGuiTableFlags.Borders);
             if (!table) continue;
@@ -235,7 +235,7 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
                 ImGui.TableNextColumn();
                 ImGui.Text($"{(AllowedEntities)(1 << i)}");
                 ImGui.TableNextColumn();
-                ImGuiUtilsEx.DrawCopyableText(entry.Output[i]);
+                ImGuiUtils.DrawCopyableText(entry.Output[i]);
             }
         }
     }

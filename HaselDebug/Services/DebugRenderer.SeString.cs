@@ -254,7 +254,7 @@ public unsafe partial class DebugRenderer
             ImGui.Text(payload.Type == ReadOnlySePayloadType.Text ? "Text" : "ToString()");
             ImGui.TableNextColumn();
             var text = payload.ToString();
-            ImGuiUtilsEx.DrawCopyableText($"\"{text}\"", text);
+            ImGuiUtils.DrawCopyableText($"\"{text}\"", new() { CopyText = text });
 
             if (payload.Type != ReadOnlySePayloadType.Macro)
                 continue;
@@ -312,9 +312,9 @@ public unsafe partial class DebugRenderer
                 ImGui.SameLine();
             }
 
-            ImGuiUtilsEx.DrawCopyableText(u32.ToString());
+            ImGuiUtils.DrawCopyableText(u32.ToString());
             ImGui.SameLine();
-            ImGuiUtilsEx.DrawCopyableText($"0x{u32:X}");
+            ImGuiUtils.DrawCopyableText($"0x{u32:X}");
 
             if (macroCode == MacroCode.Link && idx == 0)
             {

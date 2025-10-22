@@ -35,7 +35,7 @@ public unsafe partial class UIColorTab : DebugTab
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn();
-            ImGuiUtilsEx.DrawCopyableText(row.RowId.ToString());
+            ImGuiUtils.DrawCopyableText(row.RowId.ToString());
 
             ImGui.TableNextColumn();
             var color = (Vector4)Color.FromABGR(row.Dark);

@@ -36,7 +36,7 @@ public partial class UnlocksNameColumn : ColumnString<UnlockLinkEntry>
                         _debugRenderer.DrawTexture(unlock.TexturePath, drawInfo: unlock.DrawInfo, noTooltip: true);
                     }
 
-                    ImGuiUtilsEx.DrawCopyableText(unlock.Label, noTooltip: true);
+                    ImGuiUtils.DrawCopyableText(unlock.Label, new() { NoTooltip = true });
 
                     ImGui.EndGroup();
 

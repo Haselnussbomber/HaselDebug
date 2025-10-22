@@ -64,7 +64,7 @@ public unsafe partial class AtkDebugRenderer
         if (!_typeService.AddonTypes.TryGetValue(unitBase->NameString, out var type))
             type = typeof(AtkUnitBase);
 
-        ImGuiUtilsEx.DrawCopyableText(unitBase->NameString);
+        ImGuiUtils.DrawCopyableText(unitBase->NameString);
 
         ImGui.SameLine();
 
@@ -754,33 +754,33 @@ public unsafe partial class AtkDebugRenderer
                             case 0 when hasPosition: // Position
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtils.DrawCopyableText(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
 
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtils.DrawCopyableText(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
                                 break;
 
                             case 1 when hasRotation: // Rotation
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Float.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtils.DrawCopyableText(keyFrame.Value.Float.ToString(CultureInfo.InvariantCulture));
                                 break;
 
                             case 2 when hasScale: // Scale
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtils.DrawCopyableText(keyFrame.Value.Float2.Item1.ToString(CultureInfo.InvariantCulture));
 
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtils.DrawCopyableText(keyFrame.Value.Float2.Item2.ToString(CultureInfo.InvariantCulture));
                                 break;
 
                             case 3 when hasAlpha: // Alpha
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.Byte.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtils.DrawCopyableText(keyFrame.Value.Byte.ToString(CultureInfo.InvariantCulture));
                                 break;
 
                             case 4 when hasTint: // NodeTint
@@ -798,7 +798,7 @@ public unsafe partial class AtkDebugRenderer
                             case 5 when hasPartId: // PartId
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.UShort.ToString(CultureInfo.InvariantCulture));
+                                ImGuiUtils.DrawCopyableText(keyFrame.Value.UShort.ToString(CultureInfo.InvariantCulture));
                                 break;
 
                             case 5 when hasTextColor: // TextColor
@@ -818,7 +818,7 @@ public unsafe partial class AtkDebugRenderer
                             case 7 when hasTextLabel: // TextLabel
                                 ImGui.TableNextColumn();
                                 ImGui.AlignTextToFramePadding();
-                                ImGuiUtilsEx.DrawCopyableText(keyFrame.Value.UShort.ToString(CultureInfo.InvariantCulture)); // Might not be the correct property UShort vs Short for this bucket
+                                ImGuiUtils.DrawCopyableText(keyFrame.Value.UShort.ToString(CultureInfo.InvariantCulture)); // Might not be the correct property UShort vs Short for this bucket
                                 break;
                         }
                     }

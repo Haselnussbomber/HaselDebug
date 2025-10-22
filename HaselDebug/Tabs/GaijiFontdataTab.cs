@@ -70,7 +70,7 @@ public partial class GaijiFontdataTable : Table<GfdEntry>, IDisposable
 
         public override void DrawColumn(GfdEntry row)
         {
-            ImGuiUtilsEx.DrawCopyableText(ToName(row));
+            ImGuiUtils.DrawCopyableText(ToName(row));
         }
     }
 
@@ -121,7 +121,7 @@ public partial class GaijiFontdataTable : Table<GfdEntry>, IDisposable
 
         public override void DrawColumn(GfdEntry row)
         {
-            ImGuiUtilsEx.DrawCopyableText(ToName(row));
+            ImGuiUtils.DrawCopyableText(ToName(row));
         }
     }
 
@@ -144,7 +144,7 @@ public partial class GaijiFontdataTable : Table<GfdEntry>, IDisposable
 
         public override void DrawColumn(GfdEntry row)
         {
-            ImGuiUtilsEx.DrawCopyableText(ToName(row));
+            ImGuiUtils.DrawCopyableText(ToName(row));
         }
     }
 }

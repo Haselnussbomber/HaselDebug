@@ -185,9 +185,9 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
             switch (item.Type)
             {
                 case TextParameterType.Integer:
-                    ImGuiUtilsEx.DrawCopyableText($"0x{item.IntValue:X}");
+                    ImGuiUtils.DrawCopyableText($"0x{item.IntValue:X}");
                     ImGui.SameLine();
-                    ImGuiUtilsEx.DrawCopyableText(item.IntValue.ToString());
+                    ImGuiUtils.DrawCopyableText(item.IntValue.ToString());
                     break;
 
                 case TextParameterType.ReferencedUtf8String:
@@ -402,7 +402,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
                         ImGui.SameLine();
                         ImGui.Text("(vfunc: "u8);
                         ImGui.SameLine(0, 0);
-                        ImGuiUtilsEx.DrawCopyableText($"{vfOffset / 8}");
+                        ImGuiUtils.DrawCopyableText($"{vfOffset / 8}");
                         ImGui.SameLine(0, 0);
                         ImGui.Text(")"u8);
                     }

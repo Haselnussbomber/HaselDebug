@@ -17,6 +17,7 @@ global using HaselCommon.Extensions;
 global using HaselCommon.Gui;
 global using HaselCommon.Services;
 global using HaselCommon.Utils;
+global using HaselCommon.Windows;
 global using Injectio.Attributes;
 global using InteropGenerator.Runtime;
 global using InteropGenerator.Runtime.Attributes;

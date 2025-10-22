@@ -162,47 +162,47 @@ public unsafe partial class AddonConfigTab : DebugTab
         ImGui.TableNextRow();
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText(i.ToString());
+        ImGuiUtils.DrawCopyableText(i.ToString());
 
         ImGui.TableNextColumn();
         var hash = configEntry->AddonNameHash;
-        ImGuiUtilsEx.DrawCopyableText(_addonNames.TryGetValue(hash, out var name) ? name : hash.ToString("X"));
+        ImGuiUtils.DrawCopyableText(_addonNames.TryGetValue(hash, out var name) ? name : hash.ToString("X"));
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText(configEntry->X.ToString("0.###", CultureInfo.InvariantCulture));
+        ImGuiUtils.DrawCopyableText(configEntry->X.ToString("0.###", CultureInfo.InvariantCulture));
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText(configEntry->Y.ToString("0.###", CultureInfo.InvariantCulture));
+        ImGuiUtils.DrawCopyableText(configEntry->Y.ToString("0.###", CultureInfo.InvariantCulture));
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText(configEntry->Scale.ToString("0.0", CultureInfo.InvariantCulture));
+        ImGuiUtils.DrawCopyableText(configEntry->Scale.ToString("0.0", CultureInfo.InvariantCulture));
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText("0x" + configEntry->ElementFlags.ToString("X"));
+        ImGuiUtils.DrawCopyableText("0x" + configEntry->ElementFlags.ToString("X"));
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText(configEntry->Width.ToString());
+        ImGuiUtils.DrawCopyableText(configEntry->Width.ToString());
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText(configEntry->Height.ToString());
+        ImGuiUtils.DrawCopyableText(configEntry->Height.ToString());
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText("0x" + configEntry->ByteValue1.ToString("X"));
+        ImGuiUtils.DrawCopyableText("0x" + configEntry->ByteValue1.ToString("X"));
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText("0x" + configEntry->ByteValue2.ToString("X"));
+        ImGuiUtils.DrawCopyableText("0x" + configEntry->ByteValue2.ToString("X"));
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText("0x" + configEntry->ByteValue3.ToString("X"));
+        ImGuiUtils.DrawCopyableText("0x" + configEntry->ByteValue3.ToString("X"));
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText(configEntry->Alpha.ToString());
+        ImGuiUtils.DrawCopyableText(configEntry->Alpha.ToString());
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText(configEntry->HasValue.ToString());
+        ImGuiUtils.DrawCopyableText(configEntry->HasValue.ToString());
 
         ImGui.TableNextColumn();
-        ImGuiUtilsEx.DrawCopyableText(configEntry->IsOpen.ToString());
+        ImGuiUtils.DrawCopyableText(configEntry->IsOpen.ToString());
     }
 
     public void DrawHudLayoutAddonsTab()
@@ -227,23 +227,23 @@ public unsafe partial class AddonConfigTab : DebugTab
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Index
-            ImGuiUtilsEx.DrawCopyableText(i.ToString());
+            ImGuiUtils.DrawCopyableText(i.ToString());
 
             ImGui.TableNextColumn(); // AddonName
-            ImGuiUtilsEx.DrawCopyableText(entry.AddonName.ToString());
+            ImGuiUtils.DrawCopyableText(entry.AddonName.ToString());
 
             ImGui.TableNextColumn(); // Hash
-            ImGuiUtilsEx.DrawCopyableText($"0x{UIGlobals.ComputeAddonNameHash(entry.AddonName):X8}");
+            ImGuiUtils.DrawCopyableText($"0x{UIGlobals.ComputeAddonNameHash(entry.AddonName):X8}");
 
             ImGui.TableNextColumn(); // HudRowId
 
             if (_excelService.TryGetRow<Hud>(entry.HudRowId, out var hudRow))
-                ImGuiUtilsEx.DrawCopyableText($"[Hud#{entry.HudRowId}] {hudRow.Unknown0}");
+                ImGuiUtils.DrawCopyableText($"[Hud#{entry.HudRowId}] {hudRow.Unknown0}");
             else
-                ImGuiUtilsEx.DrawCopyableText($"[Hud#{entry.HudRowId}]");
+                ImGuiUtils.DrawCopyableText($"[Hud#{entry.HudRowId}]");
 
             ImGui.TableNextColumn(); // Flags
-            ImGuiUtilsEx.DrawCopyableText($"0x{entry.Flags:X2}");
+            ImGuiUtils.DrawCopyableText($"0x{entry.Flags:X2}");
         }
     }
 }

@@ -34,7 +34,11 @@ public unsafe partial class DebugRenderer
             if (propInfo.Name == "RowId")
                 continue;
 
-            ImGuiUtilsEx.DrawCopyableText(propInfo.PropertyType.ReadableTypeName(), propInfo.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
+            ImGuiUtils.DrawCopyableText(propInfo.PropertyType.ReadableTypeName(), new()
+            {
+                CopyText = propInfo.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)),
+                TextColor = ColorType
+            });
             ImGui.SameLine();
             ImGui.TextColored(ColorFieldName, propInfo.Name);
             ImGui.SameLine();
@@ -218,7 +222,11 @@ public unsafe partial class DebugRenderer
                         if (pi.Name == "RowId")
                             continue;
 
-                        ImGuiUtilsEx.DrawCopyableText(pi.PropertyType.ReadableTypeName(), pi.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)), textColor: ColorType);
+                        ImGuiUtils.DrawCopyableText(pi.PropertyType.ReadableTypeName(), new()
+                        {
+                            CopyText = pi.PropertyType.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)),
+                            TextColor = ColorType
+                        });
                         ImGui.SameLine();
                         ImGui.TextColored(ColorFieldName, pi.Name);
                         ImGui.SameLine();

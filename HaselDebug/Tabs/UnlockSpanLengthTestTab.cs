@@ -47,22 +47,22 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGuiUtilsEx.DrawCopyableText(entry.Name);
+            ImGuiUtils.DrawCopyableText(entry.Name);
 
             ImGui.TableNextColumn();
-            ImGuiUtilsEx.DrawCopyableText(entry.BitArray.ByteLength.ToString());
+            ImGuiUtils.DrawCopyableText(entry.BitArray.ByteLength.ToString());
 
             ImGui.TableNextColumn();
-            ImGuiUtilsEx.DrawCopyableText(entry.LengthShould.ToString());
+            ImGuiUtils.DrawCopyableText(entry.LengthShould.ToString());
 
             ImGui.TableNextColumn();
-            ImGuiUtilsEx.DrawCopyableText(entry.BitArray.BitCount.ToString());
+            ImGuiUtils.DrawCopyableText(entry.BitArray.BitCount.ToString());
 
             ImGui.TableNextColumn();
-            ImGuiUtilsEx.DrawCopyableText(entry.BitCount.ToString());
+            ImGuiUtils.DrawCopyableText(entry.BitCount.ToString());
 
             ImGui.TableNextColumn();
-            ImGuiUtilsEx.DrawCopyableText(entry.BitArray.PopCount.ToString());
+            ImGuiUtils.DrawCopyableText(entry.BitArray.PopCount.ToString());
 
             ImGui.TableNextColumn();
             var match = entry.BitArray.ByteLength == entry.LengthShould && entry.BitArray.BitCount == entry.BitCount;

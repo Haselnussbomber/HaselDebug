@@ -54,7 +54,7 @@ public partial class AddonNameTable : Table<AddonNameEntry>, IDisposable
 
         public override void DrawColumn(AddonNameEntry row)
         {
-            ImGuiUtilsEx.DrawCopyableText(ToName(row));
+            ImGuiUtils.DrawCopyableText(ToName(row));
         }
     }
 
@@ -73,7 +73,7 @@ public partial class AddonNameTable : Table<AddonNameEntry>, IDisposable
 
         public override unsafe void DrawColumn(AddonNameEntry row)
         {
-            ImGuiUtilsEx.DrawCopyableText(ToName(row));
+            ImGuiUtils.DrawCopyableText(ToName(row));
 
             if (ImGui.IsItemClicked())
             {

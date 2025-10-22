@@ -39,7 +39,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                     {
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
-                        ImGuiUtilsEx.DrawCopyableText(itemId.ToString());
+                        ImGuiUtils.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
                         ImGui.Text(item.SpecialId.ToString());
                         ImGui.TableNextColumn();
@@ -72,7 +72,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                     {
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
-                        ImGuiUtilsEx.DrawCopyableText(itemId.ToString());
+                        ImGuiUtils.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
                         ImGui.Text($"{item.Count} / {item.MaxCount}");
                         ImGui.TableNextColumn();
@@ -105,7 +105,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
                     {
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
-                        ImGuiUtilsEx.DrawCopyableText(itemId.ToString());
+                        ImGuiUtils.DrawCopyableText(itemId.ToString());
                         ImGui.TableNextColumn();
                         ImGui.Text($"{item.Count} / {item.MaxCount}");
                         ImGui.TableNextColumn();

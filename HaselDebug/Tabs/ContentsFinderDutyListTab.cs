@@ -62,7 +62,7 @@ public unsafe partial class ContentsFinderDutyListTab : DebugTab
             var item = addon->DutyList->Items[i].Value;
             ImGui.Text($"{i}:");
             ImGui.SameLine();
-            ImGuiUtilsEx.DrawCopyableText($"{(nint)item:X}");
+            ImGuiUtils.DrawCopyableText($"{(nint)item:X}");
 
             using (ImRaii.PushIndent())
             {
