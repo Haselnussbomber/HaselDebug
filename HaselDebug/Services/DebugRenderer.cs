@@ -227,6 +227,10 @@ public unsafe partial class DebugRenderer
                         additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ToString();
                         break;
 
+                    case EventHandlerContent.Fishing:
+                        type = typeof(FishingEventHandler);
+                        break;
+
                     case EventHandlerContent.FateDirector:
                         type = typeof(FateDirector);
                         break;
