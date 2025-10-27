@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.38.0] (2025-10-28)
+
+- **Added:** New unlock tab "Items".
+- **Added:** Type redirect for FishingEventHandler.
+- **Added:** Support to switch to experimental sheets in the "Excel (v2)" tab.
+- **Added:** A Patch column was added to the "Recipes" unlock tab.
+- **Added:** The missing 4 new unknown columns to the "UIColor" tab.
+- **Added:** "Unlock Span Length Test" tab now lists arrays from QuestManager.
+- **Fixed:** "UIColor" inputs are now correctly spanning the whole width of the column.
+- **Fixed:** PlaceNames in the "Territory Intended Use" tab are now correctly using the UI language.
+- **Updated:** The "Territory Intended Use" and "Item Action Type" tabs now load their data asynchronously.
+- **Updated:** ClientStructs now at [f2341514](https://github.com/aers/FFXIVClientStructs/tree/f2341514) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b1dabe8d..f2341514)).
+
 ## [1.37.0] (2025-10-13)
 
 - **Added:** A Furniture Catalog tab to preview all indoor and outdoor furniture, including those that aren't listed in the games list.
@@ -570,7 +583,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.37.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.38.0...main
+[1.38.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.37.0...v1.38.0
 [1.37.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.36.0...v1.37.0
 [1.36.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.1...v1.36.0
 [1.35.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.0...v1.35.1
