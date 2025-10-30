@@ -18,7 +18,7 @@ public unsafe class ChocoboTaxiStandsTab(ChocoboTaxiStandsTable table) : DebugTa
         return new UnlockProgress()
         {
             TotalUnlocks = table.Rows.Count,
-            NumUnlocked = table.Rows.Count(row => UIState.Instance()->IsChocoboTaxiStandUnlocked(row.RowId - 1179648)),
+            NumUnlocked = table.Rows.Count(row => UIState.Instance()->IsChocoboTaxiStandUnlocked(row.RowId)),
         };
     }
 
