@@ -14,6 +14,7 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
     private readonly ExcelService _excelService;
     private readonly SetColumn _setColumn;
     private readonly ItemsColumn _itemsColumn;
+    private readonly IClientState _clientState;
 
     [AutoPostConstruct]
     public void Initialize()
@@ -25,6 +26,13 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
         ];
 
         Flags |= ImGuiTableFlags.SortTristate;
+
+        _clientState.Login += OnLogin;
+    }
+
+    private void OnLogin()
+    {
+        LoadRows();
     }
 
     public override float CalculateLineHeight()
@@ -34,6 +42,7 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
 
     public override unsafe void LoadRows()
     {
+        Rows.Clear();
         var agent = AgentTryon.Instance();
         var cabinetSheet = _excelService.GetSheet<Cabinet>().Select(row => row.Item.RowId).ToArray();
         foreach (var row in _excelService.GetSheet<CustomMirageStoreSetItem>())
