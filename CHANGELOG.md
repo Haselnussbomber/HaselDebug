@@ -4,6 +4,7 @@
 
 - **Fixed:** The "Outfits" table is now refreshed when logging in.
 - **Fixed:** The "Unlocks" summary table now renders correctly again.
+- **Changed:** The "Item Action Type" tab was renamed to "Item Actions". The ItemAction sheet a mapping between the Item and the Action sheet. Who knew?
 - **Updated:** ClientStructs now at [2dfa0680](https://github.com/aers/FFXIVClientStructs/tree/2dfa0680) ([compare](https://github.com/aers/FFXIVClientStructs/compare/f2341514..2dfa0680)).
 
 ## [1.38.0] (2025-10-28)
