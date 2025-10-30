@@ -14,7 +14,7 @@ public unsafe partial class DragDropTypeTab : DebugTab
             using var treeNode = ImRaii.TreeNode($"[{i}] {(DragDropType)i}", ImGuiTreeNodeFlags.SpanAvailWidth);
             if (!treeNode) continue;
 
-            using var table = ImRaii.Table($"DragDropTypeTable{i}", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollX | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+            using var table = ImRaii.Table($"DragDropTypeTable{i}", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollX | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new Vector2(-1, 600));
             if (!table)
                 return;
 
