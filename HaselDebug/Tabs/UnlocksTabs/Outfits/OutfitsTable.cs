@@ -30,9 +30,17 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
         _clientState.Login += OnLogin;
     }
 
+    public override void Dispose()
+    {
+        _clientState.Login -= OnLogin;
+        base.Dispose();
+    }
+
     private void OnLogin()
     {
-        LoadRows();
+        Rows.Clear();
+        RowsLoaded = false;
+        IsFilterDirty = true;
     }
 
     public override float CalculateLineHeight()
@@ -42,7 +50,6 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
 
     public override unsafe void LoadRows()
     {
-        Rows.Clear();
         var agent = AgentTryon.Instance();
         var cabinetSheet = _excelService.GetSheet<Cabinet>().Select(row => row.Item.RowId).ToArray();
         foreach (var row in _excelService.GetSheet<CustomMirageStoreSetItem>())
