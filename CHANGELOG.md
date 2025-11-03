@@ -6,6 +6,7 @@
 - **Fixed:** The "Unlocks" summary table now renders correctly again.
 - **Fixed:** The tables in the "Drag Drop Type" tab now have a fixed height of 600px, so they are actually usable.
 - **Changed:** The "Item Action Type" tab was renamed to "Item Actions". The ItemAction sheet a mapping between the Item and the Action sheet. Who knew?
+- **Updated:** The RowIds in the "Excel (v2)" tab can now be copied.
 - **Updated:** ClientStructs now at [2dfa0680](https://github.com/aers/FFXIVClientStructs/tree/2dfa0680) ([compare](https://github.com/aers/FFXIVClientStructs/compare/f2341514..2dfa0680)).
 
 ## [1.38.0] (2025-10-28)
