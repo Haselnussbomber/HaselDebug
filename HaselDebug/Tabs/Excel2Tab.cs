@@ -36,7 +36,7 @@ public unsafe partial class Excel2Tab : DebugTab
     private IExcelV2SheetWrapper? _nextSheetWrapper;
     private string _sheetNameSearchTerm = string.Empty;
     private bool _useExperimentalSheets = true;
-    private bool _showUntypedSheets = false;
+    private bool _showRawSheets = false;
     private bool _isInitialized;
     
     private string _globalSearchTerm = string.Empty;
@@ -102,19 +102,11 @@ public unsafe partial class Excel2Tab : DebugTab
 
         ImGui.Text("Work in progress!"u8);
 
-        // Open results window on main thread if flagged
+        // Open results window
         if (_openResultsWindowOnNextFrame)
         {
             _openResultsWindowOnNextFrame = false;
-            try
-            {
-                _logger.LogInformation("[Excel2Tab] Opening search results window from main thread");
-                OpenSearchResultsWindow();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[Excel2Tab] Failed to open search results window from main thread");
-            }
+            OpenSearchResultsWindow();
         }
 
         if (_nextSheetWrapper != null)
@@ -161,7 +153,7 @@ public unsafe partial class Excel2Tab : DebugTab
         }
 
         ImGui.SameLine();
-        ImGui.Checkbox("Show Untyped Sheets", ref _showUntypedSheets);
+        ImGui.Checkbox("Show Raw Sheets", ref _showRawSheets);
 
         DrawGlobalSearch();
 
@@ -207,8 +199,8 @@ public unsafe partial class Excel2Tab : DebugTab
 
             var hasType = _sheetTypes.ContainsKey(sheetName);
             
-            // Skip untyped sheets if the checkbox is not enabled
-            if (!hasType && !_showUntypedSheets)
+            // Skip raw sheets
+            if (!hasType && !_showRawSheets)
                 continue;
 
             ImGui.TableNextRow();
@@ -290,41 +282,27 @@ public unsafe partial class Excel2Tab : DebugTab
         ImGui.Separator();
     }
 
+    // Opens a new window to display search results
     private void OpenSearchResultsWindow()
     {
-        _logger.LogInformation("[Excel2Tab] OpenSearchResultsWindow called with {ResultCount} results", _globalSearchResults.Count);
         var windowTitle = $"Excel Search Results - \"{_globalSearchTerm}\" ({_globalSearchResults.Count} results)";
-        _logger.LogInformation("[Excel2Tab] Window title: {WindowTitle}", windowTitle);
         
-        try
-        {
-            _windowManager.CreateOrOpen(windowTitle, () => 
-            {
-                _logger.LogInformation("[Excel2Tab] Creating ExcelSearchResultsWindow instance");
-                return ActivatorUtilities.CreateInstance<ExcelSearchResultsWindow>(
-                    _serviceProvider,
-                    this,
-                    _globalSearchTerm,
-                    new List<GlobalSearchResult>(_globalSearchResults),
-                    windowTitle
-                );
-            });
-            _logger.LogInformation("[Excel2Tab] CreateOrOpen completed");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "[Excel2Tab] Failed in CreateOrOpen");
-            throw;
-        }
+        _windowManager.CreateOrOpen(windowTitle, () => 
+            ActivatorUtilities.CreateInstance<ExcelSearchResultsWindow>(
+                _serviceProvider,
+                this,
+                _globalSearchTerm,
+                new List<GlobalSearchResult>(_globalSearchResults),
+                windowTitle
+            ));
     }
 
+    // Initiates a global search across all Excel sheets (typed and raw)
+    // Search runs asynchronously to avoid blocking the UI
     private void StartGlobalSearch()
     {
         if (string.IsNullOrWhiteSpace(_globalSearchTerm))
-        {
-            _logger.LogWarning("[Excel2Tab] Search term is empty");
             return;
-        }
 
         _logger.LogInformation("[Excel2Tab] Starting global search for: {SearchTerm}", _globalSearchTerm);
 
@@ -336,7 +314,7 @@ public unsafe partial class Excel2Tab : DebugTab
         _isSearching = true;
         _globalSearchResults.Clear();
 
-        _logger.LogInformation("[Excel2Tab] Searching {SheetCount} sheets (all sheets including untyped)", _allSheetNames.Count);
+        _logger.LogInformation("[Excel2Tab] Searching {SheetCount} sheets", _allSheetNames.Count);
 
         Task.Run(() =>
         {
@@ -345,13 +323,11 @@ public unsafe partial class Excel2Tab : DebugTab
                 var results = new List<GlobalSearchResult>();
                 var sheetsSearched = 0;
 
+                // Search all sheets - typed sheets use reflection, raw sheets use RawRow API
                 foreach (var sheetName in _allSheetNames.OrderBy(s => s))
                 {
                     if (token.IsCancellationRequested)
-                    {
-                        _logger.LogInformation("[Excel2Tab] Search cancelled");
                         break;
-                    }
 
                     try
                     {
@@ -368,7 +344,7 @@ public unsafe partial class Excel2Tab : DebugTab
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "[Excel2Tab] Failed to search sheet: {SheetName}", sheetName);
+                        _logger.LogWarning("[Excel2Tab] Failed to search sheet: {SheetName}", ex.Message);
                     }
                 }
 
@@ -378,24 +354,18 @@ public unsafe partial class Excel2Tab : DebugTab
                 {
                     _globalSearchResults = results;
                     
-                    _logger.LogInformation("[Excel2Tab] Results stored, setting flag to open window on next frame");
-                    
-                    // Set flag to open window on next frame (main thread)
+                    // Set flag to open window on next frame
                     _openResultsWindowOnNextFrame = true;
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[Excel2Tab] Search failed with exception");
             }
             finally
             {
                 _isSearching = false;
-                _logger.LogInformation("[Excel2Tab] Search completed, _isSearching set to false");
             }
         }, token);
     }
 
+    // Searches a typed sheet using reflection to access all properties
     private void SearchSheet(Type sheetType, string sheetName, string searchTerm, List<GlobalSearchResult> results, CancellationToken token)
     {
         var getSheetMethodInfo = typeof(ExcelService)
@@ -453,6 +423,8 @@ public unsafe partial class Excel2Tab : DebugTab
         }
     }
 
+    // Searches a raw sheet using RawRow API for sheets without C# type definitions
+    // Similar to CompletionTab.cs - reads columns as strings and numbers directly
     private void SearchSheetRaw(string sheetName, string searchTerm, List<GlobalSearchResult> results, CancellationToken token)
     {
         var sheet = _excelService.GetSheet<RawRow>(sheetName, SelectedLanguage);
@@ -467,9 +439,8 @@ public unsafe partial class Excel2Tab : DebugTab
 
             var rowId = row.RowId;
             
-            // Try to determine column count by reading until we hit an exception
-            // RawRow doesn't expose column count directly
-            for (int i = 0; i < 100; i++) // reasonable max column limit
+            // RawRow doesn't expose column count, so we iterate until we hit an exception
+            for (int i = 0; i < 100; i++) // Reasonable max, most sheets have far fewer columns
             {
                 try
                 {
