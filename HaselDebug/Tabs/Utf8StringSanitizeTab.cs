@@ -2,7 +2,6 @@ using System.Text.Unicode;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using HaselDebug.Services;
 
 namespace HaselDebug.Tabs;
 
@@ -173,14 +172,12 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
         new ("Specials", UnicodeRanges.Specials)
     ];
 
-    private readonly DebugRenderer _debugRenderer;
+    private bool _initialized;
 
     public override string Title => "Utf8String Sanitize";
 
-    public Utf8StringSanitizeTab(DebugRenderer debugRenderer)
+    private void Initialize()
     {
-        _debugRenderer = debugRenderer;
-
         var str = Utf8String.CreateEmpty();
 
         foreach (var entry in _list)
@@ -212,6 +209,12 @@ public unsafe class Utf8StringSanitizeTab : DebugTab
 
     public override void Draw()
     {
+        if (!_initialized)
+        {
+            Initialize();
+            _initialized = true;
+        }
+
         foreach (var entry in _list)
         {
             using var node = ImRaii.TreeNode($"U+{entry.Range.FirstCodePoint:X4}-U+{entry.Range.FirstCodePoint + entry.Range.Length - 1:X4} - {entry.Name}###{entry.Name}", ImGuiTreeNodeFlags.SpanFullWidth);
