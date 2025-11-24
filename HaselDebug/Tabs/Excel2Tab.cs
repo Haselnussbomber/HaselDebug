@@ -1,7 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Abstracts;
+using HaselDebug.Config;
 using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -12,6 +15,8 @@ namespace HaselDebug.Tabs;
 
 #pragma warning disable PendingExcelSchema
 
+public record GlobalSearchResult(string SheetType, string SheetName, uint RowId, int ColumnIndex, string ColumnName, string Value);
+
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class Excel2Tab : DebugTab
 {
@@ -21,13 +26,26 @@ public unsafe partial class Excel2Tab : DebugTab
     private readonly IServiceProvider _serviceProvider;
     private readonly LanguageProvider _languageProvider;
     private readonly TextService _textService;
+    private readonly IDataManager _dataManager;
+    private readonly ExcelService _excelService;
+    private readonly WindowManager _windowManager;
+    private readonly ILogger<Excel2Tab> _logger;
+    private readonly PluginConfig _pluginConfig;
 
     private Dictionary<string, Type> _sheetTypes;
+    private HashSet<string> _allSheetNames;
     private IExcelV2SheetWrapper? _sheetWrapper;
     private IExcelV2SheetWrapper? _nextSheetWrapper;
     private string _sheetNameSearchTerm = string.Empty;
     private bool _useExperimentalSheets = true;
+    private bool _showRawSheets = false;
     private bool _isInitialized;
+    
+    private string _globalSearchTerm = string.Empty;
+    private List<GlobalSearchResult> _globalSearchResults = new();
+    private bool _isSearching = false;
+    private bool _openResultsWindowOnNextFrame = false;
+    private CancellationTokenSource? _searchCts;
 
     public override string Title => "Excel (v2)";
 
@@ -37,6 +55,7 @@ public unsafe partial class Excel2Tab : DebugTab
     private void Initialize()
     {
         SelectedLanguage = _languageProvider.ClientLanguage;
+        _showRawSheets = _pluginConfig.Excel2Tab_ShowRawSheets;
         LoadSheetTypes();
     }
 
@@ -50,6 +69,24 @@ public unsafe partial class Excel2Tab : DebugTab
             .GetExportedTypes()
             .Where(type => type.Namespace == sheetsType.Namespace && !string.IsNullOrEmpty(type.GetCustomAttribute<SheetAttribute>()?.Name))
             .ToDictionary(type => type.GetCustomAttribute<SheetAttribute>()!.Name!);
+
+        // Load all sheet names from ExcelListFile
+        try
+        {
+            var excelListFile = _dataManager.GameData.GetFile<Lumina.Data.Files.Excel.ExcelListFile>("exd/root.exl");
+            if (excelListFile != null)
+            {
+                _allSheetNames = excelListFile.ExdMap.Keys.ToHashSet();
+            }
+            else
+            {
+                _allSheetNames = _sheetTypes.Keys.ToHashSet();
+            }
+        }
+        catch
+        {
+            _allSheetNames = _sheetTypes.Keys.ToHashSet();
+        }
 
         ChangeSheet(_nextSheetWrapper?.SheetName ?? _sheetWrapper?.SheetName ?? "Achievement");
     }
@@ -67,6 +104,13 @@ public unsafe partial class Excel2Tab : DebugTab
         if (!hostChild) return;
 
         ImGui.Text("Work in progress!"u8);
+
+        // Open results window
+        if (_openResultsWindowOnNextFrame)
+        {
+            _openResultsWindowOnNextFrame = false;
+            OpenSearchResultsWindow();
+        }
 
         if (_nextSheetWrapper != null)
         {
@@ -111,6 +155,15 @@ public unsafe partial class Excel2Tab : DebugTab
             LoadSheetTypes();
         }
 
+        ImGui.SameLine();
+        if (ImGui.Checkbox("Show Raw Sheets", ref _showRawSheets))
+        {
+            _pluginConfig.Excel2Tab_ShowRawSheets = _showRawSheets;
+            _pluginConfig.Save();
+        }
+
+        DrawGlobalSearch();
+
         DrawSheetList();
         ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
 
@@ -146,13 +199,25 @@ public unsafe partial class Excel2Tab : DebugTab
         ImGui.TableHeadersRow();
 
         var i = 0;
-        foreach (var sheetName in _sheetTypes.Keys.OrderBy(sheetName => sheetName))
+        foreach (var sheetName in _allSheetNames.OrderBy(sheetName => sheetName))
         {
             if (hasSearchTerm && !sheetName.Contains(_sheetNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
                 continue;
 
+            var hasType = _sheetTypes.ContainsKey(sheetName);
+            
+            // Skip raw sheets
+            if (!hasType && !_showRawSheets)
+                continue;
+
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Name
+            
+            if (!hasType)
+            {
+                using var color = ImRaii.PushColor(ImGuiCol.Text, 0xFF666666);
+            }
+            
             if (ImGui.Selectable(sheetName + $"###SheetSelectable{i++}", sheetName == _sheetWrapper?.SheetName, ImGuiSelectableFlags.SpanAllColumns))
             {
                 ChangeSheet(sheetName);
@@ -160,19 +225,292 @@ public unsafe partial class Excel2Tab : DebugTab
         }
     }
 
+    /// <summary>
+    /// Changes the currently displayed sheet. Determines if the sheet is typed or raw,
+    /// then creates the appropriate wrapper to display the data.
+    /// </summary>
     private void ChangeSheet(string sheetName)
     {
-        if (!TryGetSheetType(sheetName, out var sheetType))
-            return;
-
-        _nextSheetWrapper = (IExcelV2SheetWrapper)ActivatorUtilities.CreateInstance(
-            _serviceProvider,
-            typeof(ExcelV2SheetWrapper<>).MakeGenericType(sheetType),
-            this);
+        // Handle typed sheets with type definitions
+        if (TryGetSheetType(sheetName, out var sheetType))
+        {
+            // For typed sheets, use ExcelV2SheetWrapper
+            _nextSheetWrapper = (IExcelV2SheetWrapper)ActivatorUtilities.CreateInstance(
+                _serviceProvider,
+                typeof(ExcelV2SheetWrapper<>).MakeGenericType(sheetType),
+                this);
+        }
+        else
+        {
+            // For raw sheets, use RawSheetWrapper
+            _nextSheetWrapper = ActivatorUtilities.CreateInstance<RawSheetWrapper>(
+                _serviceProvider,
+                this,
+                sheetName);
+        }
     }
 
     public bool TryGetSheetType(string sheetName, [NotNullWhen(returnValue: true)] out Type? sheetType)
         => _sheetTypes.TryGetValue(sheetName, out sheetType);
+
+    public void ChangeSheetFromSearch(string sheetName)
+    {
+        ChangeSheet(sheetName);
+    }
+
+    private void DrawGlobalSearch()
+    {
+        ImGui.Separator();
+        ImGui.Text("Search All Sheets:");
+        ImGui.SameLine();
+        
+        ImGui.SetNextItemWidth(300);
+        ImGui.InputTextWithHint("##GlobalSearch", "Enter search term...", ref _globalSearchTerm, 256);
+        
+        ImGui.SameLine();
+        using (ImRaii.Disabled(_isSearching || string.IsNullOrWhiteSpace(_globalSearchTerm)))
+        {
+            if (ImGui.Button("Search"))
+            {
+                StartGlobalSearch();
+            }
+        }
+        
+        if (_isSearching)
+        {
+            ImGui.SameLine();
+            ImGui.Text("Searching...");
+        }
+        
+        if (_globalSearchResults.Count > 0)
+        {
+            ImGui.SameLine();
+            ImGui.Text($"{_globalSearchResults.Count} result(s) found");
+            
+            ImGui.SameLine();
+            if (ImGui.Button("View Results"))
+            {
+                OpenSearchResultsWindow();
+            }
+            
+            ImGui.SameLine();
+            if (ImGui.Button("Clear Results"))
+            {
+                _globalSearchResults.Clear();
+            }
+        }
+        
+        ImGui.Separator();
+    }
+
+    // Opens a new window to display search results
+    private void OpenSearchResultsWindow()
+    {
+        var windowTitle = $"Excel Search Results - \"{_globalSearchTerm}\" ({_globalSearchResults.Count} results)";
+        
+        _windowManager.CreateOrOpen(windowTitle, () => 
+            ActivatorUtilities.CreateInstance<ExcelSearchResultsWindow>(
+                _serviceProvider,
+                this,
+                _globalSearchTerm,
+                new List<GlobalSearchResult>(_globalSearchResults),
+                windowTitle
+            ));
+    }
+
+    // Initiates a global search across all Excel sheets (typed and raw)
+    // Search runs asynchronously to avoid blocking the UI
+    private void StartGlobalSearch()
+    {
+        if (string.IsNullOrWhiteSpace(_globalSearchTerm))
+            return;
+
+        _logger.LogInformation("[Excel2Tab] Starting global search for: {SearchTerm}", _globalSearchTerm);
+
+        _searchCts?.Cancel();
+        _searchCts = new CancellationTokenSource();
+        var token = _searchCts.Token;
+        var searchTerm = _globalSearchTerm;
+
+        _isSearching = true;
+        _globalSearchResults.Clear();
+
+        _logger.LogInformation("[Excel2Tab] Searching {SheetCount} sheets", _allSheetNames.Count);
+
+        Task.Run(() =>
+        {
+            try
+            {
+                var results = new List<GlobalSearchResult>();
+                var sheetsSearched = 0;
+
+                // Search all sheets - typed sheets use reflection, raw sheets use RawRow API
+                foreach (var sheetName in _allSheetNames.OrderBy(s => s))
+                {
+                    if (token.IsCancellationRequested)
+                        break;
+
+                    try
+                    {
+                        // Try to search with type definition first, fall back to RawRow
+                        if (TryGetSheetType(sheetName, out var sheetType))
+                        {
+                            SearchSheet(sheetType, sheetName, searchTerm, results, token);
+                        }
+                        else
+                        {
+                            SearchSheetRaw(sheetName, searchTerm, results, token);
+                        }
+                        sheetsSearched++;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning("[Excel2Tab] Failed to search sheet: {SheetName}", ex.Message);
+                    }
+                }
+
+                _logger.LogInformation("[Excel2Tab] Searched {SheetsSearched} sheets, found {ResultCount} results", sheetsSearched, results.Count);
+
+                if (!token.IsCancellationRequested)
+                {
+                    _globalSearchResults = results;
+                    
+                    // Set flag to open window on next frame
+                    _openResultsWindowOnNextFrame = true;
+                }
+            }
+            finally
+            {
+                _isSearching = false;
+            }
+        }, token);
+    }
+
+    // Searches a typed sheet using reflection to access all properties
+    private void SearchSheet(Type sheetType, string sheetName, string searchTerm, List<GlobalSearchResult> results, CancellationToken token)
+    {
+        var getSheetMethodInfo = typeof(ExcelService)
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .First(mi => mi.Name == "GetSheet" && mi.IsGenericMethod && mi.GetParameters().Length == 1);
+        
+        var getSheetTyped = getSheetMethodInfo.MakeGenericMethod(sheetType);
+        var sheet = getSheetTyped.Invoke(_excelService, [SelectedLanguage]);
+        
+        if (sheet == null)
+            return;
+
+        var rows = (System.Collections.IEnumerable)sheet;
+        
+        var properties = sheetType.GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+
+        foreach (var row in rows)
+        {
+            if (token.IsCancellationRequested)
+                break;
+
+            var rowIdProp = properties.FirstOrDefault(p => p.Name == "RowId");
+            var rowId = rowIdProp != null ? (uint)rowIdProp.GetValue(row)! : 0u;
+
+            for (int i = 0; i < properties.Length; i++)
+            {
+                var prop = properties[i];
+                var value = prop.GetValue(row);
+                
+                if (value == null)
+                    continue;
+
+                string stringValue;
+                if (prop.PropertyType == typeof(ReadOnlySeString))
+                {
+                    stringValue = ((ReadOnlySeString)value).ToString();
+                }
+                else
+                {
+                    stringValue = value.ToString() ?? string.Empty;
+                }
+
+                if (stringValue.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    results.Add(new GlobalSearchResult(
+                        "Typed",
+                        sheetName,
+                        rowId,
+                        i,
+                        prop.Name,
+                        stringValue
+                    ));
+                }
+            }
+        }
+    }
+
+    // Searches a raw sheet using RawRow API for sheets without C# type definitions
+    // Similar to CompletionTab.cs - reads columns as strings and numbers directly
+    private void SearchSheetRaw(string sheetName, string searchTerm, List<GlobalSearchResult> results, CancellationToken token)
+    {
+        var sheet = _excelService.GetSheet<RawRow>(sheetName, SelectedLanguage);
+        
+        if (sheet == null)
+            return;
+
+        foreach (var row in sheet)
+        {
+            if (token.IsCancellationRequested)
+                break;
+
+            var rowId = row.RowId;
+            
+            // RawRow doesn't expose column count, so we iterate until we hit an exception
+            for (int i = 0; i < 100; i++) // Reasonable max, most sheets have far fewer columns
+            {
+                try
+                {
+                    // Try reading as string first
+                    var stringValue = row.ReadStringColumn(i);
+                    var stringText = stringValue.ToString();
+                    if (!string.IsNullOrEmpty(stringText) && stringText.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        results.Add(new GlobalSearchResult(
+                            "Raw",
+                            sheetName,
+                            rowId,
+                            i,
+                            $"Column{i}",
+                            stringText
+                        ));
+                        continue;
+                    }
+
+                    // Try reading as numeric types
+                    try
+                    {
+                        var numValue = row.ReadUInt32Column(i);
+                        var numString = numValue.ToString();
+                        if (numString.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            results.Add(new GlobalSearchResult(
+                                "Raw",
+                                sheetName,
+                                rowId,
+                                i,
+                                $"Column{i}",
+                                numString
+                            ));
+                        }
+                    }
+                    catch
+                    {
+                        // Not a numeric column, skip
+                    }
+                }
+                catch
+                {
+                    // Column doesn't exist, we've reached the end
+                    break;
+                }
+            }
+        }
+    }
 }
 
 public interface IExcelV2SheetWrapper
@@ -542,5 +880,168 @@ public partial class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
 
         var title = $"{sheetName}#{rowId} ({_excelTab.SelectedLanguage})";
         _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, sheetType, rowId, _excelTab.SelectedLanguage, title));
+    }
+}
+
+/// <summary>
+/// Displays raw sheet data using binary RawRow API
+/// </summary>
+[AutoConstruct]
+public partial class RawSheetWrapper : IExcelV2SheetWrapper
+{
+    private readonly Excel2Tab _excelTab;
+    private readonly ExcelService _excelService; // Provides access to Excel sheet data
+    private readonly DebugRenderer _debugRenderer; // Renders special data types
+    
+    private List<RawRow> _rows = new(); // All rows from the sheet
+    private List<RawRow> _filteredRows = new(); // Rows after filtering (currently all rows)
+    private int _columnCount = 0; // Number of columns detected in this sheet
+    
+    [AutoConstructIgnore]
+    public string SheetName { get; private set; } = string.Empty;
+    
+    /// <summary>Gets client language (affects how strings are rendered)</summary>
+    public ClientLanguage Language => _excelTab.SelectedLanguage;
+
+    /// <summary>Sets the sheet name that was passed as a parameter.</summary>
+    [AutoPostConstruct]
+    private void Initialize(string sheetName)
+    {
+        SheetName = sheetName;
+    }
+
+    /// <summary>
+    /// Loads all rows from the raw sheet and detects the number of columns using trial and error
+    /// </summary>
+    public void ReloadSheet()
+    {
+        _rows.Clear();
+        _filteredRows.Clear();
+        _columnCount = 0;
+        
+        // Fetch the raw sheet data for the selected language
+        var sheet = _excelService.GetSheet<RawRow>(SheetName, Language);
+        if (sheet == null)
+            return;
+
+        _rows = sheet.ToList();
+        _filteredRows = _rows;
+        
+        // Auto-detect column count
+        if (_rows.Count > 0)
+        {
+            var firstRow = _rows[0];
+            for (int i = 0; i < 100; i++) // Avoid excessive iterations
+            {
+                try
+                {
+                    //Increment the column count if we can read this column
+                    _ = firstRow.ReadStringColumn(i);
+                    _columnCount = i + 1;
+                }
+                catch
+                {
+                    // Column that doesn't exist
+                    break;
+                }
+            }
+        }
+    }
+
+    /// <summary>Render raw sheet data as a table with a RowId column and dynamic data columns.</summary>
+    public void Draw()
+    {
+        // Only fetch sheet data when first drawn (not when ChangeSheet is called)
+        if (_rows.Count == 0)
+        {
+            ReloadSheet();
+        }
+        
+        // Header (SheetName, Type, RowCount, ColumnCount)
+        ImGui.Text(SheetName);
+        ImGui.SameLine();
+        using (Color.Grey.Push(ImGuiCol.Text))
+            ImGui.Text(" (Raw Sheet)");
+        ImGui.SameLine();
+        ImGui.Text($"{_filteredRows.Count} row{(_filteredRows.Count != 1 ? "s" : "")}");
+        ImGui.SameLine();
+        ImGui.Text($"{_columnCount} column{(_columnCount != 1 ? "s" : "")}");
+
+        // Create table with +1 column for RowId, plus all data columns
+        using var table = ImRaii.Table("RawSheetTable", _columnCount + 1,
+            ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | 
+            ImGuiTableFlags.ScrollX | ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings,
+            new Vector2(-1));
+        if (!table) return;
+
+        // Set up columns
+        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 75);
+        ImGui.TableSetupScrollFreeze(1, 1); // Freeze first column
+        
+        // Create a column for each detected data column
+        for (int i = 0; i < _columnCount; i++)
+        {
+            ImGui.TableSetupColumn($"Column{i}", ImGuiTableColumnFlags.WidthFixed, 100);
+        }
+        ImGui.TableHeadersRow();
+
+        // Draw rows
+        foreach (var row in _filteredRows)
+        {
+            ImGui.TableNextRow();
+            
+            // RowId column
+            ImGui.TableNextColumn();
+            ImGui.Text(row.RowId.ToString());
+            
+            // Data columns
+            for (int i = 0; i < _columnCount; i++)
+            {
+                ImGui.TableNextColumn();
+                
+                try
+                {
+                    // Try to read as string first
+                    var stringValue = row.ReadStringColumn(i);
+                    if (!stringValue.IsEmpty)
+                    {
+                        // DebugRenderer to properly display SeStrings with formatting
+                        _debugRenderer.DrawSeString(stringValue.AsSpan(), new NodeOptions()
+                        {
+                            RenderSeString = false,
+                            Title = $"{SheetName}#{row.RowId} Column{i}",
+                            Language = Language,
+                        });
+                        continue;
+                    }
+                    
+                    // Try numeric types
+                    try
+                    {
+                        var uintValue = row.ReadUInt32Column(i);
+                        ImGui.Text(uintValue.ToString());
+                    }
+                    catch
+                    {
+                        // Try signed 32-bit integer
+                        try
+                        {
+                            var intValue = row.ReadInt32Column(i);
+                            ImGui.Text(intValue.ToString());
+                        }
+                        catch
+                        {
+                            // All attempts failed
+                            ImGui.Text("-");
+                        }
+                    }
+                }
+                catch
+                {
+                    // Exception reading from RawRow
+                    ImGui.Text("-");
+                }
+            }
+        }
     }
 }

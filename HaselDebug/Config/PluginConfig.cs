@@ -72,4 +72,5 @@ public partial class PluginConfig
     public bool AutoOpenPluginWindow = false;
     public string LastSelectedTab = "";
     public string[] PinnedInstances = [];
+    public bool Excel2Tab_ShowRawSheets = false;
 }
