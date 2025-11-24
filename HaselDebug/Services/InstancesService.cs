@@ -1,18 +1,27 @@
 using System.Reflection;
+using System.Threading.Tasks;
 using FFXIVClientStructs.Attributes;
 
 namespace HaselDebug.Services;
 
-[RegisterSingleton]
-public class InstancesService
+[RegisterSingleton, AutoConstruct]
+public partial class InstancesService
 {
-    public Instance[] Instances { get; init; }
+    public Instance[] Instances { get; private set; } = [];
 
-    public unsafe InstancesService()
+    public event Action? Loaded;
+
+    public InstancesService()
     {
+        Task.Run(Load);
+    }
+
+    public async Task Load()
+    {
+        var csAssembly = typeof(AddonAttribute).Assembly;
         var list = new List<Instance>();
 
-        foreach (var type in typeof(AgentAttribute).Assembly.GetTypes())
+        foreach (var type in csAssembly.GetTypes())
         {
             if (!type.IsStruct())
                 continue;
@@ -25,11 +34,15 @@ public class InstancesService
             if (pointer == null)
                 continue;
 
-            var address = (nint)Pointer.Unbox(pointer);
-            list.Add(new Instance(address, type));
+            unsafe
+            {
+                var address = (nint)Pointer.Unbox(pointer);
+                list.Add(new Instance(address, type));
+            }
         }
 
         Instances = [.. list];
+        Loaded?.Invoke();
     }
 
     public record Instance(nint Address, Type Type);

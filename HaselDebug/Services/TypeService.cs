@@ -13,6 +13,8 @@ public class TypeService
     public ImmutableSortedDictionary<string, Type>? AddonTypes { get; private set; }
     public ImmutableSortedDictionary<AgentId, Type>? AgentTypes { get; private set; }
 
+    public event Action? Loaded;
+
     public TypeService()
     {
         Task.Run(Load);
@@ -35,6 +37,8 @@ public class TypeService
             .ToImmutableSortedDictionary(
                 tuple => tuple.agentId,
                 tuple => tuple.type);
+
+        Loaded?.Invoke();
     }
 
     public Type GetAddonType(string addonName)

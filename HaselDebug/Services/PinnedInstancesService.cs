@@ -15,6 +15,13 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
     [AutoPostConstruct]
     public void Initialize()
     {
+        _instancesService.Loaded += OnInstancesLoaded;
+    }
+
+    private void OnInstancesLoaded()
+    {
+        _instancesService.Loaded -= OnInstancesLoaded;
+
         // make sure the types of pinned instances exist
         _pluginConfig.PinnedInstances = _pluginConfig.PinnedInstances
             .Where(name => _instancesService.Instances.Any(inst => inst.Type.FullName == name))
