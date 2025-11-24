@@ -5,6 +5,8 @@ namespace HaselDebug.Windows;
 [AutoConstruct]
 public partial class ExcelSearchResultsWindow : SimpleWindow
 {
+    private readonly IServiceProvider _serviceProvider;
+    private readonly WindowManager _windowManager;
     private readonly Excel2Tab _excelTab;
     private readonly string _searchTerm;
     private readonly List<GlobalSearchResult> _results;
@@ -34,11 +36,6 @@ public partial class ExcelSearchResultsWindow : SimpleWindow
         DisableWindowSounds = true;
     }
 
-    public override bool DrawConditions()
-    {
-        return true; // Always show window, even with 0 results
-    }
-
     public override void Draw()
     {
         if (_results.Count == 0)
@@ -59,7 +56,7 @@ public partial class ExcelSearchResultsWindow : SimpleWindow
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
-        foreach (var result in _results)
+        foreach (var (index, result) in _results.Index())
         {
             ImGui.TableNextRow();
             
@@ -67,14 +64,21 @@ public partial class ExcelSearchResultsWindow : SimpleWindow
             ImGui.Text(result.SheetType);
             
             ImGui.TableNextColumn();
-            if (ImGui.Selectable(result.SheetName, false, ImGuiSelectableFlags.SpanAllColumns))
+            if (ImGui.Selectable($"{result.SheetName}##SheetName{index}", false))
             {
                 _excelTab.ChangeSheetFromSearch(result.SheetName);
             }
             
             ImGui.TableNextColumn();
-            ImGui.Text(result.RowId.ToString());
-            
+            if (result.IsSubrowSheet)
+            {
+                ImGui.Text($"{result.RowId}");
+            }
+            else if (ImGui.Selectable($"{result.RowId}##RowId{index}", false))
+            {
+                OpenSheet(result.SheetName, (uint)float.Parse(result.RowId));
+            }
+
             ImGui.TableNextColumn();
             ImGui.Text(result.ColumnIndex.ToString());
             
@@ -85,5 +89,14 @@ public partial class ExcelSearchResultsWindow : SimpleWindow
             var displayValue = result.Value.Length > 100 ? result.Value[..100] + "..." : result.Value;
             ImGui.TextWrapped(displayValue);
         }
+    }
+
+    private void OpenSheet(string sheetName, uint rowId)
+    {
+        if (!_excelTab.TryGetSheetType(sheetName, out var sheetType))
+            return;
+
+        var title = $"{sheetName}#{rowId} ({_excelTab.SelectedLanguage})";
+        _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, sheetType, rowId, _excelTab.SelectedLanguage, title));
     }
 }

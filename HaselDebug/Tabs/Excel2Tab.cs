@@ -1,4 +1,7 @@
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,12 +13,13 @@ using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
+using Lumina.Data.Structs.Excel;
 
 namespace HaselDebug.Tabs;
 
 #pragma warning disable PendingExcelSchema
 
-public record GlobalSearchResult(string SheetType, string SheetName, uint RowId, int ColumnIndex, string ColumnName, string Value);
+public record GlobalSearchResult(bool IsSubrowSheet, string SheetType, string SheetName, string RowId, int ColumnIndex, string ColumnName, string Value);
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class Excel2Tab : DebugTab
@@ -40,9 +44,9 @@ public unsafe partial class Excel2Tab : DebugTab
     private bool _useExperimentalSheets = true;
     private bool _showRawSheets = false;
     private bool _isInitialized;
-    
+
     private string _globalSearchTerm = string.Empty;
-    private List<GlobalSearchResult> _globalSearchResults = new();
+    private List<GlobalSearchResult> _globalSearchResults = [];
     private bool _isSearching = false;
     private bool _openResultsWindowOnNextFrame = false;
     private CancellationTokenSource? _searchCts;
@@ -74,18 +78,13 @@ public unsafe partial class Excel2Tab : DebugTab
         try
         {
             var excelListFile = _dataManager.GameData.GetFile<Lumina.Data.Files.Excel.ExcelListFile>("exd/root.exl");
-            if (excelListFile != null)
-            {
-                _allSheetNames = excelListFile.ExdMap.Keys.ToHashSet();
-            }
-            else
-            {
-                _allSheetNames = _sheetTypes.Keys.ToHashSet();
-            }
+            _allSheetNames = excelListFile != null
+                ? [.. excelListFile.ExdMap.Keys]
+                : [.. _sheetTypes.Keys];
         }
         catch
         {
-            _allSheetNames = _sheetTypes.Keys.ToHashSet();
+            _allSheetNames = [.. _sheetTypes.Keys];
         }
 
         ChangeSheet(_nextSheetWrapper?.SheetName ?? _sheetWrapper?.SheetName ?? "Achievement");
@@ -117,17 +116,6 @@ public unsafe partial class Excel2Tab : DebugTab
             _sheetWrapper = _nextSheetWrapper;
             _nextSheetWrapper = null;
         }
-
-        /*
-        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - LanguageSelectorWidth * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X);
-        var searchTerm = SearchTerm;
-        var listDirty = false;
-        if (ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref searchTerm, 256, ImGuiInputTextFlags.AutoSelectAll))
-        {
-            SearchTerm = searchTerm;
-            listDirty |= true;
-        }
-        */
 
         ImGui.SameLine();
 
@@ -189,8 +177,6 @@ public unsafe partial class Excel2Tab : DebugTab
         var hasSearchTermChanged = ImGui.InputTextWithHint("##NameTextSearch", _textService.Translate("SearchBar.Hint"), ref _sheetNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         var hasSearchTerm = !string.IsNullOrWhiteSpace(_sheetNameSearchTerm);
 
-        // TODO: checkbox Search Rows
-
         using var table = ImRaii.Table("SheetTable"u8, 1, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings, new Vector2(300, -1));
         if (!table) return;
 
@@ -205,19 +191,19 @@ public unsafe partial class Excel2Tab : DebugTab
                 continue;
 
             var hasType = _sheetTypes.ContainsKey(sheetName);
-            
+
             // Skip raw sheets
             if (!hasType && !_showRawSheets)
                 continue;
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Name
-            
+
             if (!hasType)
             {
                 using var color = ImRaii.PushColor(ImGuiCol.Text, 0xFF666666);
             }
-            
+
             if (ImGui.Selectable(sheetName + $"###SheetSelectable{i++}", sheetName == _sheetWrapper?.SheetName, ImGuiSelectableFlags.SpanAllColumns))
             {
                 ChangeSheet(sheetName);
@@ -261,54 +247,57 @@ public unsafe partial class Excel2Tab : DebugTab
     private void DrawGlobalSearch()
     {
         ImGui.Separator();
-        ImGui.Text("Search All Sheets:");
+        ImGui.AlignTextToFramePadding();
+        ImGui.Text("Search in all sheets:");
         ImGui.SameLine();
-        
+
         ImGui.SetNextItemWidth(300);
-        ImGui.InputTextWithHint("##GlobalSearch", "Enter search term...", ref _globalSearchTerm, 256);
-        
+        using (ImRaii.Disabled(_isSearching))
+            ImGui.InputTextWithHint("##GlobalSearch", "Enter search term...", ref _globalSearchTerm, 256);
+
         ImGui.SameLine();
-        using (ImRaii.Disabled(_isSearching || string.IsNullOrWhiteSpace(_globalSearchTerm)))
+        if (_isSearching && ImGui.Button("Cancel"))
         {
-            if (ImGui.Button("Search"))
-            {
-                StartGlobalSearch();
-            }
+            CancelGlobalSearch();
         }
-        
+        else if (!_isSearching && ImGui.Button("Search"))
+        {
+            StartGlobalSearch();
+        }
+
         if (_isSearching)
         {
             ImGui.SameLine();
             ImGui.Text("Searching...");
         }
-        
+
         if (_globalSearchResults.Count > 0)
         {
             ImGui.SameLine();
             ImGui.Text($"{_globalSearchResults.Count} result(s) found");
-            
+
             ImGui.SameLine();
             if (ImGui.Button("View Results"))
             {
                 OpenSearchResultsWindow();
             }
-            
+
             ImGui.SameLine();
             if (ImGui.Button("Clear Results"))
             {
                 _globalSearchResults.Clear();
             }
         }
-        
+
         ImGui.Separator();
     }
 
     // Opens a new window to display search results
     private void OpenSearchResultsWindow()
     {
-        var windowTitle = $"Excel Search Results - \"{_globalSearchTerm}\" ({_globalSearchResults.Count} results)";
-        
-        _windowManager.CreateOrOpen(windowTitle, () => 
+        var windowTitle = $"Excel Search Results for \"{_globalSearchTerm}\" ({_globalSearchResults.Count} results)";
+
+        _windowManager.CreateOrOpen(windowTitle, () =>
             ActivatorUtilities.CreateInstance<ExcelSearchResultsWindow>(
                 _serviceProvider,
                 this,
@@ -316,6 +305,14 @@ public unsafe partial class Excel2Tab : DebugTab
                 new List<GlobalSearchResult>(_globalSearchResults),
                 windowTitle
             ));
+    }
+
+    private void CancelGlobalSearch()
+    {
+        _searchCts?.Cancel();
+        _searchCts = null;
+        _isSearching = false;
+        _globalSearchResults.Clear();
     }
 
     // Initiates a global search across all Excel sheets (typed and raw)
@@ -327,13 +324,12 @@ public unsafe partial class Excel2Tab : DebugTab
 
         _logger.LogInformation("[Excel2Tab] Starting global search for: {SearchTerm}", _globalSearchTerm);
 
-        _searchCts?.Cancel();
+        CancelGlobalSearch();
+
         _searchCts = new CancellationTokenSource();
         var token = _searchCts.Token;
-        var searchTerm = _globalSearchTerm;
-
+        var searchTerm = new ParsedSearchTerm(_globalSearchTerm);
         _isSearching = true;
-        _globalSearchResults.Clear();
 
         _logger.LogInformation("[Excel2Tab] Searching {SheetCount} sheets", _allSheetNames.Count);
 
@@ -341,41 +337,32 @@ public unsafe partial class Excel2Tab : DebugTab
         {
             try
             {
-                var results = new List<GlobalSearchResult>();
-                var sheetsSearched = 0;
+                var dict = new ConcurrentDictionary<string, List<GlobalSearchResult>>();
 
-                // Search all sheets - typed sheets use reflection, raw sheets use RawRow API
-                foreach (var sheetName in _allSheetNames.OrderBy(s => s))
+                Parallel.ForEach(_allSheetNames, new ParallelOptions() { CancellationToken = token }, (sheetName) =>
                 {
-                    if (token.IsCancellationRequested)
-                        break;
-
                     try
                     {
-                        // Try to search with type definition first, fall back to RawRow
+                        var results = new List<GlobalSearchResult>();
+
                         if (TryGetSheetType(sheetName, out var sheetType))
-                        {
                             SearchSheet(sheetType, sheetName, searchTerm, results, token);
-                        }
                         else
-                        {
                             SearchSheetRaw(sheetName, searchTerm, results, token);
-                        }
-                        sheetsSearched++;
+
+                        dict.TryAdd(sheetName, results);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogWarning("[Excel2Tab] Failed to search sheet: {SheetName}", ex.Message);
                     }
-                }
+                });
 
-                _logger.LogInformation("[Excel2Tab] Searched {SheetsSearched} sheets, found {ResultCount} results", sheetsSearched, results.Count);
+                _logger.LogInformation("[Excel2Tab] Searched {SheetsSearched} sheets, found {ResultCount} results", dict.Count, dict.Values.Sum(l => l.Count));
 
                 if (!token.IsCancellationRequested)
                 {
-                    _globalSearchResults = results;
-                    
-                    // Set flag to open window on next frame
+                    _globalSearchResults = [.. dict.OrderBy(kv => kv.Key).SelectMany(kv => kv.Value)];
                     _openResultsWindowOnNextFrame = true;
                 }
             }
@@ -387,69 +374,111 @@ public unsafe partial class Excel2Tab : DebugTab
     }
 
     // Searches a typed sheet using reflection to access all properties
-    private void SearchSheet(Type sheetType, string sheetName, string searchTerm, List<GlobalSearchResult> results, CancellationToken token)
+    private void SearchSheet(Type sheetType, string sheetName, ParsedSearchTerm searchTerm, List<GlobalSearchResult> results, CancellationToken token)
     {
-        var getSheetMethodInfo = typeof(ExcelService)
-            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .First(mi => mi.Name == "GetSheet" && mi.IsGenericMethod && mi.GetParameters().Length == 1);
-        
-        var getSheetTyped = getSheetMethodInfo.MakeGenericMethod(sheetType);
-        var sheet = getSheetTyped.Invoke(_excelService, [SelectedLanguage]);
-        
-        if (sheet == null)
-            return;
+        var properties = sheetType
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-        var rows = (System.Collections.IEnumerable)sheet;
-        
-        var properties = sheetType.GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-
-        foreach (var row in rows)
+        var isSubrowType = sheetType.IsAssignableTo(typeof(IExcelSubrow<>).MakeGenericType(sheetType));
+        if (isSubrowType)
         {
-            if (token.IsCancellationRequested)
-                break;
+            var getSheetMethodInfo = typeof(ExcelService)
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .First(mi => mi.Name == "GetSubrowSheet" && mi.IsGenericMethod && mi.GetParameters().Length == 1);
 
-            var rowIdProp = properties.FirstOrDefault(p => p.Name == "RowId");
-            var rowId = rowIdProp != null ? (uint)rowIdProp.GetValue(row)! : 0u;
+            var sheet = getSheetMethodInfo
+                .MakeGenericMethod(sheetType)
+                .Invoke(_excelService, [SelectedLanguage]);
+            if (sheet == null)
+                return;
 
-            for (int i = 0; i < properties.Length; i++)
+            foreach (var row in (IEnumerable)sheet)
             {
-                var prop = properties[i];
-                var value = prop.GetValue(row);
-                
-                if (value == null)
-                    continue;
+                if (token.IsCancellationRequested)
+                    break;
 
-                string stringValue;
-                if (prop.PropertyType == typeof(ReadOnlySeString))
-                {
-                    stringValue = ((ReadOnlySeString)value).ToString();
-                }
-                else
-                {
-                    stringValue = value.ToString() ?? string.Empty;
-                }
+                var rowProperties = row.GetType() // SubrowCollection<T>
+                    .GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-                if (stringValue.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
+                var rowIdProp = rowProperties.FirstOrDefault(p => p.Name == "RowId");
+                var rowId = rowIdProp != null ? (uint)rowIdProp.GetValue(row)! : 0u;
+
+                foreach (var subrow in (IEnumerable)row)
                 {
-                    results.Add(new GlobalSearchResult(
-                        "Typed",
-                        sheetName,
-                        rowId,
-                        i,
-                        prop.Name,
-                        stringValue
-                    ));
+                    if (token.IsCancellationRequested)
+                        break;
+
+                    var subrowIdProp = properties.FirstOrDefault(p => p.Name == "SubrowId");
+                    var subrowId = subrowIdProp != null ? (ushort)subrowIdProp.GetValue(subrow)! : 0u;
+
+                    foreach (var (index, prop) in properties.Index())
+                    {
+                        var value = prop.GetValue(subrow);
+                        if (value == null)
+                            continue;
+
+                        if (searchTerm.IsMatch(prop, value, out var propValue))
+                        {
+                            results.Add(new GlobalSearchResult(
+                                true,
+                                "Typed",
+                                sheetName,
+                                $"{rowId}.{subrowId}",
+                                index,
+                                prop.Name,
+                                propValue
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            var getSheetMethodInfo = typeof(ExcelService)
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .First(mi => mi.Name == "GetSheet" && mi.IsGenericMethod && mi.GetParameters().Length == 1);
+
+            var sheet = getSheetMethodInfo
+                .MakeGenericMethod(sheetType)
+                .Invoke(_excelService, [SelectedLanguage]);
+            if (sheet == null)
+                return;
+
+            foreach (var row in (IEnumerable)sheet)
+            {
+                if (token.IsCancellationRequested)
+                    break;
+
+                var rowIdProp = properties.FirstOrDefault(p => p.Name == "RowId");
+                var rowId = rowIdProp != null ? (uint)rowIdProp.GetValue(row)! : 0u;
+
+                foreach (var (index, prop) in properties.Index())
+                {
+                    var value = prop.GetValue(row);
+                    if (value == null)
+                        continue;
+
+                    if (searchTerm.IsMatch(prop, value, out var propValue))
+                    {
+                        results.Add(new GlobalSearchResult(
+                            false,
+                            "Typed",
+                            sheetName,
+                            rowId.ToString(),
+                            index,
+                            prop.Name,
+                            propValue
+                        ));
+                    }
                 }
             }
         }
     }
 
-    // Searches a raw sheet using RawRow API for sheets without C# type definitions
-    // Similar to CompletionTab.cs - reads columns as strings and numbers directly
-    private void SearchSheetRaw(string sheetName, string searchTerm, List<GlobalSearchResult> results, CancellationToken token)
+    private void SearchSheetRaw(string sheetName, ParsedSearchTerm searchTerm, List<GlobalSearchResult> results, CancellationToken token)
     {
         var sheet = _excelService.GetSheet<RawRow>(sheetName, SelectedLanguage);
-        
         if (sheet == null)
             return;
 
@@ -458,55 +487,19 @@ public unsafe partial class Excel2Tab : DebugTab
             if (token.IsCancellationRequested)
                 break;
 
-            var rowId = row.RowId;
-            
-            // RawRow doesn't expose column count, so we iterate until we hit an exception
-            for (int i = 0; i < 100; i++) // Reasonable max, most sheets have far fewer columns
+            for (var i = 0; i < row.Columns.Count; i++)
             {
-                try
+                if (searchTerm.IsMatch(row, i, out var columnValue))
                 {
-                    // Try reading as string first
-                    var stringValue = row.ReadStringColumn(i);
-                    var stringText = stringValue.ToString();
-                    if (!string.IsNullOrEmpty(stringText) && stringText.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        results.Add(new GlobalSearchResult(
-                            "Raw",
-                            sheetName,
-                            rowId,
-                            i,
-                            $"Column{i}",
-                            stringText
-                        ));
-                        continue;
-                    }
-
-                    // Try reading as numeric types
-                    try
-                    {
-                        var numValue = row.ReadUInt32Column(i);
-                        var numString = numValue.ToString();
-                        if (numString.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            results.Add(new GlobalSearchResult(
-                                "Raw",
-                                sheetName,
-                                rowId,
-                                i,
-                                $"Column{i}",
-                                numString
-                            ));
-                        }
-                    }
-                    catch
-                    {
-                        // Not a numeric column, skip
-                    }
-                }
-                catch
-                {
-                    // Column doesn't exist, we've reached the end
-                    break;
+                    results.Add(new GlobalSearchResult(
+                        false,
+                        "Raw",
+                        sheetName,
+                        row.RowId.ToString(),
+                        i,
+                        $"Column{i}",
+                        columnValue
+                    ));
                 }
             }
         }
@@ -890,25 +883,16 @@ public partial class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
 public partial class RawSheetWrapper : IExcelV2SheetWrapper
 {
     private readonly Excel2Tab _excelTab;
-    private readonly ExcelService _excelService; // Provides access to Excel sheet data
-    private readonly DebugRenderer _debugRenderer; // Renders special data types
-    
-    private List<RawRow> _rows = new(); // All rows from the sheet
-    private List<RawRow> _filteredRows = new(); // Rows after filtering (currently all rows)
-    private int _columnCount = 0; // Number of columns detected in this sheet
-    
-    [AutoConstructIgnore]
-    public string SheetName { get; private set; } = string.Empty;
-    
-    /// <summary>Gets client language (affects how strings are rendered)</summary>
-    public ClientLanguage Language => _excelTab.SelectedLanguage;
+    private readonly ExcelService _excelService;
+    private readonly DebugRenderer _debugRenderer;
 
-    /// <summary>Sets the sheet name that was passed as a parameter.</summary>
-    [AutoPostConstruct]
-    private void Initialize(string sheetName)
-    {
-        SheetName = sheetName;
-    }
+    private List<RawRow> _rows = [];
+    private List<RawRow> _filteredRows = [];
+    private IReadOnlyList<ExcelColumnDefinition> _columns = [];
+
+    public string SheetName { get; init; } = string.Empty;
+
+    public ClientLanguage Language => _excelTab.SelectedLanguage;
 
     /// <summary>
     /// Loads all rows from the raw sheet and detects the number of columns using trial and error
@@ -917,35 +901,16 @@ public partial class RawSheetWrapper : IExcelV2SheetWrapper
     {
         _rows.Clear();
         _filteredRows.Clear();
-        _columnCount = 0;
-        
+        _columns = [];
+
         // Fetch the raw sheet data for the selected language
         var sheet = _excelService.GetSheet<RawRow>(SheetName, Language);
         if (sheet == null)
             return;
 
-        _rows = sheet.ToList();
+        _rows = [.. sheet];
         _filteredRows = _rows;
-        
-        // Auto-detect column count
-        if (_rows.Count > 0)
-        {
-            var firstRow = _rows[0];
-            for (int i = 0; i < 100; i++) // Avoid excessive iterations
-            {
-                try
-                {
-                    //Increment the column count if we can read this column
-                    _ = firstRow.ReadStringColumn(i);
-                    _columnCount = i + 1;
-                }
-                catch
-                {
-                    // Column that doesn't exist
-                    break;
-                }
-            }
-        }
+        _columns = _rows.ElementAt(0).Columns;
     }
 
     /// <summary>Render raw sheet data as a table with a RowId column and dynamic data columns.</summary>
@@ -956,7 +921,7 @@ public partial class RawSheetWrapper : IExcelV2SheetWrapper
         {
             ReloadSheet();
         }
-        
+
         // Header (SheetName, Type, RowCount, ColumnCount)
         ImGui.Text(SheetName);
         ImGui.SameLine();
@@ -965,21 +930,23 @@ public partial class RawSheetWrapper : IExcelV2SheetWrapper
         ImGui.SameLine();
         ImGui.Text($"{_filteredRows.Count} row{(_filteredRows.Count != 1 ? "s" : "")}");
         ImGui.SameLine();
-        ImGui.Text($"{_columnCount} column{(_columnCount != 1 ? "s" : "")}");
+        ImGui.Text($"{_columns.Count} column{(_columns.Count != 1 ? "s" : "")}");
+
+        var visibleColumnCount = Math.Min(_columns.Count, 100);
 
         // Create table with +1 column for RowId, plus all data columns
-        using var table = ImRaii.Table("RawSheetTable", _columnCount + 1,
-            ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | 
+        using var table = ImRaii.Table("RawSheetTable", visibleColumnCount + 1,
+            ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY |
             ImGuiTableFlags.ScrollX | ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings,
             new Vector2(-1));
         if (!table) return;
 
         // Set up columns
         ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 75);
-        ImGui.TableSetupScrollFreeze(1, 1); // Freeze first column
-        
+        ImGui.TableSetupScrollFreeze(1, 1);
+
         // Create a column for each detected data column
-        for (int i = 0; i < _columnCount; i++)
+        for (var i = 0; i < visibleColumnCount; i++)
         {
             ImGui.TableSetupColumn($"Column{i}", ImGuiTableColumnFlags.WidthFixed, 100);
         }
@@ -989,59 +956,401 @@ public partial class RawSheetWrapper : IExcelV2SheetWrapper
         foreach (var row in _filteredRows)
         {
             ImGui.TableNextRow();
-            
+
             // RowId column
             ImGui.TableNextColumn();
             ImGui.Text(row.RowId.ToString());
-            
+
             // Data columns
-            for (int i = 0; i < _columnCount; i++)
+            for (var i = 0; i < visibleColumnCount; i++)
             {
                 ImGui.TableNextColumn();
-                
-                try
+                var column = _columns[i];
+
+                if (column.Type == ExcelColumnDataType.String)
                 {
-                    // Try to read as string first
                     var stringValue = row.ReadStringColumn(i);
                     if (!stringValue.IsEmpty)
                     {
-                        // DebugRenderer to properly display SeStrings with formatting
                         _debugRenderer.DrawSeString(stringValue.AsSpan(), new NodeOptions()
                         {
                             RenderSeString = false,
                             Title = $"{SheetName}#{row.RowId} Column{i}",
                             Language = Language,
                         });
-                        continue;
-                    }
-                    
-                    // Try numeric types
-                    try
-                    {
-                        var uintValue = row.ReadUInt32Column(i);
-                        ImGui.Text(uintValue.ToString());
-                    }
-                    catch
-                    {
-                        // Try signed 32-bit integer
-                        try
-                        {
-                            var intValue = row.ReadInt32Column(i);
-                            ImGui.Text(intValue.ToString());
-                        }
-                        catch
-                        {
-                            // All attempts failed
-                            ImGui.Text("-");
-                        }
                     }
                 }
-                catch
+                else if (column.Type == ExcelColumnDataType.Bool)
                 {
-                    // Exception reading from RawRow
-                    ImGui.Text("-");
+                    ImGui.Text(row.ReadBoolColumn(i).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.Int8)
+                {
+                    ImGui.Text(row.ReadInt8Column(i).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.Int16)
+                {
+                    ImGui.Text(row.ReadInt16Column(i).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.Int32)
+                {
+                    ImGui.Text(row.ReadInt32Column(i).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.Int64)
+                {
+                    ImGui.Text(row.ReadInt64Column(i).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.UInt8)
+                {
+                    ImGui.Text(row.ReadUInt8Column(i).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.UInt16)
+                {
+                    ImGui.Text(row.ReadUInt16Column(i).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.UInt32)
+                {
+                    ImGui.Text(row.ReadUInt32Column(i).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.UInt64)
+                {
+                    ImGui.Text(row.ReadUInt64Column(i).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.Float32)
+                {
+                    ImGui.Text(row.ReadFloat32Column(i).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.PackedBool0)
+                {
+                    ImGui.Text(row.ReadPackedBoolColumn(i, 0).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.PackedBool1)
+                {
+                    ImGui.Text(row.ReadPackedBoolColumn(i, 1).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.PackedBool2)
+                {
+                    ImGui.Text(row.ReadPackedBoolColumn(i, 2).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.PackedBool3)
+                {
+                    ImGui.Text(row.ReadPackedBoolColumn(i, 3).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.PackedBool4)
+                {
+                    ImGui.Text(row.ReadPackedBoolColumn(i, 4).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.PackedBool5)
+                {
+                    ImGui.Text(row.ReadPackedBoolColumn(i, 5).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.PackedBool6)
+                {
+                    ImGui.Text(row.ReadPackedBoolColumn(i, 6).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (column.Type == ExcelColumnDataType.PackedBool7)
+                {
+                    ImGui.Text(row.ReadPackedBoolColumn(i, 7).ToString(CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    ImGui.Text($"Unknown Type {column.Type}");
                 }
             }
         }
+    }
+}
+
+public readonly struct ParsedSearchTerm
+{
+    public ParsedSearchTerm(string searchTerm)
+    {
+        String = searchTerm;
+
+        // --- Constructor Body (Parsing Logic) ---
+        IsBool = bool.TryParse(searchTerm, out Bool);
+        IsSByte = sbyte.TryParse(searchTerm, out SByte);
+        IsByte = byte.TryParse(searchTerm, out Byte);
+        IsShort = short.TryParse(searchTerm, out Short);
+        IsUShort = ushort.TryParse(searchTerm, out UShort);
+        IsInt = int.TryParse(searchTerm, out Int);
+        IsUInt = uint.TryParse(searchTerm, out UInt);
+        IsLong = long.TryParse(searchTerm, out Long);
+        IsULong = ulong.TryParse(searchTerm, out ULong);
+        IsFloat = float.TryParse(searchTerm, out Float);
+    }
+
+    public readonly string String;
+
+    // --- Field Definitions (Flag and Value) ---
+
+    // Boolean
+    public readonly bool IsBool;
+    public readonly bool Bool;
+
+    // Signed Integers
+    public readonly bool IsSByte;
+    public readonly sbyte SByte;
+    public readonly bool IsShort;
+    public readonly short Short;
+    public readonly bool IsInt;
+    public readonly int Int;
+    public readonly bool IsLong;
+    public readonly long Long;
+
+    // Unsigned Integers
+    public readonly bool IsByte;
+    public readonly byte Byte;
+    public readonly bool IsUShort;
+    public readonly ushort UShort;
+    public readonly bool IsUInt;
+    public readonly uint UInt;
+    public readonly bool IsULong;
+    public readonly ulong ULong;
+
+    // Floating Point Numbers
+    public readonly bool IsFloat;
+    public readonly float Float;
+
+    public bool IsMatch(PropertyInfo prop, object? value, [NotNullWhen(returnValue: true)] out string? columnValue)
+    {
+        if (prop.PropertyType == typeof(ReadOnlySeString)
+            && value is ReadOnlySeString stringValue
+            && stringValue.ToString("m") is { } macroString
+            && macroString.Contains(String, StringComparison.InvariantCultureIgnoreCase))
+        {
+            columnValue = macroString;
+            return true;
+        }
+
+        if (prop.PropertyType == typeof(bool)
+            && IsBool
+            && value is bool boolValue
+            && boolValue == Bool)
+        {
+            columnValue = boolValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (prop.PropertyType == typeof(sbyte)
+            && IsSByte
+            && value is sbyte sbyteValue
+            && sbyteValue == SByte)
+        {
+            columnValue = sbyteValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (prop.PropertyType == typeof(short)
+            && IsShort
+            && value is short shortValue
+            && shortValue == Short)
+        {
+            columnValue = shortValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (prop.PropertyType == typeof(int)
+            && IsInt
+            && value is int intValue
+            && intValue == Int)
+        {
+            columnValue = intValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (prop.PropertyType == typeof(long)
+            && IsLong
+            && value is long longValue
+            && longValue == Long)
+        {
+            columnValue = longValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (prop.PropertyType == typeof(byte)
+            && IsByte
+            && value is byte byteValue
+            && byteValue == Byte)
+        {
+            columnValue = byteValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (prop.PropertyType == typeof(ushort)
+            && IsUShort
+            && value is ushort ushortValue
+            && ushortValue == UShort)
+        {
+            columnValue = ushortValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (prop.PropertyType == typeof(uint)
+            && IsUInt
+            && value is uint uintValue
+            && uintValue == UInt)
+        {
+            columnValue = uintValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (prop.PropertyType == typeof(ulong)
+            && IsULong
+            && value is ulong ulongValue
+            && ulongValue == ULong)
+        {
+            columnValue = ulongValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (prop.PropertyType == typeof(float)
+            && IsFloat
+            && value is float floatValue
+            && floatValue == Float)
+        {
+            columnValue = floatValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+
+        if (prop.PropertyType.IsGenericType
+            && IsUInt
+            && prop.PropertyType.GetGenericTypeDefinition() is { } genericTypeDefinition
+            && genericTypeDefinition == typeof(RowRef<>)
+            && prop.PropertyType.GetProperty("RowId", BindingFlags.Public | BindingFlags.Instance) is { } rowIdProp
+            && rowIdProp.GetValue(value) is uint rowIdValue
+            && rowIdValue == UInt)
+        {
+            columnValue = rowIdValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        columnValue = null;
+        return false;
+    }
+
+    public bool IsMatch(RawRow row, int columnIndex, [NotNullWhen(returnValue: true)] out string? columnValue)
+    {
+        var column = row.Columns[columnIndex];
+
+        if (column.Type == ExcelColumnDataType.String
+            && row.ReadStringColumn(columnIndex) is { } stringValue
+            && stringValue.ToString("m") is { } macroString
+            && macroString.Contains(String, StringComparison.InvariantCultureIgnoreCase))
+        {
+            columnValue = macroString;
+            return true;
+        }
+
+        if (column.Type == ExcelColumnDataType.Bool
+            && IsBool
+            && row.ReadBoolColumn(columnIndex) is { } boolValue
+            && boolValue == Bool)
+        {
+            columnValue = boolValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (column.Type == ExcelColumnDataType.Int8
+            && IsSByte
+            && row.ReadInt8Column(columnIndex) is { } sbyteValue
+            && sbyteValue == SByte)
+        {
+            columnValue = sbyteValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (column.Type == ExcelColumnDataType.Int16
+            && IsShort
+            && row.ReadInt16Column(columnIndex) is { } shortValue
+            && shortValue == Short)
+        {
+            columnValue = shortValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (column.Type == ExcelColumnDataType.Int32
+            && IsInt
+            && row.ReadInt32Column(columnIndex) is { } intValue
+            && intValue == Int)
+        {
+            columnValue = intValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (column.Type == ExcelColumnDataType.Int64
+            && IsLong
+            && row.ReadInt64Column(columnIndex) is { } longValue
+            && longValue == Long)
+        {
+            columnValue = longValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (column.Type == ExcelColumnDataType.UInt8
+            && IsByte
+            && row.ReadUInt8Column(columnIndex) is { } byteValue
+            && byteValue == Byte)
+        {
+            columnValue = byteValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (column.Type == ExcelColumnDataType.UInt16
+            && IsUShort
+            && row.ReadUInt16Column(columnIndex) is { } ushortValue
+            && ushortValue == UShort)
+        {
+            columnValue = ushortValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (column.Type == ExcelColumnDataType.UInt32
+            && IsUInt
+            && row.ReadUInt32Column(columnIndex) is { } uintValue
+            && uintValue == UInt)
+        {
+            columnValue = uintValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (column.Type == ExcelColumnDataType.UInt64
+            && IsULong
+            && row.ReadUInt64Column(columnIndex) is { } ulongValue
+            && ulongValue == ULong)
+        {
+            columnValue = ulongValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (column.Type == ExcelColumnDataType.Float32
+            && IsFloat
+            && row.ReadFloat32Column(columnIndex) is { } floatValue
+            && floatValue == Float)
+        {
+            columnValue = floatValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (column.Type
+            is ExcelColumnDataType.PackedBool0
+            or ExcelColumnDataType.PackedBool1
+            or ExcelColumnDataType.PackedBool2
+            or ExcelColumnDataType.PackedBool3
+            or ExcelColumnDataType.PackedBool4
+            or ExcelColumnDataType.PackedBool5
+            or ExcelColumnDataType.PackedBool6
+            or ExcelColumnDataType.PackedBool7
+            && IsBool
+            && row.ReadPackedBoolColumn(columnIndex) is { } packedBoolValue
+            && packedBoolValue == Bool)
+        {
+            columnValue = packedBoolValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        columnValue = null;
+        return false;
     }
 }
