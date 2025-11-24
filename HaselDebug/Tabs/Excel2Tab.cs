@@ -48,6 +48,7 @@ public unsafe partial class Excel2Tab : DebugTab
     private string _globalSearchTerm = string.Empty;
     private List<GlobalSearchResult> _globalSearchResults = [];
     private bool _isSearching = false;
+    private bool _searchMacroString = true;
     private bool _openResultsWindowOnNextFrame = false;
     private CancellationTokenSource? _searchCts;
 
@@ -256,6 +257,9 @@ public unsafe partial class Excel2Tab : DebugTab
             ImGui.InputTextWithHint("##GlobalSearch", "Enter search term...", ref _globalSearchTerm, 256);
 
         ImGui.SameLine();
+        ImGui.Checkbox("MacroString", ref _searchMacroString);
+
+        ImGui.SameLine();
         if (_isSearching && ImGui.Button("Cancel"))
         {
             CancelGlobalSearch();
@@ -328,7 +332,7 @@ public unsafe partial class Excel2Tab : DebugTab
 
         _searchCts = new CancellationTokenSource();
         var token = _searchCts.Token;
-        var searchTerm = new ParsedSearchTerm(_globalSearchTerm);
+        var searchTerm = new ParsedSearchTerm(_globalSearchTerm, _searchMacroString);
         _isSearching = true;
 
         _logger.LogInformation("[Excel2Tab] Searching {SheetCount} sheets", _allSheetNames.Count);
@@ -1063,9 +1067,12 @@ public partial class RawSheetWrapper : IExcelV2SheetWrapper
 
 public readonly struct ParsedSearchTerm
 {
-    public ParsedSearchTerm(string searchTerm)
+    private readonly bool _searchMacroString;
+
+    public ParsedSearchTerm(string searchTerm, bool searchMacroString)
     {
         String = searchTerm;
+        _searchMacroString = searchMacroString;
 
         // --- Constructor Body (Parsing Logic) ---
         IsBool = bool.TryParse(searchTerm, out Bool);
@@ -1116,10 +1123,10 @@ public readonly struct ParsedSearchTerm
     {
         if (prop.PropertyType == typeof(ReadOnlySeString)
             && value is ReadOnlySeString stringValue
-            && stringValue.ToString("m") is { } macroString
-            && macroString.Contains(String, StringComparison.InvariantCultureIgnoreCase))
+            && stringValue.ToString(_searchMacroString ? "m" : "t") is { } str
+            && str.Contains(String, StringComparison.InvariantCultureIgnoreCase))
         {
-            columnValue = macroString;
+            columnValue = str;
             return true;
         }
 
@@ -1236,10 +1243,10 @@ public readonly struct ParsedSearchTerm
 
         if (column.Type == ExcelColumnDataType.String
             && row.ReadStringColumn(columnIndex) is { } stringValue
-            && stringValue.ToString("m") is { } macroString
-            && macroString.Contains(String, StringComparison.InvariantCultureIgnoreCase))
+            && stringValue.ToString(_searchMacroString ? "m" : "t") is { } str
+            && str.Contains(String, StringComparison.InvariantCultureIgnoreCase))
         {
-            columnValue = macroString;
+            columnValue = str;
             return true;
         }
 
