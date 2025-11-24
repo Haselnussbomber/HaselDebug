@@ -885,9 +885,16 @@ public partial class RawSheetWrapper : IExcelV2SheetWrapper
     private List<RawRow> _filteredRows = [];
     private IReadOnlyList<ExcelColumnDefinition> _columns = [];
 
-    public string SheetName { get; init; } = string.Empty;
+    [AutoConstructIgnore]
+    public string SheetName { get; private set; } = string.Empty;
 
     public ClientLanguage Language => _excelTab.SelectedLanguage;
+
+    [AutoPostConstruct]
+    private void Initialize(string sheetName)
+    {
+        SheetName = sheetName;
+    }
 
     /// <summary>
     /// Loads all rows from the raw sheet and detects the number of columns using trial and error
