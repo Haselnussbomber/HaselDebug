@@ -254,7 +254,7 @@ public unsafe partial class Excel2Tab : DebugTab
 
         ImGui.SetNextItemWidth(300);
         using (ImRaii.Disabled(_isSearching))
-            ImGui.InputTextWithHint("##GlobalSearch", "Enter search term...", ref _globalSearchTerm, 256);
+            ImGui.InputTextWithHint("##GlobalSearch", "Enter search term...", ref _globalSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
 
         ImGui.SameLine();
         ImGui.Checkbox("MacroString", ref _searchMacroString);
