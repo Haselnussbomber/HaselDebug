@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Abstracts;
+using HaselDebug.Config;
 using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -29,6 +30,7 @@ public unsafe partial class Excel2Tab : DebugTab
     private readonly ExcelService _excelService;
     private readonly WindowManager _windowManager;
     private readonly ILogger<Excel2Tab> _logger;
+    private readonly PluginConfig _pluginConfig;
 
     private Dictionary<string, Type> _sheetTypes;
     private HashSet<string> _allSheetNames;
@@ -53,6 +55,7 @@ public unsafe partial class Excel2Tab : DebugTab
     private void Initialize()
     {
         SelectedLanguage = _languageProvider.ClientLanguage;
+        _showRawSheets = _pluginConfig.Excel2Tab_ShowRawSheets;
         LoadSheetTypes();
     }
 
@@ -153,7 +156,11 @@ public unsafe partial class Excel2Tab : DebugTab
         }
 
         ImGui.SameLine();
-        ImGui.Checkbox("Show Raw Sheets", ref _showRawSheets);
+        if (ImGui.Checkbox("Show Raw Sheets", ref _showRawSheets))
+        {
+            _pluginConfig.Excel2Tab_ShowRawSheets = _showRawSheets;
+            _pluginConfig.Save();
+        }
 
         DrawGlobalSearch();
 
@@ -218,15 +225,29 @@ public unsafe partial class Excel2Tab : DebugTab
         }
     }
 
+    /// <summary>
+    /// Changes the currently displayed sheet. Determines if the sheet is typed or raw,
+    /// then creates the appropriate wrapper to display the data.
+    /// </summary>
     private void ChangeSheet(string sheetName)
     {
-        if (!TryGetSheetType(sheetName, out var sheetType))
-            return;
-
-        _nextSheetWrapper = (IExcelV2SheetWrapper)ActivatorUtilities.CreateInstance(
-            _serviceProvider,
-            typeof(ExcelV2SheetWrapper<>).MakeGenericType(sheetType),
-            this);
+        // Handle typed sheets with type definitions
+        if (TryGetSheetType(sheetName, out var sheetType))
+        {
+            // For typed sheets, use ExcelV2SheetWrapper
+            _nextSheetWrapper = (IExcelV2SheetWrapper)ActivatorUtilities.CreateInstance(
+                _serviceProvider,
+                typeof(ExcelV2SheetWrapper<>).MakeGenericType(sheetType),
+                this);
+        }
+        else
+        {
+            // For raw sheets, use RawSheetWrapper
+            _nextSheetWrapper = ActivatorUtilities.CreateInstance<RawSheetWrapper>(
+                _serviceProvider,
+                this,
+                sheetName);
+        }
     }
 
     public bool TryGetSheetType(string sheetName, [NotNullWhen(returnValue: true)] out Type? sheetType)
@@ -859,5 +880,168 @@ public partial class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
 
         var title = $"{sheetName}#{rowId} ({_excelTab.SelectedLanguage})";
         _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, sheetType, rowId, _excelTab.SelectedLanguage, title));
+    }
+}
+
+/// <summary>
+/// Displays raw sheet data using binary RawRow API
+/// </summary>
+[AutoConstruct]
+public partial class RawSheetWrapper : IExcelV2SheetWrapper
+{
+    private readonly Excel2Tab _excelTab;
+    private readonly ExcelService _excelService; // Provides access to Excel sheet data
+    private readonly DebugRenderer _debugRenderer; // Renders special data types
+    
+    private List<RawRow> _rows = new(); // All rows from the sheet
+    private List<RawRow> _filteredRows = new(); // Rows after filtering (currently all rows)
+    private int _columnCount = 0; // Number of columns detected in this sheet
+    
+    [AutoConstructIgnore]
+    public string SheetName { get; private set; } = string.Empty;
+    
+    /// <summary>Gets client language (affects how strings are rendered)</summary>
+    public ClientLanguage Language => _excelTab.SelectedLanguage;
+
+    /// <summary>Sets the sheet name that was passed as a parameter.</summary>
+    [AutoPostConstruct]
+    private void Initialize(string sheetName)
+    {
+        SheetName = sheetName;
+    }
+
+    /// <summary>
+    /// Loads all rows from the raw sheet and detects the number of columns using trial and error
+    /// </summary>
+    public void ReloadSheet()
+    {
+        _rows.Clear();
+        _filteredRows.Clear();
+        _columnCount = 0;
+        
+        // Fetch the raw sheet data for the selected language
+        var sheet = _excelService.GetSheet<RawRow>(SheetName, Language);
+        if (sheet == null)
+            return;
+
+        _rows = sheet.ToList();
+        _filteredRows = _rows;
+        
+        // Auto-detect column count
+        if (_rows.Count > 0)
+        {
+            var firstRow = _rows[0];
+            for (int i = 0; i < 100; i++) // Avoid excessive iterations
+            {
+                try
+                {
+                    //Increment the column count if we can read this column
+                    _ = firstRow.ReadStringColumn(i);
+                    _columnCount = i + 1;
+                }
+                catch
+                {
+                    // Column that doesn't exist
+                    break;
+                }
+            }
+        }
+    }
+
+    /// <summary>Render raw sheet data as a table with a RowId column and dynamic data columns.</summary>
+    public void Draw()
+    {
+        // Only fetch sheet data when first drawn (not when ChangeSheet is called)
+        if (_rows.Count == 0)
+        {
+            ReloadSheet();
+        }
+        
+        // Header (SheetName, Type, RowCount, ColumnCount)
+        ImGui.Text(SheetName);
+        ImGui.SameLine();
+        using (Color.Grey.Push(ImGuiCol.Text))
+            ImGui.Text(" (Raw Sheet)");
+        ImGui.SameLine();
+        ImGui.Text($"{_filteredRows.Count} row{(_filteredRows.Count != 1 ? "s" : "")}");
+        ImGui.SameLine();
+        ImGui.Text($"{_columnCount} column{(_columnCount != 1 ? "s" : "")}");
+
+        // Create table with +1 column for RowId, plus all data columns
+        using var table = ImRaii.Table("RawSheetTable", _columnCount + 1,
+            ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | 
+            ImGuiTableFlags.ScrollX | ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings,
+            new Vector2(-1));
+        if (!table) return;
+
+        // Set up columns
+        ImGui.TableSetupColumn("RowId", ImGuiTableColumnFlags.WidthFixed, 75);
+        ImGui.TableSetupScrollFreeze(1, 1); // Freeze first column
+        
+        // Create a column for each detected data column
+        for (int i = 0; i < _columnCount; i++)
+        {
+            ImGui.TableSetupColumn($"Column{i}", ImGuiTableColumnFlags.WidthFixed, 100);
+        }
+        ImGui.TableHeadersRow();
+
+        // Draw rows
+        foreach (var row in _filteredRows)
+        {
+            ImGui.TableNextRow();
+            
+            // RowId column
+            ImGui.TableNextColumn();
+            ImGui.Text(row.RowId.ToString());
+            
+            // Data columns
+            for (int i = 0; i < _columnCount; i++)
+            {
+                ImGui.TableNextColumn();
+                
+                try
+                {
+                    // Try to read as string first
+                    var stringValue = row.ReadStringColumn(i);
+                    if (!stringValue.IsEmpty)
+                    {
+                        // DebugRenderer to properly display SeStrings with formatting
+                        _debugRenderer.DrawSeString(stringValue.AsSpan(), new NodeOptions()
+                        {
+                            RenderSeString = false,
+                            Title = $"{SheetName}#{row.RowId} Column{i}",
+                            Language = Language,
+                        });
+                        continue;
+                    }
+                    
+                    // Try numeric types
+                    try
+                    {
+                        var uintValue = row.ReadUInt32Column(i);
+                        ImGui.Text(uintValue.ToString());
+                    }
+                    catch
+                    {
+                        // Try signed 32-bit integer
+                        try
+                        {
+                            var intValue = row.ReadInt32Column(i);
+                            ImGui.Text(intValue.ToString());
+                        }
+                        catch
+                        {
+                            // All attempts failed
+                            ImGui.Text("-");
+                        }
+                    }
+                }
+                catch
+                {
+                    // Exception reading from RawRow
+                    ImGui.Text("-");
+                }
+            }
+        }
     }
 }
