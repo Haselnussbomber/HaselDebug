@@ -20,12 +20,12 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
     private readonly IServiceProvider _serviceProvider;
     private readonly ITextureProvider _textureProvider;
     private readonly TextService _textService;
-    private FurnitureCatalogTable _indoorTable;
-    private FurnitureCatalogTable _outdoorTable;
+    private bool _isInitialized;
+    private FurnitureCatalogTable? _indoorTable;
+    private FurnitureCatalogTable? _outdoorTable;
     private bool _wasInside;
     private bool _wasOutside;
 
-    [AutoPostConstruct]
     private void Initialize()
     {
         _indoorTable = ActivatorUtilities.CreateInstance<FurnitureCatalogTable>(_serviceProvider, HousingTerritoryType.Indoor);
@@ -34,6 +34,12 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
 
     public override void Draw()
     {
+        if (!_isInitialized)
+        {
+            Initialize();
+            _isInitialized = true;
+        }
+
         var housingManager = HousingManager.Instance();
         if (housingManager == null)
             return;
@@ -104,7 +110,7 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
         {
             if (tab)
             {
-                _indoorTable.Draw();
+                _indoorTable?.Draw();
             }
         }
 
@@ -112,7 +118,7 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
         {
             if (tab)
             {
-                _outdoorTable.Draw();
+                _outdoorTable?.Draw();
             }
         }
     }

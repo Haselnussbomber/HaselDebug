@@ -2,7 +2,6 @@ using Dalamud.Game.Text.SeStringHandling;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using HaselDebug.Utils;
 using static HaselCommon.Utils.GfdFile;
 
 namespace HaselDebug.Tabs;

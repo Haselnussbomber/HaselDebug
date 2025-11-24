@@ -9,20 +9,18 @@ namespace HaselDebug.Tabs;
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
 {
-    private delegate AtkValue* CallHandler(AtkExternalInterface* thisPtr, AtkValue* result, uint handlerIndex, uint valueCount, AtkValue* values); // TODO: remove when https://github.com/aers/FFXIVClientStructs/pull/1449 is merged
-
     private record CallEntry(DateTime Time, uint handlerIndex, Pointer<AtkValue> Values, uint ValueCount);
 
     private readonly DebugRenderer _debugRenderer;
     private readonly IGameInteropProvider _gameInteropProvider;
     private readonly List<CallEntry> _calls = [];
-    private Hook<CallHandler>? _callHandlerDetour;
+    private Hook<AtkExternalInterface.Delegates.CallHandler>? _callHandlerDetour;
     private bool _enabled = false;
     private bool _isInitialized;
 
     private void Initialize()
     {
-        _callHandlerDetour = _gameInteropProvider.HookFromSignature<CallHandler>(
+        _callHandlerDetour = _gameInteropProvider.HookFromSignature<AtkExternalInterface.Delegates.CallHandler>(
             "40 53 48 83 EC ?? 48 8B 81 ?? ?? ?? ?? 48 8B DA 48 8B 91 ?? ?? ?? ?? 48 2B C2 45 8B D0",
             CallHandlerDetour);
     }

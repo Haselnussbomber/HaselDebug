@@ -3,7 +3,6 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs;
 

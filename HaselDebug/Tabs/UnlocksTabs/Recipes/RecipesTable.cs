@@ -27,6 +27,6 @@ public unsafe partial class RecipesTable : Table<Recipe>
 
     public override void LoadRows()
     {
-        Rows = [.._excelService.GetSheet<Recipe>().Where(row => row.ItemResult.RowId > 0)];
+        Rows = [.. _excelService.GetSheet<Recipe>().Where(row => row.ItemResult.RowId > 0)];
     }
 }

@@ -1,5 +1,5 @@
-using HaselDebug.Config;
 using HaselDebug.Interfaces;
+using HaselDebug.Config;
 using HaselDebug.Services;
 using HaselDebug.Tabs;
 using HaselDebug.Utils;

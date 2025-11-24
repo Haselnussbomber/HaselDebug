@@ -1,6 +1,5 @@
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs;
 

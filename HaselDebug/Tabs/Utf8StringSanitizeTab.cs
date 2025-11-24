@@ -3,7 +3,6 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
-using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs;
 

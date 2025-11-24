@@ -59,16 +59,16 @@ public partial class ExcelSearchResultsWindow : SimpleWindow
         foreach (var (index, result) in _results.Index())
         {
             ImGui.TableNextRow();
-            
+
             ImGui.TableNextColumn();
             ImGui.Text(result.SheetType);
-            
+
             ImGui.TableNextColumn();
             if (ImGui.Selectable($"{result.SheetName}##SheetName{index}", false))
             {
                 _excelTab.ChangeSheet(result.SheetName);
             }
-            
+
             ImGui.TableNextColumn();
             if (result.IsSubrowSheet)
             {
@@ -81,10 +81,10 @@ public partial class ExcelSearchResultsWindow : SimpleWindow
 
             ImGui.TableNextColumn();
             ImGui.Text(result.ColumnIndex.ToString());
-            
+
             ImGui.TableNextColumn();
             ImGui.Text(result.ColumnName);
-            
+
             ImGui.TableNextColumn();
             var displayValue = result.Value.Length > 100 ? result.Value[..100] + "..." : result.Value;
             ImGui.TextWrapped(displayValue);
