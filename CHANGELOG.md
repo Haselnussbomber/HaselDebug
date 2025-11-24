@@ -1,13 +1,19 @@
 # Changelog
 
-## [Unreleased]
+## [1.39.0] (2025-11-24)
 
+- **Added:** Excel (v2) now supports displaying untyped sheets and now has a global search (Thanks to @Oblituarius!)
+  - I made the following changes after the PR has been merged:
+    - **Added:** A toggle allows searching for strings as macro strings.
+    - **Added:** Subrow sheets are now supported in the global search.
+    - **Updated:** Improved performace for global search by adding parallelization and checking column types.
 - **Fixed:** The "Outfits" table is now refreshed when logging in.
 - **Fixed:** The "Unlocks" summary table now renders correctly again.
 - **Fixed:** The tables in the "Drag Drop Type" tab now have a fixed height of 600px, so they are actually usable.
 - **Changed:** The "Item Action Type" tab was renamed to "Item Actions". The ItemAction sheet a mapping between the Item and the Action sheet. Who knew?
+- **Changed:** A couple services now load asynchronously to make opening the window faster and not hang the game for a couple seconds.
 - **Updated:** The RowIds in the "Excel (v2)" tab can now be copied.
-- **Updated:** ClientStructs now at [2dfa0680](https://github.com/aers/FFXIVClientStructs/tree/2dfa0680) ([compare](https://github.com/aers/FFXIVClientStructs/compare/f2341514..2dfa0680)).
+- **Updated:** ClientStructs now at [94e37492](https://github.com/aers/FFXIVClientStructs/tree/94e37492) ([compare](https://github.com/aers/FFXIVClientStructs/compare/f2341514..94e37492)).
 
 ## [1.38.0] (2025-10-28)
 
@@ -592,7 +598,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.38.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.0...main
+[1.39.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.38.0...v1.39.0
 [1.38.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.37.0...v1.38.0
 [1.37.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.36.0...v1.37.0
 [1.36.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.35.1...v1.36.0
