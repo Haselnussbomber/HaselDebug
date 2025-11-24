@@ -1,4 +1,4 @@
-using HaselDebug.Tabs;
+using HaselDebug.Tabs.Excel;
 
 namespace HaselDebug.Windows;
 
