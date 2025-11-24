@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -10,6 +11,7 @@ namespace HaselDebug.Services;
 public partial class DebugRenderer
 {
     private Dictionary<string, MemberDocumentation> _memberDocs = [];
+    private Task? _csDocsParsingTask;
 
     public bool HasDocumentation(string? name)
         => !string.IsNullOrEmpty(name) && _memberDocs.ContainsKey(name);
@@ -19,7 +21,12 @@ public partial class DebugRenderer
 
     public record MemberDocumentation(string Name, string Sumamry, string Remarks, KeyValuePair<string, string>[] Parameters, string Returns);
 
-    internal void ParseCSDocs()
+    public void ParseCSDocs()
+    {
+        _csDocsParsingTask ??= Task.Run(LoadCSDocs);
+    }
+
+    private void LoadCSDocs()
     {
         if (_memberDocs.Count != 0)
             return;
