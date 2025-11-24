@@ -184,9 +184,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
             _imGuiContextMenu.Draw($"##Addon_{addonId}_{addonName}_Context", builder =>
             {
-                if (!_typeService.AddonTypes.TryGetValue(addonName, out var type))
-                    type = typeof(AtkUnitBase);
-
+                var type = _typeService.GetAddonType(addonName);
                 var isPinned = _pinnedInstances.Contains(addonName);
 
                 builder.AddCopyName(addonName);

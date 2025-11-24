@@ -99,9 +99,7 @@ public unsafe partial class AgentsTab : DebugTab
             }
             _imGuiContextMenu.Draw($"ContextMenuAgent{i}", builder =>
             {
-                if (!_typeService.AgentTypes.TryGetValue(agentId, out var agentType))
-                    agentType = typeof(AgentInterface);
-
+                var agentType = _typeService.GetAgentType(agentId);
                 var isPinned = _pinnedInstances.Contains(agentType);
 
                 builder.AddCopyName(agentId.ToString());

@@ -61,8 +61,7 @@ public unsafe partial class AtkDebugRenderer
             UnitBase = unitBase,
         };
 
-        if (!_typeService.AddonTypes.TryGetValue(unitBase->NameString, out var type))
-            type = typeof(AtkUnitBase);
+        var type = _typeService.GetAddonType(unitBase->NameString);
 
         ImGuiUtils.DrawCopyableText(unitBase->NameString);
 
@@ -103,8 +102,7 @@ public unsafe partial class AtkDebugRenderer
 
             ImGui.SameLine();
 
-            if (!_typeService.AgentTypes.TryGetValue(agentId, out var agentType))
-                agentType = typeof(AgentInterface);
+            var agentType = _typeService.GetAgentType(agentId);
 
             _debugRenderer.DrawPointerType(agent, agentType, nodeOptions.WithAddress((nint)agent) with
             {

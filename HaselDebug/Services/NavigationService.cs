@@ -43,9 +43,7 @@ public unsafe partial class NavigationService
 
         _imGuiContextMenu.Draw($"AgentNavigationContextMenu{_tooltipIndex++}", (builder) =>
         {
-            if (!_typeService.AgentTypes.TryGetValue(agentId, out var type))
-                type = typeof(AgentInterface);
-
+            var agentType = _typeService.GetAgentType(agentId);
             var agentName = agentId.ToString();
             var agent = AgentModule.Instance()->GetAgentByInternalId(agentId);
 
@@ -60,27 +58,27 @@ public unsafe partial class NavigationService
                 Label = _textService.Translate("ContextMenu.TabPopout"),
                 ClickCallback = () =>
                 {
-                    var window = ActivatorUtilities.CreateInstance<PointerTypeWindow>(_serviceProvider, (nint)agent, type, agentName);
+                    var window = ActivatorUtilities.CreateInstance<PointerTypeWindow>(_serviceProvider, (nint)agent, agentType, agentName);
                     window.WindowName = displayName;
                     _windowManager.Open(window);
                 }
             });
 
             var pinnedInstancesService = _serviceProvider.GetRequiredService<PinnedInstancesService>();
-            var isPinned = pinnedInstancesService.Contains(type);
+            var isPinned = pinnedInstancesService.Contains(agentType);
 
             builder.Add(new ImGuiContextMenuEntry()
             {
                 Visible = !isPinned,
                 Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
-                ClickCallback = () => pinnedInstancesService.Add((nint)agent, type)
+                ClickCallback = () => pinnedInstancesService.Add((nint)agent, agentType)
             });
 
             builder.Add(new ImGuiContextMenuEntry()
             {
                 Visible = isPinned,
                 Label = _textService.Translate("ContextMenu.PinnedInstances.Unpin"),
-                ClickCallback = () => pinnedInstancesService.Remove(type)
+                ClickCallback = () => pinnedInstancesService.Remove(agentType)
             });
         });
     }
@@ -104,8 +102,7 @@ public unsafe partial class NavigationService
 
         _imGuiContextMenu.Draw($"AddonNavigationContextMenu{_tooltipIndex++}", (builder) =>
         {
-            if (!_typeService.AddonTypes.TryGetValue(addonName, out var type))
-                type = typeof(AtkUnitBase);
+            var type = _typeService.GetAddonType(addonName);
 
             var unitBase = RaptureAtkUnitManager.Instance()->GetAddonById(addonId);
             if (unitBase == null)

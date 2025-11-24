@@ -1,17 +1,24 @@
 using System.Collections.Immutable;
 using System.Reflection;
+using System.Threading.Tasks;
 using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace HaselDebug.Services;
 
 [RegisterSingleton]
 public class TypeService
 {
-    public ImmutableSortedDictionary<string, Type> AddonTypes { get; private set; }
-    public ImmutableSortedDictionary<AgentId, Type> AgentTypes { get; private set; }
+    public ImmutableSortedDictionary<string, Type>? AddonTypes { get; private set; }
+    public ImmutableSortedDictionary<AgentId, Type>? AgentTypes { get; private set; }
 
     public TypeService()
+    {
+        Task.Run(Load);
+    }
+
+    public async Task Load()
     {
         var csAssembly = typeof(AddonAttribute).Assembly;
 
@@ -28,5 +35,15 @@ public class TypeService
             .ToImmutableSortedDictionary(
                 tuple => tuple.agentId,
                 tuple => tuple.type);
+    }
+
+    public Type GetAddonType(string addonName)
+    {
+        return AddonTypes != null && AddonTypes.TryGetValue(addonName, out var type) ? type : typeof(AtkUnitBase);
+    }
+
+    public Type GetAgentType(AgentId agentId)
+    {
+        return AgentTypes != null && AgentTypes.TryGetValue(agentId, out var type) ? type : typeof(AgentInterface);
     }
 }
