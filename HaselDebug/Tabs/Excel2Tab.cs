@@ -212,11 +212,7 @@ public unsafe partial class Excel2Tab : DebugTab
         }
     }
 
-    /// <summary>
-    /// Changes the currently displayed sheet. Determines if the sheet is typed or raw,
-    /// then creates the appropriate wrapper to display the data.
-    /// </summary>
-    private void ChangeSheet(string sheetName)
+    public void ChangeSheet(string sheetName)
     {
         // Handle typed sheets with type definitions
         if (TryGetSheetType(sheetName, out var sheetType))
@@ -239,11 +235,6 @@ public unsafe partial class Excel2Tab : DebugTab
 
     public bool TryGetSheetType(string sheetName, [NotNullWhen(returnValue: true)] out Type? sheetType)
         => _sheetTypes.TryGetValue(sheetName, out sheetType);
-
-    public void ChangeSheetFromSearch(string sheetName)
-    {
-        ChangeSheet(sheetName);
-    }
 
     private void DrawGlobalSearch()
     {

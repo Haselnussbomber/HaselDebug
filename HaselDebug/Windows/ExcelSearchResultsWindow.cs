@@ -66,7 +66,7 @@ public partial class ExcelSearchResultsWindow : SimpleWindow
             ImGui.TableNextColumn();
             if (ImGui.Selectable($"{result.SheetName}##SheetName{index}", false))
             {
-                _excelTab.ChangeSheetFromSearch(result.SheetName);
+                _excelTab.ChangeSheet(result.SheetName);
             }
             
             ImGui.TableNextColumn();
