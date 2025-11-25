@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
@@ -59,9 +60,11 @@ public readonly struct ParsedSearchTerm
     public readonly bool IsFloat;
     public readonly float Float;
 
-    public bool IsMatch(PropertyInfo prop, object? value, [NotNullWhen(returnValue: true)] out string? columnValue)
+    public bool IsMatch(Type type, object? value, [NotNullWhen(returnValue: true)] out string? columnValue, out int index)
     {
-        if (prop.PropertyType == typeof(ReadOnlySeString)
+        index = -1;
+
+        if (type == typeof(ReadOnlySeString)
             && value is ReadOnlySeString stringValue
             && stringValue.ToString(_searchMacroString ? "m" : "t") is { } str
             && str.Contains(String, StringComparison.InvariantCultureIgnoreCase))
@@ -70,7 +73,7 @@ public readonly struct ParsedSearchTerm
             return true;
         }
 
-        if (prop.PropertyType == typeof(bool)
+        if (type == typeof(bool)
             && IsBool
             && value is bool boolValue
             && boolValue == Bool)
@@ -79,7 +82,7 @@ public readonly struct ParsedSearchTerm
             return true;
         }
 
-        if (prop.PropertyType == typeof(sbyte)
+        if (type == typeof(sbyte)
             && IsSByte
             && value is sbyte sbyteValue
             && sbyteValue == SByte)
@@ -88,7 +91,7 @@ public readonly struct ParsedSearchTerm
             return true;
         }
 
-        if (prop.PropertyType == typeof(short)
+        if (type == typeof(short)
             && IsShort
             && value is short shortValue
             && shortValue == Short)
@@ -97,7 +100,7 @@ public readonly struct ParsedSearchTerm
             return true;
         }
 
-        if (prop.PropertyType == typeof(int)
+        if (type == typeof(int)
             && IsInt
             && value is int intValue
             && intValue == Int)
@@ -106,7 +109,7 @@ public readonly struct ParsedSearchTerm
             return true;
         }
 
-        if (prop.PropertyType == typeof(long)
+        if (type == typeof(long)
             && IsLong
             && value is long longValue
             && longValue == Long)
@@ -115,7 +118,7 @@ public readonly struct ParsedSearchTerm
             return true;
         }
 
-        if (prop.PropertyType == typeof(byte)
+        if (type == typeof(byte)
             && IsByte
             && value is byte byteValue
             && byteValue == Byte)
@@ -124,7 +127,7 @@ public readonly struct ParsedSearchTerm
             return true;
         }
 
-        if (prop.PropertyType == typeof(ushort)
+        if (type == typeof(ushort)
             && IsUShort
             && value is ushort ushortValue
             && ushortValue == UShort)
@@ -133,7 +136,7 @@ public readonly struct ParsedSearchTerm
             return true;
         }
 
-        if (prop.PropertyType == typeof(uint)
+        if (type == typeof(uint)
             && IsUInt
             && value is uint uintValue
             && uintValue == UInt)
@@ -142,7 +145,7 @@ public readonly struct ParsedSearchTerm
             return true;
         }
 
-        if (prop.PropertyType == typeof(ulong)
+        if (type == typeof(ulong)
             && IsULong
             && value is ulong ulongValue
             && ulongValue == ULong)
@@ -151,7 +154,7 @@ public readonly struct ParsedSearchTerm
             return true;
         }
 
-        if (prop.PropertyType == typeof(float)
+        if (type == typeof(float)
             && IsFloat
             && value is float floatValue
             && floatValue == Float)
@@ -160,17 +163,52 @@ public readonly struct ParsedSearchTerm
             return true;
         }
 
-
-        if (prop.PropertyType.IsGenericType
-            && IsUInt
-            && prop.PropertyType.GetGenericTypeDefinition() is { } genericTypeDefinition
-            && genericTypeDefinition == typeof(RowRef<>)
-            && prop.PropertyType.GetProperty("RowId", BindingFlags.Public | BindingFlags.Instance) is { } rowIdProp
-            && rowIdProp.GetValue(value) is uint rowIdValue
-            && rowIdValue == UInt)
+        if (type.IsGenericType && type.GetGenericTypeDefinition() is { } genericTypeDefinition)
         {
-            columnValue = rowIdValue.ToString(CultureInfo.InvariantCulture);
-            return true;
+            if (genericTypeDefinition == typeof(Collection<>)
+                && value is IEnumerable enumerable
+                && type.GenericTypeArguments[0] is Type innerType)
+            {
+                if (innerType.IsStruct())
+                {
+                    var innerProperties = innerType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                    foreach (var element in enumerable)
+                    {
+                        index++;
+
+                        foreach (var innerProp in innerProperties)
+                        {
+                            var innerValue = innerProp.GetValue(element);
+                            if (innerValue == null)
+                                continue;
+
+                            if (IsMatch(innerProp.PropertyType, innerValue, out columnValue, out _))
+                                return true;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var element in enumerable)
+                    {
+                        index++;
+
+                        if (IsMatch(innerType, element, out columnValue, out _))
+                            return true;
+                    }
+                }
+            }
+
+            if (genericTypeDefinition == typeof(RowRef<>)
+                && IsUInt
+                && type.GetProperty("RowId", BindingFlags.Public | BindingFlags.Instance) is { } rowIdProp
+                && rowIdProp.GetValue(value) is uint rowIdValue
+                && rowIdValue == UInt)
+            {
+                columnValue = rowIdValue.ToString(CultureInfo.InvariantCulture);
+                return true;
+            }
         }
 
         columnValue = null;

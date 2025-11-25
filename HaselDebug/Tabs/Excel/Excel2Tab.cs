@@ -403,7 +403,7 @@ public unsafe partial class Excel2Tab : DebugTab
                         if (value == null)
                             continue;
 
-                        if (searchTerm.IsMatch(prop, value, out var propValue))
+                        if (searchTerm.IsMatch(prop.PropertyType, value, out var propValue, out var idx))
                         {
                             results.Add(new GlobalSearchResult(
                                 true,
@@ -411,7 +411,7 @@ public unsafe partial class Excel2Tab : DebugTab
                                 sheetName,
                                 $"{rowId}.{subrowId}",
                                 index,
-                                prop.Name,
+                                prop.Name + (idx == -1 ? string.Empty : $"[{idx}]"),
                                 propValue
                             ));
                         }
@@ -445,7 +445,7 @@ public unsafe partial class Excel2Tab : DebugTab
                     if (value == null)
                         continue;
 
-                    if (searchTerm.IsMatch(prop, value, out var propValue))
+                    if (searchTerm.IsMatch(prop.PropertyType, value, out var propValue, out var idx))
                     {
                         results.Add(new GlobalSearchResult(
                             false,
@@ -453,7 +453,7 @@ public unsafe partial class Excel2Tab : DebugTab
                             sheetName,
                             rowId.ToString(),
                             index,
-                            prop.Name,
+                            prop.Name + (idx == -1 ? string.Empty : $"[{idx}]"),
                             propValue
                         ));
                     }
