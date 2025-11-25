@@ -1,14 +1,14 @@
 namespace HaselDebug.Tabs.Excel;
 
 [AutoConstruct]
-public partial class ExcelV2SheetWrapper<T> : IExcelV2SheetWrapper where T : struct
+public partial class ExcelSheetWrapper<T> : IExcelSheetWrapper where T : struct
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly Excel2Tab _excelTab;
+    private readonly ExcelTab _excelTab;
 
     private ExcelTable<T> _table;
 
-    public List<ExcelV2SheetColumn<T>> Columns { get; set; } = [];
+    public List<ExcelSheetColumn<T>> Columns { get; set; } = [];
     public string SheetName { get; } = typeof(T).Name;
     public ClientLanguage Language => _excelTab.SelectedLanguage;
 
@@ -26,12 +26,12 @@ public partial class ExcelV2SheetWrapper<T> : IExcelV2SheetWrapper where T : str
 
     public void Draw()
     {
+        ImGui.AlignTextToFramePadding();
         ImGui.Text(SheetName);
-        ImGui.SameLine();
 
+        ImGui.SameLine();
         var count = (_table.FilteredRows ?? _table.Rows).Count;
         ImGui.Text($"{count} row{(count != 1 ? "s" : "")}");
-        ImGui.Text($"IsSubrowType: {_table.IsSubrowType}");
 
         ImGui.SameLine();
         ShowColumnSelector();
@@ -55,7 +55,7 @@ public partial class ExcelV2SheetWrapper<T> : IExcelV2SheetWrapper where T : str
         using var contextMenu = ImRaii.Popup("ColumnsPopup");
         if (!contextMenu) return;
 
-        var canAdd = _table.Columns.Count < Excel2Tab.MaxColumns;
+        var canAdd = _table.Columns.Count < ExcelTab.MaxColumns;
 
         for (var i = 0; i < _table.AvailableColumns.Count; i++)
         {

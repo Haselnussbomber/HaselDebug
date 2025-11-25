@@ -8,10 +8,10 @@ using HaselDebug.Windows;
 namespace HaselDebug.Tabs.Excel;
 
 [AutoConstruct]
-public partial class ExcelV2SheetColumn<T> : ColumnString<T> where T : struct
+public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly Excel2Tab _excelTab;
+    private readonly ExcelTab _excelTab;
     private readonly ExcelTable<T> _excelTable;
     private readonly DebugRenderer _debugRenderer;
     private readonly WindowManager _windowManager;

@@ -15,7 +15,7 @@ namespace HaselDebug.Tabs.Excel;
 #pragma warning disable PendingExcelSchema
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class Excel2Tab : DebugTab
+public unsafe partial class ExcelTab : DebugTab
 {
     public const int MaxColumns = 60;
     private const int LanguageSelectorWidth = 90;
@@ -26,13 +26,13 @@ public unsafe partial class Excel2Tab : DebugTab
     private readonly IDataManager _dataManager;
     private readonly ExcelService _excelService;
     private readonly WindowManager _windowManager;
-    private readonly ILogger<Excel2Tab> _logger;
+    private readonly ILogger<ExcelTab> _logger;
     private readonly PluginConfig _pluginConfig;
 
     private Dictionary<string, Type> _sheetTypes;
     private HashSet<string> _allSheetNames;
-    private IExcelV2SheetWrapper? _sheetWrapper;
-    private IExcelV2SheetWrapper? _nextSheetWrapper;
+    private IExcelSheetWrapper? _sheetWrapper;
+    private IExcelSheetWrapper? _nextSheetWrapper;
     private string _sheetNameSearchTerm = string.Empty;
     private bool _useExperimentalSheets = true;
     private bool _showRawSheets = false;
@@ -44,8 +44,6 @@ public unsafe partial class Excel2Tab : DebugTab
     private bool _searchMacroString = true;
     private bool _openResultsWindowOnNextFrame = false;
     private CancellationTokenSource? _searchCts;
-
-    public override string Title => "Excel (v2)";
 
     public string SearchTerm { get; private set; } = string.Empty;
     public ClientLanguage SelectedLanguage { get; private set; }
@@ -94,8 +92,6 @@ public unsafe partial class Excel2Tab : DebugTab
         using var hostChild = ImRaii.Child("Host", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
         if (!hostChild) return;
 
-        ImGui.Text("Work in progress!"u8);
-
         // Open results window
         if (_openResultsWindowOnNextFrame)
         {
@@ -109,9 +105,24 @@ public unsafe partial class Excel2Tab : DebugTab
             _nextSheetWrapper = null;
         }
 
-        ImGui.SameLine();
+        var regionAvail = ImGui.GetContentRegionAvail();
 
-        ImGui.SetNextItemWidth(LanguageSelectorWidth * ImGuiHelpers.GlobalScale);
+        if (ImGui.Checkbox("Use Experimental Sheets", ref _useExperimentalSheets))
+        {
+            LoadSheetTypes();
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Checkbox("Show Raw Sheets", ref _showRawSheets))
+        {
+            _pluginConfig.Excel2Tab_ShowRawSheets = _showRawSheets;
+            _pluginConfig.Save();
+        }
+
+        ImGui.SameLine();
+        var languageSelectorWidth = LanguageSelectorWidth * ImGuiHelpers.GlobalScale;
+        ImGui.SetCursorPosX(regionAvail.X - languageSelectorWidth);
+        ImGui.SetNextItemWidth(languageSelectorWidth);
         using (var dropdown = ImRaii.Combo("##Language", SelectedLanguage.ToString()))
         {
             if (dropdown)
@@ -126,20 +137,6 @@ public unsafe partial class Excel2Tab : DebugTab
                     }
                 }
             }
-        }
-
-        ImGui.SameLine();
-
-        if (ImGui.Checkbox("Use Experimental Sheets", ref _useExperimentalSheets))
-        {
-            LoadSheetTypes();
-        }
-
-        ImGui.SameLine();
-        if (ImGui.Checkbox("Show Raw Sheets", ref _showRawSheets))
-        {
-            _pluginConfig.Excel2Tab_ShowRawSheets = _showRawSheets;
-            _pluginConfig.Save();
         }
 
         DrawGlobalSearch();
@@ -209,9 +206,9 @@ public unsafe partial class Excel2Tab : DebugTab
         if (TryGetSheetType(sheetName, out var sheetType))
         {
             // For typed sheets, use ExcelV2SheetWrapper
-            _nextSheetWrapper = (IExcelV2SheetWrapper)ActivatorUtilities.CreateInstance(
+            _nextSheetWrapper = (IExcelSheetWrapper)ActivatorUtilities.CreateInstance(
                 _serviceProvider,
-                typeof(ExcelV2SheetWrapper<>).MakeGenericType(sheetType),
+                typeof(ExcelSheetWrapper<>).MakeGenericType(sheetType),
                 this);
         }
         else

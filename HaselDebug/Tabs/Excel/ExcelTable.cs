@@ -7,10 +7,10 @@ namespace HaselDebug.Tabs.Excel;
 public partial class ExcelTable<T> : Table<T> where T : struct
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly Excel2Tab _excelTab;
+    private readonly ExcelTab _excelTab;
     private readonly ExcelService _excelService;
 
-    public List<ExcelV2SheetColumn<T>> AvailableColumns { get; private set; } = [];
+    public List<ExcelSheetColumn<T>> AvailableColumns { get; private set; } = [];
     public bool IsSubrowType { get; private set; }
 
     [AutoPostConstruct]
@@ -29,11 +29,11 @@ public partial class ExcelTable<T> : Table<T> where T : struct
 
         foreach (var property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
-            var column = ActivatorUtilities.CreateInstance<ExcelV2SheetColumn<T>>(_serviceProvider, _excelTab, this, property);
+            var column = ActivatorUtilities.CreateInstance<ExcelSheetColumn<T>>(_serviceProvider, _excelTab, this, property);
 
             AvailableColumns.Add(column);
 
-            if (Columns.Count < Excel2Tab.MaxColumns)
+            if (Columns.Count < ExcelTab.MaxColumns)
             {
                 Columns.Add(column);
             }

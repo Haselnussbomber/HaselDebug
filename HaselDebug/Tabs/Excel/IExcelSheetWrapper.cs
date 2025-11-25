@@ -1,6 +1,6 @@
 namespace HaselDebug.Tabs.Excel;
 
-public interface IExcelV2SheetWrapper
+public interface IExcelSheetWrapper
 {
     string SheetName { get; }
     ClientLanguage Language { get; }

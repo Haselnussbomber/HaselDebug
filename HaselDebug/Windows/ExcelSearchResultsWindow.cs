@@ -7,7 +7,7 @@ public partial class ExcelSearchResultsWindow : SimpleWindow
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly WindowManager _windowManager;
-    private readonly Excel2Tab _excelTab;
+    private readonly ExcelTab _excelTab;
     private readonly string _searchTerm;
     private readonly List<GlobalSearchResult> _results;
 

@@ -6,9 +6,9 @@ using Lumina.Data.Structs.Excel;
 namespace HaselDebug.Tabs.Excel;
 
 [AutoConstruct]
-public partial class RawSheetWrapper : IExcelV2SheetWrapper
+public partial class RawSheetWrapper : IExcelSheetWrapper
 {
-    private readonly Excel2Tab _excelTab;
+    private readonly ExcelTab _excelTab;
     private readonly ExcelService _excelService;
     private readonly DebugRenderer _debugRenderer;
 
