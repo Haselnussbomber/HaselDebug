@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.39.1] (2025-11-25)
+
+- **Added:** Found 2 Permissions names: 150 = Idle Camera, 178 = Group Pose
+- **Added:** The Excel (v2) tab now supports searching values in collections.
+- **Removed:** The Excel tab was removed.
+- **Changed:** The Excel (v2) tab was renamed to Excel.
+- **Fixed:** It was not possible to search for macros in the excel sheet columns.
+
 ## [1.39.0] (2025-11-24)
 
 - **Added:** Excel (v2) now supports displaying untyped sheets and now has a global search (Thanks to @Oblituarius!)
@@ -598,7 +606,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.1...main
+[1.39.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.0...v1.39.1
 [1.39.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.38.0...v1.39.0
 [1.38.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.37.0...v1.38.0
 [1.37.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.36.0...v1.37.0
