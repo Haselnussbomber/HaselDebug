@@ -48,7 +48,7 @@ public unsafe partial class PermissionsTab : DebugTab
                 continue;
 
             using var color = ImRaii.PushColor(ImGuiCol.Text, hasPermission ? Color.Green : Color.Red);
-            using var node = ImRaii.TreeNode($"Permission#{row.RowId}", ImGuiTreeNodeFlags.SpanAvailWidth);
+            using var node = ImRaii.TreeNode(GetPermissionName(row.RowId), ImGuiTreeNodeFlags.SpanAvailWidth);
             color.Dispose();
             if (!node) continue;
 
@@ -89,6 +89,19 @@ public unsafe partial class PermissionsTab : DebugTab
                     ImGui.Text($"{matches}");
             }
         }
+    }
+
+    private string GetPermissionName(uint rowId)
+    {
+        var name = $"Permission #{rowId}";
+
+        switch (rowId)
+        {
+            case 150: name += " - Idle Camera"; break;
+            case 178: name += " - Group Pose"; break;
+        }
+
+        return name;
     }
 }
 
