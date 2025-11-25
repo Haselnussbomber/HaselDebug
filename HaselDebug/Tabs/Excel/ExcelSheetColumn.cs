@@ -65,7 +65,7 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
             return string.Empty;
 
         if (ColumnType == typeof(ReadOnlySeString))
-            return ((ReadOnlySeString)value).ToString();
+            return ((ReadOnlySeString)value).ToString("m");
 
         if (ColumnType == typeof(RowRef))
             return ((uint)ColumnType.GetProperty("RowId")?.GetValue(value)!).ToString();
@@ -101,11 +101,6 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
             return ToValue(lhs).CompareTo(ToValue(rhs));
 
         return 0;
-    }
-
-    public bool MatchesSearchTerm(T row)
-    {
-        return ToName(row).Contains(_excelTab.SearchTerm, StringComparison.InvariantCultureIgnoreCase);
     }
 
     public override void DrawColumn(T row)
