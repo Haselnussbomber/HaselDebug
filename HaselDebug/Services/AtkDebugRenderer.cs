@@ -21,6 +21,7 @@ public struct DrawAddonParams()
 public unsafe partial class AtkDebugRenderer
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IAddonLifecycle _addonLifecycle;
     private readonly TypeService _typeService;
     private readonly DebugRenderer _debugRenderer;
     private readonly TextService _textService;
@@ -204,6 +205,14 @@ public unsafe partial class AtkDebugRenderer
             ("Scale", $"{unitBase->Scale * 100}%"),
             ("Size (scaled)", $"{scaledWidth}x{scaledHeight}"),
             ("Widget Count", $"{unitBase->UldManager.ObjectCount}"));
+
+        if (ImGui.Button("Observe AtkValues"))
+        {
+            var addonName = unitBase->NameString;
+            _windowManager.CreateOrOpen(
+                addonName + " - AtkValues Observer",
+                () => new AddonAtkValuesObserverWindow(_windowManager, _textService, _addonObserver, _addonLifecycle, _debugRenderer) { AddonName = addonName });
+        }
 
         ImGuiUtilsEx.PaddedSeparator();
 

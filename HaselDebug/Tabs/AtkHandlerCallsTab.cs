@@ -1,19 +1,17 @@
-using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
 {
-    private record CallEntry(DateTime Time, uint handlerIndex, Pointer<AtkValue> Values, uint ValueCount);
-
     private readonly DebugRenderer _debugRenderer;
     private readonly IGameInteropProvider _gameInteropProvider;
-    private readonly List<CallEntry> _calls = [];
+    private readonly List<AtkValuesCopy> _calls = [];
     private Hook<AtkExternalInterface.Delegates.CallHandler>? _callHandlerDetour;
     private bool _enabled = false;
     private bool _isInitialized;
@@ -30,88 +28,51 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
         _callHandlerDetour?.Dispose();
 
         foreach (var entry in _calls)
-        {
-            FreeAtkValues(new Span<AtkValue>(entry.Values, (int)entry.ValueCount));
-        }
+            entry.Dispose();
 
         _calls.Clear();
-    }
-
-    private AtkValue* CopyAtkValues(Span<AtkValue> values)
-    {
-        var ptr = (AtkValue*)IMemorySpace.GetDefaultSpace()->Malloc((ulong)sizeof(AtkValue) * (ulong)values.Length, 0x8);
-        var valuesCopy = new Span<AtkValue>(ptr, values.Length);
-        var valueCountCopy = 0;
-
-        for (var i = 0; i < values.Length; i++)
-        {
-            var value = values.GetPointer(i);
-            var valueCopy = valuesCopy.GetPointer(i);
-
-            if (value->Type == ValueType.Int && i < values.Length - 1 && values.GetPointer(i + 1)->Type == ValueType.AtkValues)
-                valueCountCopy = value->Int;
-            else if (value->Type != ValueType.AtkValues)
-                valueCountCopy = 0;
-
-            valueCopy->Ctor();
-
-            if (value->Type == ValueType.String)
-            {
-                var str = new ReadOnlySeStringSpan(value->String.Value);
-                var strPtr = (byte*)IMemorySpace.GetDefaultSpace()->Malloc((ulong)str.ByteLength + 1, 0x8);
-                Marshal.Copy(str.Data.ToArray(), 0, (nint)strPtr, str.ByteLength);
-                strPtr[str.ByteLength] = 0;
-                valueCopy->SetString(strPtr);
-            }
-            else if (value->Type == ValueType.AtkValues && valueCountCopy > 0)
-            {
-                valueCopy->ChangeType(ValueType.AtkValues);
-                valueCopy->AtkValues = CopyAtkValues(new Span<AtkValue>(value->AtkValues, valueCountCopy));
-            }
-            else
-            {
-                valueCopy->Copy(value);
-            }
-        }
-
-        return ptr;
-    }
-
-    private void FreeAtkValues(Span<AtkValue> values)
-    {
-        var valueCountCopy = 0;
-
-        for (var i = 0; i < values.Length; i++)
-        {
-            var value = values.GetPointer(i);
-
-            if (value->Type == ValueType.Int && i < values.Length - 1 && values[i + 1].Type == ValueType.AtkValues)
-                valueCountCopy = value->Int;
-            else if (value->Type != ValueType.AtkValues)
-                valueCountCopy = 0;
-
-            if (value->Type == ValueType.String)
-            {
-                IMemorySpace.Free(value->String, (ulong)new ReadOnlySeStringSpan(value->String.Value).ByteLength + 1);
-                value->ChangeType(ValueType.Undefined);
-                value->String = null;
-            }
-            else if (value->Type == ValueType.AtkValues && valueCountCopy > 0)
-            {
-                FreeAtkValues(new Span<AtkValue>(value->AtkValues, valueCountCopy));
-            }
-
-            value->Dtor();
-        }
-
-        IMemorySpace.Free(values.GetPointer(0), (ulong)sizeof(AtkValue) * (ulong)values.Length);
     }
 
     private AtkValue* CallHandlerDetour(AtkExternalInterface* thisPtr, AtkValue* returnValue, uint handlerIndex, uint valueCount, AtkValue* values)
     {
         if (valueCount > 0)
         {
-            _calls.Add(new CallEntry(DateTime.Now, handlerIndex, CopyAtkValues(new Span<AtkValue>(values, (int)valueCount)), valueCount));
+            var additionalText = handlerIndex switch
+            {
+                1 => "UnregisterAddonCallback",
+                2 => "AddonAgentCallback",
+                3 => "AddonEventCallback",
+                4 => "AddonEventCallback2",
+                5 => "SubscribeAtkArrayData",
+                6 => "UnsubscribeAtkArrayData",
+                11 => "SetCursor",
+                14 => "OpenMapWithMapLink",
+                17 => "SaveAddonConfig",
+                21 => "PlaySoundEffect",
+                22 => "ExecuteHotbarSlot",
+                23 => "SetHotbarSlot",
+                24 => "ItemMove",
+                25 => "LootRoll",
+                26 => "SellStack",
+                27 => "SetBattleMode",
+                28 => "OpenInventory",
+                29 => "OpenItemContextMenu",
+                31 => "NameplateHover",
+                32 => "ShowDetailAddon",
+                33 => "FormatText",
+                41 => "ExecuteMainCommand",
+                42 => "IsMainCommandUnlocked",
+                44 => "NowLoading",
+                45 => "ItemDiscard",
+                49 => "WorldToScreenPoint",
+                50 => "ScdResource",
+                52 => "CloseTryOn",
+                53 => "OpenContextMenuForAddon",
+                56 => "GlassesDrop",
+                _ => handlerIndex.ToString()
+            };
+
+            _calls.Add(new AtkValuesCopy(new Span<AtkValue>(values, (int)valueCount)) { AdditionalText = additionalText });
         }
 
         return _callHandlerDetour!.Original(thisPtr, returnValue, handlerIndex, valueCount, values);
@@ -150,9 +111,7 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
             if (ImGui.Button("Clear"u8))
             {
                 foreach (var entry in _calls)
-                {
-                    FreeAtkValues(new Span<AtkValue>(entry.Values, (int)entry.ValueCount));
-                }
+                    entry.Dispose();
 
                 _calls.Clear();
             }
@@ -176,43 +135,10 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
             ImGui.Text(record.Time.ToLongTimeString());
 
             ImGui.TableNextColumn();
-            ImGui.Text(record.handlerIndex switch
-            {
-                1 => "UnregisterAddonCallback",
-                2 => "AddonAgentCallback",
-                3 => "AddonEventCallback",
-                4 => "AddonEventCallback2",
-                5 => "SubscribeAtkArrayData",
-                6 => "UnsubscribeAtkArrayData",
-                11 => "SetCursor",
-                14 => "OpenMapWithMapLink",
-                17 => "SaveAddonConfig",
-                21 => "PlaySoundEffect",
-                22 => "ExecuteHotbarSlot",
-                23 => "SetHotbarSlot",
-                24 => "ItemMove",
-                25 => "LootRoll",
-                26 => "SellStack",
-                27 => "SetBattleMode",
-                28 => "OpenInventory",
-                29 => "OpenItemContextMenu",
-                31 => "NameplateHover",
-                32 => "ShowDetailAddon",
-                33 => "FormatText",
-                41 => "ExecuteMainCommand",
-                42 => "IsMainCommandUnlocked",
-                44 => "NowLoading",
-                45 => "ItemDiscard",
-                49 => "WorldToScreenPoint",
-                50 => "ScdResource",
-                52 => "CloseTryOn",
-                53 => "OpenContextMenuForAddon",
-                56 => "GlassesDrop",
-                _ => record.handlerIndex.ToString()
-            });
+            ImGui.Text(record.AdditionalText);
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawAtkValues(record.Values, (ushort)record.ValueCount, new() { AddressPath = new((nint)record.Values.Value) });
+            _debugRenderer.DrawAtkValues(record.Ptr, (ushort)record.ValueCount, new() { AddressPath = new((nint)record.Ptr.Value) });
         }
     }
 }
