@@ -12,6 +12,8 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
     private readonly InstancesService _instancesService;
     private readonly List<PinnedInstanceTab> _tabs = [];
 
+    public event Action? Loaded;
+
     [AutoPostConstruct]
     public void Initialize()
     {
@@ -36,6 +38,8 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
         }
 
         Sort();
+
+        Loaded?.Invoke();
     }
 
     private void Sort()

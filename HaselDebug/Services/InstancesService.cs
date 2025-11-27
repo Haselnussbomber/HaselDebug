@@ -7,11 +7,14 @@ namespace HaselDebug.Services;
 [RegisterSingleton, AutoConstruct]
 public partial class InstancesService
 {
+    private readonly IFramework _framework;
+
     public Instance[] Instances { get; private set; } = [];
 
     public event Action? Loaded;
 
-    public InstancesService()
+    [AutoPostConstruct]
+    private void Initialize()
     {
         Task.Run(Load);
     }
@@ -42,7 +45,8 @@ public partial class InstancesService
         }
 
         Instances = [.. list];
-        Loaded?.Invoke();
+
+        _ = _framework.RunOnFrameworkThread(() => Loaded?.Invoke());
     }
 
     public record Instance(nint Address, Type Type);

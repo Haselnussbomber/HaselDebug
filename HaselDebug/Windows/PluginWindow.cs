@@ -57,6 +57,12 @@ public partial class PluginWindow : SimpleWindow
             .OrderBy(t => t.Title)
         ];
 
+        _pinnedInstances.Loaded += OnPinnedInstancesLoaded;
+    }
+
+    private void OnPinnedInstancesLoaded()
+    {
+        _pinnedInstances.Loaded -= OnPinnedInstancesLoaded;
         SelectTabWithoutSave(_pluginConfig.LastSelectedTab);
     }
 
