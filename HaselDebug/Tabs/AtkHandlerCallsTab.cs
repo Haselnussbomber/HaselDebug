@@ -131,7 +131,7 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
             return;
         }
 
-        if (ImGui.Checkbox("Enabled", ref _enabled))
+        if (ImGui.Checkbox("Enabled"u8, ref _enabled))
         {
             if (_enabled && !_callHandlerDetour.IsEnabled)
             {
@@ -145,20 +145,23 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
 
         ImGui.SameLine();
 
-        if (ImGui.Button("Clear"))
+        using (ImRaii.Disabled(_calls.Count == 0))
         {
-            foreach (var entry in _calls)
+            if (ImGui.Button("Clear"u8))
             {
-                FreeAtkValues(new Span<AtkValue>(entry.Values, (int)entry.ValueCount));
-            }
+                foreach (var entry in _calls)
+                {
+                    FreeAtkValues(new Span<AtkValue>(entry.Values, (int)entry.ValueCount));
+                }
 
-            _calls.Clear();
+                _calls.Clear();
+            }
         }
 
         using var table = ImRaii.Table("CallTable"u8, 3, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable);
         if (!table) return;
 
-        ImGui.TableSetupColumn("Time"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Time"u8, ImGuiTableColumnFlags.WidthFixed, 80);
         ImGui.TableSetupColumn("Handler"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupColumn("Values"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(0, 1);
