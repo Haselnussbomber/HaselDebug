@@ -15,6 +15,7 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
     private readonly SetColumn _setColumn;
     private readonly ItemsColumn _itemsColumn;
     private readonly IClientState _clientState;
+    private readonly ItemService _itemService;
 
     [AutoPostConstruct]
     public void Initialize()
@@ -67,7 +68,7 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
                 continue;
 
             // does not only consist of items that can't be worn
-            if (row.Items.Where(i => i.RowId != 0).All(i => !agent->CanTryOn(i.Value.RowId)))
+            if (row.Items.Where(i => i.RowId != 0).All(i => !_itemService.CanTryOn(i.Value.RowId)))
                 continue;
 
             Rows.Add(row);
