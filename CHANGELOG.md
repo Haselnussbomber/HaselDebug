@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** A new Inventory Operations tab. Please note that not all inventory operations are actually logged and that the types might be incorrect.
+- **Added:** A new "Observe AtkValues" button was added to the Addon Inspector which allows logging AtkValues from OnSetup and OnRefresh calls.
+- **Fixed:** The last selected tab wasn't restored when the window opened. It is now selected after the pinned instances are loaded.
+- **Updated:** ClientStructs now at [2c6c8d0f](https://github.com/aers/FFXIVClientStructs/tree/2c6c8d0f) ([compare](https://github.com/aers/FFXIVClientStructs/compare/94e37492..2c6c8d0f)).
+
 ## [1.39.1] (2025-11-25)
 
 - **Added:** Found 2 Permissions names: 150 = Idle Camera, 178 = Group Pose
