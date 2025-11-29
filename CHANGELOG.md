@@ -4,6 +4,7 @@
 
 - **Added:** A new Inventory Operations tab. Please note that not all inventory operations are actually logged and that the types might be incorrect.
 - **Added:** A new "Observe AtkValues" button was added to the Addon Inspector which allows logging AtkValues from OnSetup and OnRefresh calls.
+- **Added:** A LuaLogger to log `print` and panic output to `/xllog`. Needs to be enabled in the plugin configuration.
 - **Fixed:** The last selected tab wasn't restored when the window opened. It is now selected after the pinned instances are loaded.
 - **Updated:** Added support for checking the Achievement.CompletedAchievements BitArray to the Unlock Span Length Test tab.
 - **Updated:** ClientStructs now at [e5f58663](https://github.com/aers/FFXIVClientStructs/tree/e5f58663) ([compare](https://github.com/aers/FFXIVClientStructs/compare/94e37492..e5f58663)).

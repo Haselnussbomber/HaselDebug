@@ -24,6 +24,10 @@
     "en": "Auto-open HaselDebug",
     "de": "HaselDebug automatisch öffnen"
   },
+  "Config.EnableLuaLogger.Label": {
+    "en": "Enable LuaLogger",
+    "de": "LuaLogger aktivieren"
+  },
 
   "SearchBar.Hint": {
     "en": "Search...",
