@@ -154,6 +154,11 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
         //    unknown));
 
         _bitArrays.Add(new BitArrayRecord(
+            "UIState.Achievement.CompletedAchievements",
+            UIState.Instance()->Achievement.CompletedAchievementsBitArray,
+            _excelService.GetRowCount<Lumina.Excel.Sheets.Achievement>()));
+
+        _bitArrays.Add(new BitArrayRecord(
             "UIState.UnlockedAetherytes",
             UIState.Instance()->UnlockedAetherytesBitArray,
             _excelService.GetRowCount<Aetheryte>()));
