@@ -110,7 +110,7 @@ public unsafe partial class CompletionTab : DebugTab
                     {
                         var start = int.Parse(entry[..dash]);
                         var end = int.Parse(entry[(dash + 1)..]);
-                        idRanges.AddRange(Enumerable.Range(start, end - start).Select(i => (uint)i));
+                        idRanges.AddRange(Enumerable.Range(start, end - start + 1).Select(i => (uint)i));
                     }
                 }
 
@@ -127,8 +127,8 @@ public unsafe partial class CompletionTab : DebugTab
                 Row = row,
                 SheetName = sheetName,
                 IsNoun = isNoun,
-                IdRanges = hasRanges ? idRanges.ToList() : null,
-                Columns = cols.ToList(),
+                IdRanges = hasRanges ? [.. idRanges] : null,
+                Columns = [.. cols],
             });
 nextRow:;
         }
