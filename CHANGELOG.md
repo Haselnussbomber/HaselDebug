@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.40.0] (2025-12-02)
 
 - **Added:** A new Inventory Operations tab. Please note that not all inventory operations are actually logged and that the types might be incorrect.
 - **Added:** A new "Observe AtkValues" button was added to the Addon Inspector which allows logging AtkValues from OnSetup and OnRefresh calls.
@@ -616,7 +616,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.0...main
+[1.40.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.1...v1.40.0
 [1.39.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.0...v1.39.1
 [1.39.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.38.0...v1.39.0
 [1.38.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.37.0...v1.38.0
