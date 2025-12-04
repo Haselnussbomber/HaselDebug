@@ -98,7 +98,11 @@ public unsafe partial class UnlocksTabUtils
         if (!popuptable) return;
 
         var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
-        var drawResult = ImGuiHelpers.SeStringWrapped(title, new() { TargetDrawList = default(ImDrawListPtr) });
+        var drawResult = ImGuiHelpers.SeStringWrapped(title, new()
+        {
+            TargetDrawList = default(ImDrawListPtr),
+            Font = ImGui.GetFont(),
+        });
 
         ImGui.TableSetupColumn("Icon"u8, ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale + itemInnerSpacing.X);
         ImGui.TableSetupColumn("Text"u8, ImGuiTableColumnFlags.WidthFixed, Math.Max(drawResult.Size.X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
