@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.40.1] (2025-12-04)
+
+- **Added:** A new Beast Tribe tab. Nothing special, just displaying some values.
+- **Fixed:** `ImGuiHelpers.SeStringWrapped` from Dalamud now requires the font to be set when passing in a draw list (used to calculate tooltip text sizes in here).
+
 ## [1.40.0] (2025-12-02)
 
 - **Added:** A new Inventory Operations tab. Please note that not all inventory operations are actually logged and that the types might be incorrect.
@@ -616,7 +621,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.1...main
+[1.40.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.0...v1.40.1
 [1.40.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.1...v1.40.0
 [1.39.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.0...v1.39.1
 [1.39.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.38.0...v1.39.0
