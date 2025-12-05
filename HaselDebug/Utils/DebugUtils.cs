@@ -60,12 +60,12 @@ public static unsafe class DebugUtils
 
     public static void HighlightNode(AtkResNode* node)
     {
-        if (!((nint)node).IsValid())
+        if (!MemoryUtils.IsPointerValid(node))
             return;
 
         var scale = 1f;
         var addon = RaptureAtkUnitManager.Instance()->GetAddonByNode(node);
-        if (((nint)addon).IsValid())
+        if (MemoryUtils.IsPointerValid(addon))
             scale *= addon->Scale;
 
         var pos = new Vector2(node->ScreenX, node->ScreenY);

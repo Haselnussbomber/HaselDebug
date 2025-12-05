@@ -1,8 +1,5 @@
-using System.Net;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselDebug.Extensions;
 using HaselDebug.Utils;
-using InteropGenerator.Runtime;
 
 namespace HaselDebug.Services;
 
@@ -16,7 +13,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!address.IsValid())
+        if (!MemoryUtils.IsPointerValid(address))
         {
             ImGui.Text("invalid"u8);
             return;
@@ -84,7 +81,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!address.IsValid())
+        if (!MemoryUtils.IsPointerValid(address))
         {
             ImGui.Text("invalid"u8);
             return;

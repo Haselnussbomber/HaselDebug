@@ -86,7 +86,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!address.IsValid())
+        if (!MemoryUtils.IsPointerValid(address))
         {
             ImGui.Text("invalid"u8);
             return;
@@ -110,7 +110,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!address.IsValid())
+        if (!MemoryUtils.IsPointerValid(address))
         {
             ImGui.Text("invalid"u8);
             return;
@@ -1138,7 +1138,7 @@ public unsafe partial class DebugRenderer
 
     public object? DrawNumeric(nint address, Type type, NodeOptions nodeOptions)
     {
-        if (!address.IsValid())
+        if (!MemoryUtils.IsPointerValid(address))
         {
             ImGui.Text("null"u8);
             return 0;

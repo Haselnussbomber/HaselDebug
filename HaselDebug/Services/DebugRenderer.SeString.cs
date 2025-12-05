@@ -116,7 +116,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!address.IsValid())
+        if (!MemoryUtils.IsPointerValid(address))
         {
             ImGui.Text("invalid"u8);
             return;
@@ -125,7 +125,7 @@ public unsafe partial class DebugRenderer
         nodeOptions = nodeOptions.WithAddress(address);
 
         var str = (Utf8String*)address;
-        if (!str->StringPtr.IsValid())
+        if (!MemoryUtils.IsPointerValid(str->StringPtr))
         {
             ImGui.Text("null"u8);
             return;
@@ -143,7 +143,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!address.IsValid())
+        if (!MemoryUtils.IsPointerValid(address))
         {
             ImGui.Text("invalid"u8);
             return;

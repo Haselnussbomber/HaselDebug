@@ -15,7 +15,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!address.IsValid())
+        if (!MemoryUtils.IsPointerValid(address))
         {
             ImGui.Text("invalid"u8);
             return;
