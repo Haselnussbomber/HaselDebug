@@ -39,6 +39,7 @@
     <PackageReference Include="AutoCtor" Version="2.8.2" PrivateAssets="all" ExcludeAssets="compile;runtime" />
     <PackageReference Include="Injectio" Version="5.1.0" PrivateAssets="all" />
     <PackageReference Include="Iced" Version="1.21.0" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.205" PrivateAssets="All" />
   </ItemGroup>
 
   <!-- FFXIVClientStructs -->

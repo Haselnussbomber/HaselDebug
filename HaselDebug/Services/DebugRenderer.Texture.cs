@@ -1,5 +1,6 @@
 using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
@@ -9,6 +10,18 @@ public unsafe partial class DebugRenderer
 {
     public void DrawAtkTexture(nint address, NodeOptions nodeOptions)
     {
+        if (address == 0)
+        {
+            ImGui.Text("null"u8);
+            return;
+        }
+
+        if (!address.IsValid())
+        {
+            ImGui.Text("invalid"u8);
+            return;
+        }
+
         var tex = (AtkTexture*)address;
         if (!tex->IsTextureReady())
         {
@@ -35,6 +48,12 @@ public unsafe partial class DebugRenderer
         if (address == 0)
         {
             ImGui.Text("null"u8);
+            return;
+        }
+
+        if (!address.IsValid())
+        {
+            ImGui.Text("invalid"u8);
             return;
         }
 

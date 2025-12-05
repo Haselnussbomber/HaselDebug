@@ -1,0 +1,2 @@
+VirtualQuery
+MEMORY_BASIC_INFORMATION

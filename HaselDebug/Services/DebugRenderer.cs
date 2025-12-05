@@ -24,6 +24,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
+using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using static Dalamud.Utility.StringExtensions;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkUldManager;
@@ -79,9 +80,15 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (address == 0 || address < 0x140000000)
+        if (address == 0)
         {
             ImGui.Text("null"u8);
+            return;
+        }
+
+        if (!address.IsValid())
+        {
+            ImGui.Text("invalid"u8);
             return;
         }
 
@@ -97,9 +104,15 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (address == 0 || address < 0x140000000)
+        if (address == 0)
         {
             ImGui.Text("null"u8);
+            return;
+        }
+
+        if (!address.IsValid())
+        {
+            ImGui.Text("invalid"u8);
             return;
         }
 
@@ -1125,6 +1138,12 @@ public unsafe partial class DebugRenderer
 
     public object? DrawNumeric(nint address, Type type, NodeOptions nodeOptions)
     {
+        if (!address.IsValid())
+        {
+            ImGui.Text("null"u8);
+            return 0;
+        }
+
         object? value = null;
 
         switch (type)

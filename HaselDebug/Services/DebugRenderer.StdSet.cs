@@ -9,6 +9,18 @@ public unsafe partial class DebugRenderer
 {
     public void DrawStdSet(nint address, Type valueType, NodeOptions nodeOptions)
     {
+        if (address == 0)
+        {
+            ImGui.Text("null"u8);
+            return;
+        }
+
+        if (!address.IsValid())
+        {
+            ImGui.Text("invalid"u8);
+            return;
+        }
+
         var elementCount = *(ulong*)(address + 0x8);
         if (elementCount == 0)
         {

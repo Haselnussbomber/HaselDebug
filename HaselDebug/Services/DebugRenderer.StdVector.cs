@@ -9,6 +9,18 @@ public unsafe partial class DebugRenderer
 {
     public void DrawStdVector(nint address, Type valueType, NodeOptions nodeOptions)
     {
+        if (address == 0)
+        {
+            ImGui.Text("null"u8);
+            return;
+        }
+
+        if (!address.IsValid())
+        {
+            ImGui.Text("invalid"u8);
+            return;
+        }
+
         var size = valueType.SizeOf();
         if (size == 0)
         {

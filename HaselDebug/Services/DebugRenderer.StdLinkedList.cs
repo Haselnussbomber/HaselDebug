@@ -9,6 +9,18 @@ public unsafe partial class DebugRenderer
 {
     public void DrawStdLinkedList(nint address, Type valueType, NodeOptions nodeOptions)
     {
+        if (address == 0)
+        {
+            ImGui.Text("null"u8);
+            return;
+        }
+
+        if (!address.IsValid())
+        {
+            ImGui.Text("invalid"u8);
+            return;
+        }
+
         if (*(nint*)address == 0)
         {
             ImGui.Text("Not initialized"u8);

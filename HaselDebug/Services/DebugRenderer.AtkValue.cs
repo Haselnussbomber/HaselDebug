@@ -1,5 +1,8 @@
+using System.Net;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselDebug.Extensions;
 using HaselDebug.Utils;
+using InteropGenerator.Runtime;
 
 namespace HaselDebug.Services;
 
@@ -7,6 +10,18 @@ public unsafe partial class DebugRenderer
 {
     public void DrawAtkValue(nint address, NodeOptions nodeOptions)
     {
+        if (address == 0)
+        {
+            ImGui.Text("null"u8);
+            return;
+        }
+
+        if (!address.IsValid())
+        {
+            ImGui.Text("invalid"u8);
+            return;
+        }
+
         nodeOptions = nodeOptions.WithAddress(address);
 
         var value = (AtkValue*)address;
@@ -62,6 +77,19 @@ public unsafe partial class DebugRenderer
 
     public void DrawAtkValues(AtkValue* values, ushort elementCount, NodeOptions nodeOptions)
     {
+        var address = (nint)values;
+        if (address == 0)
+        {
+            ImGui.Text("null"u8);
+            return;
+        }
+
+        if (!address.IsValid())
+        {
+            ImGui.Text("invalid"u8);
+            return;
+        }
+
         if (elementCount == 0)
         {
             ImGui.Text("No values"u8);

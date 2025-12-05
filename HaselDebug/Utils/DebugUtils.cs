@@ -1,6 +1,7 @@
 using System.Reflection;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselDebug.Extensions;
 
 namespace HaselDebug.Utils;
 
@@ -59,12 +60,12 @@ public static unsafe class DebugUtils
 
     public static void HighlightNode(AtkResNode* node)
     {
-        if (node == null)
+        if (!((nint)node).IsValid())
             return;
 
         var scale = 1f;
         var addon = RaptureAtkUnitManager.Instance()->GetAddonByNode(node);
-        if (addon != null)
+        if (((nint)addon).IsValid())
             scale *= addon->Scale;
 
         var pos = new Vector2(node->ScreenX, node->ScreenY);
