@@ -346,7 +346,7 @@ public unsafe partial class AtkDebugRenderer
     public void DrawNode(AtkResNode* node)
     {
         var unitManager = RaptureAtkUnitManager.Instance();
-        var unitBase = unitManager->GetAddonByNode(node);
+        var unitBase = unitManager->AtkUnitManager.GetAddonByNodeSafe(node);
         if (unitBase == null)
         {
             ImGui.Text($"Could not find addon with node {(nint)node:X}");

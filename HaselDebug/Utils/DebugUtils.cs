@@ -64,7 +64,7 @@ public static unsafe class DebugUtils
             return;
 
         var scale = 1f;
-        var addon = RaptureAtkUnitManager.Instance()->GetAddonByNode(node);
+        var addon = RaptureAtkUnitManager.Instance()->AtkUnitManager.GetAddonByNodeSafe(node);
         if (MemoryUtils.IsPointerValid(addon))
             scale *= addon->Scale;
 

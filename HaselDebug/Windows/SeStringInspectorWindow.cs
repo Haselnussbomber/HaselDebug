@@ -3,6 +3,7 @@ using Dalamud.Interface.ImGuiSeStringRenderer;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselDebug.Extensions;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using Lumina.Text.Parse;
@@ -51,7 +52,7 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
     public bool IsValidUtf8String
         => Node != null &&
             Utf8String != null &&
-            RaptureAtkUnitManager.Instance()->GetAddonByNode(Node) != null;
+            RaptureAtkUnitManager.Instance()->AtkUnitManager.GetAddonByNodeSafe(Node) != null;
 
     [AutoPostConstruct]
     private void Initialize()
