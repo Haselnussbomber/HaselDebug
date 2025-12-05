@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** Addon Inspector now shows field names or possible field offsets for nodes in cyan.
+- **Added:** Pointers are checked if they point to committed memory before they are dereferenced. This should prevent some crashes where it would dereference some garbage.
+- **Fixed:** A crash when setting an empty text for a TextNode.
+
 ## [1.40.1] (2025-12-04)
 
 - **Added:** A new Beast Tribe tab. Nothing special, just displaying some values.
