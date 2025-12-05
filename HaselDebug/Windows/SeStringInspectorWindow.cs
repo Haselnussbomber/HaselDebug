@@ -101,8 +101,13 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
             if (ImGui.InputText("MacroString", ref _macroString, 1024, ImGuiInputTextFlags.EnterReturnsTrue))
             {
                 using var rssb = new RentedSeStringBuilder();
+
                 rssb.Builder.Append(ReadOnlySeString.FromMacroString(_macroString, new MacroStringParseOptions { ExceptionMode = MacroStringParseExceptionMode.Ignore }));
-                Utf8String->SetString(rssb.Builder.GetViewAsSpan());
+
+                if (!rssb.Builder.ToReadOnlySeString().IsEmpty)
+                    Utf8String->SetString(rssb.Builder.GetViewAsSpan());
+                else
+                    Utf8String->Clear();
             }
         }
 
