@@ -1,4 +1,7 @@
 using System.Globalization;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -30,6 +33,7 @@ public unsafe partial class AtkDebugRenderer
     private readonly AddonObserver _addonObserver;
     private readonly PinnedInstancesService _pinnedInstancesService;
     private readonly NavigationService _navigationService;
+    private readonly Dictionary<string, OrderedDictionary<int, string>> _fieldMapping = [];
     private string _nodeQuery = string.Empty;
 
     public void DrawAddon(DrawAddonParams drawParams)
@@ -49,7 +53,7 @@ public unsafe partial class AtkDebugRenderer
         if ((unitBase == null && !string.IsNullOrEmpty(drawParams.AddonName)) || (unitBase != null && unitBase->NameString != drawParams.AddonName))
             unitBase = unitManager->GetAddonByName(drawParams.AddonName);
 
-        if (unitBase == null)
+        if (!((nint)unitBase).IsValid())
         {
             ImGui.Text($"Could not find addon with id {drawParams.AddonId} or name {drawParams.AddonName}");
             return;
@@ -63,6 +67,21 @@ public unsafe partial class AtkDebugRenderer
         };
 
         var type = _typeService.GetAddonType(unitBase->NameString);
+
+        if (!_fieldMapping.ContainsKey(unitBase->NameString))
+        {
+            var fields = _fieldMapping[unitBase->NameString] = [];
+
+            LoadTypeMapping(fields, "", 0, type);
+
+            for (var offset = 0; offset < type.SizeOf() - 8; offset += 8)
+            {
+                if (!fields.ContainsKey(offset))
+                {
+                    fields[offset] = $"+0x{offset:X}";
+                }
+            }
+        }
 
         ImGuiUtils.DrawCopyableText(unitBase->NameString);
 
@@ -258,6 +277,39 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
+    private static void LoadTypeMapping(OrderedDictionary<int, string> fields, string prefix, int offset, Type type)
+    {
+        foreach (var fieldInfo in type.GetFields(BindingFlags.Default | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+        {
+            if (fieldInfo.GetCustomAttribute<FieldOffsetAttribute>() is not { } fieldOffsetAttribute)
+                continue;
+
+            if (fieldInfo.IsAssembly
+                && fieldInfo.GetCustomAttribute<FixedSizeArrayAttribute>() is FixedSizeArrayAttribute fixedSizeArrayAttribute
+                && !fixedSizeArrayAttribute.IsString
+                && !fixedSizeArrayAttribute.IsBitArray
+                && fieldInfo.FieldType.GetCustomAttribute<InlineArrayAttribute>() is InlineArrayAttribute inlineArrayAttribute)
+            {
+                var innerType = fieldInfo.FieldType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)[0].FieldType;
+                for (var i = 0; i < inlineArrayAttribute.Length; i++)
+                {
+                    LoadTypeMapping(fields, $"{prefix}{fieldInfo.Name[1..].FirstCharToUpper()}[{i}].", offset + fieldOffsetAttribute.Value + i * innerType.SizeOf(), innerType);
+                }
+            }
+            else if (fieldInfo.FieldType.IsStruct())
+            {
+                LoadTypeMapping(fields, prefix + fieldInfo.Name + ".", offset + fieldOffsetAttribute.Value, fieldInfo.FieldType);
+            }
+            else
+            {
+                if (!fields.ContainsKey(offset + fieldOffsetAttribute.Value))
+                {
+                    fields[offset + fieldOffsetAttribute.Value] = prefix + fieldInfo.Name;
+                }
+            }
+        }
+    }
+
     private bool IsNodeMatchingSearch(AtkResNode* node)
     {
         if (string.IsNullOrEmpty(_nodeQuery))
@@ -329,10 +381,19 @@ public unsafe partial class AtkDebugRenderer
 
     private void PrintSimpleNode(AtkResNode* node, string treePrefix, List<Pointer<AtkResNode>>? nodePath, NodeOptions nodeOptions)
     {
+        using var rssb = new RentedSeStringBuilder();
+        var titleBuilder = rssb.Builder
+            .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
+            .Append($"{treePrefix}[#{node->NodeId}] {node->Type} Node ({(nint)node:X})")
+            .PopColor();
+
+        AddNodeFieldSuffix(titleBuilder, node, nodeOptions);
+
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
-            Title = $"{treePrefix}[#{node->NodeId}] {node->Type} Node (0x{(nint)node:X})",
-            TitleColor = node->IsVisible() ? Color.Green : Color.Grey,
+            SeStringTitle = titleBuilder.ToReadOnlySeString(),
+            DrawSeStringTreeNode = true,
+            TitleColor = node->IsVisible() ? Color.Green : Color.Grey, // needed for the tree node arrow
             HighlightAddress = (nint)node,
             HighlightType = typeof(AtkResNode),
             DrawContextMenu = (nodeOptions, builder) =>
@@ -389,10 +450,19 @@ public unsafe partial class AtkDebugRenderer
         if (objectInfo == null)
             return;
 
+        using var rssb = new RentedSeStringBuilder();
+        var titleBuilder = rssb.Builder
+            .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
+            .Append($"{treePrefix}[#{node->NodeId}] {objectInfo->ComponentType} Component Node (Node: {(nint)node:X}, Component: {(nint)component:X})")
+            .PopColor();
+
+        AddNodeFieldSuffix(titleBuilder, (AtkResNode*)node, nodeOptions);
+
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
-            Title = $"{treePrefix}[#{node->NodeId}] {objectInfo->ComponentType} Component Node (Node: 0x{(nint)node:X}, Component: 0x{(nint)component:X})",
-            TitleColor = node->IsVisible() ? Color.Green : Color.Grey,
+            SeStringTitle = titleBuilder.ToReadOnlySeString(),
+            DrawSeStringTreeNode = true,
+            TitleColor = node->IsVisible() ? Color.Green : Color.Grey, // needed for the tree node arrow
             HighlightAddress = (nint)node,
             HighlightType = typeof(AtkComponentNode),
             DrawContextMenu = (nodeOptions, builder) =>
@@ -456,6 +526,28 @@ public unsafe partial class AtkDebugRenderer
         for (var i = 0; i < component->UldManager.NodeListCount; i++)
         {
             PrintNode(component->UldManager.NodeList[i], false, $"[{i}] ", nodePath, nodeOptions);
+        }
+    }
+
+    private void AddNodeFieldSuffix(SeStringBuilder titleBuilder, AtkResNode* node, NodeOptions nodeOptions)
+    {
+        if (nodeOptions.UnitBase.HasValue && _fieldMapping.TryGetValue(nodeOptions.UnitBase.Value.Value->NameString, out var fields))
+        {
+            var unitBaseAddress = (nint)nodeOptions.UnitBase.Value.Value;
+            foreach (var (offset, name) in fields)
+            {
+                var fieldValue = *(nint*)(unitBaseAddress + offset);
+                if (fieldValue != (nint)node)
+                    continue;
+
+                titleBuilder
+                    .Append(' ')
+                    .PushColorRgba(Color.Cyan)
+                    .Append(name)
+                    .PopColor();
+
+                break;
+            }
         }
     }
 
