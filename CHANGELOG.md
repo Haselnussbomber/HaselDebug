@@ -6,6 +6,7 @@
 - **Added:** A new option to enable pointer validation (default on). This is resource-intensive, but might prevent crashes.
 - **Fixed:** A crash when setting an empty text for a TextNode.
 - **Fixed:** A possible crash when hovering nodes.
+- **Updated:** ClientStructs now at [6f339d8f](https://github.com/aers/FFXIVClientStructs/tree/6f339d8f) ([compare](https://github.com/aers/FFXIVClientStructs/compare/e5dedba4..6f339d8f)).
 
 ## [1.40.1] (2025-12-04)
 
