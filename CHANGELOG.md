@@ -5,6 +5,7 @@
 - **Added:** Addon Inspector now shows field names or possible field offsets for nodes in cyan.
 - **Added:** A new option to enable pointer validation (default on). This is very resource-intensive, but might prevent crashes.
 - **Fixed:** A crash when setting an empty text for a TextNode.
+- **Fixed:** A possible crash when hovering nodes.
 
 ## [1.40.1] (2025-12-04)
 
