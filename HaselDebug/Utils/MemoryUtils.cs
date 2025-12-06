@@ -1,3 +1,4 @@
+using HaselDebug.Config;
 using Windows.Win32;
 using Windows.Win32.System.Memory;
 
@@ -12,8 +13,13 @@ public static unsafe class MemoryUtils
 
     public static bool IsPointerValid(void* ptr)
     {
-        return ptr != null
-            && PInvoke.VirtualQuery(ptr, out var mbi, (nuint)sizeof(MEMORY_BASIC_INFORMATION)) != 0
+        if (ptr == null || !ServiceLocator.TryGetService<PluginConfig>(out var pluginConfig))
+            return false;
+
+        if (!pluginConfig.EnablePointerValidation)
+            return true;
+
+        return PInvoke.VirtualQuery(ptr, out var mbi, (nuint)sizeof(MEMORY_BASIC_INFORMATION)) != 0
             && mbi.State == VIRTUAL_ALLOCATION_TYPE.MEM_COMMIT;
     }
 }
