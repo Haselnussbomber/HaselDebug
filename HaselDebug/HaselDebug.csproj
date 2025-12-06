@@ -26,14 +26,6 @@
     <None Include="LICENSES.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
-  <!-- References to Dalamud dependencies -->
-  <ItemGroup>
-    <Reference Include="SharpDX" Private="false" />
-    <Reference Include="SharpDX.DXGI" Private="false" />
-    <Reference Include="SharpDX.Direct3D11" Private="false" />
-    <Reference Include="SharpDX.Mathematics" Private="false" />
-  </ItemGroup>
-
   <!-- NuGet dependencies -->
   <ItemGroup>
     <PackageReference Include="AutoCtor" Version="2.8.2" PrivateAssets="all" ExcludeAssets="compile;runtime" />
