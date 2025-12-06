@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.41.0] (2025-12-06)
 
 - **Added:** Addon Inspector now shows field names or possible field offsets for nodes in cyan.
 - **Added:** A new option to enable pointer validation (default on). This is resource-intensive, but might prevent crashes.
@@ -629,7 +629,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.41.0...main
+[1.41.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.1...v1.41.0
 [1.40.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.0...v1.40.1
 [1.40.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.1...v1.40.0
 [1.39.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.0...v1.39.1
