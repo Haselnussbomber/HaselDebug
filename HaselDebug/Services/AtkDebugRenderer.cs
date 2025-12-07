@@ -33,7 +33,7 @@ public unsafe partial class AtkDebugRenderer
     private readonly AddonObserver _addonObserver;
     private readonly PinnedInstancesService _pinnedInstancesService;
     private readonly NavigationService _navigationService;
-    private readonly Dictionary<string, OrderedDictionary<int, string>> _fieldMapping = [];
+    private readonly Dictionary<string, OrderedDictionary<int, (string, Type?)>> _fieldMapping = [];
     private string _nodeQuery = string.Empty;
 
     public void DrawAddon(DrawAddonParams drawParams)
@@ -78,7 +78,7 @@ public unsafe partial class AtkDebugRenderer
             {
                 if (!fields.ContainsKey(offset))
                 {
-                    fields[offset] = $"+0x{offset:X}";
+                    fields[offset] = ($"+0x{offset:X}", null);
                 }
             }
         }
@@ -277,7 +277,8 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
-    private static void LoadTypeMapping(OrderedDictionary<int, string> fields, string prefix, int offset, Type type)
+    // TODO: move to Utils
+    public static void LoadTypeMapping(OrderedDictionary<int, (string, Type?)> fields, string prefix, int offset, Type type)
     {
         foreach (var fieldInfo in type.GetFields(BindingFlags.Default | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
         {
@@ -304,7 +305,7 @@ public unsafe partial class AtkDebugRenderer
             {
                 if (!fields.ContainsKey(offset + fieldOffsetAttribute.Value))
                 {
-                    fields[offset + fieldOffsetAttribute.Value] = prefix + fieldInfo.Name;
+                    fields[offset + fieldOffsetAttribute.Value] = (prefix + fieldInfo.Name, fieldInfo.FieldType);
                 }
             }
         }
@@ -534,7 +535,7 @@ public unsafe partial class AtkDebugRenderer
         if (nodeOptions.UnitBase.HasValue && _fieldMapping.TryGetValue(nodeOptions.UnitBase.Value.Value->NameString, out var fields))
         {
             var unitBaseAddress = (nint)nodeOptions.UnitBase.Value.Value;
-            foreach (var (offset, name) in fields)
+            foreach (var (offset, (name, type)) in fields)
             {
                 var fieldValue = *(nint*)(unitBaseAddress + offset);
                 if (fieldValue != (nint)node)

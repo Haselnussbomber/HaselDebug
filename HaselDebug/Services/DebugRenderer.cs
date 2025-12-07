@@ -1029,7 +1029,7 @@ public unsafe partial class DebugRenderer
         var fullName = (fieldInfo.DeclaringType != null ? fieldInfo.DeclaringType.FullName + "." : string.Empty) + fieldInfo.Name;
         var hasDoc = HasDocumentation(fullName);
 
-        using (ImRaii.PushColor(ImGuiCol.Text, ImGui.ColorConvertFloat4ToU32((Vector4)ColorFieldName)))
+        using (ColorFieldName.Push(ImGuiCol.Text))
         {
             var startPos = ImGui.GetWindowPos() + ImGui.GetCursorPos() - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY());
 

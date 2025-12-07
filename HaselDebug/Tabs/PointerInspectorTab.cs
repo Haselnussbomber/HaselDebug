@@ -1,10 +1,8 @@
 using System.Globalization;
-using System.Reflection;
-using System.Threading.Tasks;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using HaselDebug.Services.Data;
 using HaselDebug.Utils;
 using Iced.Intel;
 
@@ -13,38 +11,37 @@ namespace HaselDebug.Tabs;
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class PointerInspectorTab : DebugTab
 {
+    private readonly DataYmlService _dataYml;
+    private readonly TypeService _typeService;
     private readonly DebugRenderer _debugRenderer;
     private readonly ISigScanner _sigScanner;
     private readonly ILogger<PointerInspectorTab> _logger;
 
-    private readonly Dictionary<nint, Type> _virtualTableMappings = [];
-    private readonly Dictionary<OffsetInfo, Type> _offsetMappings = [];
-    private Task _loadTask;
+    private readonly List<OffsetInfo> _offsetMappings = [];
+    private OffsetInfo? _currentStructInfo;
+    private OrderedDictionary<int, (string, Type?)>? _currentStructFields;
+
+    private nint? _freeMemoryAddress;
 
     private string _addressInput = string.Empty;
     private string _addressSize = string.Empty;
 
-    private uint _memorySize;
     private nint _memoryAddress;
-    private nint _freeMemoryAddress;
+    private uint _memorySize;
 
-    private record OffsetInfo(nint ActualAddress, int Offset);
+    private record OffsetInfo
+    {
+        public nint Address { get; set; }
+        public nint ResolvedAddress { get; set; }
+        public int Offset { get; set; }
+        public string ClassName { get; set; } = string.Empty;
+        public string FieldName { get; set; } = string.Empty;
+        public Type? Type { get; set; }
+    }
 
     public override void Draw()
     {
-        _loadTask ??= Task.Run(Load);
-
-        if (!_loadTask.IsCompleted)
-        {
-            ImGui.Text("Loading...");
-            return;
-        }
-
-        if (_loadTask.IsFaulted)
-        {
-            ImGuiUtilsEx.DrawAlertError("TaskError", _loadTask.Exception?.ToString() ?? "Error loading data :(");
-            return;
-        }
+        _freeMemoryAddress ??= _sigScanner.ScanText("E8 ?? ?? ?? ?? 4D 89 AE") - _sigScanner.Module.BaseAddress;
 
         DrawSearchBox();
 
@@ -93,19 +90,63 @@ public unsafe partial class PointerInspectorTab : DebugTab
 
         ImGui.TableNextRow();
         ImGui.TableNextColumn();
-        ImGuiHelpers.ScaledDummy(10.0f);
+        if (_currentStructInfo != null)
+        {
+            ImGui.Text("Struct:");
+            ImGui.SameLine();
+            ImGuiUtils.DrawCopyableText(_currentStructInfo.ClassName, new() { TextColor = DebugRenderer.ColorTreeNode });
+        }
 
-        ImGui.TableNextRow();
-        ImGui.TableNextColumn();
-        ImGui.Text($"Struct Address: 0x{_memoryAddress:X}\nStruct Size: 0x{_memorySize:X}");
+        ImGui.Text("Struct Address:");
+        ImGui.SameLine();
+        _debugRenderer.DrawAddress(_memoryAddress);
+
+        ImGui.Text("Struct Size:");
+        ImGui.SameLine();
+        ImGuiUtils.DrawCopyableText($"0x{_memorySize:X}");
     }
 
     private void ParsePointer()
     {
         _offsetMappings.Clear();
+        _currentStructInfo = null;
+        _currentStructFields = null;
 
         if (!MemoryUtils.IsPointerValid(_memoryAddress) || _memorySize == 0)
             return;
+
+        var vtablePtr = *(nint*)_memoryAddress;
+        if (MemoryUtils.IsPointerValid(vtablePtr))
+        {
+            foreach (var (name, cl) in _dataYml.Data.Classes)
+            {
+                if (cl == null || cl.VirtualTables == null || cl.VirtualTables.Count == 0)
+                    continue;
+
+                if (cl.VirtualTables.First().Address != (ulong)(vtablePtr - _sigScanner.Module.BaseAddress))
+                    continue;
+
+                _logger.LogDebug("Found struct {name} vtbl at {add:X}", name, vtablePtr);
+
+                var csType = GetCSTypeByName(name);
+
+                _currentStructInfo = new OffsetInfo()
+                {
+                    Address = _memoryAddress,
+                    ResolvedAddress = vtablePtr,
+                    ClassName = name,
+                    Type = csType,
+                };
+
+                if (csType != null)
+                {
+                    _currentStructFields = [];
+                    AtkDebugRenderer.LoadTypeMapping(_currentStructFields, "", 0, csType);
+                }
+
+                break;
+            }
+        }
 
         foreach (var offsetIndex in Enumerable.Range(0, (int)_memorySize / 8))
         {
@@ -121,8 +162,40 @@ public unsafe partial class PointerInspectorTab : DebugTab
             if (!MemoryUtils.IsPointerValid(virtualTablePointer))
                 continue;
 
-            if (_virtualTableMappings.TryGetValue(virtualTablePointer, out var tableName))
-                _offsetMappings.TryAdd(new OffsetInfo(objectPointer, offsetIndex * 8), tableName);
+            var foundInFields = false;
+            var foundInDataYml = false;
+
+            var offsetInfo = new OffsetInfo()
+            {
+                Address = offsetAddress,
+                ResolvedAddress = objectPointer,
+                Offset = offsetIndex * 8,
+            };
+
+            if (_currentStructFields != null && _currentStructFields.TryGetValue(offsetIndex, out var fieldInfo))
+            {
+                offsetInfo.FieldName = fieldInfo.Item1;
+                offsetInfo.Type = fieldInfo.Item2;
+                foundInFields = true;
+            }
+
+            foreach (var (name, cl) in _dataYml.Data.Classes)
+            {
+                if (cl == null || cl.VirtualTables == null || cl.VirtualTables.Count == 0)
+                    continue;
+
+                if (cl.VirtualTables.First().Address != (ulong)(virtualTablePointer - _sigScanner.Module.BaseAddress))
+                    continue;
+
+                _logger.LogDebug("Found {name} vtbl at {add:X}", name, virtualTablePointer);
+                offsetInfo.ClassName = name;
+                offsetInfo.Type = GetCSTypeByName(name)?.MakePointerType();
+                foundInDataYml = true;
+                break;
+            }
+
+            if (foundInFields || foundInDataYml)
+                _offsetMappings.Add(offsetInfo);
         }
     }
 
@@ -145,48 +218,63 @@ public unsafe partial class PointerInspectorTab : DebugTab
             return;
         }
 
-        using var table = ImRaii.Table("OffsetTypeMapping", 2);
-        if (!table) return;
-
-        ImGui.TableSetupColumn("Offset", ImGuiTableColumnFlags.WidthFixed, 65.0f * ImGuiHelpers.GlobalScale);
-        ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthStretch);
-
-        foreach (var ((address, offset), type) in _offsetMappings)
+        foreach (var info in _offsetMappings)
         {
-            using var id = ImRaii.PushId(offset.ToString());
+            using var id = ImRaii.PushId(info.Offset.ToString());
 
-            ImGui.TableNextColumn();
-            ImGui.Text($"+0x{offset,-6:X}");
+            ImGuiUtils.DrawCopyableText($"[0x{info.Offset:X}]", new()
+            {
+                CopyText = ImGui.IsKeyDown(ImGuiKey.LeftShift) ? $"0x{info.Offset:X}" : $"{info.Address + info.Offset:X}",
+                TextColor = Color.Grey3
+            });
 
-            ImGui.TableNextColumn();
-            _debugRenderer.DrawPointerType(address, type, new NodeOptions());
+            ImGui.SameLine();
+
+            if (info.Type == null)
+            {
+                if (!string.IsNullOrEmpty(info.ClassName))
+                {
+                    ImGuiUtils.DrawCopyableText(info.ClassName + "*", new() { TextColor = DebugRenderer.ColorType });
+                    ImGui.SameLine();
+                }
+
+                if (!string.IsNullOrEmpty(info.FieldName))
+                {
+                    ImGui.TextColored(DebugRenderer.ColorFieldName, info.FieldName);
+                    ImGui.SameLine();
+                }
+
+                _debugRenderer.DrawAddress(info.ResolvedAddress);
+            }
+            else
+            {
+                ImGuiUtils.DrawCopyableText(info.Type.ReadableTypeName(), new()
+                {
+                    CopyText = info.Type.ReadableTypeName(ImGui.IsKeyDown(ImGuiKey.LeftShift)),
+                    TextColor = DebugRenderer.ColorType
+                });
+                ImGui.SameLine();
+
+                if (!string.IsNullOrEmpty(info.FieldName))
+                {
+                    ImGui.TextColored(DebugRenderer.ColorFieldName, info.FieldName);
+                    ImGui.SameLine();
+                }
+
+                _debugRenderer.DrawPointerType(info.ResolvedAddress, info.Type, new NodeOptions());
+            }
         }
     }
 
-    private void Load()
+    private Type? GetCSTypeByName(string name)
     {
-        _freeMemoryAddress = _sigScanner.ScanText("E8 ?? ?? ?? ?? 4D 89 AE") - _sigScanner.Module.BaseAddress;
+        if (_typeService.CSTypes == null)
+            return null;
 
-        foreach (var type in typeof(AtkUnitBase).Assembly.GetTypes())
-        {
-            if (!type.GetCustomAttributes<VirtualTableAttribute>(false).Any())
-                continue;
+        if (!_typeService.CSTypes.TryGetValue("FFXIVClientStructs.FFXIV." + name.Replace("::", "."), out var type))
+            return null;
 
-            var addressesType = type.GetNestedType("Addresses", BindingFlags.Public | BindingFlags.Static);
-            if (addressesType == null)
-                continue;
-
-            var staticVirtualTableType = addressesType.GetField("StaticVirtualTable", BindingFlags.Public | BindingFlags.Static);
-            if (staticVirtualTableType == null)
-                continue;
-
-            var address = (Address?)staticVirtualTableType.GetValue(null);
-            if (address == null)
-                continue;
-
-            if (_virtualTableMappings.TryAdd(address.Value, type))
-                _logger.LogDebug("Mapped: {address:X} to {typeName}", address.Value, type.Name);
-        }
+        return type;
     }
 
     private void FindSize()
