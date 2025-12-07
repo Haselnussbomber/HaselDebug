@@ -128,7 +128,7 @@ public partial class PointerInspectorTab : DebugTab
         if (T.TryParse(numberString, null, out var parsedNumber))
             return parsedNumber;
 
-        if (numberString.StartsWith("0x") && T.TryParse(numberString[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var parsedHex))
+        if (T.TryParse(numberString.StartsWith("0x") ? numberString[2..] : numberString, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var parsedHex))
             return parsedHex;
 
         return default;
