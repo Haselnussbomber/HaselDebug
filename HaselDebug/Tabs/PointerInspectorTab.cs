@@ -172,26 +172,29 @@ public unsafe partial class PointerInspectorTab : DebugTab
                 Offset = offsetIndex * 8,
             };
 
-            if (_currentStructFields != null && _currentStructFields.TryGetValue(offsetIndex, out var fieldInfo))
+            if (_currentStructFields != null && _currentStructFields.TryGetValue(offsetIndex, out var fieldInfo) && fieldInfo.Item2?.IsPointer == true)
             {
                 offsetInfo.FieldName = fieldInfo.Item1;
                 offsetInfo.Type = fieldInfo.Item2;
                 foundInFields = true;
             }
 
-            foreach (var (name, cl) in _dataYml.Data.Classes)
+            if (!foundInFields)
             {
-                if (cl == null || cl.VirtualTables == null || cl.VirtualTables.Count == 0)
-                    continue;
+                foreach (var (name, cl) in _dataYml.Data.Classes)
+                {
+                    if (cl == null || cl.VirtualTables == null || cl.VirtualTables.Count == 0)
+                        continue;
 
-                if (cl.VirtualTables.First().Address != (ulong)(virtualTablePointer - _sigScanner.Module.BaseAddress))
-                    continue;
+                    if (cl.VirtualTables.First().Address != (ulong)(virtualTablePointer - _sigScanner.Module.BaseAddress))
+                        continue;
 
-                _logger.LogDebug("Found {name} vtbl at {add:X}", name, virtualTablePointer);
-                offsetInfo.ClassName = name;
-                offsetInfo.Type = GetCSTypeByName(name)?.MakePointerType();
-                foundInDataYml = true;
-                break;
+                    _logger.LogDebug("Found {name} vtbl at {add:X}", name, virtualTablePointer);
+                    offsetInfo.ClassName = name;
+                    offsetInfo.Type = GetCSTypeByName(name)?.MakePointerType();
+                    foundInDataYml = true;
+                    break;
+                }
             }
 
             if (foundInFields || foundInDataYml)
