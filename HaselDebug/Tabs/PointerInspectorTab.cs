@@ -172,8 +172,11 @@ public unsafe partial class PointerInspectorTab : DebugTab
                 Offset = offsetIndex * 8,
             };
 
-            if (_currentStructFields != null && _currentStructFields.TryGetValue(offsetIndex, out var fieldInfo) && fieldInfo.Item2?.IsPointer == true)
+            if (_currentStructFields != null && _currentStructFields.TryGetValue(offsetIndex * 8, out var fieldInfo) && fieldInfo.Item2 != null)
             {
+                if (!fieldInfo.Item2.IsPointer)
+                    continue;
+
                 offsetInfo.FieldName = fieldInfo.Item1;
                 offsetInfo.Type = fieldInfo.Item2;
                 foundInFields = true;
@@ -233,23 +236,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
 
             ImGui.SameLine();
 
-            if (info.Type == null)
-            {
-                if (!string.IsNullOrEmpty(info.ClassName))
-                {
-                    ImGuiUtils.DrawCopyableText(info.ClassName + "*", new() { TextColor = DebugRenderer.ColorType });
-                    ImGui.SameLine();
-                }
-
-                if (!string.IsNullOrEmpty(info.FieldName))
-                {
-                    ImGui.TextColored(DebugRenderer.ColorFieldName, info.FieldName);
-                    ImGui.SameLine();
-                }
-
-                _debugRenderer.DrawAddress(info.ResolvedAddress);
-            }
-            else
+            if (info.Type != null)
             {
                 ImGuiUtils.DrawCopyableText(info.Type.ReadableTypeName(), new()
                 {
@@ -257,14 +244,26 @@ public unsafe partial class PointerInspectorTab : DebugTab
                     TextColor = DebugRenderer.ColorType
                 });
                 ImGui.SameLine();
+            }
+            else if (!string.IsNullOrEmpty(info.ClassName))
+            {
+                ImGuiUtils.DrawCopyableText(info.ClassName + "*", new() { TextColor = DebugRenderer.ColorType });
+                ImGui.SameLine();
+            }
 
-                if (!string.IsNullOrEmpty(info.FieldName))
-                {
-                    ImGui.TextColored(DebugRenderer.ColorFieldName, info.FieldName);
-                    ImGui.SameLine();
-                }
+            if (!string.IsNullOrEmpty(info.FieldName))
+            {
+                ImGui.TextColored(DebugRenderer.ColorFieldName, info.FieldName);
+                ImGui.SameLine();
+            }
 
+            if (info.Type != null)
+            {
                 _debugRenderer.DrawPointerType(info.ResolvedAddress, info.Type, new NodeOptions());
+            }
+            else
+            {
+                _debugRenderer.DrawAddress(info.ResolvedAddress);
             }
         }
     }
