@@ -57,12 +57,11 @@ public unsafe partial class PointerInspectorTab : DebugTab
 
     private void DrawSearchBox()
     {
-        using var table = ImRaii.Table("SearchTable", 3, ImGuiTableFlags.SizingStretchProp);
+        using var table = ImRaii.Table("SearchTable", 2, ImGuiTableFlags.SizingStretchProp);
         if (!table) return;
 
         ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthStretch, 1);
         ImGui.TableSetupColumn("Size", ImGuiTableColumnFlags.WidthStretch, 1);
-        ImGui.TableSetupColumn("Button", ImGuiTableColumnFlags.WidthFixed, 100);
 
         ImGui.TableNextRow();
         ImGui.TableNextColumn();
@@ -78,18 +77,15 @@ public unsafe partial class PointerInspectorTab : DebugTab
         {
             _memoryAddress = ParseNumericString<nint>(_addressInput);
             FindSize();
+            ParsePointer();
         }
 
         ImGui.TableNextColumn();
         ImGui.SetNextItemWidth(-1);
         if (ImGui.InputText("##MemorySize", ref _addressSize, 10, ImGuiInputTextFlags.AutoSelectAll))
-            _memorySize = ParseNumericString<uint>(_addressSize);
-
-        ImGui.TableNextColumn();
-        if (ImGui.Button("Process", new Vector2(-1, ImGui.GetFrameHeight())))
         {
-            if (MemoryUtils.IsPointerValid(_memoryAddress) && _memorySize > 0)
-                ParsePointer(_memoryAddress, _memorySize);
+            _memorySize = ParseNumericString<uint>(_addressSize);
+            ParsePointer();
         }
 
         if (_memoryAddress == 0)
@@ -104,13 +100,16 @@ public unsafe partial class PointerInspectorTab : DebugTab
         ImGui.Text($"Struct Address: 0x{_memoryAddress:X}\nStruct Size: 0x{_memorySize:X}");
     }
 
-    private void ParsePointer(nint address, uint size)
+    private void ParsePointer()
     {
         _offsetMappings.Clear();
 
-        foreach (var offsetIndex in Enumerable.Range(0, (int)size / 8))
+        if (!MemoryUtils.IsPointerValid(_memoryAddress) || _memorySize == 0)
+            return;
+
+        foreach (var offsetIndex in Enumerable.Range(0, (int)_memorySize / 8))
         {
-            var offsetAddress = address + offsetIndex * 8;
+            var offsetAddress = _memoryAddress + offsetIndex * 8;
             if (!MemoryUtils.IsPointerValid(offsetAddress))
                 continue;
 
@@ -123,7 +122,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
                 continue;
 
             if (_virtualTableMappings.TryGetValue(virtualTablePointer, out var tableName))
-                _offsetMappings.TryAdd(new OffsetInfo(*(nint*)offsetAddress, offsetIndex * 8), tableName);
+                _offsetMappings.TryAdd(new OffsetInfo(objectPointer, offsetIndex * 8), tableName);
         }
     }
 
@@ -220,7 +219,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
 
         var vtblAddress = nint.Zero;
         var rax = nint.Zero;
-        
+
         var list = new List<Instruction>();
 
         while (codeReader.CanReadByte)
