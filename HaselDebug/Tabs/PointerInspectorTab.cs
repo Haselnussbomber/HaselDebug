@@ -259,7 +259,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
 
             if (info.Type != null)
             {
-                _debugRenderer.DrawPointerType(info.ResolvedAddress, info.Type, new NodeOptions());
+                _debugRenderer.DrawPointerType(info.Address, info.Type, new NodeOptions());
             }
             else
             {
