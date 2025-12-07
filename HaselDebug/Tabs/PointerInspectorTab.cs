@@ -132,6 +132,8 @@ public partial class PointerInspectorTab : DebugTab
         
         foreach (var ((address, offset), type) in _offsetMappings)
         {
+            using var id = ImRaii.PushId(offset.ToString());
+            
             ImGui.TableNextColumn();
             ImGui.Text($"+0x{offset, -6:X}");
             
