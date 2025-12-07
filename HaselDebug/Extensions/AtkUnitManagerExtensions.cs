@@ -7,7 +7,7 @@ public static unsafe class AtkUnitManagerExtensions
 {
     public static AtkUnitBase* GetAddonByNodeSafe(ref this AtkUnitManager atkUnitManager, AtkResNode* needle)
     {
-        if (!MemoryUtils.IsPointerValid(needle))
+        if (MemoryUtils.IsPointerValidationEnabled() && !MemoryUtils.IsPointerValid(needle))
             return null;
 
         var count = atkUnitManager.AllLoadedUnitsList.Count;

@@ -12,10 +12,7 @@ public partial class FateTab : DebugTab
 
     public override void Draw()
     {
-        var fateTable = _fateTable;
-        var textureManager = _textureProvider;
-
-        if (fateTable.Length == 0)
+        if (_fateTable.Length == 0)
         {
             ImGui.Text("No fates or data not ready."u8);
             return;
@@ -40,9 +37,9 @@ public partial class FateTab : DebugTab
         ImGui.TableSetupScrollFreeze(7, 1);
         ImGui.TableHeadersRow();
 
-        for (var i = 0; i < fateTable.Length; i++)
+        for (var i = 0; i < _fateTable.Length; i++)
         {
-            var fate = fateTable[i];
+            var fate = _fateTable[i];
             if (fate == null)
                 continue;
 
@@ -74,7 +71,7 @@ public partial class FateTab : DebugTab
 
             if (fate.IconId != 0)
             {
-                if (textureManager.GetFromGameIcon(fate.IconId).TryGetWrap(out var texture, out _))
+                if (_textureProvider.GetFromGameIcon(fate.IconId).TryGetWrap(out var texture, out _))
                 {
                     ImGui.Image(texture.Handle, new(ImGui.GetTextLineHeight()));
 
@@ -99,7 +96,7 @@ public partial class FateTab : DebugTab
 
             if (fate.MapIconId != 0)
             {
-                if (textureManager.GetFromGameIcon(fate.MapIconId).TryGetWrap(out var texture, out _))
+                if (_textureProvider.GetFromGameIcon(fate.MapIconId).TryGetWrap(out var texture, out _))
                 {
                     ImGui.Image(texture.Handle, new(ImGui.GetTextLineHeight()));
 

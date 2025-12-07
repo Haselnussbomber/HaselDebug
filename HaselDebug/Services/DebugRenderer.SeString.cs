@@ -125,25 +125,18 @@ public unsafe partial class DebugRenderer
         nodeOptions = nodeOptions.WithAddress(address);
 
         var str = (Utf8String*)address;
-        if (!MemoryUtils.IsPointerValid(str->StringPtr))
-        {
-            ImGui.Text("null"u8);
-            return;
-        }
-
         DrawSeString(str->StringPtr, nodeOptions);
     }
 
     public void DrawSeString(byte* ptr, NodeOptions nodeOptions)
     {
-        var address = (nint)ptr;
-        if (address == 0)
+        if (ptr == null)
         {
             ImGui.Text("null"u8);
             return;
         }
 
-        if (!MemoryUtils.IsPointerValid(address))
+        if (!MemoryUtils.IsPointerValid(ptr))
         {
             ImGui.Text("invalid"u8);
             return;

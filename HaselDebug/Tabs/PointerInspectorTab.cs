@@ -1,12 +1,11 @@
 using System.Globalization;
 using System.Reflection;
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
-using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using Task = System.Threading.Tasks.Task;
 
 namespace HaselDebug.Tabs;
 
@@ -17,7 +16,8 @@ public partial class PointerInspectorTab : DebugTab
     private readonly ILogger<PointerInspectorTab> _logger;
 
     private readonly Dictionary<nint, Type> _virtualTableMappings = [];
-    private bool _isReady;
+    private readonly Dictionary<OffsetInfo, Type> _offsetMappings = [];
+    private Task _loadTask;
 
     private string _addressInput = string.Empty;
     private string _addressSize = string.Empty;
@@ -26,37 +26,42 @@ public partial class PointerInspectorTab : DebugTab
     private nint _memoryAddress;
 
     private record OffsetInfo(nint ActualAddress, int Offset);
-    private readonly Dictionary<OffsetInfo, Type> _offsetMappings = [];
-
-    [AutoPostConstruct]
-    private void Initialize()
-    {
-        Task.Run(PopulateVirtualTableMappings);
-    }
 
     public override void Draw()
     {
-        if (!_isReady) 
-            ImGui.Text("Parsing VirtualTable Addresses, please wait...");
-        else
+        _loadTask ??= Task.Run(PopulateVirtualTableMappings);
+
+        if (!_loadTask.IsCompleted)
         {
-            DrawSearchBox();
-            ImGui.Separator();
-            DrawResults();
+            ImGui.Text("Loading...");
+            return;
         }
+
+        if (_loadTask.IsFaulted)
+        {
+            ImGuiUtilsEx.DrawAlertError("TaskError", _loadTask.Exception?.ToString() ?? "Error loading data :(");
+            return;
+        }
+
+        DrawSearchBox();
+
+        if (_memoryAddress == 0)
+            return;
+
+        ImGui.Separator();
+        DrawResults();
     }
 
     private void DrawSearchBox()
     {
-        using var child = ImRaii.Child("PointerInspectorChild", new Vector2(ImGui.GetContentRegionAvail().X, 105.0f * ImGuiHelpers.GlobalScale));
-        if (!child) return;
-        
-        using var table = ImRaii.Table("SearchTable", 2, ImGuiTableFlags.SizingStretchProp);
+        using var table = ImRaii.Table("SearchTable", 3, ImGuiTableFlags.SizingStretchProp);
         if (!table) return;
-        
-        ImGui.TableSetupColumn("##first", ImGuiTableColumnFlags.WidthStretch, 1.0f);
-        ImGui.TableSetupColumn("##second", ImGuiTableColumnFlags.WidthStretch, 1.0f);
-        
+
+        ImGui.TableSetupColumn("Address", ImGuiTableColumnFlags.WidthStretch, 1);
+        ImGui.TableSetupColumn("Size", ImGuiTableColumnFlags.WidthStretch, 1);
+        ImGui.TableSetupColumn("Button", ImGuiTableColumnFlags.WidthFixed, 100);
+
+        ImGui.TableNextRow();
         ImGui.TableNextColumn();
         ImGui.Text("Struct Address");
 
@@ -65,30 +70,34 @@ public partial class PointerInspectorTab : DebugTab
 
         ImGui.TableNextRow();
         ImGui.TableNextColumn();
-        ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X - ImGui.GetStyle().FramePadding.X);
-        if (ImGui.InputTextWithHint("##Memory Address", "Struct Address", ref _addressInput, 20)) 
+        ImGui.SetNextItemWidth(-1);
+        if (ImGui.InputText("##MemoryAddress", ref _addressInput, 20, ImGuiInputTextFlags.AutoSelectAll))
+        {
             _memoryAddress = ParseNumericString<nint>(_addressInput);
+        }
 
         ImGui.TableNextColumn();
-        ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X - ImGui.GetStyle().FramePadding.X);
-        if (ImGui.InputTextWithHint("##Memory Size", "Struct Size", ref _addressSize, 10))
+        ImGui.SetNextItemWidth(-1);
+        if (ImGui.InputText("##MemorySize", ref _addressSize, 10, ImGuiInputTextFlags.AutoSelectAll))
             _memorySize = ParseNumericString<uint>(_addressSize);
-        
+
+        ImGui.TableNextColumn();
+        if (ImGui.Button("Process", new Vector2(-1, ImGui.GetFrameHeight())))
+        {
+            if (MemoryUtils.IsPointerValid(_memoryAddress) && _memorySize > 0)
+                ParsePointer(_memoryAddress, _memorySize);
+        }
+
+        if (_memoryAddress == 0)
+            return;
+
         ImGui.TableNextRow();
         ImGui.TableNextColumn();
         ImGuiHelpers.ScaledDummy(10.0f);
-        
+
         ImGui.TableNextRow();
         ImGui.TableNextColumn();
         ImGui.Text($"Struct Address: 0x{_memoryAddress:X}\nStruct Size: 0x{_memorySize:X}");
-        
-        ImGui.TableNextColumn();
-        ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - 125.0f * ImGuiHelpers.GlobalScale);
-        if (ImGui.Button("Process", ImGuiHelpers.ScaledVector2(125.0f, 24.0f)))
-        {
-            if (_memoryAddress != nint.Zero && _memoryAddress.IsValid() && _memorySize > 0) 
-                ParsePointer(_memoryAddress, _memorySize);
-        }
     }
 
     private unsafe void ParsePointer(IntPtr address, uint size)
@@ -98,16 +107,19 @@ public partial class PointerInspectorTab : DebugTab
         foreach (var offsetIndex in Enumerable.Range(0, (int)size / 8))
         {
             var offsetAddress = address + offsetIndex * 8;
-            if (!offsetAddress.IsValid()) continue;
-            
+            if (!MemoryUtils.IsPointerValid(offsetAddress))
+                continue;
+
             var objectPointer = *(nint*)offsetAddress;
-            if (objectPointer == nint.Zero || !objectPointer.IsValid()) continue;
-            
+            if (!MemoryUtils.IsPointerValid(objectPointer))
+                continue;
+
             var virtualTablePointer = *(nint*)objectPointer;
-            if (virtualTablePointer == nint.Zero || !virtualTablePointer.IsValid()) continue;
-                
-            if (_virtualTableMappings.TryGetValue(virtualTablePointer, out var tableName)) 
-                _offsetMappings.TryAdd(new OffsetInfo(*(nint*)offsetAddress, offsetIndex * 8) , tableName);
+            if (!MemoryUtils.IsPointerValid(virtualTablePointer))
+                continue;
+
+            if (_virtualTableMappings.TryGetValue(virtualTablePointer, out var tableName))
+                _offsetMappings.TryAdd(new OffsetInfo(*(nint*)offsetAddress, offsetIndex * 8), tableName);
         }
     }
 
@@ -115,7 +127,7 @@ public partial class PointerInspectorTab : DebugTab
     {
         if (T.TryParse(numberString, null, out var parsedNumber))
             return parsedNumber;
-        
+
         if (numberString.StartsWith("0x") && T.TryParse(numberString[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var parsedHex))
             return parsedHex;
 
@@ -124,19 +136,25 @@ public partial class PointerInspectorTab : DebugTab
 
     private void DrawResults()
     {
+        if (!MemoryUtils.IsPointerValid(_memoryAddress))
+        {
+            ImGui.Text("Invalid pointer.");
+            return;
+        }
+
         using var table = ImRaii.Table("OffsetTypeMapping", 2);
         if (!table) return;
-        
-        ImGui.TableSetupColumn("##offset", ImGuiTableColumnFlags.WidthFixed, 65.0f * ImGuiHelpers.GlobalScale);
-        ImGui.TableSetupColumn("##type", ImGuiTableColumnFlags.WidthStretch);
-        
+
+        ImGui.TableSetupColumn("Offset", ImGuiTableColumnFlags.WidthFixed, 65.0f * ImGuiHelpers.GlobalScale);
+        ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthStretch);
+
         foreach (var ((address, offset), type) in _offsetMappings)
         {
             using var id = ImRaii.PushId(offset.ToString());
-            
+
             ImGui.TableNextColumn();
-            ImGui.Text($"+0x{offset, -6:X}");
-            
+            ImGui.Text($"+0x{offset,-6:X}");
+
             ImGui.TableNextColumn();
             _debugRenderer.DrawPointerType(address, type, new NodeOptions());
         }
@@ -161,12 +179,8 @@ public partial class PointerInspectorTab : DebugTab
             if (address == null)
                 continue;
 
-            if (!_virtualTableMappings.TryAdd(address.Value, type))
-                _logger.LogWarning("Duplicate found for {typeName}", type.Name);
-            else
+            if (_virtualTableMappings.TryAdd(address.Value, type))
                 _logger.LogDebug("Mapped: {address:X} to {typeName}", address.Value, type.Name);
         }
-
-        _isReady = true;
     }
 }
