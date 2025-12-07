@@ -104,7 +104,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
         ImGui.Text($"Struct Address: 0x{_memoryAddress:X}\nStruct Size: 0x{_memorySize:X}");
     }
 
-    private void ParsePointer(IntPtr address, uint size)
+    private void ParsePointer(nint address, uint size)
     {
         _offsetMappings.Clear();
 

@@ -4,6 +4,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 using Iced.Intel;
 using Decoder = Iced.Intel.Decoder;
 
