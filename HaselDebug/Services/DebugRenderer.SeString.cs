@@ -4,7 +4,6 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 using Lumina.Data;

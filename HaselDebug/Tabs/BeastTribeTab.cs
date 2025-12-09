@@ -3,7 +3,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
-using Lumina.Excel;
 
 namespace HaselDebug.Tabs;
 
