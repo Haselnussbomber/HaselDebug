@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [27cebc62](https://github.com/aers/FFXIVClientStructs/tree/27cebc62) ([compare](https://github.com/aers/FFXIVClientStructs/compare/6f339d8f..27cebc62)).
+
 ## [1.41.0] (2025-12-06)
 
 - **Added:** Addon Inspector now shows field names or possible field offsets for nodes in cyan.
