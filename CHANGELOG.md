@@ -4,7 +4,13 @@
 
 - **Added:** A new Pointer Inspector tab. (Thanks to @MidoriKami!)  
   This tool tries to find pointers with vtables that are known in the data.yml. It doesn't update the list every frame, just when hitting enter on the address/size. The size is automatically detected when the pointer points to memory with a vtable that has a dtor at vf0.
-- **Updated:** ClientStructs now at [27cebc62](https://github.com/aers/FFXIVClientStructs/tree/27cebc62) ([compare](https://github.com/aers/FFXIVClientStructs/compare/6f339d8f..27cebc62)).
+- **Updated:** Some small Lua Debug tab improvements.
+  - More colors.
+  - `__index` displays the tables `className` when available.
+  - Native functions now print the address of the function.
+- **Updated:** The categories in the Config tab are now drawn in yellow for easier distinction.
+- **Changed:** Removed pointer validation from DrawNumeric, since that tanks FPS in the Config tab.
+- **Updated:** ClientStructs now at [1a4e28c1](https://github.com/aers/FFXIVClientStructs/tree/1a4e28c1) ([compare](https://github.com/aers/FFXIVClientStructs/compare/6f339d8f..1a4e28c1)).
 
 ## [1.41.0] (2025-12-06)
 
