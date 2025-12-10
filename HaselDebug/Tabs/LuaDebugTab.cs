@@ -2,6 +2,8 @@ using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Common.Lua;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
+using HaselDebug.Services;
+using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs;
 
@@ -9,14 +11,17 @@ namespace HaselDebug.Tabs;
 
 public readonly record struct LuaGlobal(string Key, string? Value, LuaType Type);
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class LuaDebugTab : DebugTab
+[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class LuaDebugTab : DebugTab
 {
     public static lua_State* L => Framework.Instance()->LuaState.State;
-    public string InspectorFilter = string.Empty;
-    public string GlobalsFilter = string.Empty;
-    public readonly string[] TypeFilterStrings = Enum.GetNames<LuaType>();
-    public int TypeFilter = (int)LuaType.UserData;
+
+    private readonly DebugRenderer _debugRenderer;
+
+    private string _inspectorFilter = string.Empty;
+    private string _globalsFilter = string.Empty;
+    private readonly string[] _typeFilterStrings = Enum.GetNames<LuaType>();
+    private int _typeFilter = (int)LuaType.UserData;
 
     public override void Draw()
     {
@@ -41,14 +46,14 @@ public unsafe class LuaDebugTab : DebugTab
     private void DrawInspectorTab()
     {
         ImGui.SetNextItemWidth(120);
-        ImGui.Combo("##inspectorTypeFilter", ref TypeFilter, TypeFilterStrings, TypeFilterStrings.Length);
+        ImGui.Combo("##inspectorTypeFilter", ref _typeFilter, _typeFilterStrings, _typeFilterStrings.Length);
         ImGui.SameLine();
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputText("##inspectorFilter", ref InspectorFilter, 512);
+        ImGui.InputText("##inspectorFilter", ref _inspectorFilter, 512);
         ImGui.Separator();
         if (ImGui.BeginChild("##inspectorChild"))
         {
-            var filterType = Enum.Parse<LuaType>(TypeFilterStrings[TypeFilter]);
+            var filterType = Enum.Parse<LuaType>(_typeFilterStrings[_typeFilter]);
             if (ImGui.TreeNodeEx("_G", ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.DefaultOpen))
             {
                 var top = L->lua_gettop();
@@ -60,9 +65,9 @@ public unsafe class LuaDebugTab : DebugTab
                     var typeValue = L->lua_type(-1);
 
                     var filtered = false;
-                    if (!string.IsNullOrWhiteSpace(InspectorFilter))
+                    if (!string.IsNullOrWhiteSpace(_inspectorFilter))
                     {
-                        if (!strKey.Contains(InspectorFilter, StringComparison.OrdinalIgnoreCase))
+                        if (!strKey.Contains(_inspectorFilter, StringComparison.OrdinalIgnoreCase))
                             filtered = true;
                     }
                     else
@@ -75,7 +80,7 @@ public unsafe class LuaDebugTab : DebugTab
                     }
 
                     if (typeValue != LuaType.Function && !filtered)
-                        DrawNodeByType(typeValue, strKey, "_G", L->lua_gettop());
+                        DrawNodeByType(typeValue, strKey, "_G", L->lua_gettop(), new NodeOptions());
 
                     L->lua_pop(1);
                 }
@@ -88,15 +93,61 @@ public unsafe class LuaDebugTab : DebugTab
         ImGui.EndChild();
     }
 
-    private void DrawNodeByType(LuaType type, string key, string id, int idx)
+    private void DrawNodeByType(LuaType type, string key, string id, int idx, NodeOptions nodeOptions)
     {
         var drawTop = L->lua_gettop();
+
+        nodeOptions = nodeOptions.WithAddress(key.GetHashCode());
+
+        ImGui.TextColored(DebugRenderer.ColorType, type.ToString());
+        ImGui.SameLine();
 
         switch (type)
         {
             case LuaType.Table:
-                if (ImGui.TreeNodeEx($"[{type}] {key}##{id}", ImGuiTreeNodeFlags.SpanAvailWidth))
                 {
+                    var className = "";
+
+                    if (key == "__index")
+                    {
+                        var indextop = L->lua_gettop();
+                        L->lua_pushvalue(idx);
+                        L->lua_pushnil();
+                        while (L->lua_next(-2) != 0)
+                        {
+                            var typeKey = L->lua_type(-2);
+                            if (typeKey == LuaType.String && L->lua_tostring(-2) == "className")
+                            {
+                                className = L->lua_tostring(-1).ToString();
+                                L->lua_pop(1);
+                                break;
+                            }
+                            L->lua_pop(1);
+                        }
+                        L->lua_settop(indextop);
+                    }
+
+                    using var rssb = new RentedSeStringBuilder();
+                    var title = rssb.Builder
+                        .PushColorBgra(DebugRenderer.ColorFieldName)
+                        .Append(key);
+
+                    if (!string.IsNullOrEmpty(className))
+                    {
+                        rssb.Builder.Append($" ({className})");
+                    }
+
+                    rssb.Builder.PopColor();
+
+                    using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
+                    {
+                        TitleColor = DebugRenderer.ColorTreeNode,
+                        SeStringTitle = title.ToReadOnlySeString()
+                    });
+
+                    if (!treeNode)
+                        break;
+
                     var top = L->lua_gettop();
                     L->lua_pushvalue(idx);
                     L->lua_pushnil();
@@ -109,12 +160,12 @@ public unsafe class LuaDebugTab : DebugTab
                         if (typeKey == LuaType.Number)
                         {
                             strKey = $"{L->lua_tonumber(-2)}";
-                            DrawNodeByType(typeValue, strKey, key, L->lua_gettop());
+                            DrawNodeByType(typeValue, strKey, key, L->lua_gettop(), nodeOptions);
                         }
                         else if (typeKey == LuaType.String)
                         {
                             strKey = $"{L->lua_tostring(-2)}";
-                            DrawNodeByType(typeValue, strKey, key, L->lua_gettop());
+                            DrawNodeByType(typeValue, strKey, key, L->lua_gettop(), nodeOptions);
                         }
                         else
                         {
@@ -125,13 +176,24 @@ public unsafe class LuaDebugTab : DebugTab
                     }
 
                     L->lua_settop(top);
-                    ImGui.TreePop();
                 }
-
                 break;
             case LuaType.UserData:
-                if (ImGui.TreeNodeEx($"[{type}] {key}##{id}", ImGuiTreeNodeFlags.SpanAvailWidth))
                 {
+                    using var rssb = new RentedSeStringBuilder();
+                    using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
+                    {
+                        TitleColor = DebugRenderer.ColorTreeNode,
+                        SeStringTitle = rssb.Builder
+                        .PushColorBgra(DebugRenderer.ColorFieldName)
+                        .Append(key)
+                        .PopColor()
+                        .ToReadOnlySeString()
+                    });
+
+                    if (!treeNode)
+                        break;
+
                     var top = L->lua_gettop();
 
                     if (L->lua_getmetatable(idx) == 1)
@@ -141,7 +203,7 @@ public unsafe class LuaDebugTab : DebugTab
                         if (L->lua_type(-1) == LuaType.String)
                             className = $"{L->lua_tostring(-1)}";
                         L->lua_pop(1);
-                        DrawNodeByType(L->lua_type(-1), className, id, L->lua_gettop());
+                        DrawNodeByType(L->lua_type(-1), className, id, L->lua_gettop(), nodeOptions);
                         L->lua_pop(1);
                     }
                     else
@@ -153,24 +215,33 @@ public unsafe class LuaDebugTab : DebugTab
                     }
 
                     L->lua_settop(top);
-                    ImGui.TreePop();
                 }
-
                 break;
             case LuaType.Boolean:
             case LuaType.Number:
             case LuaType.String:
-                ImGui.TreeNodeEx($"[{type}] {key} = \"{L->lua_tostring(idx)}\"##{id}", ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.NoTreePushOnOpen);
+                ImGuiUtils.DrawCopyableText(key, new() { TextColor = DebugRenderer.ColorFieldName });
+                ImGui.SameLine();
+                ImGuiUtils.DrawCopyableText(L->lua_tostring(idx));
+                break;
+            case LuaType.Function:
+                ImGuiUtils.DrawCopyableText(key, new() { TextColor = DebugRenderer.ColorFieldName });
+
+                var cFunctionPtr = L->lua_tocfunction(-1);
+                if (cFunctionPtr != null)
+                {
+                    ImGui.SameLine();
+                    _debugRenderer.DrawAddress(cFunctionPtr);
+                }
                 break;
             case LuaType.LightUserData:
-            case LuaType.Function:
             case LuaType.Thread:
             case LuaType.Proto:
             case LuaType.Upval:
             case LuaType.None:
             case LuaType.Nil:
             default:
-                ImGui.TreeNodeEx($"[{type}] {key}##{id}", ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.NoTreePushOnOpen);
+                ImGuiUtils.DrawCopyableText(key, new() { TextColor = DebugRenderer.ColorFieldName });
                 break;
         }
 
@@ -180,10 +251,10 @@ public unsafe class LuaDebugTab : DebugTab
     private void DrawGlobalsTab()
     {
         ImGui.SetNextItemWidth(120);
-        ImGui.Combo("##globalsTypeFilter", ref TypeFilter, TypeFilterStrings, TypeFilterStrings.Length);
+        ImGui.Combo("##globalsTypeFilter", ref _typeFilter, _typeFilterStrings, _typeFilterStrings.Length);
         ImGui.SameLine();
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputText("##globalsFilter", ref GlobalsFilter, 512);
+        ImGui.InputText("##globalsFilter", ref _globalsFilter, 512);
         ImGui.Separator();
         if (!ImGui.BeginTable("##luaGlobalEnvTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY))
             return;
@@ -194,13 +265,13 @@ public unsafe class LuaDebugTab : DebugTab
         ImGui.TableSetupColumn("Value"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableHeadersRow();
 
-        var filterType = Enum.Parse<LuaType>(TypeFilterStrings[TypeFilter]);
+        var filterType = Enum.Parse<LuaType>(_typeFilterStrings[_typeFilter]);
 
         foreach (var g in EnumGlobals().OrderBy(v => v.Type))
         {
-            if (!string.IsNullOrWhiteSpace(GlobalsFilter))
+            if (!string.IsNullOrWhiteSpace(_globalsFilter))
             {
-                if (!g.Key.Contains(GlobalsFilter, StringComparison.OrdinalIgnoreCase))
+                if (!g.Key.Contains(_globalsFilter, StringComparison.OrdinalIgnoreCase))
                     continue;
             }
             else
