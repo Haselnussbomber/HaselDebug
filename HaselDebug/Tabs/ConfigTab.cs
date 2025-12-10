@@ -151,7 +151,11 @@ public unsafe partial class ConfigTab : DebugTab
             }
 
             ImGui.TableNextColumn(); // Name
-            ImGuiUtils.DrawCopyableText(optionName, new() { HighlightedText = hasSearchTerm ? _searchTerm : null });
+            ImGuiUtils.DrawCopyableText(optionName, new()
+            {
+                TextColor = option->Type == 1 ? DebugRenderer.ColorTreeNode : null,
+                HighlightedText = hasSearchTerm ? _searchTerm : null
+            });
 
             switch (option->Type)
             {
