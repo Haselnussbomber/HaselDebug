@@ -18,11 +18,11 @@ public partial class ClassInfo
     public string Name { get; set; }
     public string Namespace { get; set; }
     public string FullName { get; set; }
-    public ulong Offset { get; set; }
+    public nint Offset { get; set; }
     public ClassInfo? ParentClass { get; set; }
-    public Dictionary<ulong, string> Functions { get; } = new();
-    public Dictionary<int, string> VirtualFunctions { get; } = new();
-    public Dictionary<ulong, string> Instances { get; } = new();
+    public Dictionary<nint, string> Functions { get; } = [];
+    public Dictionary<int, string> VirtualFunctions { get; } = [];
+    public Dictionary<nint, string> Instances { get; } = [];
 
     public ClassInfo(ClientStructsData data, string rawName, XivClass? xivClass, XivVTable? baseClass)
     {

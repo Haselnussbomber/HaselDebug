@@ -123,7 +123,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
                 if (cl == null || cl.VirtualTables == null || cl.VirtualTables.Count == 0)
                     continue;
 
-                if (cl.VirtualTables.First().Address != (ulong)(vtablePtr - _sigScanner.Module.BaseAddress))
+                if (cl.VirtualTables.First().Address != vtablePtr - _sigScanner.Module.BaseAddress)
                     continue;
 
                 _logger.LogDebug("Found struct {name} vtbl at {add:X}", name, vtablePtr);
@@ -189,7 +189,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
                     if (cl == null || cl.VirtualTables == null || cl.VirtualTables.Count == 0)
                         continue;
 
-                    if (cl.VirtualTables.First().Address != (ulong)(virtualTablePointer - _sigScanner.Module.BaseAddress))
+                    if (cl.VirtualTables.First().Address != virtualTablePointer - _sigScanner.Module.BaseAddress)
                         continue;
 
                     _logger.LogDebug("Found {name} vtbl at {add:X}", name, virtualTablePointer);

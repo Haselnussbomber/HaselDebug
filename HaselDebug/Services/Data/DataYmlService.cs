@@ -12,7 +12,7 @@ namespace HaselDebug.Services.Data;
 [RegisterSingleton, AutoConstruct]
 public partial class DataYmlService
 {
-    public const ulong BaseAddress = 0x140000000;
+    public static nint BaseAddress => unchecked((nint)0x140000000);
 
     private readonly ILogger<DataYmlService> _logger;
     private readonly IFramework _framework;
@@ -20,7 +20,7 @@ public partial class DataYmlService
 
     public ClientStructsData Data { get; set; } = new();
     public List<ClassInfo> Classes { get; } = [];
-    public Dictionary<ulong, ClassInfo> ClassMap { get; } = [];
+    public Dictionary<nint, ClassInfo> ClassMap { get; } = [];
 
     public event Action? Loaded;
 
@@ -102,7 +102,7 @@ public partial class DataYmlService
         {
             value = null;
             var underlyingType = Nullable.GetUnderlyingType(expectedType) ?? expectedType;
-            if (underlyingType != typeof(ulong))
+            if (underlyingType != typeof(nint))
                 return false;
 
             if (!reader.TryConsume<Scalar>(out var scalar) || !TryGetAddress(scalar.Value, out var address))
@@ -115,12 +115,12 @@ public partial class DataYmlService
             return true;
         }
 
-        private static bool TryGetAddress(string value, out ulong address)
+        private static bool TryGetAddress(string value, out nint address)
         {
             address = 0;
             if (value.Length <= 2 || !value.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
                 return false;
-            return ulong.TryParse(value.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out address);
+            return nint.TryParse(value.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out address);
         }
     }
 }
