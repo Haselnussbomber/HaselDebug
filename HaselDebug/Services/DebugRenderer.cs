@@ -24,6 +24,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
+using HaselDebug.Services.Data;
 using HaselDebug.Utils;
 using static Dalamud.Utility.StringExtensions;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkUldManager;
@@ -67,6 +68,7 @@ public unsafe partial class DebugRenderer
     private readonly AddonObserver _addonObserver;
     private readonly ExcelService _excelService;
     private readonly NavigationService _navigationService;
+    private readonly DataYmlService _dataYml;
 
     public void DrawPointerType(void* obj, Type? type, NodeOptions nodeOptions)
         => DrawPointerType((nint)obj, type, nodeOptions);
@@ -1120,14 +1122,19 @@ public unsafe partial class DebugRenderer
     {
         if (address == 0)
         {
-            ImGui.Text("");
+            ImGui.Text("null");
             return;
         }
 
         if (address > _sigScanner.Module.BaseAddress && !ImGui.IsKeyDown(ImGuiKey.LeftShift))
         {
-            ImGuiUtils.DrawCopyableText($"+0x{address - _sigScanner.Module.BaseAddress:X}");
-            return;
+            var offset = address - _sigScanner.Module.BaseAddress;
+            var dataOffset = DataYmlService.BaseAddress + offset;
+
+            ImGuiUtils.DrawCopyableText($"+0x{offset:X}", new CopyableTextOptions()
+            {
+                Tooltip = _dataYml.FunctionNames.TryGetValue(dataOffset, out var fn) ? fn : null // TODO: suboptimal display of info
+            });
         }
         else
         {

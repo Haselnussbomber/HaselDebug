@@ -21,6 +21,7 @@ public partial class DataYmlService
     public ClientStructsData Data { get; set; } = new();
     public List<ClassInfo> Classes { get; } = [];
     public Dictionary<nint, ClassInfo> ClassMap { get; } = [];
+    public Dictionary<nint, string> FunctionNames { get; } = [];
 
     public event Action? Loaded;
 
@@ -59,10 +60,27 @@ public partial class DataYmlService
         }
 
         UpdateClasses();
+        UpdateFunctionNames();
 
         _logger.LogDebug("Loaded {num} classes", Data.Classes.Count);
 
         _ = _framework.RunOnFrameworkThread(() => Loaded?.Invoke());
+    }
+
+    private void UpdateFunctionNames()
+    {
+        foreach (var func in Data.Functions)
+        {
+            FunctionNames.TryAdd(func.Key, func.Value);
+        }
+
+        foreach (var cl in Classes)
+        {
+            foreach (var func in cl.Functions)
+            {
+                FunctionNames[func.Key] = func.Value;
+            }
+        }
     }
 
     private void UpdateClasses()
