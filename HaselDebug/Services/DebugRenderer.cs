@@ -1137,7 +1137,7 @@ public unsafe partial class DebugRenderer
 
     public object? DrawNumeric(nint address, Type type, NodeOptions nodeOptions)
     {
-        if (!MemoryUtils.IsPointerValid(address))
+        if (address == 0)
         {
             ImGui.Text("null"u8);
             return 0;
