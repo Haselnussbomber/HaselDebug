@@ -7,6 +7,7 @@ namespace HaselDebug.Services;
 [RegisterSingleton, AutoConstruct]
 public partial class InstancesService
 {
+    private readonly ILogger<InstancesService> _logger;
     private readonly IFramework _framework;
 
     public Instance[] Instances { get; private set; } = [];
@@ -29,22 +30,30 @@ public partial class InstancesService
             if (!type.IsStruct())
                 continue;
 
-            var method = type.GetMethod("Instance", BindingFlags.Static | BindingFlags.Public);
-            if (method == null || method.GetParameters().Length != 0 || !method.ReturnType.IsPointer)
-                continue;
-
-            var pointer = method?.Invoke(null, null);
-            if (pointer == null)
-                continue;
-
-            unsafe
+            try
             {
-                var address = (nint)Pointer.Unbox(pointer);
-                list.Add(new Instance(address, type));
+                var method = type.GetMethod("Instance", BindingFlags.Static | BindingFlags.Public);
+                if (method == null || method.GetParameters().Length != 0 || !method.ReturnType.IsPointer)
+                    continue;
+
+                var pointer = method?.Invoke(null, null);
+                if (pointer == null)
+                    continue;
+
+                unsafe
+                {
+                    var address = (nint)Pointer.Unbox(pointer);
+                    list.Add(new Instance(address, type));
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unexpected exception while loading instances");
             }
         }
 
         Instances = [.. list];
+        _logger.LogDebug("Loaded {count} instances", list.Count);
 
         _ = _framework.RunOnFrameworkThread(() => Loaded?.Invoke());
     }

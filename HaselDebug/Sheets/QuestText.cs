@@ -3,6 +3,8 @@ namespace HaselDebug.Sheets;
 [Sheet]
 public readonly struct QuestText(ExcelPage page, uint offset, uint row) : IExcelRow<QuestText>
 {
+    public ExcelPage ExcelPage => page;
+    public uint RowOffset => offset;
     public uint RowId => row;
 
     public ReadOnlySeString LuaKey => page.ReadString(offset, offset);

@@ -12,5 +12,5 @@ public partial class TypeColumn : ColumnString<Item>
     }
 
     public override string ToName(Item row)
-        => ((ItemActionType)row.ItemAction.Value.Type).ToString();
+        => ((ItemActionType)row.ItemAction.Value.Action.RowId).ToString();
 }

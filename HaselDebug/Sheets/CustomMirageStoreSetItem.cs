@@ -3,6 +3,8 @@ namespace HaselDebug.Sheets;
 [Sheet("MirageStoreSetItem")]
 public readonly unsafe struct CustomMirageStoreSetItem(ExcelPage page, uint offset, uint row) : IExcelRow<CustomMirageStoreSetItem>
 {
+    public ExcelPage ExcelPage => page;
+    public uint RowOffset => offset;
     public uint RowId => row;
 
     public readonly RowRef<Item> Set => new(page.Module, RowId, page.Language);

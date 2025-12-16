@@ -132,7 +132,7 @@ public partial class LocationColumn : ColumnString<AetherCurrentEntry>
         }
         else
         {
-            if (!_excelService.TryFindRow<EObj>(row => row.Data == aetherCurrent.RowId, out eobj))
+            if (!_excelService.TryFindRow<EObj>(row => row.Data.RowId == aetherCurrent.RowId, out eobj))
                 return false;
 
             _table.AetherCurrentEObjCache.Add(aetherCurrent.RowId, eobj.RowId);

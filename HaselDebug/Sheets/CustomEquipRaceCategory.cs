@@ -3,6 +3,8 @@ namespace HaselDebug.Sheets;
 [Sheet("EquipRaceCategory")]
 public readonly unsafe struct CustomEquipRaceCategory(ExcelPage page, uint offset, uint row) : IExcelRow<CustomEquipRaceCategory>
 {
+    public ExcelPage ExcelPage => page;
+    public uint RowOffset => offset;
     public uint RowId => row;
 
     public readonly Collection<bool> Races => new(page, offset, offset, &RaceCtor, 8);

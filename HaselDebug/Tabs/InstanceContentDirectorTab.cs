@@ -59,7 +59,7 @@ public unsafe partial class InstanceContentDirectorTab : DebugTab
 
         ImGui.Text("CraftLeveEventHandler:"u8);
         ImGui.SameLine();
-        var craftLeveEventHandler = EventFramework.Instance()->EventHandlerModule.CraftLeveEventHandler;
+        var craftLeveEventHandler = EventFramework.Instance()->EventHandlerModule.CraftLeveClientEventHandler;
         if (craftLeveEventHandler == null)
         {
             ImGui.Text("None active"u8);

@@ -102,6 +102,8 @@ public unsafe partial class UnlocksTabUtils
         {
             TargetDrawList = default(ImDrawListPtr),
             Font = ImGui.GetFont(),
+            ScreenOffset = ImGui.GetCursorScreenPos(),
+            FontSize = ImGui.GetFontSize(),
         });
 
         ImGui.TableSetupColumn("Icon"u8, ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale + itemInnerSpacing.X);

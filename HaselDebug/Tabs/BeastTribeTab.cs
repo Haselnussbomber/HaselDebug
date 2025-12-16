@@ -41,13 +41,13 @@ public unsafe partial class BeastTribeTab : DebugTab
 
             var currentRep = playerState->GetBeastTribeCurrentReputation(index);
             var neededRep = playerState->GetBeastTribeNeededReputation(index);
-            var isAllied = row.Expansion.RowId != 0 && row.Unknown1 != 0 && QuestManager.IsQuestComplete(row.Unknown1);
+            var isAllied = row.Expansion.RowId != 0 && row.IntersocietalQuest.RowId != 0 && QuestManager.IsQuestComplete(row.IntersocietalQuest.RowId);
             var maxRank = isAllied ? 8 : row.MaxRank;
             var rankName = rankRow.AlliedNames;
 
             if (row.Expansion.RowId != 0
-                && row.Unknown1 != 0
-                && QuestManager.IsQuestComplete(row.Unknown1))
+                && row.IntersocietalQuest.RowId != 0
+                && QuestManager.IsQuestComplete(row.IntersocietalQuest.RowId))
             {
                 rank++;
                 rankName = rankRow.Name;
@@ -67,7 +67,7 @@ public unsafe partial class BeastTribeTab : DebugTab
 
             ImGui.TableNextColumn(); // Name
             _debugRenderer.DrawIcon(row.Icon);
-            if (_excelService.TryGetRow<Level>(row.Unknown2, out var level) && _teleportService.TryGetClosestAetheryte(level, out var aetheryte))
+            if (_excelService.TryGetRow<Level>(row.Level.RowId, out var level) && _teleportService.TryGetClosestAetheryte(level, out var aetheryte))
             {
                 var clicked = ImGui.Selectable(row.Name.ToString());
                 if (ImGui.IsItemHovered())

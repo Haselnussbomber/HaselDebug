@@ -226,7 +226,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
                     row.HintItem.IsValid &&
                     row.HintItem.Value.ItemAction.RowId != 0 &&
                     row.HintItem.Value.ItemAction.IsValid &&
-                    row.HintItem.Value.ItemAction.Value.Type == (uint)ItemActionType.UnlockLink &&
+                    row.HintItem.Value.ItemAction.Value.Action.RowId == (uint)ItemActionType.UnlockLink &&
                     row.HintItem.Value.ItemAction.Value.Data[0] == row.UnlockLink)
                 {
                     // Hairstyles
@@ -343,17 +343,17 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
         foreach (var row in _excelService.GetSheet<EmjVoiceNpc>())
         {
-            if (row.Unknown26 == 0)
+            if (row.UnlockLink == 0)
                 continue;
 
-            if (!dict.TryGetValue(row.Unknown26, out var names))
-                dict.Add(row.Unknown26, names = []);
+            if (!dict.TryGetValue(row.UnlockLink, out var names))
+                dict.Add(row.UnlockLink, names = []);
 
             names.Add(new UnlockEntry()
             {
                 RowType = typeof(EmjVoiceNpc),
                 RowId = row.RowId,
-                Label = row.Unknown24.ToString(),
+                Label = row.Name.ToString(),
             });
         }
 
@@ -376,18 +376,18 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
         foreach (var row in _excelService.GetSheet<EventTutorial>())
         {
-            if (row.Unknown2 == 0)
+            if (row.UnlockLink == 0)
                 continue;
 
-            if (!dict.TryGetValue(row.Unknown2, out var names))
-                dict.Add(row.Unknown2, names = []);
+            if (!dict.TryGetValue(row.UnlockLink, out var names))
+                dict.Add(row.UnlockLink, names = []);
 
             names.Add(new UnlockEntry()
             {
                 RowType = typeof(EventTutorial),
                 RowId = row.RowId,
                 TexturePath = "ui/uld/EventTutorial_hr1.tex",
-                Label = row.Unknown0.ToString(),
+                Label = row.Singular.ToString(),
             });
         }
 
@@ -411,7 +411,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
         foreach (var row in _excelService.GetSheet<Item>())
         {
-            if (row.ItemAction.RowId == 0 || !row.ItemAction.IsValid || (ItemActionType)row.ItemAction.Value.Type is not (ItemActionType.UnlockLink or ItemActionType.OccultRecords))
+            if (row.ItemAction.RowId == 0 || !row.ItemAction.IsValid || (ItemActionType)row.ItemAction.Value.Action.RowId is not (ItemActionType.UnlockLink or ItemActionType.OccultRecords))
                 continue;
 
             if (!dict.TryGetValue(row.ItemAction.Value.Data[0], out var names))
@@ -446,11 +446,11 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
         foreach (var row in _excelService.GetSheet<MKDLore>())
         {
-            if (row.Unknown2 == 0)
+            if (row.UnlockLink == 0)
                 continue;
 
-            if (!dict.TryGetValue(row.Unknown2, out var names))
-                dict.Add(row.Unknown2, names = []);
+            if (!dict.TryGetValue(row.UnlockLink, out var names))
+                dict.Add(row.UnlockLink, names = []);
 
             names.Add(new UnlockEntry()
             {
@@ -479,11 +479,11 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
         foreach (var row in _excelService.GetSheet<PatchMark>())
         {
-            if (row.Unknown2 != 4)
+            if (row.RequirementType != 4)
                 continue;
 
-            if (!dict.TryGetValue(row.Unknown0, out var names))
-                dict.Add(row.Unknown0, names = []);
+            if (!dict.TryGetValue(row.Requirement.RowId, out var names))
+                dict.Add(row.Requirement.RowId, names = []);
 
             names.Add(new UnlockEntry()
             {

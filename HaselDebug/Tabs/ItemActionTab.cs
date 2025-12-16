@@ -14,7 +14,7 @@ public unsafe partial class ItemActionTab : DebugTab
     private readonly ExcelService _excelService;
     private readonly DebugRenderer _debugRenderer;
 
-    private ImmutableSortedDictionary<ushort, ItemHandle[]> _dict;
+    private ImmutableSortedDictionary<uint, ItemHandle[]> _dict;
     private Task? _loadTask;
 
     public override string Title => "Item Actions";
@@ -22,7 +22,7 @@ public unsafe partial class ItemActionTab : DebugTab
     private void LoadData()
     {
         _dict = _excelService.GetSheet<ItemAction>()
-            .GroupBy(row => row.Type)
+            .GroupBy(row => row.Action.RowId)
             .ToDictionary(
                 g => g.Key,
                 g => _excelService.FindRows<Item>(item => g.Any(itemAction => itemAction.RowId == item.ItemAction.RowId)).Select(row => (ItemHandle)row).ToArray()
@@ -55,7 +55,7 @@ public unsafe partial class ItemActionTab : DebugTab
             {
                 _debugRenderer.DrawExdRow(typeof(Item), item.ItemId, 0, new NodeOptions()
                 {
-                    AddressPath = new AddressPath([type]),
+                    AddressPath = new AddressPath([(nint)type]),
                     Title = $"[Item#{item.ItemId}] {item.Name}"
                 });
             }

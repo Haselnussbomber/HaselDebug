@@ -30,7 +30,7 @@ public unsafe partial class TripleTriadCardsTable : Table<TripleTriadCardEntry>
         var obtainSheet = _excelService.GetSheet<TripleTriadCardObtain>();
 
         var cardItems = _excelService.GetSheet<Item>()
-            .Where(itemRow => itemRow.ItemAction.Value.Type == (uint)ItemActionType.TripleTriadCard)
+            .Where(itemRow => itemRow.ItemAction.Value.Action.RowId == (uint)ItemActionType.TripleTriadCard)
             .ToDictionary(itemRow => (uint)itemRow.ItemAction.Value!.Data[0]);
 
         Rows = _excelService.GetSheet<TripleTriadCard>()

@@ -20,7 +20,7 @@ public static unsafe class MemoryUtils
     public static bool IsPointerValid(void* ptr)
     {
         return ptr != null
-            && PInvoke.VirtualQuery(ptr, out var mbi, (nuint)sizeof(MEMORY_BASIC_INFORMATION)) != 0
+            && PInvoke.VirtualQuery(ptr, out var mbi) != 0
             && mbi.State == VIRTUAL_ALLOCATION_TYPE.MEM_COMMIT;
     }
 }
