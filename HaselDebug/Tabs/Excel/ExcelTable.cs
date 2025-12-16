@@ -29,6 +29,9 @@ public partial class ExcelTable<T> : Table<T> where T : struct
 
         foreach (var property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
+            if (property.Name is "ExcelPage" or "RowOffset")
+                continue;
+
             var column = ActivatorUtilities.CreateInstance<ExcelSheetColumn<T>>(_serviceProvider, _excelTab, this, property);
 
             AvailableColumns.Add(column);

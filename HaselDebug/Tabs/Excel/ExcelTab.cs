@@ -396,6 +396,9 @@ public unsafe partial class ExcelTab : DebugTab
 
                     foreach (var (index, prop) in properties.Index())
                     {
+                        if (prop.Name is "ExcelPage" or "RowOffset")
+                            continue;
+
                         var value = prop.GetValue(subrow);
                         if (value == null)
                             continue;
@@ -438,6 +441,9 @@ public unsafe partial class ExcelTab : DebugTab
 
                 foreach (var (index, prop) in properties.Index())
                 {
+                    if (prop.Name is "ExcelPage" or "RowOffset")
+                        continue;
+
                     var value = prop.GetValue(row);
                     if (value == null)
                         continue;
