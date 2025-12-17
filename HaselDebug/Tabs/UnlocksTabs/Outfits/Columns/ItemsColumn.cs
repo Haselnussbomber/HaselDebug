@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -40,16 +41,33 @@ public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
 
     public override unsafe void DrawColumn(CustomMirageStoreSetItem row)
     {
-        var glamourDresserItemIds = ItemFinderModule.Instance()->GlamourDresserItemIds;
-        var isSetCollected = glamourDresserItemIds.Contains(row.RowId);
+        var itemFinderModule = ItemFinderModule.Instance();
+        var glamourDresserItemIds = itemFinderModule->GlamourDresserItemIds;
+        var glamourDresserItemSetUnlockBits = itemFinderModule->GlamourDresserItemSetUnlockBits;
+        var glamourDresserIndex = glamourDresserItemIds.IndexOf(row.RowId);
+        var hasSetItem = glamourDresserIndex != -1;
 
-        for (var i = 1; i < row.Items.Count; i++)
+        var isSetCollected = hasSetItem;
+        if (hasSetItem)
         {
-            var item = row.Items[i];
+            var unlockBitArray = new BitArray((byte*)glamourDresserItemSetUnlockBits.GetPointer(glamourDresserIndex), row.Items.Count);
+            for (var slotIndex = 0; slotIndex < row.Items.Count; slotIndex++)
+            {
+                var slotItem = row.Items[slotIndex];
+                if (slotItem.RowId == 0)
+                    continue;
+
+                isSetCollected &= unlockBitArray.TryGet(slotIndex, out var slotLocked) && !slotLocked;
+            }
+        }
+
+        for (var slotIndex = 0; slotIndex < row.Items.Count; slotIndex++)
+        {
+            var item = row.Items[slotIndex];
             if (item.RowId == 0)
                 continue;
 
-            var isItemCollected = glamourDresserItemIds.Contains(item.RowId) || glamourDresserItemIds.Contains(item.RowId + 1_000_000);
+            var isItemCollected = isSetCollected || (hasSetItem && new BitArray((byte*)glamourDresserItemSetUnlockBits.GetPointer(glamourDresserIndex), row.Items.Count).TryGet(slotIndex, out var slotLocked) && !slotLocked);
             var isItemInInventory = false;
             unsafe
             {

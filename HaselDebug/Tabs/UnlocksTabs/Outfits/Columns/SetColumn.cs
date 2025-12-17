@@ -25,7 +25,11 @@ public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
 
     public override unsafe void DrawColumn(CustomMirageStoreSetItem row)
     {
-        var isSetCollected = ItemFinderModule.Instance()->GlamourDresserItemIds.Contains(row.RowId);
+        var itemFinderModule = ItemFinderModule.Instance();
+        var glamourDresserItemIds = itemFinderModule->GlamourDresserItemIds;
+        var glamourDresserItemSetUnlockBits = itemFinderModule->GlamourDresserItemSetUnlockBits;
+        var glamourDresserIndex = glamourDresserItemIds.IndexOf(row.RowId);
+        var hasSetItem = glamourDresserIndex != -1;
 
         ImGui.BeginGroup();
         ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
@@ -35,7 +39,7 @@ public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
             (uint)row.Set.Value.Icon,
             new(IconSize * ImGuiHelpers.GlobalScale)
             {
-                TintColor = isSetCollected
+                TintColor = hasSetItem
                     ? Color.White
                     : ImGui.IsItemHovered() || ImGui.IsPopupOpen($"###Set_{row.RowId}_Icon_ItemContextMenu")
                         ? Color.White : Color.Grey3
@@ -52,6 +56,22 @@ public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
                 ImGuiUtils.PushCursorY(textureWrap.Height / 2f - ImGui.GetTextLineHeight() / 2f);
             }
             ImGui.Text(ToName(row));
+        }
+
+        var isSetCollected = hasSetItem;
+
+        if (hasSetItem)
+        {
+            var unlockBitArray = new BitArray((byte*)glamourDresserItemSetUnlockBits.GetPointer(glamourDresserIndex), row.Items.Count);
+
+            for (var slotIndex = 0; slotIndex < row.Items.Count; slotIndex++)
+            {
+                var slotItem = row.Items[slotIndex];
+                if (slotItem.RowId == 0)
+                    continue;
+
+                isSetCollected &= unlockBitArray.TryGet(slotIndex, out var slotLocked) && !slotLocked;
+            }
         }
 
         if (isSetCollected)
