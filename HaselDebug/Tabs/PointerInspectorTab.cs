@@ -41,7 +41,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
 
     public override void Draw()
     {
-        _freeMemoryAddress ??= _sigScanner.ScanText("E8 ?? ?? ?? ?? 4D 89 AE") - _sigScanner.Module.BaseAddress;
+        _freeMemoryAddress ??= _sigScanner.ScanText("E8 ?? ?? ?? ?? 48 89 5D ?? 48 8B 74 24") - _sigScanner.Module.BaseAddress;
 
         DrawSearchBox();
 
