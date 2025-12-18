@@ -50,7 +50,7 @@ public unsafe partial class ProcessInfoService : IDisposable
 
     public bool IsPointerValid(void* ptr)
     {
-        return ptr != null && GetSectionToPointer((nint)ptr) != null;
+        return ptr != null && GetSectionToPointer((nint)ptr) != default;
     }
 
     public string GetAddressName(nint address)
@@ -61,7 +61,7 @@ public unsafe partial class ProcessInfoService : IDisposable
         // }
 
         var section = GetSectionToPointer(address);
-        if (section != null)
+        if (section != default)
         {
             if (section.Category == SectionCategory.CODE || section.Category == SectionCategory.DATA)
             {
@@ -88,53 +88,53 @@ public unsafe partial class ProcessInfoService : IDisposable
         var modules = Modules;
         var index = FindModuleIndex(modules, address);
         return index < 0 ? default : modules[index];
-    }
 
-    private static int FindModuleIndex(ModuleInfo[] modules, nint address)
-    {
-        var min = 0;
-        var max = modules.Length - 1;
-        while (min <= max)
+        static int FindModuleIndex(ModuleInfo[] modules, nint address)
         {
-            var mid = (min + max) / 2;
-            var module = modules[mid];
+            var min = 0;
+            var max = modules.Length - 1;
+            while (min <= max)
+            {
+                var mid = (min + max) / 2;
+                var module = modules[mid];
 
-            if (address >= module.BaseAddress && address < module.BaseAddress + module.Size)
-                return mid;
+                if (address >= module.BaseAddress && address < module.BaseAddress + module.Size)
+                    return mid;
 
-            if (address < module.BaseAddress)
-                max = mid - 1;
-            else
-                min = mid + 1;
+                if (address < module.BaseAddress)
+                    max = mid - 1;
+                else
+                    min = mid + 1;
+            }
+            return -1;
         }
-        return -1;
     }
 
-    public SectionInfo? GetSectionToPointer(nint address)
+    public SectionInfo GetSectionToPointer(nint address)
     {
         var sections = Sections;
         var index = FindSectionIndex(sections, address);
-        return index < 0 ? null : sections[index];
-    }
+        return index < 0 ? default : sections[index];
 
-    private static int FindSectionIndex(SectionInfo[] sections, nint address)
-    {
-        var min = 0;
-        var max = sections.Length - 1;
-        while (min <= max)
+        static int FindSectionIndex(SectionInfo[] sections, nint address)
         {
-            var mid = (min + max) / 2;
-            var section = sections[mid];
+            var min = 0;
+            var max = sections.Length - 1;
+            while (min <= max)
+            {
+                var mid = (min + max) / 2;
+                var section = sections[mid];
 
-            if (address >= section.Start && address < section.End)
-                return mid;
+                if (address >= section.Start && address < section.End)
+                    return mid;
 
-            if (address < section.Start)
-                max = mid - 1;
-            else
-                min = mid + 1;
+                if (address < section.Start)
+                    max = mid - 1;
+                else
+                    min = mid + 1;
+            }
+            return -1;
         }
-        return -1;
     }
 
     private ModuleInfo[] GetModules(HANDLE processHandle)
@@ -212,36 +212,58 @@ public unsafe partial class ProcessInfoService : IDisposable
             {
                 var sectionAddress = module.BaseAddress + sectionHeader.VirtualAddress;
 
-                foreach (var section in sections)
+                var idx = FindSectionIndexInList(sections, (nint)sectionAddress);
+                if (idx == -1)
+                    continue;
+
+                ref var section = ref CollectionsMarshal.AsSpan(sections)[idx];
+
+                if (sectionAddress < section.Start)
+                    continue;
+
+                if (sectionAddress >= section.Start + section.Size)
+                    continue;
+
+                if (sectionHeader.VirtualAddress + sectionHeader.Misc.VirtualSize > module.Size)
+                    continue;
+
+                if (sectionHeader.Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_CODE))
                 {
-                    if (sectionAddress < section.Start)
-                        continue;
-
-                    if (sectionAddress >= section.Start + section.Size)
-                        continue;
-
-                    if (sectionHeader.VirtualAddress + sectionHeader.Misc.VirtualSize > module.Size)
-                        continue;
-
-                    if (sectionHeader.Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_CODE))
-                    {
-                        section.Category = SectionCategory.CODE;
-                    }
-                    else if (sectionHeader.Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_INITIALIZED_DATA)
-                        || sectionHeader.Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_UNINITIALIZED_DATA))
-                    {
-                        section.Category = SectionCategory.DATA;
-                    }
-
-                    section.Name = Encoding.UTF8.GetString(sectionHeader.Name.AsSpan()).TrimEnd('\0');
-                    section.ModulePath = module.Path;
-                    section.ModuleName = Path.GetFileName(module.Path);
-                    break;
+                    section.Category = SectionCategory.CODE;
                 }
+                else if (sectionHeader.Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_INITIALIZED_DATA)
+                    || sectionHeader.Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_UNINITIALIZED_DATA))
+                {
+                    section.Category = SectionCategory.DATA;
+                }
+
+                section.Name = Encoding.UTF8.GetString(sectionHeader.Name.AsSpan()).TrimEnd('\0');
+                section.ModulePath = module.Path;
+                section.ModuleName = Path.GetFileName(module.Path);
             }
         }
 
         return [.. sections.OrderBy(section => section.Start)];
+
+        static int FindSectionIndexInList(List<SectionInfo> sections, nint address)
+        {
+            var min = 0;
+            var max = sections.Count - 1;
+            while (min <= max)
+            {
+                var mid = (min + max) / 2;
+                var section = sections[mid];
+
+                if (address >= section.Start && address < section.End)
+                    return mid;
+
+                if (address < section.Start)
+                    max = mid - 1;
+                else
+                    min = mid + 1;
+            }
+            return -1;
+        }
     }
 }
 
@@ -253,7 +275,7 @@ public enum SectionCategory
     HEAP
 }
 
-public record SectionInfo
+public record struct SectionInfo
 {
     public required nint Start { get; set; }
     public required nint End { get; set; }
