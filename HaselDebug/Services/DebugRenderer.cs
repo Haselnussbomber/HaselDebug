@@ -677,7 +677,7 @@ public unsafe partial class DebugRenderer
 
             ImGuiUtils.DrawCopyableText($"[0x{offset:X}]", new()
             {
-                CopyText = ImGui.IsKeyDown(ImGuiKey.LeftShift) ? $"0x{offset:X}" : $"{address + offset:X}",
+                CopyText = ImGui.IsKeyDown(ImGuiKey.LeftShift) ? $"{address + offset:X}" : $"0x{offset:X}",
                 TextColor = Color.Grey3
             });
 
