@@ -96,7 +96,7 @@ public unsafe partial class InstanceContentDirectorTab : DebugTab
         {
             var ic = _excelService.GetSheet<InstanceContent>().GetRow(instanceContentDirector->ContentDirector.Director.ContentId);
             var cfc = _excelService.GetSheet<ContentFinderCondition>(ClientLanguage.English).GetRow(ic.ContentFinderCondition.RowId);
-            var key = (!cfc.Name.IsEmpty ? cfc.Name : instanceContentDirector->ContentDirector.Director.UnkString0.ToString(), instanceContentDirector->InstanceContentType);
+            var key = (!cfc.Name.IsEmpty ? cfc.Name : $"{nameof(ContentFinderCondition)}#{cfc.RowId}", instanceContentDirector->InstanceContentType);
             if (!InstanceContentTypeVtables.ContainsKey(key))
             {
                 InstanceContentTypeVtables.Add(key, *(nint*)instanceContentDirector);
