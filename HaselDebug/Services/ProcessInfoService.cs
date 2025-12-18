@@ -75,7 +75,7 @@ public unsafe partial class ProcessInfoService : IDisposable
         if (module != default)
         {
             var offset = address - module.BaseAddress;
-            return $"{module.Name}+0x{offset:X}";
+            return $"{(module.Name == "ffxiv_dx11.exe" ? "" : module.Name)}+0x{offset:X}";
         }
 
         return address.ToString("X");
