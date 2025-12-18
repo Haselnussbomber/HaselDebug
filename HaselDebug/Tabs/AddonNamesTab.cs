@@ -73,14 +73,6 @@ public partial class AddonNameTable : Table<AddonNameEntry>, IDisposable
         public override unsafe void DrawColumn(AddonNameEntry row)
         {
             ImGuiUtils.DrawCopyableText(ToName(row));
-
-            if (ImGui.IsItemClicked())
-            {
-                var values = stackalloc AtkValue[3];
-                values[0].SetManagedString("Test");
-                values[1].SetUInt(0);
-                RaptureAtkModule.Instance()->OpenAddon((uint)row.Index, 2, values, null, 0, 0, 0);
-            }
         }
     }
 }
