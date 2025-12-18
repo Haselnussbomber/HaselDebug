@@ -6,7 +6,7 @@
     <OutputPath>..\bin\</OutputPath>
     <DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
     <DefineConstants>$(DefineConstants);AUTOCTOR_EMBED_ATTRIBUTES</DefineConstants>
-    <NoWarn>$(NoWarn);Dalamud001</NoWarn>
+    <NoWarn>$(NoWarn);Dalamud001;MSB3277</NoWarn>
   </PropertyGroup>
 
   <!-- Dalamud.NET.Sdk settings -->

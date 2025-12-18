@@ -5,7 +5,7 @@ using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using TerritoryIntendedUseEnum = HaselCommon.Game.Enums.TerritoryIntendedUse;
+using TerritoryIntendedUseEnum = FFXIVClientStructs.FFXIV.Client.Enums.TerritoryIntendedUse;
 
 namespace HaselDebug.Tabs;
 
