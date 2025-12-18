@@ -55,7 +55,7 @@ public unsafe partial class AtkDebugRenderer
         if ((unitBase == null && !string.IsNullOrEmpty(drawParams.AddonName)) || (unitBase != null && unitBase->NameString != drawParams.AddonName))
             unitBase = unitManager->GetAddonByName(drawParams.AddonName);
 
-        if (_processInfoService.IsPointerValidationEnabled && !_processInfoService.IsPointerValid(unitBase))
+        if (!_processInfoService.IsPointerValid(unitBase))
         {
             ImGui.Text($"Could not find addon with id {drawParams.AddonId} or name {drawParams.AddonName}");
             return;

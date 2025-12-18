@@ -7,10 +7,7 @@ public static unsafe class AtkUnitManagerExtensions
 {
     public static AtkUnitBase* GetAddonByNodeSafe(ref this AtkUnitManager atkUnitManager, AtkResNode* needle)
     {
-        if (!ServiceLocator.TryGetService<ProcessInfoService>(out var processInfoService))
-            return null;
-
-        if (processInfoService.IsPointerValidationEnabled && !processInfoService.IsPointerValid(needle))
+        if (!ServiceLocator.TryGetService<ProcessInfoService>(out var processInfoService) || !processInfoService.IsPointerValid(needle))
             return null;
 
         var count = atkUnitManager.AllLoadedUnitsList.Count;

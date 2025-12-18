@@ -32,14 +32,6 @@
     "en": "Writes print and panics to the Debug log.",
     "de": "Schreibt print und panics in die Debug-Log."
   },
-  "Config.EnablePointerValidation.Label": {
-    "en": "Enable Pointer Validation",
-    "de": "Pointervalidierung aktivieren"
-  },
-  "Config.EnablePointerValidation.Description": {
-    "en": "Checks whether the pointer refers to committed memory. This is resource-intensive, but might prevent crashes!",
-    "de": "Überprüft, ob der Pointer auf fest zugewiesenen Speicher verweist. Dies ist ressourcenintensiv, aber könnte Abstürze verhindern!"
-  },
 
   "SearchBar.Hint": {
     "en": "Search...",

@@ -37,8 +37,6 @@ public unsafe partial class ProcessInfoService : IDisposable
     public ModuleInfo[] Modules { get; private set; } = [];
     public SectionInfo[] Sections { get; private set; } = [];
 
-    public bool IsPointerValidationEnabled => _pluginConfig.EnablePointerValidation;
-
     private void Refresh()
     {
         var processHandle = PInvoke.GetCurrentProcess();

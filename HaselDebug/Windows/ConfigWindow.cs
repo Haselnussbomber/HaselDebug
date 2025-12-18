@@ -39,9 +39,6 @@ public partial class ConfigWindow : SimpleWindow
         using (ImGuiUtils.ConfigIndent())
             ImGui.TextColoredWrapped(Color.Grey3, _textService.Translate("Config.EnableLuaLogger.Description"));
 
-        // EnablePointerValidation
-        configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.EnablePointerValidation.Label")}##EnablePointerValidation", ref _pluginConfig.EnablePointerValidation);
-
         using (ImGuiUtils.ConfigIndent())
             ImGui.TextColoredWrapped(Color.Grey3, _textService.Translate("Config.EnablePointerValidation.Description"));
 
