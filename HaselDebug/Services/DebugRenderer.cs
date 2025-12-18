@@ -1129,20 +1129,14 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (address > _sigScanner.Module.BaseAddress && !ImGui.IsKeyDown(ImGuiKey.LeftShift))
-        {
-            var offset = address - _sigScanner.Module.BaseAddress;
-            var dataOffset = DataYmlService.BaseAddress + offset;
-
-            ImGuiUtils.DrawCopyableText($"+0x{offset:X}", new CopyableTextOptions()
-            {
-                Tooltip = _dataYml.FunctionNames.TryGetValue(dataOffset, out var fn) ? fn : null // TODO: suboptimal display of info
-            });
-        }
-        else
+        if (ImGui.IsKeyDown(ImGuiKey.LeftShift))
         {
             ImGuiUtils.DrawCopyableText($"0x{address:X}");
+            return;
         }
+
+        var addressName = _processInfoService.GetAddressName(address);
+        ImGuiUtils.DrawCopyableText(addressName);
     }
 
     public object? DrawNumeric(nint address, Type type, NodeOptions nodeOptions)

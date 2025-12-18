@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Text;
 using System.Timers;
@@ -61,24 +60,25 @@ public unsafe partial class ProcessInfoService : IDisposable
         var section = GetSectionToPointer(address);
         if (section != default)
         {
-            if (section.Category == SectionCategory.CODE || section.Category == SectionCategory.DATA)
+            switch (section.Category)
             {
-                // Code and Data sections belong to a module.
-                return $"<{section.Category}>{section.ModuleName}.{address:X}";
-            }
-            if (section.Category == SectionCategory.HEAP)
-            {
-                return $"<HEAP>{address:X}";
+                case SectionCategory.CODE:
+                case SectionCategory.DATA:
+                    return $"{(section.ModuleName == "ffxiv_dx11.exe" ? "" : section.ModuleName)}+0x{address - section.Start:X}"; // <{section.Category}>
+
+                case SectionCategory.HEAP:
+                    return address.ToString("X");
             }
         }
 
         var module = GetModuleToPointer(address);
         if (module != default)
         {
-            return $"{module.Name}.{address:X}";
+            var offset = address - module.BaseAddress;
+            return $"{module.Name}+0x{offset:X}";
         }
 
-        return string.Empty;
+        return address.ToString("X");
     }
 
     public ModuleInfo GetModuleToPointer(nint address)
