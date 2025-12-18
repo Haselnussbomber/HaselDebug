@@ -28,8 +28,7 @@ public partial class InstancesTab : DebugTab
 
         using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
-        var i = 0;
-        foreach (var (ptr, type) in _instancesService.Instances)
+        foreach (var (i, (ptr, type)) in _instancesService.Instances.Index())
         {
             if (_typeService.AgentTypes != null && _typeService.AgentTypes.ContainsValue(type))
                 continue;
@@ -41,7 +40,7 @@ public partial class InstancesTab : DebugTab
             ImGui.SameLine(120);
             _debugRenderer.DrawPointerType(ptr, type, new NodeOptions()
             {
-                AddressPath = new AddressPath(i++),
+                AddressPath = new AddressPath(i),
                 DrawContextMenu = (nodeOptions, builder) =>
                 {
                     var isPinned = _pinnedInstances.Contains(type);
