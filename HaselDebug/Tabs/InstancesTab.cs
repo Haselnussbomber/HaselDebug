@@ -1,5 +1,3 @@
-using System.Reflection;
-using FFXIVClientStructs.Attributes;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -18,6 +16,7 @@ public partial class InstancesTab : DebugTab
     private readonly WindowManager _windowManager;
     private readonly InstancesService _instancesService;
     private readonly PinnedInstancesService _pinnedInstances;
+    private readonly TypeService _typeService;
 
     private string _searchTerm = string.Empty;
 
@@ -32,8 +31,11 @@ public partial class InstancesTab : DebugTab
         var i = 0;
         foreach (var (ptr, type) in _instancesService.Instances)
         {
-            if (type.GetCustomAttribute<AgentAttribute>() != null) continue;
-            if (hasSearchTerm && !type.FullName!.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)) continue;
+            if (_typeService.AgentTypes != null && _typeService.AgentTypes.ContainsValue(type))
+                continue;
+
+            if (hasSearchTerm && !type.FullName!.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
+                continue;
 
             _debugRenderer.DrawAddress(ptr);
             ImGui.SameLine(120);
