@@ -2,6 +2,7 @@ using System.Reflection;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Extensions;
+using HaselDebug.Service;
 
 namespace HaselDebug.Utils;
 
@@ -56,20 +57,5 @@ public static unsafe class DebugUtils
         result = currentType == targetType;
         InheritsCache.TryAdd((pointerType, targetType), result);
         return result;
-    }
-
-    public static void HighlightNode(AtkResNode* node)
-    {
-        if (!MemoryUtils.IsPointerValid(node))
-            return;
-
-        var scale = 1f;
-        var addon = RaptureAtkUnitManager.Instance()->AtkUnitManager.GetAddonByNodeSafe(node);
-        if (MemoryUtils.IsPointerValid(addon))
-            scale *= addon->Scale;
-
-        var pos = new Vector2(node->ScreenX, node->ScreenY);
-        var size = new Vector2(node->Width, node->Height) * scale;
-        ImGui.GetForegroundDrawList().AddRect(pos, pos + size, Color.Gold.ToUInt());
     }
 }

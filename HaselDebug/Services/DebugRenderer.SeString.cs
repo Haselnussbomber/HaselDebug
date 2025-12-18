@@ -115,7 +115,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!MemoryUtils.IsPointerValid(address))
+        if (!_processInfoService.IsPointerValid(address))
         {
             ImGui.Text("invalid"u8);
             return;
@@ -135,7 +135,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!MemoryUtils.IsPointerValid(ptr))
+        if (!_processInfoService.IsPointerValid(ptr))
         {
             ImGui.Text("invalid"u8);
             return;

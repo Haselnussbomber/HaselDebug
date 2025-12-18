@@ -108,6 +108,8 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
                             RaptureHotbarModule.HotbarSlotType.Ornament => _textService.GetOrnamentName(slot->CommandId),
                             // LostFindsItem
                             RaptureHotbarModule.HotbarSlotType.Glasses => _textService.GetGlassesName(slot->CommandId),
+                            RaptureHotbarModule.HotbarSlotType.PhantomAction => _textService.GetAddonText(slot->CommandId switch { 1 => 16296, 2 => 16298, _ => 0 }),
+                            RaptureHotbarModule.HotbarSlotType.QuickPanel => _seStringEvaluatorService.EvaluateFromAddon(17215, [slot->CommandId + 1]).ToString(),
                             _ => string.Empty
                         }
                     });

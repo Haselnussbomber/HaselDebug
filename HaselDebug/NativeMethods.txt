@@ -1,2 +1,10 @@
+CreateToolhelp32Snapshot
+GetCurrentProcess
+GetProcessId
+IMAGE_DOS_HEADER
+IMAGE_NT_HEADERS64
+IMAGE_SECTION_HEADER
+Module32FirstW
+Module32NextW
+ReadProcessMemory
 VirtualQuery
-MEMORY_BASIC_INFORMATION

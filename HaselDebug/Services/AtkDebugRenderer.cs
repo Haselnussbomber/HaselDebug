@@ -6,6 +6,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Extensions;
+using HaselDebug.Service;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 
@@ -33,6 +34,7 @@ public unsafe partial class AtkDebugRenderer
     private readonly AddonObserver _addonObserver;
     private readonly PinnedInstancesService _pinnedInstancesService;
     private readonly NavigationService _navigationService;
+    private readonly ProcessInfoService _processInfoService;
     private readonly Dictionary<string, OrderedDictionary<int, (string, Type?)>> _fieldMapping = [];
     private string _nodeQuery = string.Empty;
 
@@ -53,7 +55,7 @@ public unsafe partial class AtkDebugRenderer
         if ((unitBase == null && !string.IsNullOrEmpty(drawParams.AddonName)) || (unitBase != null && unitBase->NameString != drawParams.AddonName))
             unitBase = unitManager->GetAddonByName(drawParams.AddonName);
 
-        if (MemoryUtils.IsPointerValidationEnabled() && !MemoryUtils.IsPointerValid(unitBase))
+        if (_processInfoService.IsPointerValidationEnabled && !_processInfoService.IsPointerValid(unitBase))
         {
             ImGui.Text($"Could not find addon with id {drawParams.AddonId} or name {drawParams.AddonName}");
             return;

@@ -1,6 +1,7 @@
 using System.Globalization;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
+using HaselDebug.Service;
 using HaselDebug.Services;
 using HaselDebug.Services.Data;
 using HaselDebug.Utils;
@@ -15,6 +16,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
     private readonly TypeService _typeService;
     private readonly DebugRenderer _debugRenderer;
     private readonly ISigScanner _sigScanner;
+    private readonly ProcessInfoService _processInfoService;
     private readonly ILogger<PointerInspectorTab> _logger;
 
     private readonly List<OffsetInfo> _offsetMappings = [];
@@ -112,11 +114,11 @@ public unsafe partial class PointerInspectorTab : DebugTab
         _currentStructInfo = null;
         _currentStructFields = null;
 
-        if (!MemoryUtils.IsPointerValid(_memoryAddress) || _memorySize == 0)
+        if (!_processInfoService.IsPointerValid(_memoryAddress) || _memorySize == 0)
             return;
 
         var vtablePtr = *(nint*)_memoryAddress;
-        if (MemoryUtils.IsPointerValid(vtablePtr))
+        if (_processInfoService.IsPointerValid(vtablePtr))
         {
             foreach (var (name, cl) in _dataYml.Data.Classes)
             {
@@ -151,15 +153,15 @@ public unsafe partial class PointerInspectorTab : DebugTab
         foreach (var offsetIndex in Enumerable.Range(0, (int)_memorySize / 8))
         {
             var offsetAddress = _memoryAddress + offsetIndex * 8;
-            if (!MemoryUtils.IsPointerValid(offsetAddress))
+            if (!_processInfoService.IsPointerValid(offsetAddress))
                 continue;
 
             var objectPointer = *(nint*)offsetAddress;
-            if (!MemoryUtils.IsPointerValid(objectPointer))
+            if (!_processInfoService.IsPointerValid(objectPointer))
                 continue;
 
             var virtualTablePointer = *(nint*)objectPointer;
-            if (!MemoryUtils.IsPointerValid(virtualTablePointer))
+            if (!_processInfoService.IsPointerValid(virtualTablePointer))
                 continue;
 
             var foundInFields = false;
@@ -218,7 +220,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
 
     private void DrawResults()
     {
-        if (!MemoryUtils.IsPointerValid(_memoryAddress))
+        if (!_processInfoService.IsPointerValid(_memoryAddress))
         {
             ImGui.Text("Invalid pointer.");
             return;
@@ -281,21 +283,21 @@ public unsafe partial class PointerInspectorTab : DebugTab
 
     private void FindSize()
     {
-        if (!MemoryUtils.IsPointerValid(_memoryAddress))
+        if (!_processInfoService.IsPointerValid(_memoryAddress))
         {
             _logger.LogWarning("FindSize failed at _memoryAddress ({_memoryAddress:X})", _memoryAddress);
             return;
         }
 
         var vtblPtr = *(nint*)_memoryAddress;
-        if (!MemoryUtils.IsPointerValid(vtblPtr))
+        if (!_processInfoService.IsPointerValid(vtblPtr))
         {
             _logger.LogWarning("FindSize failed at vtblPtr ({vtblPtr:X})", vtblPtr);
             return;
         }
 
         var vf0Ptr = *(nint*)vtblPtr;
-        if (!MemoryUtils.IsPointerValid(vf0Ptr))
+        if (!_processInfoService.IsPointerValid(vf0Ptr))
         {
             _logger.LogWarning("FindSize failed at vf0Ptr ({vf0Ptr:X})", vf0Ptr);
             return;

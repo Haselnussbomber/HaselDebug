@@ -24,6 +24,8 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
+using HaselDebug.Extensions;
+using HaselDebug.Service;
 using HaselDebug.Services.Data;
 using HaselDebug.Utils;
 using static Dalamud.Utility.StringExtensions;
@@ -69,6 +71,7 @@ public unsafe partial class DebugRenderer
     private readonly ExcelService _excelService;
     private readonly NavigationService _navigationService;
     private readonly DataYmlService _dataYml;
+    private readonly ProcessInfoService _processInfoService;
 
     public void DrawPointerType(void* obj, Type? type, NodeOptions nodeOptions)
         => DrawPointerType((nint)obj, type, nodeOptions);
@@ -87,7 +90,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!MemoryUtils.IsPointerValid(address))
+        if (!_processInfoService.IsPointerValid(address))
         {
             ImGui.Text("invalid"u8);
             return;
@@ -111,7 +114,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!MemoryUtils.IsPointerValid(address))
+        if (!_processInfoService.IsPointerValid(address))
         {
             ImGui.Text("invalid"u8);
             return;
@@ -1485,5 +1488,20 @@ public unsafe partial class DebugRenderer
             var ptr = span.GetPointer(i);
             DrawPointerType(ptr, type, nodeOptions);
         }
+    }
+
+    public void HighlightNode(AtkResNode* node)
+    {
+        if (!_processInfoService.IsPointerValid(node))
+            return;
+
+        var scale = 1f;
+        var addon = RaptureAtkUnitManager.Instance()->AtkUnitManager.GetAddonByNodeSafe(node);
+        if (_processInfoService.IsPointerValid(addon))
+            scale *= addon->Scale;
+
+        var pos = new Vector2(node->ScreenX, node->ScreenY);
+        var size = new Vector2(node->Width, node->Height) * scale;
+        ImGui.GetForegroundDrawList().AddRect(pos, pos + size, Color.Gold.ToUInt());
     }
 }
