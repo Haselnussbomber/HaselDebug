@@ -31,7 +31,7 @@ public unsafe partial class DebugRenderer
 
         foreach (var propInfo in sheetType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
         {
-            if (propInfo.Name == "RowId")
+            if (propInfo.Name is "RowId" or "ExcelPage" or "RowOffset")
                 continue;
 
             ImGuiUtils.DrawCopyableText(propInfo.PropertyType.ReadableTypeName(), new()
@@ -219,7 +219,7 @@ public unsafe partial class DebugRenderer
 
                     foreach (var pi in collectionType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
                     {
-                        if (pi.Name == "RowId")
+                        if (propInfo.Name is "RowId" or "ExcelPage" or "RowOffset")
                             continue;
 
                         ImGuiUtils.DrawCopyableText(pi.PropertyType.ReadableTypeName(), new()
