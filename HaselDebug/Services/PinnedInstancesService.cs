@@ -33,7 +33,7 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
         foreach (var name in _pluginConfig.PinnedInstances)
         {
             var inst = _instancesService.Instances.FirstOrDefault(inst => inst.Type.FullName == name);
-            if (inst == null) continue;
+            if (inst == default) continue;
             _tabs.Add(new PinnedInstanceTab(_debugRenderer, inst.Address, inst.Type));
         }
 

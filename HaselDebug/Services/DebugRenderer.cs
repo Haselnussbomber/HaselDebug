@@ -80,7 +80,7 @@ public unsafe partial class DebugRenderer
     {
         if (type == null)
         {
-            ImGui.Text("");
+            ImGui.Text(""u8);
             return;
         }
 
@@ -104,7 +104,7 @@ public unsafe partial class DebugRenderer
 
         if (type == null)
         {
-            ImGui.Text("");
+            ImGui.Text(""u8);
             return;
         }
 
@@ -134,7 +134,7 @@ public unsafe partial class DebugRenderer
 
         if (type.IsVoid())
         {
-            ImGui.Text("");
+            ImGui.Text(""u8);
             return;
         }
 

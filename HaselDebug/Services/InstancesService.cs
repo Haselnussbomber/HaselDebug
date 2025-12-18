@@ -58,5 +58,5 @@ public partial class InstancesService
         _ = _framework.RunOnFrameworkThread(() => Loaded?.Invoke());
     }
 
-    public record Instance(nint Address, Type Type);
+    public record struct Instance(nint Address, Type Type);
 }
