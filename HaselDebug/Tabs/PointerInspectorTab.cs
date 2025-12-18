@@ -232,7 +232,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
 
             ImGuiUtils.DrawCopyableText($"[0x{info.Offset:X}]", new()
             {
-                CopyText = ImGui.IsKeyDown(ImGuiKey.LeftShift) ? $"0x{info.Offset:X}" : $"{info.Address + info.Offset:X}",
+                CopyText = ImGui.IsKeyDown(ImGuiKey.LeftShift) ? $"{info.Address + info.Offset:X}" : $"0x{info.Offset:X}",
                 TextColor = Color.Grey3
             });
 
