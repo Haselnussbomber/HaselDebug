@@ -22,8 +22,8 @@ public unsafe partial class UIColorTab : DebugTab
         ImGui.TableSetupColumn(_textService.GetAddonText(4233)); // Light
         ImGui.TableSetupColumn(_textService.GetAddonText(4234)); // Classic FF
         ImGui.TableSetupColumn(_textService.GetAddonText(4235)); // Clear Blue
-        ImGui.TableSetupColumn("Unknown0"u8);
-        ImGui.TableSetupColumn("Unknown1"u8);
+        ImGui.TableSetupColumn(_textService.GetAddonText(4236)); // Clear White
+        ImGui.TableSetupColumn(_textService.GetAddonText(4237)); // Clear Green
         ImGui.TableSetupColumn("Unknown2"u8);
         ImGui.TableSetupColumn("Unknown3"u8);
         ImGui.TableSetupScrollFreeze(0, 1);
@@ -59,12 +59,12 @@ public unsafe partial class UIColorTab : DebugTab
             ImGui.TableNextColumn();
             color = (Vector4)Color.FromABGR(row.Unknown0);
             ImGui.SetNextItemWidth(-1);
-            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown0", ref color, ImGuiColorEditFlags.DisplayHex);
+            ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearWhite", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
             color = (Vector4)Color.FromABGR(row.Unknown1);
             ImGui.SetNextItemWidth(-1);
-            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown1", ref color, ImGuiColorEditFlags.DisplayHex);
+            ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearGreen", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
             color = (Vector4)Color.FromABGR(row.Unknown2);
