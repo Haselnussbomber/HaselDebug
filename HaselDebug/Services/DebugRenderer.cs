@@ -24,6 +24,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
+using HaselDebug.Config;
 using HaselDebug.Extensions;
 using HaselDebug.Service;
 using HaselDebug.Services.Data;
@@ -72,6 +73,7 @@ public unsafe partial class DebugRenderer
     private readonly NavigationService _navigationService;
     private readonly DataYmlService _dataYml;
     private readonly ProcessInfoService _processInfoService;
+    private readonly PluginConfig _pluginConfig;
     private readonly IAddonLifecycle _addonLifecycle;
 
     public void DrawPointerType(void* obj, Type? type, NodeOptions nodeOptions)
@@ -122,9 +124,12 @@ public unsafe partial class DebugRenderer
         }
 
         // Get the original VTable address for addons from IAddonLifecycle, if it replaced it
-        var originalAddress = _addonLifecycle.GetOriginalVirtualTable(address);
-        if (originalAddress != 0 && _processInfoService.IsPointerValid(originalAddress))
-            address = originalAddress;
+        if (_pluginConfig.ResolveAddonLifecycleVTables)
+        {
+            var originalAddress = _addonLifecycle.GetOriginalVirtualTable(address);
+            if (originalAddress != 0 && _processInfoService.IsPointerValid(originalAddress))
+                address = originalAddress;
+        }
 
         if (type.IsPointer && type.GetElementType() == typeof(void))
         {

@@ -39,8 +39,8 @@ public partial class ConfigWindow : SimpleWindow
         using (ImGuiUtils.ConfigIndent())
             ImGui.TextColoredWrapped(Color.Grey3, _textService.Translate("Config.EnableLuaLogger.Description"));
 
-        using (ImGuiUtils.ConfigIndent())
-            ImGui.TextColoredWrapped(Color.Grey3, _textService.Translate("Config.EnablePointerValidation.Description"));
+        // ResolveAddonLifecycleVTables
+        configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.ResolveAddonLifecycleVTables.Label")}##ResolveAddonLifecycleVTables", ref _pluginConfig.ResolveAddonLifecycleVTables);
 
         if (configChanged)
         {

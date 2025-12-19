@@ -32,6 +32,10 @@
     "en": "Writes print and panics to the Debug log.",
     "de": "Schreibt print und panics in die Debug-Log."
   },
+  "Config.ResolveAddonLifecycleVTables.Label": {
+    "en": "Resolve original Addon vtables",
+    "de": "Originale Addon vtables auflösen"
+  },
 
   "SearchBar.Hint": {
     "en": "Search...",
