@@ -52,33 +52,15 @@ public unsafe partial class ProcessInfoService : IDisposable
 
     public string GetAddressName(nint address)
     {
-        // if (NamedAddresses.TryGetValue(address, out var namedAddress))
-        // {
-        //     return namedAddress;
-        // }
-
-        var section = GetSectionToPointer(address);
-        if (section != default)
-        {
-            switch (section.Category)
-            {
-                case SectionCategory.CODE:
-                case SectionCategory.DATA:
-                    return $"{(section.ModuleName == "ffxiv_dx11.exe" ? "" : section.ModuleName)}+0x{address - section.Start:X}"; // <{section.Category}>
-
-                case SectionCategory.HEAP:
-                    return address.ToString("X");
-            }
-        }
-
         var module = GetModuleToPointer(address);
         if (module != default)
         {
-            var offset = address - module.BaseAddress;
-            return $"{(module.Name == "ffxiv_dx11.exe" ? "" : module.Name)}+0x{offset:X}";
+            var moduleOffset = address - module.BaseAddress;
+            var name = module.Name == "ffxiv_dx11.exe" ? "" : module.Name;
+            return $"{name}+0x{moduleOffset:X}";
         }
 
-        return address.ToString("X");
+        return $"0x{address:X}";
     }
 
     public ModuleInfo GetModuleToPointer(nint address)
