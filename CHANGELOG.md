@@ -1,16 +1,24 @@
 # Changelog
 
-## [Unreleased]
+## [1.42.0] (2025-12-19)
 
-- **Added:** A new Pointer Inspector tab. (Thanks to @MidoriKami!)  
+Update for 7.4. You're welcome.
+
+- **Added:** A new Pointer Inspector tab. (Thanks to @MidoriKami and me!)  
   This tool tries to find pointers with vtables that are known in the data.yml. It doesn't update the list every frame, just when hitting enter on the address/size. The size is automatically detected when the pointer points to memory with a vtable that has a dtor at vf0.
+- **Changed:** Clicking on an offset now copies the offset, as intended. Hold shift to copy the address. Sorry about your muscle memory.
 - **Updated:** Some small Lua Debug tab improvements.
   - More colors.
   - `__index` displays the tables `className` when available.
   - Native functions now print the address of the function.
+- **Updated:** The Outfits tab now supports partial outfits.
 - **Updated:** The categories in the Config tab are now drawn in yellow for easier distinction.
-- **Changed:** Removed pointer validation from DrawNumeric, since that tanks FPS in the Config tab.
-- **Updated:** ClientStructs now at [1a4e28c1](https://github.com/aers/FFXIVClientStructs/tree/1a4e28c1) ([compare](https://github.com/aers/FFXIVClientStructs/compare/6f339d8f..1a4e28c1)).
+- **Updated:** Replaced the on-the-spot pointer validation with a periodic (every second) comitted memory section scan and a range check.
+- **Updated:** Filtered out ExcelPage and RowOffset properties from all Excel displays.
+- **Updated:** Support for AddonLifecycle vtable replacements in Dalamud v14. The original vtable is now resolved.
+- **Fixed:** The addons listed in the Addon Names tab no longer open when clicked. This was leftover testing code. It now only copies the name when clicking on them. Sorry about that.
+- **Updated:** ClientStructs now at [82de587a](https://github.com/aers/FFXIVClientStructs/tree/82de587a) ([compare](https://github.com/aers/FFXIVClientStructs/compare/6f339d8f..82de587a)).
+
 
 ## [1.41.0] (2025-12-06)
 
@@ -641,7 +649,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.41.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.0...main
+[1.42.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.41.0...v1.42.0
 [1.41.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.1...v1.41.0
 [1.40.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.0...v1.40.1
 [1.40.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.39.1...v1.40.0
