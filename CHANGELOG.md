@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.42.1] (2025-12-19)
+
+Update for 7.4hf1.
+
+- **Updated:** The Unknown0 and Unknown1 columns in the UIColor tab were renamed to Clear White and Clear Green.
+- **Updated:** ClientStructs now at [9653cf4f](https://github.com/aers/FFXIVClientStructs/tree/9653cf4f) ([compare](https://github.com/aers/FFXIVClientStructs/compare/82de587a..9653cf4f)).
+
 ## [1.42.0] (2025-12-19)
 
 Update for 7.4. You're welcome.
@@ -649,7 +656,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.1...main
+[1.42.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.0...v1.42.1
 [1.42.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.41.0...v1.42.0
 [1.41.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.1...v1.41.0
 [1.40.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.0...v1.40.1

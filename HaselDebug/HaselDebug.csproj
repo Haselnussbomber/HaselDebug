@@ -3,7 +3,7 @@
   <!-- Project settings -->
   <PropertyGroup>
     <Name>HaselDebug</Name>
-    <Version>1.42.0</Version>
+    <Version>1.42.1</Version>
     <Author>Haselnussbomber</Author>
     <RepoUrl>https://github.com/Haselnussbomber/HaselDebug</RepoUrl>
     <Punchline>Various tools to debug things.</Punchline>
@@ -12,7 +12,6 @@
 
   <!-- Build settings -->
   <PropertyGroup>
-    <Version>1.41.0</Version>
     <OutputPath>..\bin\</OutputPath>
     <DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
     <DefineConstants>$(DefineConstants);AUTOCTOR_EMBED_ATTRIBUTES</DefineConstants>
