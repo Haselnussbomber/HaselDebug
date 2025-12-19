@@ -17,6 +17,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
     private readonly DebugRenderer _debugRenderer;
     private readonly ISigScanner _sigScanner;
     private readonly ProcessInfoService _processInfoService;
+    private readonly IAddonLifecycle _addonLifecycle;
     private readonly ILogger<PointerInspectorTab> _logger;
 
     private readonly List<OffsetInfo> _offsetMappings = [];
@@ -118,6 +119,9 @@ public unsafe partial class PointerInspectorTab : DebugTab
             return;
 
         var vtablePtr = *(nint*)_memoryAddress;
+        var originalAddress = _addonLifecycle.GetOriginalVirtualTable(vtablePtr);
+        if (originalAddress != 0 && _processInfoService.IsPointerValid(originalAddress))
+            vtablePtr = originalAddress;
         if (_processInfoService.IsPointerValid(vtablePtr))
         {
             foreach (var (name, cl) in _dataYml.Data.Classes)
@@ -290,6 +294,9 @@ public unsafe partial class PointerInspectorTab : DebugTab
         }
 
         var vtblPtr = *(nint*)_memoryAddress;
+        var originalAddress = _addonLifecycle.GetOriginalVirtualTable(vtblPtr);
+        if (originalAddress != 0 && _processInfoService.IsPointerValid(originalAddress))
+            vtblPtr = originalAddress;
         if (!_processInfoService.IsPointerValid(vtblPtr))
         {
             _logger.LogWarning("FindSize failed at vtblPtr ({vtblPtr:X})", vtblPtr);
