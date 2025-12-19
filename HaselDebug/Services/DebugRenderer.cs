@@ -72,6 +72,7 @@ public unsafe partial class DebugRenderer
     private readonly NavigationService _navigationService;
     private readonly DataYmlService _dataYml;
     private readonly ProcessInfoService _processInfoService;
+    private readonly IAddonLifecycle _addonLifecycle;
 
     public void DrawPointerType(void* obj, Type? type, NodeOptions nodeOptions)
         => DrawPointerType((nint)obj, type, nodeOptions);
@@ -119,6 +120,11 @@ public unsafe partial class DebugRenderer
             ImGui.Text("invalid"u8);
             return;
         }
+
+        // Get the original VTable address for addons from IAddonLifecycle, if it replaced it
+        var originalAddress = _addonLifecycle.GetOriginalVirtualTable(address);
+        if (originalAddress != 0 && _processInfoService.IsPointerValid(originalAddress))
+            address = originalAddress;
 
         if (type.IsPointer && type.GetElementType() == typeof(void))
         {
