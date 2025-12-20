@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.42.2] (2025-12-20)
+
+- **Updated:** The items in the Outfit tab now have better indicators:
+  - Yellow = Item collected in partial set (Outfit Glamour-ready Item)
+  - Orange = Item in glamour dresser or inventory
+- **Updated:** ClientStructs now at [f27d2f6f](https://github.com/aers/FFXIVClientStructs/tree/f27d2f6f) ([compare](https://github.com/aers/FFXIVClientStructs/compare/9653cf4f..f27d2f6f)).
+
 ## [1.42.1] (2025-12-19)
 
 Update for 7.4hf1.
@@ -656,7 +663,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.2...main
+[1.42.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.1...v1.42.2
 [1.42.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.0...v1.42.1
 [1.42.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.41.0...v1.42.0
 [1.41.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.40.1...v1.41.0
