@@ -52,11 +52,14 @@ public partial class ClassInfo
 
         try
         {
-            foreach (var func in xivClass.Functions)
+            if (xivClass.Functions != null)
             {
-                if (func.Key == 0 || string.IsNullOrWhiteSpace(func.Value))
-                    continue;
-                Functions[func.Key] = $"{FullName}.{func.Value}";
+                foreach (var func in xivClass.Functions)
+                {
+                    if (func.Key == 0 || string.IsNullOrWhiteSpace(func.Value))
+                        continue;
+                    Functions[func.Key] = $"{FullName}.{func.Value}";
+                }
             }
         }
         catch (NullReferenceException)
