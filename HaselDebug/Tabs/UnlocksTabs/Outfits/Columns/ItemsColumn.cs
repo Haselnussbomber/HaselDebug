@@ -107,9 +107,9 @@ public unsafe partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
                     ImGui.GetCursorScreenPos() + new Vector2(-dotSize, dotSize), dotSize / 2f,
                     true switch
                     {
-                        _ when isItemCollectedInPartialSet => Color.Yellow.ToUInt(), // Outfit Glamour-ready Item
+                        _ when isItemCollectedInPartialSet => Color.Green.ToUInt(), // Outfit Glamour-ready Item
                         _ when isItemInDresser => Color.Orange.ToUInt(), // In Glamour Dresser
-                        _ when isItemInInventory => Color.Orange.ToUInt(), // In Inventory
+                        _ when isItemInInventory => Color.Yellow.ToUInt(), // In Inventory
                         _ => Color.Transparent.ToUInt(),
                     });
             }
