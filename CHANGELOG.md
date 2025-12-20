@@ -1,17 +1,22 @@
 # Changelog
 
+## [1.42.4] (2025-12-20)
+
+- **Fixed:** The Outfits tab now pulls data directly from MirageManager instead of the ItemFinderModule when it's loaded, because the data in ItemFinderModule is out of date when you're not actively running item searches.
+- **Fixed:** The Restore Item context menu entry when right-clicking an item in the Outfits tab no longer has a checkmark next to it. (Note: Restoring might still fail. Maybe there is also some internal countdown. Just retry.)
+
 ## [1.42.3] (2025-12-20)
 
 I don't know what I've been thinking.
 
-- **Updated:** The items in the Outfit tab now have better indicators:
+- **Updated:** The items in the Outfits tab now have better indicators:
   - Green = Item collected in partial set (Outfit Glamour-ready Item)
   - Yellow = Item in Inventory
   - Orange = Item in Glamour Dresser
 
 ## [1.42.2] (2025-12-20)
 
-- **Updated:** The items in the Outfit tab now have better indicators:
+- **Updated:** The items in the Outfits tab now have better indicators:
   - Yellow = Item collected in partial set (Outfit Glamour-ready Item)
   - Orange = Item in glamour dresser or inventory
 - **Updated:** ClientStructs now at [f27d2f6f](https://github.com/aers/FFXIVClientStructs/tree/f27d2f6f) ([compare](https://github.com/aers/FFXIVClientStructs/compare/9653cf4f..f27d2f6f)).
@@ -672,7 +677,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.3...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.4...main
+[1.42.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.3...v1.42.4
 [1.42.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.2...v1.42.3
 [1.42.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.1...v1.42.2
 [1.42.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.0...v1.42.1
