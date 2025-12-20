@@ -96,6 +96,19 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
 
     public static unsafe bool TryGetSetItemBitArray(CustomMirageStoreSetItem row, out BitArray bitArray)
     {
+        var mirageManager = MirageManager.Instance();
+        if (mirageManager->PrismBoxLoaded)
+        {
+            var prismBoxItemIndex = mirageManager->PrismBoxItemIds.IndexOf(row.RowId);
+            if (prismBoxItemIndex == -1)
+            {
+                bitArray = default;
+                return false;
+            }
+            bitArray = new BitArray(mirageManager->PrismBoxStain0Ids.GetPointer(prismBoxItemIndex), row.Items.Count);
+            return true;
+        }
+
         var itemFinderModule = ItemFinderModule.Instance();
         var glamourDresserIndex = itemFinderModule->GlamourDresserItemIds.IndexOf(row.RowId);
         if (glamourDresserIndex == -1)
@@ -109,7 +122,10 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
 
     public static unsafe bool IsItemInDresser(ItemHandle item)
     {
-        var items = ItemFinderModule.Instance()->GlamourDresserItemIds;
+        var mirageManager = MirageManager.Instance();
+        var items = mirageManager->PrismBoxLoaded
+            ? mirageManager->PrismBoxItemIds
+            : ItemFinderModule.Instance()->GlamourDresserItemIds;
         return items.Contains(item.BaseItemId) || items.Contains(item.BaseItemId + (uint)ItemKind.Hq);
     }
 
