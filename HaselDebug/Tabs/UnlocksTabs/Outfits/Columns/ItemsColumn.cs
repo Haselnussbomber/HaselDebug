@@ -1,8 +1,5 @@
-using System;
 using System.Text;
-using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Extensions;
 using HaselDebug.Sheets;
@@ -11,7 +8,7 @@ using HaselDebug.Utils;
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
 [RegisterSingleton, AutoConstruct]
-public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
+public unsafe partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
 {
     private const float IconSize = OutfitsTable.IconSize;
 
@@ -41,25 +38,11 @@ public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
 
     public override unsafe void DrawColumn(CustomMirageStoreSetItem row)
     {
-        var itemFinderModule = ItemFinderModule.Instance();
-        var glamourDresserItemIds = itemFinderModule->GlamourDresserItemIds;
-        var glamourDresserItemSetUnlockBits = itemFinderModule->GlamourDresserItemSetUnlockBits;
-        var glamourDresserIndex = glamourDresserItemIds.IndexOf(row.RowId);
-        var hasSetItem = glamourDresserIndex != -1;
-
-        var isSetCollected = hasSetItem;
-        if (hasSetItem)
-        {
-            var unlockBitArray = new BitArray((byte*)glamourDresserItemSetUnlockBits.GetPointer(glamourDresserIndex), row.Items.Count);
-            for (var slotIndex = 0; slotIndex < row.Items.Count; slotIndex++)
-            {
-                var slotItem = row.Items[slotIndex];
-                if (slotItem.RowId == 0)
-                    continue;
-
-                isSetCollected &= unlockBitArray.TryGet(slotIndex, out var slotLocked) && !slotLocked;
-            }
-        }
+        var isSetInGlamourDresser = OutfitsTable.TryGetSetItemBitArray(row, out var bitArray);
+        var isFullSetCollected = isSetInGlamourDresser && row.Items
+            .Index()
+            .Where((kv) => kv.Item.RowId != 0)
+            .All((kv) => bitArray.TryGet(kv.Index, out var slotLocked) && !slotLocked);
 
         for (var slotIndex = 0; slotIndex < row.Items.Count; slotIndex++)
         {
@@ -67,22 +50,10 @@ public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
             if (item.RowId == 0)
                 continue;
 
-            var isItemCollected = isSetCollected || (hasSetItem && new BitArray((byte*)glamourDresserItemSetUnlockBits.GetPointer(glamourDresserIndex), row.Items.Count).TryGet(slotIndex, out var slotLocked) && !slotLocked);
-            var isItemInInventory = false;
-            unsafe
-            {
-                for (var invIdx = 0; invIdx < 4; invIdx++)
-                {
-                    var container = InventoryManager.Instance()->GetInventoryContainer((InventoryType)invIdx);
-                    for (var slotIdx = 0; slotIdx < container->GetSize(); slotIdx++)
-                    {
-                        var slot = container->GetInventorySlot(slotIdx);
-                        isItemInInventory |= slot->GetBaseItemId() == item.RowId;
-                        if (isItemInInventory) break;
-                    }
-                    if (isItemInInventory) break;
-                }
-            }
+            var isItemInInventory = OutfitsTable.IsItemInInventory(item);
+            var isItemInDresser = OutfitsTable.IsItemInDresser(item);
+            var isItemCollectedInPartialSet = bitArray.TryGet(slotIndex, out var slotLocked) && !slotLocked;
+            var isItemCollected = isFullSetCollected || isItemCollectedInPartialSet;
 
             ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
             var afterIconPos = ImGui.GetCursorPos();
@@ -92,7 +63,7 @@ public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
                 (uint)item.Value.Icon,
                 new(IconSize * ImGuiHelpers.GlobalScale)
                 {
-                    TintColor = isSetCollected || isItemCollected || isItemInInventory
+                    TintColor = isItemCollected || isItemInDresser || isItemInInventory
                         ? Color.White
                         : ImGui.IsItemHovered() || ImGui.IsPopupOpen($"###SetItem_{row.RowId}_{item.RowId}_ItemContextMenu")
                             ? Color.White : Color.Grey3
@@ -106,11 +77,14 @@ public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
             {
                 ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                 _unlocksTabUtils.DrawItemTooltip(item.Value,
-                    descriptionOverride: isItemCollected
-                        ? "In Glamour Dresser"
-                        : isItemInInventory
-                            ? "In Inventory"
-                            : null);
+                    descriptionOverride: true switch
+                    {
+                        _ when isFullSetCollected => _textService.GetAddonText(15643), // Used as part of an outfit glamour.
+                        _ when isItemCollectedInPartialSet => _textService.GetAddonText(15636), // Outfit Glamour-ready Item
+                        _ when isItemInDresser => "In Glamour Dresser",
+                        _ when isItemInInventory => "In Inventory",
+                        _ => "",
+                    });
             }
 
             _imGuiContextMenuService.Draw($"###SetItem_{row.RowId}_{item.RowId}_ItemContextMenu", builder =>
@@ -125,17 +99,19 @@ public partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
                 builder.AddOpenOnGarlandTools("item", item.RowId);
             });
 
-            if (isItemCollected || isItemInInventory)
+            if (!isFullSetCollected && (isItemCollected || isItemInDresser || isItemInInventory))
             {
                 ImGui.SameLine(0, 0);
                 var dotSize = IconSize / 5f * ImGuiHelpers.GlobalScale;
                 ImGui.GetWindowDrawList().AddCircleFilled(
                     ImGui.GetCursorScreenPos() + new Vector2(-dotSize, dotSize), dotSize / 2f,
-                    isItemCollected
-                        ? Color.Yellow.ToUInt()
-                        : isItemInInventory
-                            ? Color.Green.ToUInt()
-                            : Color.Transparent.ToUInt());
+                    true switch
+                    {
+                        _ when isItemCollectedInPartialSet => Color.Yellow.ToUInt(), // Outfit Glamour-ready Item
+                        _ when isItemInDresser => Color.Orange.ToUInt(), // In Glamour Dresser
+                        _ when isItemInInventory => Color.Orange.ToUInt(), // In Inventory
+                        _ => Color.Transparent.ToUInt(),
+                    });
             }
 
             ImGui.SameLine();

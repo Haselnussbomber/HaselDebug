@@ -1,4 +1,7 @@
+using Dalamud.Utility;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Sheets;
 using HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
@@ -89,5 +92,46 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
             var pos = ImGui.GetWindowPos() + ImGui.GetCursorPos() - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY()) + ImGuiHelpers.ScaledVector2(IconSize / 2.5f + 4);
             ImGui.GetWindowDrawList().AddImage(tex.Handle, pos, pos + ImGuiHelpers.ScaledVector2(IconSize) / 1.5f, new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
         }
+    }
+
+    public static unsafe bool TryGetSetItemBitArray(CustomMirageStoreSetItem row, out BitArray bitArray)
+    {
+        var itemFinderModule = ItemFinderModule.Instance();
+        var glamourDresserIndex = itemFinderModule->GlamourDresserItemIds.IndexOf(row.RowId);
+        if (glamourDresserIndex == -1)
+        {
+            bitArray = default;
+            return false;
+        }
+        bitArray = new BitArray((byte*)itemFinderModule->GlamourDresserItemSetUnlockBits.GetPointer(glamourDresserIndex), row.Items.Count);
+        return true;
+    }
+
+    public static unsafe bool IsItemInDresser(ItemHandle item)
+    {
+        var items = ItemFinderModule.Instance()->GlamourDresserItemIds;
+        return items.Contains(item.BaseItemId) || items.Contains(item.BaseItemId + (uint)ItemKind.Hq);
+    }
+
+    public static unsafe bool IsItemInInventory(ItemHandle item)
+    {
+        var isItemInInventory = false;
+        for (var invIdx = 0; invIdx < 4; invIdx++)
+        {
+            var container = InventoryManager.Instance()->GetInventoryContainer((InventoryType)invIdx);
+            for (var slotIdx = 0; slotIdx < container->GetSize(); slotIdx++)
+            {
+                var slot = container->GetInventorySlot(slotIdx);
+
+                isItemInInventory |= slot->GetBaseItemId() == item.BaseItemId;
+
+                if (isItemInInventory)
+                    break;
+            }
+
+            if (isItemInInventory)
+                break;
+        }
+        return isItemInInventory;
     }
 }
