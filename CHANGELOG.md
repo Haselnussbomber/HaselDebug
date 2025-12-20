@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.42.3] (2025-12-20)
+
+I don't know what I've been thinking.
+
+- **Updated:** The items in the Outfit tab now have better indicators:
+  - Green = Item collected in partial set (Outfit Glamour-ready Item)
+  - Yellow = Item in Inventory
+  - Orange = Item in Glamour Dresser
+
 ## [1.42.2] (2025-12-20)
 
 - **Updated:** The items in the Outfit tab now have better indicators:
@@ -663,7 +672,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.3...main
+[1.42.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.2...v1.42.3
 [1.42.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.1...v1.42.2
 [1.42.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.0...v1.42.1
 [1.42.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.41.0...v1.42.0
