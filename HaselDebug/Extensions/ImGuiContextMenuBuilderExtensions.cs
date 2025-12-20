@@ -154,7 +154,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
         {
             // TODO: this sucks, lol
 
-            if (ImGui.MenuItem(Label, Enabled))
+            if (ImGui.MenuItem(Label, false, Enabled))
             {
                 ClickCallback?.Invoke();
 
