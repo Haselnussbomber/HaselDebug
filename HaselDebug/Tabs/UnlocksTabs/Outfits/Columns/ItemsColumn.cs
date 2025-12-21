@@ -1,8 +1,8 @@
 using System.Text;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Gui.ImGuiTable;
+using HaselCommon.Sheets;
 using HaselDebug.Extensions;
-using HaselDebug.Sheets;
 using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;

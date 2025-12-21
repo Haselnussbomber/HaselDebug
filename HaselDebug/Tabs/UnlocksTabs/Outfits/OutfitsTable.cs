@@ -3,7 +3,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Gui.ImGuiTable;
-using HaselDebug.Sheets;
+using HaselCommon.Sheets;
 using HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits;
