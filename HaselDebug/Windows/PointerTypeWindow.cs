@@ -18,6 +18,7 @@ public partial class PointerTypeWindow : SimpleWindow
         _address = address;
         _type = type;
         WindowName = $"{name}##{type.Name}";
+        WindowNameKey = string.Empty;
     }
 
     public override void OnOpen()
