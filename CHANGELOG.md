@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.42.5] (2025-12-25)
+
+- **Fixed:** Popout window titles being broken, causing exceptions when opening more windows of the same type.
+- **Updated:** ClientStructs now at [f0e6cae9](https://github.com/aers/FFXIVClientStructs/tree/f0e6cae9) ([compare](https://github.com/aers/FFXIVClientStructs/compare/f27d2f6f..f0e6cae9)).
+
 ## [1.42.4] (2025-12-20)
 
 - **Fixed:** The Outfits tab now pulls data directly from MirageManager instead of the ItemFinderModule when it's loaded, because the data in ItemFinderModule is out of date when you're not actively running item searches.
@@ -677,7 +682,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.4...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.5...main
+[1.42.5]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.4...v1.42.5
 [1.42.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.3...v1.42.4
 [1.42.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.2...v1.42.3
 [1.42.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.1...v1.42.2
