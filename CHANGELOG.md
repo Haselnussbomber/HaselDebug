@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.42.6] (2025-12-27)
+
+- **Added:** Texture TreeNodes now have a context menu to copy path, size and format.
+- **Added:** The CurrencyManager tab now has xmldocs copy buttons for the different item buckets.
+- **Added:** A part list selector for UldAssets, similar to Dalamuds Addon Inspector v2.
+- **Fixed:** Node popouts crashing the game due to empty window name.
+- **Updated:** ClientStructs now at [b71506d2](https://github.com/aers/FFXIVClientStructs/tree/b71506d2) ([compare](https://github.com/aers/FFXIVClientStructs/compare/f0e6cae9..b71506d2)).
+
 ## [1.42.5] (2025-12-25)
 
 - **Fixed:** Popout window titles being broken, causing exceptions when opening more windows of the same type.
@@ -682,7 +690,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.5...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.6...main
+[1.42.6]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.5...v1.42.6
 [1.42.5]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.4...v1.42.5
 [1.42.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.3...v1.42.4
 [1.42.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.2...v1.42.3
