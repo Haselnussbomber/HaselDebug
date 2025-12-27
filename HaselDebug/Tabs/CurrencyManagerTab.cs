@@ -28,7 +28,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
         {
             if (node)
             {
-                DrawCopyButton("Copy SpecialItemBucket"u8, ref currencyManager->SpecialItemBucket);
+                DrawCopyButton("Copy SpecialItemBucket xmldocs"u8, ref currencyManager->SpecialItemBucket);
 
                 using var table = ImRaii.Table(nameof(CurrencyManager.SpecialItemBucket) + "Table", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
                 if (table)
@@ -63,7 +63,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
         {
             if (node)
             {
-                DrawCopyButton("Copy ItemBucket"u8, ref currencyManager->ItemBucket);
+                DrawCopyButton("Copy ItemBucket xmldocs"u8, ref currencyManager->ItemBucket);
 
                 using var table = ImRaii.Table(nameof(CurrencyManager.ItemBucket) + "Table", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
                 if (table)
@@ -98,7 +98,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
         {
             if (node)
             {
-                DrawCopyButton("Copy ContentItemBucket"u8, ref currencyManager->ContentItemBucket);
+                DrawCopyButton("Copy ContentItemBucket xmldocs"u8, ref currencyManager->ContentItemBucket);
 
                 using var table = ImRaii.Table(nameof(CurrencyManager.ContentItemBucket) + "Table", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
                 if (table)
