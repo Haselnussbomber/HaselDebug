@@ -403,13 +403,13 @@ public unsafe partial class AtkDebugRenderer
             {
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = !_windowManager.Contains(win => win.WindowName == nodeOptions.Title),
+                    Visible = !_windowManager.Contains(win => win.WindowName == nodeOptions.SeStringTitle.ToString()),
                     Label = _textService.Translate("ContextMenu.TabPopout"),
                     ClickCallback = () =>
                     {
                         _windowManager.Open(new NodeInspectorWindow(_windowManager, _textService, _addonObserver, this)
                         {
-                            WindowName = nodeOptions.Title!,
+                            WindowName = nodeOptions.SeStringTitle?.ToString() ?? $"Node at 0x{(nint)node:X}",
                             NodeAddress = (nint)node
                         });
                     }
@@ -472,13 +472,13 @@ public unsafe partial class AtkDebugRenderer
             {
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = !_windowManager.Contains(win => win.WindowName == nodeOptions.Title),
+                    Visible = !_windowManager.Contains(win => win.WindowName == nodeOptions.SeStringTitle.ToString()),
                     Label = _textService.Translate("ContextMenu.TabPopout"),
                     ClickCallback = () =>
                     {
                         _windowManager.Open(new NodeInspectorWindow(_windowManager, _textService, _addonObserver, this)
                         {
-                            WindowName = nodeOptions.Title!,
+                            WindowName = nodeOptions.SeStringTitle?.ToString() ?? $"Node at 0x{(nint)node:X}",
                             NodeAddress = (nint)node
                         });
                     }
