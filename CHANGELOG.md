@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.42.7] (2025-12-28)
+
+- **Fixed:** Possible crash when hovering invalid GameObjects. Before grabbing its position for the highlight-line, it will check if the object is listed in the object table (GameObjectManager).
+
 ## [1.42.6] (2025-12-27)
 
 - **Added:** Texture TreeNodes now have a context menu to copy path, size and format.
@@ -690,7 +694,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.6...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.7...main
+[1.42.7]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.6...v1.42.7
 [1.42.6]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.5...v1.42.6
 [1.42.5]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.4...v1.42.5
 [1.42.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.3...v1.42.4
