@@ -600,7 +600,8 @@ public unsafe partial class DebugRenderer
                 else if (Inherits<GameObject>(highlightType))
                 {
                     var gameObject = (GameObject*)highlightAddress;
-                    if (gameObject != null && gameObject->VirtualTable != null) // safety-check for valid pointer to pre-allocated memory on Character.CompanionObject
+                    var gameObjectExists = GameObjectManager.Instance()->Objects.IndexSorted.Contains(gameObject);
+                    if (gameObjectExists && gameObject->VirtualTable != null)
                     {
                         var pos = gameObject->GetPosition();
                         if (pos != null)
