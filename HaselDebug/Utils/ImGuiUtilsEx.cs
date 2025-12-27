@@ -210,7 +210,7 @@ public static unsafe class ImGuiUtilsEx
         }
     }
 
-    public static EndUnconditionally AlertBox(string id, Color color, Vector2 size)
+    public static ImRaii.EndUnconditionally AlertBox(string id, Color color, Vector2 size)
     {
         var colors = ImRaii
             .PushColor(ImGuiCol.ChildBg, (color with { A = 0.1f }).ToUInt())
@@ -219,7 +219,7 @@ public static unsafe class ImGuiUtilsEx
         var child = ImRaii.Child(id, size, true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
         style.Dispose();
         colors.Dispose();
-        return new EndUnconditionally(child.Dispose, true);
+        return new ImRaii.EndUnconditionally(child.Dispose, true);
     }
 
     private static void DrawAlert(string id, string text, GameIconLookup icon, Color color)
