@@ -1,4 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Utils;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
@@ -28,9 +27,14 @@ public unsafe partial class DebugRenderer
             return;
         }
 
+        var path = string.Empty;
         var title = "AtkTexture";
+
         if (tex->TextureType == TextureType.Resource)
-            title = tex->Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString();
+        {
+            path = tex->Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString();
+            title = path;
+        }
 
         var kernelTexture = tex->GetKernelTexture();
         if (kernelTexture == null)
@@ -39,10 +43,10 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        DrawTexture((nint)kernelTexture, nodeOptions.WithAddress(address).WithSeStringTitle(title));
+        DrawTexture((nint)kernelTexture, nodeOptions.WithAddress(address).WithTitle(title), path);
     }
 
-    public void DrawTexture(nint address, NodeOptions nodeOptions)
+    public void DrawTexture(nint address, NodeOptions nodeOptions, string? path = null)
     {
         if (address == 0)
         {
@@ -59,13 +63,36 @@ public unsafe partial class DebugRenderer
         nodeOptions = nodeOptions.WithAddress(address);
 
         var tex = (KernelTexture*)address;
-        var title = $"{tex->ActualWidth}x{tex->ActualHeight}, {(TextureFormat)tex->TextureFormat}";
-        if (nodeOptions.SeStringTitle != null)
-            title = $"{nodeOptions.SeStringTitle.Value} ({title})";
-        using var titleColor = ImRaii.PushColor(ImGuiCol.Text, ColorTreeNode.ToVector());
-        using var node = ImRaii.TreeNode($"{title}##TextureNode{nodeOptions.AddressPath}", nodeOptions.GetTreeNodeFlags());
+
+        var title = $"{tex->ActualWidth}x{tex->ActualHeight}, {tex->TextureFormat}";
+        if (!string.IsNullOrEmpty(nodeOptions.Title))
+            title = $"{nodeOptions.Title} ({title})";
+        nodeOptions = nodeOptions.WithTitle(title);
+
+        nodeOptions.DrawContextMenu = (nodeOptions, builder) =>
+        {
+            builder.Add(new ImGuiContextMenuEntry()
+            {
+                Visible = !string.IsNullOrEmpty(path),
+                Label = "Copy Path",
+                ClickCallback = () => ImGui.SetClipboardText(path)
+            });
+
+            builder.Add(new ImGuiContextMenuEntry()
+            {
+                Label = "Copy Size",
+                ClickCallback = () => ImGui.SetClipboardText($"{tex->ActualWidth}x{tex->ActualHeight}")
+            });
+
+            builder.Add(new ImGuiContextMenuEntry()
+            {
+                Label = "Copy Format",
+                ClickCallback = () => ImGui.SetClipboardText($"{tex->TextureFormat}")
+            });
+        };
+
+        using var node = DrawTreeNode(nodeOptions with { Title = title });
         if (!node) return;
-        titleColor?.Dispose();
 
         var size = new Vector2(tex->ActualWidth, tex->ActualHeight);
         var availSize = ImGui.GetContentRegionAvail();
