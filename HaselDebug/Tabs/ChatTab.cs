@@ -54,7 +54,7 @@ public unsafe partial class ChatTab : DebugTab
                 if (i >= count)
                     return;
 
-                if (i >= 0 && raptureLogModule->GetLogMessageDetail(i + start, out var sender, out var message, out var logKind, out var casterKind, out var targetKind, out var time))
+                if (i >= 0 && raptureLogModule->GetLogMessageDetail(i + start, out var sender, out var message, out var logKind, out EntityRelationKind casterKind, out var targetKind, out var time))
                 {
                     ImGui.TableNextRow();
 
@@ -93,21 +93,21 @@ public unsafe partial class ChatTab : DebugTab
         clipper.Destroy();
     }
 
-    private string GetLabel(int index)
+    private string GetLabel(EntityRelationKind index)
     {
         return index switch
         {
-            0 => _textService.GetAddonText(1227), // You
-            1 => _textService.GetAddonText(1228), // Party Member
-            2 => _textService.GetAddonText(1229), // Alliance Member
-            3 => _textService.GetAddonText(1230), // Other PC
-            4 => _textService.GetAddonText(1231), // Engaged Enemy
-            5 => _textService.GetAddonText(1232), // Unengaged Enemy
-            6 => _textService.GetAddonText(1283), // Friendly NPCs
-            7 => _textService.GetAddonText(1276), // Pets/Companions
-            8 => _textService.GetAddonText(1277), // Pets/Companions (Party)
-            9 => _textService.GetAddonText(1278), // Pets/Companions (Alliance)
-            10 => _textService.GetAddonText(1279), // Pets/Companions (Other PC)
+            EntityRelationKind.LocalPlayer => _textService.GetAddonText(1227), // You
+            EntityRelationKind.PartyMember => _textService.GetAddonText(1228), // Party Member
+            EntityRelationKind.AllianceMember => _textService.GetAddonText(1229), // Alliance Member
+            EntityRelationKind.OtherPlayer => _textService.GetAddonText(1230), // Other PC
+            EntityRelationKind.EngagedEnemy => _textService.GetAddonText(1231), // Engaged Enemy
+            EntityRelationKind.UnengagedEnemy => _textService.GetAddonText(1232), // Unengaged Enemy
+            EntityRelationKind.FriendlyNpc => _textService.GetAddonText(1283), // Friendly NPCs
+            EntityRelationKind.PetOrCompanion => _textService.GetAddonText(1276), // Pets/Companions
+            EntityRelationKind.PetOrCompanionParty => _textService.GetAddonText(1277), // Pets/Companions (Party)
+            EntityRelationKind.PetOrCompanionAlliance => _textService.GetAddonText(1278), // Pets/Companions (Alliance)
+            EntityRelationKind.PetOrCompanionOther => _textService.GetAddonText(1279), // Pets/Companions (Other PC)
             _ => string.Empty,
         };
     }
