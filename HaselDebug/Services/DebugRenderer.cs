@@ -1506,7 +1506,7 @@ public unsafe partial class DebugRenderer
         if (_processInfoService.IsPointerValid(addon))
             scale *= addon->Scale;
 
-        var pos = new Vector2(node->ScreenX, node->ScreenY);
+        var pos = ImGui.GetMainViewport().Pos + new Vector2(node->ScreenX, node->ScreenY);
         var size = new Vector2(node->Width, node->Height) * scale;
         ImGui.GetForegroundDrawList().AddRect(pos, pos + size, Color.Gold.ToUInt());
     }
