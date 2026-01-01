@@ -654,6 +654,11 @@ public unsafe partial class DebugRenderer
         if (nodeOptions.DrawContextMenu != null)
             ImGuiContextMenu.Draw(nodeOptions.GetKey("ContextMenu"), builder => nodeOptions.DrawContextMenu(nodeOptions, builder));
 
+        if (ImGui.IsItemClicked())
+        {
+            nodeOptions.OnClicked?.Invoke();
+        }
+
         if (nodeOptions.DrawSeStringTreeNode && nodeOptions.SeStringTitle != null)
         {
             ImGui.SameLine();
