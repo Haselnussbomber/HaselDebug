@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -39,12 +40,15 @@ public unsafe partial class AtkDebugRenderer
     {
         _ctx = ctx;
 
-        var unitBase = ctx.AtkUnitBase;
+        var unitBase = ctx.Addon;
         if (!_processInfoService.IsPointerValid(unitBase))
         {
             ImGui.Text($"Could not find addon with id {ctx.AddonId} or name {ctx.AddonName}");
             return;
         }
+
+        if (RaptureAtkUnitManager.Instance()->GetAddonByNode(_selectedNode) != _ctx.Addon)
+            _selectedNode = null;
 
         var windowSize = ImGui.GetContentRegionAvail();
         var mainContentWidth = windowSize.X - _sidebarWidth - ImGui.GetStyle().ItemSpacing.X;
@@ -86,9 +90,9 @@ public unsafe partial class AtkDebugRenderer
     {
         var nodeOptions = new NodeOptions()
         {
-            AddressPath = new([(nint)_ctx.AtkUnitBase, 1]),
+            AddressPath = new([(nint)_ctx.Addon, 1]),
             DefaultOpen = true,
-            UnitBase = _ctx.AtkUnitBase,
+            UnitBase = _ctx.Addon,
         };
 
         DrawAddonInfo(nodeOptions);
@@ -98,6 +102,8 @@ public unsafe partial class AtkDebugRenderer
         if (!tabBar) return;
 
         DrawAddonNodes(nodeOptions);
+        DrawAddonStruct(nodeOptions);
+        DrawAddonAgent(nodeOptions);
         DrawAddonAtkValues(nodeOptions);
     }
 
@@ -105,9 +111,9 @@ public unsafe partial class AtkDebugRenderer
     {
         var nodeOptions = new NodeOptions()
         {
-            AddressPath = new([(nint)_ctx.AtkUnitBase, 2]),
+            AddressPath = new([(nint)_ctx.Addon, 2]),
             DefaultOpen = true,
-            UnitBase = _ctx.AtkUnitBase,
+            UnitBase = _ctx.Addon,
         };
 
         PrintInfoTable(_selectedNode, nodeOptions);
@@ -115,13 +121,13 @@ public unsafe partial class AtkDebugRenderer
 
     private void DrawAddonInfo(NodeOptions nodeOptions)
     {
-        var unitBase = _ctx.AtkUnitBase;
+        var addon = _ctx.Addon;
 
-        ImGuiUtils.DrawCopyableText(unitBase->NameString);
+        ImGuiUtils.DrawCopyableText(addon->NameString);
 
         ImGui.SameLine();
 
-        var isVisible = unitBase->IsVisible;
+        var isVisible = addon->IsVisible;
         using (ImRaii.PushColor(ImGuiCol.Text, isVisible ? 0xFF00FF00 : Color.From(ImGuiCol.TextDisabled).ToUInt()))
         {
             ImGui.Text(isVisible ? "Visible" : "Not Visible");
@@ -133,135 +139,22 @@ public unsafe partial class AtkDebugRenderer
         }
         if (ImGui.IsItemClicked())
         {
-            unitBase->IsVisible = !isVisible;
-        }
-
-        ImGuiUtilsEx.PaddedSeparator(1);
-
-        _navigationService.DrawAddressInspectorLink((nint)unitBase);
-        ImGui.SameLine();
-        _debugRenderer.DrawPointerType((nint)unitBase, _ctx.AddonType, nodeOptions with { DefaultOpen = false });
-
-        // Agent
-        var agentModule = AgentModule.Instance();
-        foreach (var agentId in Enum.GetValues<AgentId>())
-        {
-            var agent = agentModule->GetAgentByInternalId(agentId);
-            if (agent == null || agent->AddonId != unitBase->Id)
-                continue;
-
-            ImGui.Text("Used by"u8);
-            ImGuiUtils.SameLineSpace();
-            _navigationService.DrawAgentLink(agentId);
-
-            ImGui.SameLine();
-
-            var agentType = _typeService.GetAgentType(agentId);
-
-            _debugRenderer.DrawPointerType(agent, agentType, nodeOptions.WithAddress((nint)agent) with
-            {
-                DefaultOpen = false,
-                DrawContextMenu = (nodeOptions, builder) =>
-                {
-                    var isPinned = _pinnedInstancesService.Contains(agentType);
-
-                    builder.AddCopyName(agentId.ToString());
-                    builder.AddCopyAddress((nint)agent);
-
-                    builder.AddSeparator();
-
-                    builder.Add(new ImGuiContextMenuEntry()
-                    {
-                        Visible = !_windowManager.Contains(win => win.WindowName == agentType.Name),
-                        Label = _textService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => _windowManager.Open(ActivatorUtilities.CreateInstance<PointerTypeWindow>(_serviceProvider, (nint)agent, agentType, string.Empty))
-                    });
-
-                    builder.Add(new ImGuiContextMenuEntry()
-                    {
-                        Visible = !isPinned,
-                        Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
-                        ClickCallback = () => _pinnedInstancesService.Add(agentType)
-                    });
-
-                    builder.Add(new ImGuiContextMenuEntry()
-                    {
-                        Visible = isPinned,
-                        Label = _textService.Translate("ContextMenu.PinnedInstances.Unpin"),
-                        ClickCallback = () => _pinnedInstancesService.Remove(agentType)
-                    });
-                }
-            });
-        }
-
-        // Callback
-        var atkModule = RaptureAtkModule.Instance();
-        if (atkModule->AddonCallbackMapping.TryGetValue(unitBase->Id, out var addonCallbackEntry, false))
-        {
-            var agentFound = false;
-
-            if (addonCallbackEntry.AgentInterface != null)
-            {
-                foreach (var agentId in Enum.GetValues<AgentId>())
-                {
-                    var agent = agentModule->GetAgentByInternalId(agentId);
-                    if (agent != addonCallbackEntry.AgentInterface)
-                        continue;
-
-                    agentFound = true;
-
-                    ImGui.Text("Callback handler is"u8);
-                    ImGuiUtils.SameLineSpace();
-                    _navigationService.DrawAgentLink(agentId);
-                    ImGuiUtils.SameLineSpace();
-                    ImGui.Text($"with EventKind {addonCallbackEntry.EventKind}");
-
-                    break;
-                }
-            }
-
-            if (!agentFound && addonCallbackEntry.EventInterface != null)
-            {
-                ImGui.Text("Callback handler at"u8);
-                ImGuiUtils.SameLineSpace();
-                _debugRenderer.DrawAddress(addonCallbackEntry.EventInterface);
-                ImGuiUtils.SameLineSpace();
-                ImGui.Text($"with EventKind {addonCallbackEntry.EventKind}");
-            }
-        }
-
-        // Host
-        if (unitBase->HostId != 0)
-        {
-            var host = RaptureAtkUnitManager.Instance()->GetAddonById(unitBase->HostId);
-            if (host != null)
-            {
-                ImGui.Text("Embedded by"u8);
-                ImGuiUtils.SameLineSpace();
-                _navigationService.DrawAddonLink(host->Id, host->NameString);
-            }
+            addon->IsVisible = !isVisible;
         }
 
         ImGuiUtilsEx.PaddedSeparator();
 
-        var pos = unitBase->Position;
-        var size = unitBase->Size;
-        var scaledSize = unitBase->ScaledSize;
+        var pos = addon->Position;
+        var size = addon->Size;
+        var scaledSize = addon->ScaledSize;
 
         ImGuiUtilsEx.PrintFieldValuePairs(
+            ("Address", ((nint)addon).ToString("X")),
             ("Position", $"{pos.X}x{pos.Y}"),
             ("Size", $"{size.X}x{size.Y}"),
-            ("Scale", $"{unitBase->Scale * 100}%"),
+            ("Scale", $"{addon->Scale * 100}%"),
             ("Size (scaled)", $"{scaledSize.X}x{scaledSize.Y}"),
-            ("Widget Count", $"{unitBase->UldManager.ObjectCount}"));
-
-        if (ImGui.Button("Observe AtkValues"u8))
-        {
-            var addonName = unitBase->NameString;
-            _windowManager.CreateOrOpen(
-                addonName + " - AtkValues Observer",
-                () => new AddonAtkValuesObserverWindow(_windowManager, _textService, _addonLifecycle, _debugRenderer) { AddonName = addonName });
-        }
+            ("Widget Count", $"{addon->UldManager.ObjectCount}"));
     }
 
     public void DrawAddonNodes(NodeOptions nodeOptions)
@@ -272,7 +165,7 @@ public unsafe partial class AtkDebugRenderer
         using var tabChild = ImRaii.Child("TabChild"u8, new Vector2(-1));
         if (!tabChild) return;
 
-        var unitBase = _ctx.AtkUnitBase;
+        var unitBase = _ctx.Addon;
 
         if (unitBase->RootNode != null)
         {
@@ -296,9 +189,7 @@ public unsafe partial class AtkDebugRenderer
 
             if (ImGui.InputTextWithHint("##NodeSearch"u8, _textService.Translate("SearchBar.Hint"), ref _nodeQuery, 256, ImGuiInputTextFlags.AutoSelectAll))
             {
-                _searchTokens = string.IsNullOrWhiteSpace(_nodeQuery)
-                    ? null
-                    : SearchTokenParser.Parse(_nodeQuery);
+                UpdateSearchTokens();
             }
 
             var j = 0;
@@ -321,11 +212,117 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
+    private void DrawAddonStruct(NodeOptions nodeOptions)
+    {
+        using var tabItem = ImRaii.TabItem(_ctx.AddonType.Name);
+        if (!tabItem) return;
+
+        _debugRenderer.DrawPointerType((nint)_ctx.Addon, _ctx.AddonType, nodeOptions with { DefaultOpen = true });
+    }
+
+    private void DrawAddonAgent(NodeOptions nodeOptions)
+    {
+        if (_ctx.AgentId is not AgentId agentId)
+            return;
+
+        var agentType = _typeService.GetAgentType(agentId);
+
+        using var tabItem = ImRaii.TabItem("Agent" + agentId.ToString());
+        if (!tabItem) return;
+
+        var addon = _ctx.Addon;
+        var agent = _ctx.Agent;
+
+        // Callback
+        var atkModule = RaptureAtkModule.Instance();
+        if (atkModule->AddonCallbackMapping.TryGetValue(addon->Id, out var addonCallbackEntry, false))
+        {
+            var agentFound = false;
+
+            if (addonCallbackEntry.AgentInterface != null)
+            {
+                var agentModule = AgentModule.Instance();
+                foreach (var cbAgentId in Enum.GetValues<AgentId>())
+                {
+                    var cbAgent = agentModule->GetAgentByInternalId(cbAgentId);
+                    if (cbAgent != addonCallbackEntry.AgentInterface)
+                        continue;
+
+                    agentFound = true;
+
+                    ImGui.Text("Callback handler is"u8);
+                    ImGuiUtils.SameLineSpace();
+                    _navigationService.DrawAgentLink(cbAgentId);
+                    ImGuiUtils.SameLineSpace();
+                    ImGui.Text($"with EventKind {addonCallbackEntry.EventKind}");
+
+                    break;
+                }
+            }
+
+            if (!agentFound && addonCallbackEntry.EventInterface != null)
+            {
+                ImGui.Text("Callback handler at"u8);
+                ImGuiUtils.SameLineSpace();
+                _debugRenderer.DrawAddress(addonCallbackEntry.EventInterface);
+                ImGuiUtils.SameLineSpace();
+                ImGui.Text($"with EventKind {addonCallbackEntry.EventKind}");
+            }
+        }
+
+        // Host
+        if (addon->HostId != 0)
+        {
+            var host = RaptureAtkUnitManager.Instance()->GetAddonById(addon->HostId);
+            if (host != null)
+            {
+                ImGui.Text("Embedded by"u8);
+                ImGuiUtils.SameLineSpace();
+                _navigationService.DrawAddonLink(host->Id, host->NameString);
+            }
+        }
+
+        _debugRenderer.DrawPointerType(agent, agentType, nodeOptions.WithAddress((nint)agent) with
+        {
+            DefaultOpen = true,
+            DrawContextMenu = (nodeOptions, builder) =>
+            {
+                var isPinned = _pinnedInstancesService.Contains(agentType);
+
+                builder.AddCopyName(agentId.ToString());
+                builder.AddCopyAddress((nint)agent);
+
+                builder.AddSeparator();
+
+                builder.Add(new ImGuiContextMenuEntry()
+                {
+                    Visible = !_windowManager.Contains(win => win.WindowName == agentType.Name),
+                    Label = _textService.Translate("ContextMenu.TabPopout"),
+                    ClickCallback = () => _windowManager.Open(ActivatorUtilities.CreateInstance<PointerTypeWindow>(_serviceProvider, (nint)agent, agentType, string.Empty))
+                });
+
+                builder.Add(new ImGuiContextMenuEntry()
+                {
+                    Visible = !isPinned,
+                    Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
+                    ClickCallback = () => _pinnedInstancesService.Add((nint)agent, agentType)
+                });
+
+                builder.Add(new ImGuiContextMenuEntry()
+                {
+                    Visible = isPinned,
+                    Label = _textService.Translate("ContextMenu.PinnedInstances.Unpin"),
+                    ClickCallback = () => _pinnedInstancesService.Remove(agentType)
+                });
+            }
+        });
+    }
+
     private void DrawAddonAtkValues(NodeOptions nodeOptions)
     {
-        var count = _ctx.AtkUnitBase->AtkValuesCount;
+        var count = _ctx.Addon->AtkValuesCount;
 
-        if (_ctx.AtkUnitBase->AtkValues == null || count == 0)
+        if (_ctx.Addon->AtkValues == null || count == 0)
             return;
 
         using var tabItem = ImRaii.TabItem($"AtkValues ({count})##AtkValues");
@@ -334,7 +331,15 @@ public unsafe partial class AtkDebugRenderer
         using var tabChild = ImRaii.Child("TabChild"u8, new Vector2(-1));
         if (!tabChild) return;
 
-        _debugRenderer.DrawAtkValues(_ctx.AtkUnitBase->AtkValues, count, nodeOptions, false);
+        if (ImGui.Button("Observe AtkValues"u8))
+        {
+            var addonName = _ctx.Addon->NameString;
+            _windowManager.CreateOrOpen(
+                addonName + " - AtkValues Observer",
+                () => new AddonAtkValuesObserverWindow(_windowManager, _textService, _addonObserver, _addonLifecycle, _debugRenderer) { AddonName = addonName });
+        }
+
+        _debugRenderer.DrawAtkValues(_ctx.Addon->AtkValues, count, nodeOptions, false);
     }
 
     public void DrawNode(AtkResNode* node)
@@ -415,6 +420,7 @@ public unsafe partial class AtkDebugRenderer
             HighlightType = typeof(AtkResNode),
             OnClicked = () => _selectedNode = node,
             IsLeafNode = node->ChildNode == null,
+            IsSelected = _selectedNode == node,
             /*
             DrawContextMenu = (nodeOptions, builder) =>
             {
@@ -488,6 +494,7 @@ public unsafe partial class AtkDebugRenderer
             HighlightType = typeof(AtkComponentNode),
             OnClicked = () => _selectedNode = resNode,
             IsLeafNode = component->UldManager.NodeListCount == 0,
+            IsSelected = _selectedNode == node,
             /*
             DrawContextMenu = (nodeOptions, builder) =>
             {
@@ -1321,37 +1328,92 @@ public unsafe partial class AtkDebugRenderer
         ImGui.SetNextItemWidth(200);
     }
 
-    private bool IsNodeMatchingSearch(AtkResNode* node)
+    private void UpdateSearchTokens()
     {
-        if (string.IsNullOrEmpty(_nodeQuery))
-            return true;
-
-        if (("0x" + ((nint)node).ToString("X")).Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->NodeId.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->GetNodeType().ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->Type.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->GetNodeType() == NodeType.Component)
+        if (string.IsNullOrWhiteSpace(_nodeQuery))
         {
-            var componentNode = (AtkComponentNode*)node;
-            var component = componentNode->Component;
-            if (component != null &&
-                component->UldManager.ResourceFlags.HasFlag(AtkUldManagerResourceFlag.Initialized) &&
-                component->UldManager.BaseType == AtkUldManagerBaseType.Component &&
-                ((AtkUldComponentInfo*)component->UldManager.Objects)->ComponentType.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return true;
-            }
+            _searchTokens = null;
+            return;
         }
 
-        return false;
+        _searchTokens = SearchTokenParser.Parse(_nodeQuery);
+    }
+
+    private bool IsNodeMatchingSearch(AtkResNode* node)
+    {
+        if (_searchTokens == null || _searchTokens.Count == 0)
+            return true;
+
+        return _searchTokens.All(token =>
+        {
+            var match = false;
+
+            if (string.IsNullOrEmpty(token.Key))
+            {
+                match |= MatchesNodeId(node, token.Value.StartsWith('#') ? token.Value[1..] : token.Value);
+                match |= MatchesNodeType(node, token.Value);
+                match |= MatchesNodeAddress(node, token.Value);
+            }
+            else
+            {
+                switch (token.Key)
+                {
+                    case "id":
+                        match = MatchesNodeId(node, token.Value);
+                        break;
+
+                    case "type":
+                        match = MatchesNodeType(node, token.Value);
+                        break;
+
+                    case "addr":
+                    case "address":
+                        match = MatchesNodeAddress(node, token.Value);
+                        break;
+                }
+            }
+
+            return token.IsExclude ? !match : match;
+        });
+
+        static bool MatchesNodeId(AtkResNode* node, string value)
+        {
+            return uint.TryParse(value, out var nodeId) && node->NodeId == nodeId;
+        }
+
+        static bool MatchesNodeType(AtkResNode* node, string value)
+        {
+            if (node->GetNodeType().ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase))
+                return true;
+
+            if (node->GetNodeType() == NodeType.Component)
+            {
+                var componentNode = (AtkComponentNode*)node;
+                var component = componentNode->Component;
+                if (component != null
+                    && component->UldManager.ResourceFlags.HasFlag(AtkUldManagerResourceFlag.Initialized)
+                    && component->UldManager.BaseType == AtkUldManagerBaseType.Component
+                    && ((AtkUldComponentInfo*)component->UldManager.Objects)->ComponentType.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        static bool MatchesNodeAddress(AtkResNode* node, string value)
+        {
+            nint address;
+
+            if (value.StartsWith("0x"))
+            {
+                if (nint.TryParse(value[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out address))
+                    return (nint)node == address;
+            }
+
+            return nint.TryParse(value, out address) && (nint)node == address;
+        }
     }
 }
 
@@ -1364,26 +1426,83 @@ public unsafe struct InspectorContext(string addonName, ushort addonId)
     public bool Border { get; set; } = true;
     public bool UseNavigationService { get; set; } = true;
 
-    public AtkUnitBase* AtkUnitBase
+    public AtkUnitBase* Addon
     {
         get
         {
-            foreach (AtkUnitBase* unitBase in RaptureAtkUnitManager.Instance()->AllLoadedUnitsList.Entries)
-            {
-                if (unitBase == null)
-                    break;
-
-                if (AddonId != 0 && unitBase->Id != AddonId)
-                    continue;
-
-                if (unitBase->NameString != AddonName)
-                    continue;
-
-                return unitBase;
-            }
-
-            return null;
+            if (field != null)
+                return field;
+            return field = GetAtkUnitBase();
         }
+    }
+
+    public AgentId? AgentId
+    {
+        get
+        {
+            if (field != null)
+                return field;
+            return field = GetAgentId();
+        }
+    }
+
+    public AgentInterface* Agent
+    {
+        get
+        {
+            if (field != null)
+                return field;
+            return field = GetAgentInterface();
+        }
+    }
+
+    private unsafe AtkUnitBase* GetAtkUnitBase()
+    {
+        AtkUnitBase* firstMatch = null;
+        var matchCount = 0;
+
+        Span<byte> name = stackalloc byte[32];
+        var written = Encoding.UTF8.GetBytes(AddonName, name);
+        name[written] = 0; // Null terminator
+        var nameSpan = name[..(written + 1)];
+
+        foreach (AtkUnitBase* unitBase in RaptureAtkUnitManager.Instance()->AllLoadedUnitsList.Entries)
+        {
+            if (unitBase == null || !unitBase->Name.StartsWith(nameSpan))
+                continue;
+
+            if (AddonId != 0 && unitBase->Id == AddonId)
+                return unitBase;
+
+            if (firstMatch == null)
+                firstMatch = unitBase;
+
+            matchCount++;
+        }
+
+        return matchCount == 1 ? firstMatch : null;
+    }
+
+    private unsafe AgentId? GetAgentId()
+    {
+        var agentModule = AgentModule.Instance();
+
+        foreach (var agentId in Enum.GetValues<AgentId>())
+        {
+            var agent = agentModule->GetAgentByInternalId(agentId);
+            if (agent != null && agent->AddonId == Addon->Id)
+                return agentId;
+        }
+
+        return null;
+    }
+
+    private unsafe AgentInterface* GetAgentInterface()
+    {
+        var agentId = AgentId;
+        return agentId == null
+            ? null
+            : AgentModule.Instance()->GetAgentByInternalId(agentId.Value);
     }
 
     public Type AddonType
@@ -1393,13 +1512,13 @@ public unsafe struct InspectorContext(string addonName, ushort addonId)
             if (field != null)
                 return field;
 
-            if (AtkUnitBase == null)
+            if (Addon == null)
                 return typeof(AtkUnitBase);
 
             if (!ServiceLocator.TryGetService<TypeService>(out var typeService))
                 return typeof(AtkUnitBase);
 
-            return field = typeService.GetAddonType(AtkUnitBase->NameString);
+            return field = typeService.GetAddonType(Addon->NameString);
         }
     }
 
