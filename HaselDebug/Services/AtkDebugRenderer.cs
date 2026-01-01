@@ -40,6 +40,9 @@ public unsafe partial class AtkDebugRenderer
     {
         _ctx = ctx;
 
+        if (ctx.Addon == null)
+            return;
+
         var unitBase = ctx.Addon;
         if (!_processInfoService.IsPointerValid(unitBase))
         {
@@ -47,6 +50,7 @@ public unsafe partial class AtkDebugRenderer
             return;
         }
 
+        // reset selected node if it isn't from this addon
         if (RaptureAtkUnitManager.Instance()->GetAddonByNode(_selectedNode) != _ctx.Addon)
             _selectedNode = null;
 
@@ -360,6 +364,7 @@ public unsafe partial class AtkDebugRenderer
         if (node == null)
             return;
 
+        // set default selected node to the first one that's rendered
         if (_selectedNode == null)
             _selectedNode = node;
 
@@ -1417,43 +1422,30 @@ public unsafe partial class AtkDebugRenderer
     }
 }
 
-public unsafe struct InspectorContext(string addonName, ushort addonId)
+public unsafe struct InspectorContext
 {
-    public ushort AddonId { get; private set; } = addonId;
-    public string? AddonName { get; private set; } = addonName;
+    public ushort AddonId { get; }
+    public string? AddonName { get; }
+
+    public AtkUnitBase* Addon { get; }
+    public Type AddonType { get; }
+    public AgentId? AgentId { get; }
+    public Type AgentType { get; }
+    public AgentInterface* Agent { get; }
 
     public List<Pointer<AtkResNode>>? NodePath { get; set; }
     public bool Border { get; set; } = true;
     public bool UseNavigationService { get; set; } = true;
 
-    public AtkUnitBase* Addon
+    public InspectorContext(string addonName, ushort addonId)
     {
-        get
-        {
-            if (field != null)
-                return field;
-            return field = GetAtkUnitBase();
-        }
-    }
-
-    public AgentId? AgentId
-    {
-        get
-        {
-            if (field != null)
-                return field;
-            return field = GetAgentId();
-        }
-    }
-
-    public AgentInterface* Agent
-    {
-        get
-        {
-            if (field != null)
-                return field;
-            return field = GetAgentInterface();
-        }
+        AddonId = addonId;
+        AddonName = addonName;
+        Addon = GetAtkUnitBase();
+        AddonType = GetAddonType();
+        AgentId = GetAgentId();
+        AgentType = GetAgentType();
+        Agent = GetAgentInterface();
     }
 
     private unsafe AtkUnitBase* GetAtkUnitBase()
@@ -1483,8 +1475,22 @@ public unsafe struct InspectorContext(string addonName, ushort addonId)
         return matchCount == 1 ? firstMatch : null;
     }
 
+    private Type GetAddonType()
+    {
+        if (Addon == null)
+            return typeof(AtkUnitBase);
+
+        if (!ServiceLocator.TryGetService<TypeService>(out var typeService))
+            return typeof(AtkUnitBase);
+
+        return typeService.GetAddonType(Addon->NameString);
+    }
+
     private unsafe AgentId? GetAgentId()
     {
+        if (Addon == null)
+            return null;
+
         var agentModule = AgentModule.Instance();
 
         foreach (var agentId in Enum.GetValues<AgentId>())
@@ -1497,29 +1503,23 @@ public unsafe struct InspectorContext(string addonName, ushort addonId)
         return null;
     }
 
+    private Type GetAgentType()
+    {
+        if (AgentId == null)
+            return typeof(AgentInterface);
+
+        if (!ServiceLocator.TryGetService<TypeService>(out var typeService))
+            return typeof(AgentInterface);
+
+        return typeService.GetAgentType(AgentId.Value);
+    }
+
     private unsafe AgentInterface* GetAgentInterface()
     {
         var agentId = AgentId;
         return agentId == null
             ? null
             : AgentModule.Instance()->GetAgentByInternalId(agentId.Value);
-    }
-
-    public Type AddonType
-    {
-        get
-        {
-            if (field != null)
-                return field;
-
-            if (Addon == null)
-                return typeof(AtkUnitBase);
-
-            if (!ServiceLocator.TryGetService<TypeService>(out var typeService))
-                return typeof(AtkUnitBase);
-
-            return field = typeService.GetAddonType(Addon->NameString);
-        }
     }
 
     public OrderedDictionary<int, (string, Type?)> FieldMapping
