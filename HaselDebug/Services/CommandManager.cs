@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using HaselCommon.Commands;
+using HaselCommon.Services.Commands;
 using HaselDebug.Config;
 using HaselDebug.Windows;
 
@@ -13,7 +13,6 @@ public partial class CommandManager : IHostedService
     private readonly PluginConfig _pluginConfig;
     private readonly WindowManager _windowManager;
     private readonly CommandService _commandService;
-    private CommandHandler? _commandHandler;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -24,7 +23,11 @@ public partial class CommandManager : IHostedService
         _pluginInterface.UiBuilder.OpenMainUi += TogglePluginWindow;
         _pluginInterface.UiBuilder.OpenConfigUi += ToggleConfigWindow;
 
-        _commandHandler = _commandService.Register(OnHaselDebugCommand, true);
+        _commandService.AddCommand("haseldebug", cmd => cmd
+            .WithHelpTextKey("HaselDebug.CommandHandlerHelpMessage")
+            .WithHandler(OnHaselDebugCommand)
+            .AddSubcommand("config")
+                .WithHandler(OnConfigCommand));
 
         return Task.CompletedTask;
     }
@@ -34,9 +37,6 @@ public partial class CommandManager : IHostedService
         _pluginInterface.UiBuilder.Draw -= DrawMainMenuItem;
         _pluginInterface.UiBuilder.OpenMainUi -= TogglePluginWindow;
         _pluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigWindow;
-
-        _commandHandler?.Dispose();
-        _commandHandler = null;
 
         return Task.CompletedTask;
     }
@@ -64,19 +64,13 @@ public partial class CommandManager : IHostedService
         _windowManager.CreateOrToggle<ConfigWindow>();
     }
 
-    [CommandHandler("/haseldebug", "HaselDebug.CommandHandlerHelpMessage")]
-    private void OnHaselDebugCommand(string command, string arguments)
+    private void OnHaselDebugCommand(CommandContext ctx)
     {
-        switch (arguments.Trim().ToLowerInvariant())
-        {
-            case "conf":
-            case "config":
-                ToggleConfigWindow();
-                break;
+        TogglePluginWindow();
+    }
 
-            default:
-                TogglePluginWindow();
-                break;
-        }
+    private void OnConfigCommand(CommandContext ctx)
+    {
+        ToggleConfigWindow();
     }
 }
