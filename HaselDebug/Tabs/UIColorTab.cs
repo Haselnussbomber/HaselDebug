@@ -1,5 +1,8 @@
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
+using UIColor = Lumina.Excel.Sheets.Experimental.UIColor;
+
+#pragma warning disable PendingExcelSchema
 
 namespace HaselDebug.Tabs;
 
@@ -57,12 +60,12 @@ public unsafe partial class UIColorTab : DebugTab
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearBlue", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)Color.FromABGR(row.Unknown0);
+            color = (Vector4)Color.FromABGR(row.ClearWhite);
             ImGui.SetNextItemWidth(-1);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearWhite", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)Color.FromABGR(row.Unknown1);
+            color = (Vector4)Color.FromABGR(row.ClearGreen);
             ImGui.SetNextItemWidth(-1);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearGreen", ref color, ImGuiColorEditFlags.DisplayHex);
 
