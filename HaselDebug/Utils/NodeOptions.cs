@@ -13,6 +13,7 @@ public record struct NodeOptions
     public bool Indent { get; set; } = true;
     public bool DefaultOpen { get; set; } = false;
     public bool IsLeafNode { get; set; } = false;
+    public bool IsSelected { get; set; } = false;
     public Action? OnHovered { get; set; } = null;
     public Action? OnClicked { get; set; } = null;
     public Action<NodeOptions, ImGuiContextMenuBuilder>? DrawContextMenu { get; set; }
@@ -35,6 +36,9 @@ public record struct NodeOptions
 
         if (IsLeafNode)
             flags |= ImGuiTreeNodeFlags.Leaf;
+
+        if (IsSelected)
+            flags |= ImGuiTreeNodeFlags.Selected;
 
         if (OnClicked != null)
             flags |= ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick;
