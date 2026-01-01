@@ -12,7 +12,9 @@ public record struct NodeOptions
     public ReadOnlySeString? SeStringTitle { get; set; } = null;
     public bool Indent { get; set; } = true;
     public bool DefaultOpen { get; set; } = false;
+    public bool IsLeafNode { get; set; } = false;
     public Action? OnHovered { get; set; } = null;
+    public Action? OnClicked { get; set; } = null;
     public Action<NodeOptions, ImGuiContextMenuBuilder>? DrawContextMenu { get; set; }
     public bool DrawSeStringTreeNode { get; set; } = false;
     public bool RenderSeString { get; set; } = true;
@@ -30,6 +32,12 @@ public record struct NodeOptions
     {
         if (DefaultOpen)
             flags |= ImGuiTreeNodeFlags.DefaultOpen;
+
+        if (IsLeafNode)
+            flags |= ImGuiTreeNodeFlags.Leaf;
+
+        if (OnClicked != null)
+            flags |= ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick;
 
         return flags;
     }

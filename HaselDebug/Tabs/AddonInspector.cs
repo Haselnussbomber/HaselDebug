@@ -51,10 +51,8 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
         ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
 
-        _atkDebugRenderer.DrawAddon(new DrawAddonParams()
+        _atkDebugRenderer.DrawInspector(new InspectorContext(_selectedAddonName, _selectedAddonId)
         {
-            AddonId = _selectedAddonId,
-            AddonName = _selectedAddonName,
             NodePath = _nodePath
         });
 

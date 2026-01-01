@@ -72,7 +72,7 @@ public unsafe partial class DebugRenderer
         }
     }
 
-    public void DrawAtkValues(AtkValue* values, ushort elementCount, NodeOptions nodeOptions)
+    public void DrawAtkValues(AtkValue* values, ushort elementCount, NodeOptions nodeOptions, bool inTreeNode = true)
     {
         var address = (nint)values;
         if (address == 0)
@@ -95,12 +95,15 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.WithAddress((nint)values);
 
-        using var node = DrawTreeNode(nodeOptions.WithTitle($"{elementCount} value{(elementCount != 1 ? "s" : "")}") with { DrawSeStringTreeNode = false });
-        if (!node) return;
+        using var node = inTreeNode ? DrawTreeNode(nodeOptions.WithTitle($"{elementCount} value{(elementCount != 1 ? "s" : "")}") with { DrawSeStringTreeNode = false }) : null;
+        if (node != null && !node) return;
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
-        using var table = ImRaii.Table(nodeOptions.GetKey("AtkValuesTable"), 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings);
+        var flags = ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings;
+        if (!inTreeNode)
+            flags |= ImGuiTableFlags.ScrollY;
+        using var table = ImRaii.Table(nodeOptions.GetKey("AtkValuesTable"), 3, flags);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 40);
