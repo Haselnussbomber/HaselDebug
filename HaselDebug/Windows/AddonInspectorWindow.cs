@@ -6,14 +6,13 @@ namespace HaselDebug.Windows;
 public partial class AddonInspectorWindow : SimpleWindow
 {
     private readonly AtkDebugRenderer _atkDebugRenderer;
-    private string _addonName;
 
     public ushort AddonId { get; internal set; }
 
     public string AddonName
     {
-        get => _addonName;
-        set { _addonName = value; WindowName = value; }
+        get;
+        set { field = value; WindowName = value; }
     }
 
     public override void OnOpen()
@@ -37,10 +36,8 @@ public partial class AddonInspectorWindow : SimpleWindow
 
     public override void Draw()
     {
-        _atkDebugRenderer.DrawAddon(new DrawAddonParams()
+        _atkDebugRenderer.DrawInspector(new InspectorContext(AddonName, AddonId)
         {
-            AddonId = AddonId,
-            AddonName = AddonName,
             Border = false
         });
     }
