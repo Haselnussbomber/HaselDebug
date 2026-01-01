@@ -146,8 +146,7 @@ public unsafe partial class PointerInspectorTab : DebugTab
 
                 if (csType != null)
                 {
-                    _currentStructFields = [];
-                    AtkDebugRenderer.LoadTypeMapping(_currentStructFields, "", 0, csType);
+                    _currentStructFields = _typeService.GetTypeFields(csType);
                 }
 
                 break;

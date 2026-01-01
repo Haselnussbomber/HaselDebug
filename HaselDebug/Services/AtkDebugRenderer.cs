@@ -35,7 +35,6 @@ public unsafe partial class AtkDebugRenderer
     private readonly PinnedInstancesService _pinnedInstancesService;
     private readonly NavigationService _navigationService;
     private readonly ProcessInfoService _processInfoService;
-    private readonly Dictionary<string, OrderedDictionary<int, (string, Type?)>> _fieldMapping = [];
     private string _nodeQuery = string.Empty;
 
     public void DrawAddon(DrawAddonParams drawParams)
@@ -68,23 +67,6 @@ public unsafe partial class AtkDebugRenderer
             UnitBase = unitBase,
         };
 
-        var type = _typeService.GetAddonType(unitBase->NameString);
-
-        if (!_fieldMapping.ContainsKey(unitBase->NameString))
-        {
-            var fields = _fieldMapping[unitBase->NameString] = [];
-
-            LoadTypeMapping(fields, "", 0, type);
-
-            for (var offset = 0; offset < type.SizeOf() - 8; offset += 8)
-            {
-                if (!fields.ContainsKey(offset))
-                {
-                    fields[offset] = ($"+0x{offset:X}", null);
-                }
-            }
-        }
-
         ImGuiUtils.DrawCopyableText(unitBase->NameString);
 
         ImGui.SameLine();
@@ -108,7 +90,8 @@ public unsafe partial class AtkDebugRenderer
 
         ImGuiUtilsEx.PrintFieldValuePair("Address", ((nint)unitBase).ToString("X"));
         ImGui.SameLine();
-        _debugRenderer.DrawPointerType((nint)unitBase, type, nodeOptions with { DefaultOpen = false });
+        var addonType = _typeService.GetAddonType(unitBase->NameString);
+        _debugRenderer.DrawPointerType((nint)unitBase, addonType, nodeOptions with { DefaultOpen = false });
 
         // Agent
         var agentModule = AgentModule.Instance();
@@ -277,73 +260,6 @@ public unsafe partial class AtkDebugRenderer
                 PrintNode(node, false, $"[{j++}] ", drawParams.NodePath, nodeOptions with { DefaultOpen = false });
             }
         }
-    }
-
-    // TODO: move to Utils
-    public static void LoadTypeMapping(OrderedDictionary<int, (string, Type?)> fields, string prefix, int offset, Type type)
-    {
-        foreach (var fieldInfo in type.GetFields(BindingFlags.Default | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-        {
-            if (fieldInfo.GetCustomAttribute<FieldOffsetAttribute>() is not { } fieldOffsetAttribute)
-                continue;
-
-            if (fieldInfo.IsAssembly
-                && fieldInfo.GetCustomAttribute<FixedSizeArrayAttribute>() is FixedSizeArrayAttribute fixedSizeArrayAttribute
-                && !fixedSizeArrayAttribute.IsString
-                && !fixedSizeArrayAttribute.IsBitArray
-                && fieldInfo.FieldType.GetCustomAttribute<InlineArrayAttribute>() is InlineArrayAttribute inlineArrayAttribute)
-            {
-                var innerType = fieldInfo.FieldType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)[0].FieldType;
-                for (var i = 0; i < inlineArrayAttribute.Length; i++)
-                {
-                    LoadTypeMapping(fields, $"{prefix}{fieldInfo.Name[1..].FirstCharToUpper()}[{i}].", offset + fieldOffsetAttribute.Value + i * innerType.SizeOf(), innerType);
-                }
-            }
-            else if (fieldInfo.FieldType.IsStruct())
-            {
-                LoadTypeMapping(fields, prefix + fieldInfo.Name + ".", offset + fieldOffsetAttribute.Value, fieldInfo.FieldType);
-            }
-            else
-            {
-                if (!fields.ContainsKey(offset + fieldOffsetAttribute.Value))
-                {
-                    fields[offset + fieldOffsetAttribute.Value] = (prefix + fieldInfo.Name, fieldInfo.FieldType);
-                }
-            }
-        }
-    }
-
-    private bool IsNodeMatchingSearch(AtkResNode* node)
-    {
-        if (string.IsNullOrEmpty(_nodeQuery))
-            return true;
-
-        if (("0x" + ((nint)node).ToString("X")).Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->NodeId.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->GetNodeType().ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->Type.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->GetNodeType() == NodeType.Component)
-        {
-            var componentNode = (AtkComponentNode*)node;
-            var component = componentNode->Component;
-            if (component != null &&
-                component->UldManager.ResourceFlags.HasFlag(AtkUldManagerResourceFlag.Initialized) &&
-                component->UldManager.BaseType == AtkUldManagerBaseType.Component &&
-                ((AtkUldComponentInfo*)component->UldManager.Objects)->ComponentType.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public void DrawNode(AtkResNode* node)
@@ -534,23 +450,29 @@ public unsafe partial class AtkDebugRenderer
 
     private void AddNodeFieldSuffix(SeStringBuilder titleBuilder, AtkResNode* node, NodeOptions nodeOptions)
     {
-        if (nodeOptions.UnitBase.HasValue && _fieldMapping.TryGetValue(nodeOptions.UnitBase.Value.Value->NameString, out var fields))
+        if (!nodeOptions.UnitBase.HasValue)
+            return;
+
+        var unitBase = (AtkUnitBase*)nodeOptions.UnitBase;
+        var addonType = _typeService.GetAddonType(unitBase->NameString);
+        if (addonType == null)
+            return;
+
+        var fields = _typeService.GetTypeFields(addonType);
+
+        foreach (var (offset, (name, type)) in fields)
         {
-            var unitBaseAddress = (nint)nodeOptions.UnitBase.Value.Value;
-            foreach (var (offset, (name, type)) in fields)
-            {
-                var fieldValue = *(nint*)(unitBaseAddress + offset);
-                if (fieldValue != (nint)node)
-                    continue;
+            var fieldValue = *(nint*)((nint)unitBase + offset);
+            if (fieldValue != (nint)node)
+                continue;
 
-                titleBuilder
-                    .Append(' ')
-                    .PushColorRgba(Color.Cyan)
-                    .Append(name)
-                    .PopColor();
+            titleBuilder
+                .Append(' ')
+                .PushColorRgba(Color.Cyan)
+                .Append(name)
+                .PopColor();
 
-                break;
-            }
+            break;
         }
     }
 
@@ -1271,5 +1193,38 @@ public unsafe partial class AtkDebugRenderer
         ImGui.Text(label);
         ImGui.TableNextColumn();
         ImGui.SetNextItemWidth(200);
+    }
+
+    private bool IsNodeMatchingSearch(AtkResNode* node)
+    {
+        if (string.IsNullOrEmpty(_nodeQuery))
+            return true;
+
+        if (("0x" + ((nint)node).ToString("X")).Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        if (node->NodeId.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        if (node->GetNodeType().ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        if (node->Type.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        if (node->GetNodeType() == NodeType.Component)
+        {
+            var componentNode = (AtkComponentNode*)node;
+            var component = componentNode->Component;
+            if (component != null &&
+                component->UldManager.ResourceFlags.HasFlag(AtkUldManagerResourceFlag.Initialized) &&
+                component->UldManager.BaseType == AtkUldManagerBaseType.Component &&
+                ((AtkUldComponentInfo*)component->UldManager.Objects)->ComponentType.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
