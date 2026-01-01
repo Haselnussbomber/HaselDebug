@@ -7,7 +7,7 @@ using HaselDebug.Windows;
 namespace HaselDebug.Services;
 
 [RegisterSingleton<IHostedService>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public partial class CommandManager : IHostedService
+public partial class PluginCommandService : IHostedService
 {
     private readonly IDalamudPluginInterface _pluginInterface;
     private readonly PluginConfig _pluginConfig;
@@ -26,8 +26,8 @@ public partial class CommandManager : IHostedService
         _commandService.AddCommand("haseldebug", cmd => cmd
             .WithHelpTextKey("HaselDebug.CommandHandlerHelpMessage")
             .WithHandler(OnHaselDebugCommand)
-            .AddSubcommand("config")
-                .WithHandler(OnConfigCommand));
+            .AddSubcommand("config", ctx => ctx
+                .WithHandler(OnConfigCommand)));
 
         return Task.CompletedTask;
     }
