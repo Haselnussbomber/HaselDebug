@@ -35,7 +35,9 @@ public unsafe partial class AtkDebugRenderer
     private readonly PinnedInstancesService _pinnedInstancesService;
     private readonly NavigationService _navigationService;
     private readonly ProcessInfoService _processInfoService;
+
     private string _nodeQuery = string.Empty;
+    private List<SearchToken>? _searchTokens;
 
     public void DrawAddon(DrawAddonParams drawParams)
     {
@@ -240,7 +242,12 @@ public unsafe partial class AtkDebugRenderer
             if (!nodeTree)
                 return;
 
-            ImGui.InputTextWithHint("##NodeSearch", _textService.Translate("SearchBar.Hint"), ref _nodeQuery, 256, ImGuiInputTextFlags.AutoSelectAll);
+            if (ImGui.InputTextWithHint("##NodeSearch"u8, _textService.Translate("SearchBar.Hint"), ref _nodeQuery, 256, ImGuiInputTextFlags.AutoSelectAll))
+            {
+                _searchTokens = string.IsNullOrWhiteSpace(_nodeQuery)
+                    ? null
+                    : SearchTokenParser.Parse(_nodeQuery);
+            }
 
             var j = 0;
             foreach (var node in unitBase->UldManager.Nodes)
@@ -1197,34 +1204,78 @@ public unsafe partial class AtkDebugRenderer
 
     private bool IsNodeMatchingSearch(AtkResNode* node)
     {
-        if (string.IsNullOrEmpty(_nodeQuery))
+        if (_searchTokens == null || _searchTokens.Count == 0)
             return true;
 
-        if (("0x" + ((nint)node).ToString("X")).Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->NodeId.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->GetNodeType().ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->Type.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (node->GetNodeType() == NodeType.Component)
+        return _searchTokens.All(token =>
         {
-            var componentNode = (AtkComponentNode*)node;
-            var component = componentNode->Component;
-            if (component != null &&
-                component->UldManager.ResourceFlags.HasFlag(AtkUldManagerResourceFlag.Initialized) &&
-                component->UldManager.BaseType == AtkUldManagerBaseType.Component &&
-                ((AtkUldComponentInfo*)component->UldManager.Objects)->ComponentType.ToString().Contains(_nodeQuery, StringComparison.InvariantCultureIgnoreCase))
+            var match = false;
+
+            if (string.IsNullOrEmpty(token.Key))
             {
-                return true;
+                match |= MatchesNodeId(node, token.Value.StartsWith('#') ? token.Value[1..] : token.Value);
+                match |= MatchesNodeType(node, token.Value);
+                match |= MatchesNodeAddress(node, token.Value);
             }
+            else
+            {
+                switch (token.Key)
+                {
+                    case "id":
+                        match = MatchesNodeId(node, token.Value);
+                        break;
+
+                    case "type":
+                        match = MatchesNodeType(node, token.Value);
+                        break;
+
+                    case "addr":
+                    case "address":
+                        match = MatchesNodeAddress(node, token.Value);
+                        break;
+                }
+            }
+
+            return token.IsExclude ? !match : match;
+        });
+
+        static bool MatchesNodeId(AtkResNode* node, string value)
+        {
+            return uint.TryParse(value, out var nodeId) && node->NodeId == nodeId;
         }
 
-        return false;
+        static bool MatchesNodeType(AtkResNode* node, string value)
+        {
+            if (node->GetNodeType().ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase))
+                return true;
+
+            if (node->GetNodeType() == NodeType.Component)
+            {
+                var componentNode = (AtkComponentNode*)node;
+                var component = componentNode->Component;
+                if (component != null
+                    && component->UldManager.ResourceFlags.HasFlag(AtkUldManagerResourceFlag.Initialized)
+                    && component->UldManager.BaseType == AtkUldManagerBaseType.Component
+                    && ((AtkUldComponentInfo*)component->UldManager.Objects)->ComponentType.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        static bool MatchesNodeAddress(AtkResNode* node, string value)
+        {
+            nint address;
+
+            if (value.StartsWith("0x"))
+            {
+                if (nint.TryParse(value[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out address))
+                    return (nint)node == address;
+            }
+
+            return nint.TryParse(value, out address) && (nint)node == address;
+        }
     }
 }
