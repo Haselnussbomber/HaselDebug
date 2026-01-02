@@ -12,6 +12,7 @@ namespace HaselDebug.Tabs;
 public unsafe partial class AddonInspectorTab : DebugTab
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IDalamudPluginInterface _pluginInterface;
     private readonly TextService _textService;
     private readonly LanguageProvider _languageProvider;
     private readonly TypeService _typeService;
@@ -235,7 +236,18 @@ public unsafe partial class AddonInspectorTab : DebugTab
             allUnitsList.Add(unitBase);
         }
 
-        allUnitsList.Sort((a, b) => (int)(b.Value->DepthLayer - a.Value->DepthLayer));
+        allUnitsList.Sort((a, b) =>
+        {
+            var aIsOverlay = a.Value->Name.StartsWith("KTK_Overlay"u8);
+            var bIsOverlay = b.Value->Name.StartsWith("KTK_Overlay"u8);
+
+            if (aIsOverlay && !bIsOverlay)
+                return 1;
+            if (!aIsOverlay && bIsOverlay)
+                return -1;
+
+            return (int)(b.Value->DepthLayer - a.Value->DepthLayer);
+        });
 
         var hoveredDepthLayerAddonNodes = new Dictionary<uint, Dictionary<Pointer<AtkUnitBase>, List<Pointer<AtkResNode>>>>();
         var nodeCount = 0;
@@ -252,26 +264,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
             if (!bounds->ContainsPoint((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y))
                 continue;
 
-            for (var i = 0; i < unitBase->UldManager.NodeListCount; i++)
-            {
-                var node = unitBase->UldManager.NodeList[i];
-                node->GetBounds(bounds);
-
-                if (!bounds->ContainsPoint((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y))
-                    continue;
-
-                currentHoveredNodePtrs.Add(node);
-
-                if (!hoveredDepthLayerAddonNodes.TryGetValue(unitBase->DepthLayer, out var addonNodes))
-                    hoveredDepthLayerAddonNodes.Add(unitBase->DepthLayer, addonNodes = []);
-
-                if (!addonNodes.TryGetValue(unitBase, out var nodes))
-                    addonNodes.Add(unitBase, [node]);
-                else if (!nodes.Contains(node))
-                    nodes.Add(node);
-
-                nodeCount++;
-            }
+            FindHoveredNodes(hoveredDepthLayerAddonNodes, ref nodeCount, currentHoveredNodePtrs, &unitBase->UldManager, unitBase);
         }
 
         // Only reset selection index if hovered nodes changed
@@ -288,10 +281,10 @@ public unsafe partial class AddonInspectorTab : DebugTab
             return;
         }
 
-        ImGui.SetNextWindowPos(Vector2.Zero);
+        ImGui.SetNextWindowPos(_pluginInterface.IsDevMenuOpen ? new Vector2(0, ImGui.GetFrameHeight()) : Vector2.Zero);
         ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
 
-        if (!ImGui.Begin("NodePicker", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBackground))
+        if (!ImGui.Begin("NodePicker", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             return;
 
         ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -299,12 +292,12 @@ public unsafe partial class AddonInspectorTab : DebugTab
         var nodeIndex = 0;
         foreach (var (depthLayer, addons) in hoveredDepthLayerAddonNodes)
         {
-            ImGui.Text($"Depth Layer {depthLayer}:");
+            DrawText($"Depth Layer {depthLayer}:");
 
             using var indent = ImRaii.PushIndent();
             foreach (var (unitBase, nodes) in addons)
             {
-                ImGui.Text($"{unitBase.Value->NameString}:");
+                DrawText($"{unitBase.Value->NameString}:");
 
                 using var indent2 = ImRaii.PushIndent();
 
@@ -316,10 +309,10 @@ public unsafe partial class AddonInspectorTab : DebugTab
                     if (_nodePickerSelectionIndex == nodeIndex)
                     {
                         using (ImRaii.PushFont(UiBuilder.IconFont))
-                            ImGui.Text(FontAwesomeIcon.CaretRight.ToIconString());
+                            DrawText(FontAwesomeIcon.CaretRight.ToIconString());
                         ImGui.SameLine(0, 0);
 
-                        ImGui.GetForegroundDrawList().AddRectFilled(
+                        ImGui.GetBackgroundDrawList().AddRectFilled(
                             new Vector2(bounds->Pos1.X, bounds->Pos1.Y),
                             new Vector2(bounds->Pos2.X, bounds->Pos2.Y),
                             new Color(1, 1, 0, 0.5f).ToUInt());
@@ -344,9 +337,9 @@ public unsafe partial class AddonInspectorTab : DebugTab
                         }
                     }
 
-                    if ((int)node->Type < 1000)
+                    if (node->GetNodeType() != NodeType.Component)
                     {
-                        ImGui.Text($"[0x{(nint)node:X}] [{node->NodeId}] {node->Type} Node");
+                        DrawText($"[0x{(nint)node:X}] [{node->NodeId}] {node->Type} Node");
                     }
                     else
                     {
@@ -354,7 +347,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
                         var componentInfo = compNode->Component->UldManager;
                         var objectInfo = (AtkUldComponentInfo*)componentInfo.Objects;
                         if (objectInfo == null) continue;
-                        ImGui.Text($"[0x{(nint)node:X}] [{node->NodeId}] {objectInfo->ComponentType} Component Node");
+                        DrawText($"[0x{(nint)node:X}] [{node->NodeId}] {objectInfo->ComponentType} Component Node");
                     }
 
                     nodeIndex++;
@@ -369,5 +362,70 @@ public unsafe partial class AddonInspectorTab : DebugTab
             _nodePickerSelectionIndex = 0;
 
         ImGui.End();
+    }
+
+    private static void FindHoveredNodes(
+        Dictionary<uint, Dictionary<Pointer<AtkUnitBase>, List<Pointer<AtkResNode>>>> hoveredDepthLayerAddonNodes,
+        ref int nodeCount,
+        HashSet<Pointer<AtkResNode>> currentHoveredNodePtrs,
+        AtkUldManager* uldManager,
+        AtkUnitBase* unitBase)
+    {
+        var bounds = stackalloc FFXIVClientStructs.FFXIV.Common.Math.Bounds[1];
+
+        for (var i = 0; i < uldManager->NodeListCount; i++)
+        {
+            var node = uldManager->NodeList[i];
+            node->GetBounds(bounds);
+
+            if (!bounds->ContainsPoint((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y))
+                continue;
+
+            currentHoveredNodePtrs.Add(node);
+
+            if (!hoveredDepthLayerAddonNodes.TryGetValue(unitBase->DepthLayer, out var addonNodes))
+                hoveredDepthLayerAddonNodes.Add(unitBase->DepthLayer, addonNodes = []);
+
+            if (!addonNodes.TryGetValue(unitBase, out var nodes))
+                addonNodes.Add(unitBase, [node]);
+            else if (!nodes.Contains(node))
+                nodes.Add(node);
+
+            nodeCount++;
+
+            if ((ImGui.IsKeyDown(ImGuiKey.LeftShift) || ImGui.IsKeyDown(ImGuiKey.RightShift)) && node->GetNodeType() == NodeType.Component)
+            {
+                var componentNode = (AtkComponentNode*)node;
+                var component = node->GetComponent();
+                FindHoveredNodes(hoveredDepthLayerAddonNodes, ref nodeCount, currentHoveredNodePtrs, &component->UldManager, unitBase);
+            }
+        }
+    }
+
+    private static void DrawText(string text)
+    {
+        var position = ImGui.GetCursorPos();
+        var outlineColor = Color.Black with { A = 0.5f };
+
+        // outline
+        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(-1));
+        using (outlineColor.Push(ImGuiCol.Text))
+            ImGui.Text(text);
+
+        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(1));
+        using (outlineColor.Push(ImGuiCol.Text))
+            ImGui.Text(text);
+
+        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(1, -1));
+        using (outlineColor.Push(ImGuiCol.Text))
+            ImGui.Text(text);
+
+        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(-1, 1));
+        using (outlineColor.Push(ImGuiCol.Text))
+            ImGui.Text(text);
+
+        // text
+        ImGui.SetCursorPos(position);
+        ImGui.Text(text);
     }
 }
