@@ -31,7 +31,7 @@ public unsafe partial class AtkDebugRenderer
     private InspectorContext _ctx;
     private string _nodeQuery = string.Empty;
     private List<SearchToken>? _searchTokens;
-    private float _sidebarWidth = 350f;
+    private float _sidebarWidth = 450f;
     private AtkResNode* _selectedNode;
 
     public void DrawInspector(InspectorContext ctx)
@@ -97,7 +97,7 @@ public unsafe partial class AtkDebugRenderer
             UnitBase = _ctx.Addon,
         };
 
-        DrawAddonInfo(nodeOptions);
+        DrawAddonHeader(nodeOptions);
         ImGuiUtilsEx.PaddedSeparator();
 
         using var tabBar = ImRaii.TabBar(nodeOptions.GetKey("TabBar"));
@@ -111,6 +111,9 @@ public unsafe partial class AtkDebugRenderer
 
     private void DrawSidebar()
     {
+        if (_selectedNode == null)
+            return;
+
         var nodeOptions = new NodeOptions()
         {
             AddressPath = new([(nint)_ctx.Addon, 2]),
@@ -118,10 +121,18 @@ public unsafe partial class AtkDebugRenderer
             UnitBase = _ctx.Addon,
         };
 
-        PrintInfoTable(_selectedNode, nodeOptions);
+        using var tabBar = ImRaii.TabBar(nodeOptions.GetKey("TabBar"));
+        if (!tabBar) return;
+
+        DrawNodeProperties();
+        DrawNodeInfo(nodeOptions);
+        DrawComponentInfo(nodeOptions);
+        DrawEvents(nodeOptions);
+        DrawLabelSets();
+        DrawAnimations();
     }
 
-    private void DrawAddonInfo(NodeOptions nodeOptions)
+    private void DrawAddonHeader(NodeOptions nodeOptions)
     {
         var addon = _ctx.Addon;
 
@@ -542,28 +553,14 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
-    private void PrintInfoTable(AtkResNode* node, NodeOptions nodeOptions)
+    private void DrawNodeInfo(NodeOptions nodeOptions)
     {
-        if (node == null)
-            return;
+        var node = _selectedNode;
 
-        using var tabBar = ImRaii.TabBar(nodeOptions.GetKey("TabBar"));
-        if (!tabBar) return;
-
-        PrintProperties(node);
-        PrintNodeInfo(node, nodeOptions);
-        PrintComponentInfo(node, nodeOptions);
-        PrintEvents(node, nodeOptions);
-        PrintLabelSets(node);
-        PrintAnimations(node);
-    }
-
-    private void PrintNodeInfo(AtkResNode* node, NodeOptions nodeOptions)
-    {
         using var tabItem = ImRaii.TabItem("Node"u8);
         if (!tabItem) return;
 
-        ImGui.Text("Address: "u8);
+        ImGui.Text("Address:"u8);
         ImGui.SameLine();
         _debugRenderer.DrawAddress(node);
 
@@ -574,13 +571,17 @@ public unsafe partial class AtkDebugRenderer
         _debugRenderer.DrawPointerType((nint)node, typeof(AtkResNode), nodeOptions with { DefaultOpen = true });
     }
 
-    private void PrintComponentInfo(AtkResNode* node, NodeOptions nodeOptions)
+    private void DrawComponentInfo(NodeOptions nodeOptions)
     {
-        if (node->GetNodeType() != NodeType.Component)
-            return;
+        var node = _selectedNode;
 
+        var isComponent = node->GetNodeType() == NodeType.Component;
+
+        using var disabled = !isComponent ? ImRaii.Disabled() : null;
         using var tabItem = ImRaii.TabItem("Component"u8);
-        if (!tabItem) return;
+
+        if (!tabItem || !isComponent)
+            return;
 
         var componentNode = (AtkComponentNode*)node;
         var component = componentNode->Component;
@@ -592,8 +593,10 @@ public unsafe partial class AtkDebugRenderer
         _debugRenderer.DrawPointerType((nint)component, typeof(AtkComponentBase), nodeOptions.WithAddress(2) with { DefaultOpen = true });
     }
 
-    private void PrintProperties(AtkResNode* node)
+    private void DrawNodeProperties()
     {
+        var node = _selectedNode;
+
         using var tabItem = ImRaii.TabItem("Properties"u8);
         if (!tabItem) return;
 
@@ -841,9 +844,15 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
-    private void PrintEvents(AtkResNode* node, NodeOptions nodeOptions)
+    private void DrawEvents(NodeOptions nodeOptions)
     {
-        if (node == null || node->AtkEventManager.Event == null)
+        var node = _selectedNode;
+        var hasEvents = node != null && node->AtkEventManager.Event != null;
+
+        using var disabled = !hasEvents ? ImRaii.Disabled() : null;
+        using var tabItem = ImRaii.TabItem("Events"u8);
+
+        if (!tabItem || !hasEvents)
             return;
 
         var unitBaseAddress = (nint)(nodeOptions.UnitBase.HasValue ? nodeOptions.UnitBase.Value.Value : null);
@@ -861,9 +870,6 @@ public unsafe partial class AtkDebugRenderer
 
             evt = evt->NextEvent;
         }
-
-        using var tabItem = ImRaii.TabItem("Events"u8);
-        if (!tabItem) return;
 
         var columns = 3;
         if (hasDifferentTarget) columns += 1;
@@ -923,19 +929,20 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
-    private void PrintLabelSets(AtkResNode* node)
+    private void DrawLabelSets()
     {
-        if (node == null ||
-            node->Timeline == null ||
-            node->Timeline->Resource == null ||
-            node->Timeline->Resource->LabelSetCount == 0 ||
-            node->Timeline->Resource->LabelSets == null)
-        {
-            return;
-        }
+        var node = _selectedNode;
+        var hasLabelSets = node != null
+            && node->Timeline != null
+            && node->Timeline->Resource != null
+            && node->Timeline->Resource->LabelSetCount != 0
+            && node->Timeline->Resource->LabelSets != null;
 
+        using var disabled = !hasLabelSets ? ImRaii.Disabled() : null;
         using var tabItem = ImRaii.TabItem("Label Sets"u8);
-        if (!tabItem) return;
+
+        if (!tabItem || !hasLabelSets)
+            return;
 
         if (ImGui.Button($"Export Timeline##{(nint)node:X}"))
         {
@@ -990,19 +997,20 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
-    private void PrintAnimations(AtkResNode* node)
+    private void DrawAnimations()
     {
-        if (node == null ||
-            node->Timeline == null ||
-            node->Timeline->Resource == null ||
-            node->Timeline->Resource->AnimationCount == 0 ||
-            node->Timeline->Resource->Animations == null)
-        {
-            return;
-        }
+        var node = _selectedNode;
+        var hasAnimations = node != null
+            && node->Timeline != null
+            && node->Timeline->Resource != null
+            && node->Timeline->Resource->AnimationCount != 0
+            && node->Timeline->Resource->Animations != null;
 
-        using var tabItem = ImRaii.TabItem("Animation Groups"u8);
-        if (!tabItem) return;
+        using var disabled = !hasAnimations ? ImRaii.Disabled() : null;
+        using var tabItem = ImRaii.TabItem("Animations"u8);
+
+        if (!tabItem || !hasAnimations)
+            return;
 
         if (ImGui.Button($"Export Timeline##{(nint)node:X}"))
         {
