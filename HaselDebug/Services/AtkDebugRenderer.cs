@@ -49,7 +49,7 @@ public unsafe partial class AtkDebugRenderer
         }
 
         // reset selected node if it isn't from this addon
-        if (RaptureAtkUnitManager.Instance()->GetAddonByNode(_selectedNode) != _ctx.Addon)
+        if (RaptureAtkUnitManager.Instance()->AtkUnitManager.GetAddonByNodeSafe(_selectedNode) != _ctx.Addon)
             _selectedNode = null;
 
         var windowSize = ImGui.GetContentRegionAvail();
@@ -157,6 +157,18 @@ public unsafe partial class AtkDebugRenderer
             ("Scale", $"{addon->Scale * 100}%"),
             ("Size (scaled)", $"{scaledSize.X}x{scaledSize.Y}"),
             ("Widget Count", $"{addon->UldManager.ObjectCount}"));
+
+        // Host
+        if (addon->HostId != 0)
+        {
+            var host = RaptureAtkUnitManager.Instance()->GetAddonById(addon->HostId);
+            if (host != null)
+            {
+                ImGui.Text("Embedded by"u8);
+                ImGuiUtils.SameLineSpace();
+                _navigationService.DrawAddonLink(host->Id, host->NameString);
+            }
+        }
     }
 
     public void DrawAddonNodes(NodeOptions nodeOptions)
@@ -216,7 +228,7 @@ public unsafe partial class AtkDebugRenderer
 
     private void DrawAddonStruct(NodeOptions nodeOptions)
     {
-        using var tabItem = ImRaii.TabItem(_ctx.AddonType.Name);
+        using var tabItem = ImRaii.TabItem("Addon"u8);
         if (!tabItem) return;
 
         _debugRenderer.DrawPointerType((nint)_ctx.Addon, _ctx.AddonType, nodeOptions with { DefaultOpen = true });
@@ -225,15 +237,18 @@ public unsafe partial class AtkDebugRenderer
     private void DrawAddonAgent(NodeOptions nodeOptions)
     {
         if (_ctx.AgentId is not AgentId agentId)
+        {
+            using var disabled = ImRaii.Disabled();
+            using var _ = ImRaii.TabItem("Agent"u8);
             return;
+        }
 
-        var agentType = _typeService.GetAgentType(agentId);
-
-        using var tabItem = ImRaii.TabItem("Agent" + agentId.ToString());
+        using var tabItem = ImRaii.TabItem("Agent"u8);
         if (!tabItem) return;
 
         var addon = _ctx.Addon;
         var agent = _ctx.Agent;
+        var agentType = _ctx.AgentType;
 
         // Callback
         var atkModule = RaptureAtkModule.Instance();
@@ -269,18 +284,6 @@ public unsafe partial class AtkDebugRenderer
                 _debugRenderer.DrawAddress(addonCallbackEntry.EventInterface);
                 ImGuiUtils.SameLineSpace();
                 ImGui.Text($"with EventKind {addonCallbackEntry.EventKind}");
-            }
-        }
-
-        // Host
-        if (addon->HostId != 0)
-        {
-            var host = RaptureAtkUnitManager.Instance()->GetAddonById(addon->HostId);
-            if (host != null)
-            {
-                ImGui.Text("Embedded by"u8);
-                ImGuiUtils.SameLineSpace();
-                _navigationService.DrawAddonLink(host->Id, host->NameString);
             }
         }
 
@@ -322,12 +325,17 @@ public unsafe partial class AtkDebugRenderer
 
     private void DrawAddonAtkValues(NodeOptions nodeOptions)
     {
-        var count = _ctx.Addon->AtkValuesCount;
+        var addon = _ctx.Addon;
+        var valueCount = addon->AtkValuesCount;
 
-        if (_ctx.Addon->AtkValues == null || count == 0)
+        if (addon->AtkValues == null || valueCount == 0)
+        {
+            using var disabled = ImRaii.Disabled();
+            using var _ = ImRaii.TabItem("AtkValues"u8);
             return;
+        }
 
-        using var tabItem = ImRaii.TabItem($"AtkValues ({count})##AtkValues");
+        using var tabItem = ImRaii.TabItem($"AtkValues ({valueCount})##AtkValues");
         if (!tabItem) return;
 
         using var tabChild = ImRaii.Child("TabChild"u8, new Vector2(-1));
@@ -335,13 +343,13 @@ public unsafe partial class AtkDebugRenderer
 
         if (ImGui.Button("Observe AtkValues"u8))
         {
-            var addonName = _ctx.Addon->NameString;
+            var addonName = addon->NameString;
             _windowManager.CreateOrOpen(
                 addonName + " - AtkValues Observer",
                 () => new AddonAtkValuesObserverWindow(_windowManager, _textService, _addonObserver, _addonLifecycle, _debugRenderer) { AddonName = addonName });
         }
 
-        _debugRenderer.DrawAtkValues(_ctx.Addon->AtkValues, count, nodeOptions, false);
+        _debugRenderer.DrawAtkValues(addon->AtkValues, valueCount, nodeOptions, false);
     }
 
     public void DrawNode(AtkResNode* node)
