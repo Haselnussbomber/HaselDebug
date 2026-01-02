@@ -11,6 +11,8 @@ using HaselDebug.Windows;
 
 namespace HaselDebug.Services;
 
+// TODO: docking?
+
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class AtkDebugRenderer
 {
@@ -156,8 +158,6 @@ public unsafe partial class AtkDebugRenderer
         {
             addon->IsVisible = !isVisible;
         }
-
-        ImGuiUtilsEx.PaddedSeparator();
 
         var pos = addon->Position;
         var size = addon->Size;
