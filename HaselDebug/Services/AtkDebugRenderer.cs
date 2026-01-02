@@ -1,7 +1,4 @@
 using System.Globalization;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
