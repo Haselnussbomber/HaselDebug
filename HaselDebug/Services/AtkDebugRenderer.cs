@@ -1215,6 +1215,7 @@ public unsafe partial class AtkDebugRenderer
                 match |= MatchesNodeAddress(node, token.Value);
                 match |= MatchesNodeImage(node, token.Value);
                 match |= MatchesNodeImagePart(node, token.Value);
+                match |= MatchesNodeText(node, token.Value);
             }
             else
             {
@@ -1240,6 +1241,10 @@ public unsafe partial class AtkDebugRenderer
 
                     case "part":
                         match = MatchesNodeImagePart(node, token.Value);
+                        break;
+
+                    case "text":
+                        match = MatchesNodeText(node, token.Value);
                         break;
                 }
             }
@@ -1319,6 +1324,15 @@ public unsafe partial class AtkDebugRenderer
 
             var imageNode = (AtkImageNode*)node;
             return imageNode->PartId.ToString() == value;
+        }
+
+        static bool MatchesNodeText(AtkResNode* node, string value)
+        {
+            if (node->GetNodeType() != NodeType.Text)
+                return false;
+
+            var textNode = (AtkTextNode*)node;
+            return textNode->NodeText.StringPtr.AsReadOnlySeStringSpan().ToString().Contains(value);
         }
     }
 }
