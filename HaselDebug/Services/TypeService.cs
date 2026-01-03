@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -9,18 +10,22 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace HaselDebug.Services;
 
-[RegisterSingleton]
-public class TypeService
+[RegisterSingleton, AutoConstruct]
+public partial class TypeService : IDisposable
 {
     private readonly Dictionary<Type, OrderedDictionary<int, (string, Type?)>> _offsetTypeStructs = [];
+    
+    private readonly IDalamudPluginInterface _pluginInterface;
 
     public ImmutableSortedDictionary<string, Type>? CSTypes { get; private set; }
     public ImmutableSortedDictionary<string, Type>? AddonTypes { get; private set; }
     public ImmutableSortedDictionary<AgentId, Type>? AgentTypes { get; private set; }
+    public ConcurrentDictionary<nint, Type>? CustomNodeTypes { get; private set; }
 
     public event Action? Loaded;
 
-    public TypeService()
+    [AutoPostConstruct]
+    public void Initialize()
     {
         Task.Run(Load);
     }
@@ -48,6 +53,9 @@ public class TypeService
             .ToImmutableSortedDictionary(
                 tuple => tuple.agentId,
                 tuple => tuple.type);
+
+        CustomNodeTypes = _pluginInterface
+            .GetOrCreateData("KamiToolKitAllocatedNodes", () => new ConcurrentDictionary<nint, Type>());
 
         Loaded?.Invoke();
     }
@@ -113,5 +121,10 @@ public class TypeService
                 }
             }
         }
+    }
+
+    public void Dispose()
+    {
+        _pluginInterface.RelinquishData("KamiToolKitAllocatedNodes");
     }
 }

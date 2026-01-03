@@ -305,11 +305,23 @@ public unsafe partial class AtkDebugRenderer
     private void PrintSimpleNode(AtkResNode* node, string treePrefix, List<Pointer<AtkResNode>>? nodePath, NodeOptions nodeOptions)
     {
         using var rssb = new RentedSeStringBuilder();
-        var titleBuilder = rssb.Builder
-            .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
-            .Append($"{treePrefix}[#{node->NodeId}] {node->Type} Node ({(nint)node:X})")
-            .PopColor();
 
+        SeStringBuilder titleBuilder;
+        if (_typeService.CustomNodeTypes?.TryGetValue((nint)node, out var type) ?? false)
+        {
+            titleBuilder = rssb.Builder
+                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
+                               .Append($"{treePrefix}[#{node->NodeId}] {type.ReadableTypeName().SplitCamelCase()} ({(nint)node:X})")
+                               .PopColor();
+        }
+        else
+        {
+            titleBuilder = rssb.Builder
+                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
+                               .Append($"{treePrefix}[#{node->NodeId}] {node->Type} ({(nint)node:X})")
+                               .PopColor();
+        }
+ 
         AddNodeFieldSuffix(titleBuilder, node, nodeOptions);
 
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
@@ -374,10 +386,22 @@ public unsafe partial class AtkDebugRenderer
             return;
 
         using var rssb = new RentedSeStringBuilder();
-        var titleBuilder = rssb.Builder
-            .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
-            .Append($"{treePrefix}[#{node->NodeId}] {objectInfo->ComponentType} Component Node (Node: {(nint)node:X}, Component: {(nint)component:X})")
-            .PopColor();
+        
+        SeStringBuilder titleBuilder;
+        if (_typeService.CustomNodeTypes?.TryGetValue((nint)node, out var type) ?? false)
+        {
+            titleBuilder = rssb.Builder
+                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
+                               .Append($"{treePrefix}[#{node->NodeId}] {type.ReadableTypeName().SplitCamelCase()} (Node: {(nint)node:X}, Component: {(nint)component:X})")
+                               .PopColor();
+        }
+        else
+        {
+            titleBuilder = rssb.Builder
+                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
+                               .Append($"{treePrefix}[#{node->NodeId}] {objectInfo->ComponentType} Component Node (Node: {(nint)node:X}, Component: {(nint)component:X})")
+                               .PopColor();
+        }
 
         AddNodeFieldSuffix(titleBuilder, (AtkResNode*)node, nodeOptions);
 
