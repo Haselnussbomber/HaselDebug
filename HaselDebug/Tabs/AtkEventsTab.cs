@@ -37,7 +37,9 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
             AtkEventType.FocusStop or
             AtkEventType.WindowRollOver or
             AtkEventType.WindowRollOut or
-            AtkEventType.TimerTick or (AtkEventType)74 or (AtkEventType)79))
+            AtkEventType.TimerTick or
+            AtkEventType.TimelineActiveLabelChanged or
+            (AtkEventType)79))
         {
             var ptr = (AtkEventDispatcher.Event*)Marshal.AllocHGlobal(sizeof(AtkEventDispatcher.Event));
             *ptr = *evt;
@@ -89,34 +91,42 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
 
             ImGui.TableNextColumn();
 
+            var type = typeof(AtkEventData);
+
             if ((int)eventType is >= (int)AtkEventType.MouseDown and <= (int)AtkEventType.MouseDoubleClick)
             {
-                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkMouseData), new NodeOptions() { AddressPath = new(i) });
+                type = typeof(AtkEventData.AtkMouseData);
             }
             else if ((int)eventType is >= (int)AtkEventType.InputReceived and <= (int)AtkEventType.InputNavigation)
             {
-                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkInputData), new NodeOptions() { AddressPath = new(i) });
+                type = typeof(AtkEventData.AtkInputData);
             }
             else if ((int)eventType is >= (int)AtkEventType.ListItemRollOver and <= (int)AtkEventType.ListItemSelect)
             {
-                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkListItemData), new NodeOptions() { AddressPath = new(i) });
+                type = typeof(AtkEventData.AtkListItemData);
             }
             else if ((int)eventType is >= (int)AtkEventType.DragDropBegin and <= (int)AtkEventType.DragDropClick)
             {
-                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkDragDropData), new NodeOptions() { AddressPath = new(i) });
+                type = typeof(AtkEventData.AtkDragDropData);
             }
             else if (eventType == AtkEventType.ChildAddonAttached)
             {
-                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData.AtkAddonControlData), new NodeOptions() { AddressPath = new(i) });
+                type = typeof(AtkEventData.AtkAddonControlData);
+            }
+            else if (eventType == AtkEventType.ValueUpdate)
+            {
+                type = typeof(AtkEventData.AtkValueData);
+            }
+            else if (eventType == AtkEventType.TimelineActiveLabelChanged)
+            {
+                type = typeof(AtkEventData.AtkTimelineData);
             }
             else if ((int)eventType is >= (int)AtkEventType.LinkMouseClick and <= (int)AtkEventType.LinkMouseOut)
             {
-                _debugRenderer.DrawPointerType(evt + 0x8, typeof(LinkData), new NodeOptions() { AddressPath = new(i) });
+                type = typeof(LinkData);
             }
-            else
-            {
-                _debugRenderer.DrawPointerType(evt + 0x8, typeof(AtkEventData), new NodeOptions() { AddressPath = new(i) });
-            }
+
+            _debugRenderer.DrawPointerType(evt + 0x8, type, new NodeOptions() { AddressPath = new(i) });
         }
     }
 }
