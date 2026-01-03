@@ -1311,7 +1311,7 @@ public unsafe partial class AtkDebugRenderer
             if (asset->AtkTexture.Resource->IconId.ToString() == value)
                 return true;
 
-            if (asset->AtkTexture.Resource->TexFileResourceHandle->FileName.ToString().Contains(value))
+            if (asset->AtkTexture.Resource->TexFileResourceHandle->FileName.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase))
                 return true;
 
             return false;
@@ -1332,7 +1332,7 @@ public unsafe partial class AtkDebugRenderer
                 return false;
 
             var textNode = (AtkTextNode*)node;
-            return textNode->NodeText.StringPtr.AsReadOnlySeStringSpan().ToString().Contains(value);
+            return textNode->NodeText.StringPtr.AsReadOnlySeStringSpan().ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }
