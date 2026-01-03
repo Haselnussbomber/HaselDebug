@@ -1213,6 +1213,7 @@ public unsafe partial class AtkDebugRenderer
                 match |= MatchesNodeId(node, token.Value.StartsWith('#') ? token.Value[1..] : token.Value);
                 match |= MatchesNodeType(node, token.Value);
                 match |= MatchesNodeAddress(node, token.Value);
+                match |= MatchesNodeImage(node, token.Value);
             }
             else
             {
@@ -1229,6 +1230,11 @@ public unsafe partial class AtkDebugRenderer
                     case "addr":
                     case "address":
                         match = MatchesNodeAddress(node, token.Value);
+                        break;
+
+                    case "img":
+                    case "image":
+                        match = MatchesNodeImage(node, token.Value);
                         break;
                 }
             }
@@ -1273,6 +1279,32 @@ public unsafe partial class AtkDebugRenderer
             }
 
             return nint.TryParse(value, out address) && (nint)node == address;
+        }
+
+        static bool MatchesNodeImage(AtkResNode* node, string value)
+        {
+            if (node->GetNodeType() != NodeType.Image)
+                return false;
+
+            var imageNode = (AtkImageNode*)node;
+            if (imageNode->PartsList == null || imageNode->PartId >= imageNode->PartsList->PartCount)
+                return false;
+
+            var asset = imageNode->PartsList->Parts[imageNode->PartId].UldAsset;
+            if (asset == null || asset->AtkTexture.TextureType != TextureType.Resource)
+                return false;
+
+            var resource = asset->AtkTexture.Resource;
+            if (resource == null)
+                return false;
+
+            if (asset->AtkTexture.Resource->IconId.ToString() == value)
+                return true;
+
+            if (asset->AtkTexture.Resource->TexFileResourceHandle->FileName.ToString().Contains(value))
+                return true;
+
+            return false;
         }
     }
 }
