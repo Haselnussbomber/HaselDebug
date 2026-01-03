@@ -1214,6 +1214,7 @@ public unsafe partial class AtkDebugRenderer
                 match |= MatchesNodeType(node, token.Value);
                 match |= MatchesNodeAddress(node, token.Value);
                 match |= MatchesNodeImage(node, token.Value);
+                match |= MatchesNodeImagePart(node, token.Value);
             }
             else
             {
@@ -1235,6 +1236,10 @@ public unsafe partial class AtkDebugRenderer
                     case "img":
                     case "image":
                         match = MatchesNodeImage(node, token.Value);
+                        break;
+
+                    case "part":
+                        match = MatchesNodeImagePart(node, token.Value);
                         break;
                 }
             }
@@ -1305,6 +1310,15 @@ public unsafe partial class AtkDebugRenderer
                 return true;
 
             return false;
+        }
+
+        static bool MatchesNodeImagePart(AtkResNode* node, string value)
+        {
+            if (node->GetNodeType() != NodeType.Image)
+                return false;
+
+            var imageNode = (AtkImageNode*)node;
+            return imageNode->PartId.ToString() == value;
         }
     }
 }
