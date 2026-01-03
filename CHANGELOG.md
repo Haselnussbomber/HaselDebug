@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.43.0] (2026-01-03)
+
+Happy new year!
+
+- **Changed:** Addons starting with `KTK_Overlay` are now sorted to the bottom of the node picker list.
+- **Updated:** The node list search in the Addon Inspector was slightly improved, so that you can specify more precisely what to search.  
+  Supported tags are:
+
+  - Node ids with `id:15` or just `#15`
+  - Node types with `type:res`
+  - Node addresses with `addr:0x28EFEDA19F0`, `addr:2813184317936`
+  - ImageNode IconId with `img:123456`
+  - ImageNode Filename with `img:ui/uld/ChatLog_hr1.tex`
+  - ImageNode PartId with `part:15`
+  - TextNode NodeText with `text:Title` or with space `text:"Free Company"`
+
+  It's possible to exclude these tags by prefixing them with a `-`.  
+  Naturally these are mixable with each other and still work without prefix.
+- **Updated:** Holding shift while the node picker is active will now display nodes inside components.
+- **Updated:** The struct displayed in the Atk Event tab is now automatically changed for further events:
+  - `AtkEventType.ChildAddonAttached` uses `AtkEventData.AtkAddonControlData`
+  - `AtkEventType.ValueUpdate` uses `AtkEventData.AtkValueData`
+  - `AtkEventType.TimelineActiveLabelChanged` uses `AtkEventData.AtkTimelineData`
+- **Fixed:** The highlight rectangle when hovering a node did not take the game windows position into account when playing in windowed mode.
+
 ## [1.42.7] (2025-12-28)
 
 - **Fixed:** Possible crash when hovering invalid GameObjects. Before grabbing its position for the highlight-line, it will check if the object is listed in the object table (GameObjectManager).
@@ -694,7 +719,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.7...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.43.0...main
+[1.43.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.7...v1.43.0
 [1.42.7]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.6...v1.42.7
 [1.42.6]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.5...v1.42.6
 [1.42.5]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.4...v1.42.5
