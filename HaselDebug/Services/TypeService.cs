@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Dalamud.Utility;
 using FFXIVClientStructs.Attributes;
@@ -10,27 +11,19 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace HaselDebug.Services;
 
-[RegisterSingleton, AutoConstruct]
-public partial class TypeService : IDisposable
+[AutoConstruct]
+[RegisterSingleton(Duplicate = DuplicateStrategy.Append, Registration = RegistrationStrategy.SelfWithProxyFactory)]
+public partial class TypeService : IHostedService
 {
-    private readonly Dictionary<Type, OrderedDictionary<int, (string, Type?)>> _offsetTypeStructs = [];
-    
     private readonly IDalamudPluginInterface _pluginInterface;
+    private readonly Dictionary<Type, OrderedDictionary<int, (string, Type?)>> _offsetTypeStructs = [];
 
     public ImmutableSortedDictionary<string, Type>? CSTypes { get; private set; }
     public ImmutableSortedDictionary<string, Type>? AddonTypes { get; private set; }
     public ImmutableSortedDictionary<AgentId, Type>? AgentTypes { get; private set; }
     public ConcurrentDictionary<nint, Type>? CustomNodeTypes { get; private set; }
 
-    public event Action? Loaded;
-
-    [AutoPostConstruct]
-    public void Initialize()
-    {
-        Task.Run(Load);
-    }
-
-    public async Task Load()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         var csAssembly = typeof(AddonAttribute).Assembly;
 
@@ -57,7 +50,13 @@ public partial class TypeService : IDisposable
         CustomNodeTypes = _pluginInterface
             .GetOrCreateData("KamiToolKitAllocatedNodes", () => new ConcurrentDictionary<nint, Type>());
 
-        Loaded?.Invoke();
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _pluginInterface.RelinquishData("KamiToolKitAllocatedNodes");
+        return Task.CompletedTask;
     }
 
     public Type GetAddonType(string addonName)
@@ -121,10 +120,5 @@ public partial class TypeService : IDisposable
                 }
             }
         }
-    }
-
-    public void Dispose()
-    {
-        _pluginInterface.RelinquishData("KamiToolKitAllocatedNodes");
     }
 }
