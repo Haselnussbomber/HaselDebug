@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.44.0] (2026-01-04)
+
+- **Added:** The Addon Inspector now displays the class name of KTK nodes. (Thanks to @MidoriKami)
+  - A config option "Better readable KTK Node Names" allows to toggle whether the original class name should be preserved ('ExampleName'), or if it should split on a capital letter ('Example Name', default).
+- **Changed:** Types are now loaded asynchronously when the plugin loads. This should fix an issue when the "Auto-open HaselDebug" option was enabled, where the last selected tab wasn't restored due to instances not being loaded.
+
 ## [1.43.0] (2026-01-03)
 
 Happy new year!
@@ -719,7 +725,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.43.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.0...main
+[1.44.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.43.0...v1.44.0
 [1.43.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.7...v1.43.0
 [1.42.7]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.6...v1.42.7
 [1.42.6]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.5...v1.42.6
