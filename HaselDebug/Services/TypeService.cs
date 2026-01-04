@@ -15,41 +15,31 @@ namespace HaselDebug.Services;
 [RegisterSingleton(Duplicate = DuplicateStrategy.Append, Registration = RegistrationStrategy.SelfWithProxyFactory)]
 public partial class TypeService : IHostedService
 {
+    private readonly ILogger<TypeService> _logger;
     private readonly IDalamudPluginInterface _pluginInterface;
     private readonly Dictionary<Type, OrderedDictionary<int, (string, Type?)>> _offsetTypeStructs = [];
+    private readonly TaskCompletionSource _loadedTcs = new();
 
+    public Task Loaded => _loadedTcs.Task;
     public ImmutableSortedDictionary<string, Type>? CSTypes { get; private set; }
     public ImmutableSortedDictionary<string, Type>? AddonTypes { get; private set; }
     public ImmutableSortedDictionary<AgentId, Type>? AgentTypes { get; private set; }
     public ConcurrentDictionary<nint, Type>? CustomNodeTypes { get; private set; }
+    public Instance[] Instances { get; private set; } = [];
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         var csAssembly = typeof(AddonAttribute).Assembly;
 
-        CSTypes = csAssembly.GetTypes()
-            .Where(type => type.FullName != null)
-            .ToImmutableSortedDictionary(
-                type => type.FullName!,
-                type => type);
-
-        AddonTypes = csAssembly.GetTypes()
-            .Where(type => type.GetCustomAttribute<AddonAttribute>() != null)
-            .SelectMany(type => type.GetCustomAttribute<AddonAttribute>()!.AddonIdentifiers, (type, addonName) => (type, addonName))
-            .ToImmutableSortedDictionary(
-                tuple => tuple.addonName,
-                tuple => tuple.type);
-
-        AgentTypes = csAssembly.GetTypes()
-            .Where(type => type.GetCustomAttribute<AgentAttribute>() != null)
-            .Select(type => (type, agentId: type.GetCustomAttribute<AgentAttribute>()!.Id))
-            .ToImmutableSortedDictionary(
-                tuple => tuple.agentId,
-                tuple => tuple.type);
+        LoadClientStructs(csAssembly);
+        LoadAddons(csAssembly);
+        LoadAgents(csAssembly);
+        LoadInstances(csAssembly);
 
         CustomNodeTypes = _pluginInterface
             .GetOrCreateData("KamiToolKitAllocatedNodes", () => new ConcurrentDictionary<nint, Type>());
 
+        _loadedTcs.SetResult();
         return Task.CompletedTask;
     }
 
@@ -89,6 +79,61 @@ public partial class TypeService : IHostedService
         return mapping;
     }
 
+    private void LoadClientStructs(Assembly csAssembly)
+    {
+        CSTypes = csAssembly.GetTypes()
+            .Where(type => type.FullName != null)
+            .ToImmutableSortedDictionary(
+                type => type.FullName!,
+                type => type);
+    }
+
+    private void LoadAddons(Assembly csAssembly)
+    {
+        AddonTypes = csAssembly.GetTypes()
+            .Where(type => type.GetCustomAttribute<AddonAttribute>() != null)
+            .SelectMany(type => type.GetCustomAttribute<AddonAttribute>()!.AddonIdentifiers, (type, addonName) => (type, addonName))
+            .ToImmutableSortedDictionary(
+                tuple => tuple.addonName,
+                tuple => tuple.type);
+    }
+
+    private void LoadAgents(Assembly csAssembly)
+    {
+        AgentTypes = csAssembly.GetTypes()
+            .Where(type => type.GetCustomAttribute<AgentAttribute>() != null)
+            .Select(type => (type, agentId: type.GetCustomAttribute<AgentAttribute>()!.Id))
+            .ToImmutableSortedDictionary(
+                tuple => tuple.agentId,
+                tuple => tuple.type);
+    }
+
+    private void LoadInstances(Assembly csAssembly)
+    {
+        Instances = csAssembly.GetTypes()
+            .Where(type => type.IsStruct())
+            .Select(type =>
+            {
+                var method = type.GetMethod("Instance", BindingFlags.Static | BindingFlags.Public);
+                if (method == null || method.GetParameters().Length != 0 || !method.ReturnType.IsPointer)
+                    return default;
+
+                var pointer = method?.Invoke(null, null);
+                if (pointer == null)
+                    return default;
+
+                unsafe
+                {
+                    var address = (nint)Pointer.Unbox(pointer);
+                    return new Instance(address, type);
+                }
+            })
+            .Where(tuple => tuple != default)
+            .ToArray();
+
+        _logger.LogDebug("Loaded {count} instances", Instances.Length);
+    }
+
     private static void LoadTypeMapping(OrderedDictionary<int, (string, Type?)> fields, string prefix, int offset, Type type)
     {
         foreach (var fieldInfo in type.GetFields(BindingFlags.Default | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
@@ -121,4 +166,6 @@ public partial class TypeService : IHostedService
             }
         }
     }
+
+    public record struct Instance(nint Address, Type Type);
 }

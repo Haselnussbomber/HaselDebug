@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading.Tasks;
 using HaselDebug.Config;
 using HaselDebug.Utils;
 
@@ -9,7 +10,7 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
 {
     private readonly PluginConfig _pluginConfig;
     private readonly DebugRenderer _debugRenderer;
-    private readonly InstancesService _instancesService;
+    private readonly TypeService _typeService;
     private readonly List<PinnedInstanceTab> _tabs = [];
 
     public event Action? Loaded;
@@ -17,22 +18,22 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
     [AutoPostConstruct]
     public void Initialize()
     {
-        _instancesService.Loaded += OnInstancesLoaded;
+        Task.Run(InitAsync);
     }
 
-    private void OnInstancesLoaded()
+    private async Task InitAsync()
     {
-        _instancesService.Loaded -= OnInstancesLoaded;
+        await _typeService.Loaded;
 
         // make sure the types of pinned instances exist
         _pluginConfig.PinnedInstances = _pluginConfig.PinnedInstances
-            .Where(name => _instancesService.Instances.Any(inst => inst.Type.FullName == name))
+            .Where(name => _typeService.Instances.Any(inst => inst.Type.FullName == name))
             .ToArray();
 
         // restore saved pinned instances
         foreach (var name in _pluginConfig.PinnedInstances)
         {
-            var inst = _instancesService.Instances.FirstOrDefault(inst => inst.Type.FullName == name);
+            var inst = _typeService.Instances.FirstOrDefault(inst => inst.Type.FullName == name);
             if (inst == default) continue;
             _tabs.Add(new PinnedInstanceTab(_debugRenderer, inst.Address, inst.Type));
         }
@@ -41,7 +42,7 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
 
         Loaded?.Invoke();
     }
-
+    
     private void Sort()
     {
         _tabs.Sort((a, b) => a.InternalName.CompareTo(b.InternalName));

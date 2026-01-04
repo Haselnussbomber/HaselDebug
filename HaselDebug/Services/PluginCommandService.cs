@@ -1,7 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using HaselCommon.Services.Commands;
-using HaselDebug.Config;
 using HaselDebug.Windows;
 
 namespace HaselDebug.Services;
@@ -10,15 +9,12 @@ namespace HaselDebug.Services;
 public partial class PluginCommandService : IHostedService
 {
     private readonly IDalamudPluginInterface _pluginInterface;
-    private readonly PluginConfig _pluginConfig;
     private readonly WindowManager _windowManager;
     private readonly CommandService _commandService;
+    private readonly PluginWindow _pluginWindow; // requesting for auto-open
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        if (_pluginConfig.AutoOpenPluginWindow)
-            _windowManager.CreateOrOpen<PluginWindow>();
-
         _pluginInterface.UiBuilder.Draw += DrawMainMenuItem;
         _pluginInterface.UiBuilder.OpenMainUi += TogglePluginWindow;
         _pluginInterface.UiBuilder.OpenConfigUi += ToggleConfigWindow;

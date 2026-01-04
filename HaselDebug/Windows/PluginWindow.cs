@@ -60,18 +60,22 @@ public partial class PluginWindow : SimpleWindow
         _pinnedInstances.Loaded += OnPinnedInstancesLoaded;
     }
 
-    private void OnPinnedInstancesLoaded()
-    {
-        _pinnedInstances.Loaded -= OnPinnedInstancesLoaded;
-        SelectTabWithoutSave(_pluginConfig.LastSelectedTab);
-    }
-
     public override void Dispose()
     {
         foreach (var tab in _tabs.OfType<IDisposable>())
             tab.Dispose();
 
         base.Dispose();
+    }
+
+    private void OnPinnedInstancesLoaded()
+    {
+        _pinnedInstances.Loaded -= OnPinnedInstancesLoaded;
+
+        SelectTabWithoutSave(_pluginConfig.LastSelectedTab);
+
+        if (_pluginConfig.AutoOpenPluginWindow)
+            _windowManager.CreateOrOpen<PluginWindow>();
     }
 
     public override void OnOpen()

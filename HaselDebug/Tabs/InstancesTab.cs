@@ -14,9 +14,8 @@ public partial class InstancesTab : DebugTab
     private readonly AddonObserver _addonObserver;
     private readonly DebugRenderer _debugRenderer;
     private readonly WindowManager _windowManager;
-    private readonly InstancesService _instancesService;
-    private readonly PinnedInstancesService _pinnedInstances;
     private readonly TypeService _typeService;
+    private readonly PinnedInstancesService _pinnedInstances;
 
     private string _searchTerm = string.Empty;
 
@@ -28,7 +27,7 @@ public partial class InstancesTab : DebugTab
 
         using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
-        foreach (var (i, (ptr, type)) in _instancesService.Instances.Index())
+        foreach (var (i, (ptr, type)) in _typeService.Instances.Index())
         {
             if (_typeService.AgentTypes != null && _typeService.AgentTypes.ContainsValue(type))
                 continue;
