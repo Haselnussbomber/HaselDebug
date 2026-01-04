@@ -72,6 +72,7 @@ public partial class PluginConfig
     public bool AutoOpenPluginWindow = false;
     public bool EnableLuaLogger = false;
     public bool ResolveAddonLifecycleVTables = true;
+    public bool SpacesInKTKNames = true;
     public string LastSelectedTab = "";
     public string[] PinnedInstances = [];
     public bool Excel2Tab_ShowRawSheets = false;

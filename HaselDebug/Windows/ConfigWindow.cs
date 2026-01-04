@@ -42,6 +42,12 @@ public partial class ConfigWindow : SimpleWindow
         // ResolveAddonLifecycleVTables
         configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.ResolveAddonLifecycleVTables.Label")}##ResolveAddonLifecycleVTables", ref _pluginConfig.ResolveAddonLifecycleVTables);
 
+        // SpacesInKTKNames
+        configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.SpacesInKTKNames.Label")}##SpacesInKTKNames", ref _pluginConfig.SpacesInKTKNames);
+
+        using (ImGuiUtils.ConfigIndent())
+            ImGui.TextColoredWrapped(Color.Grey3, _textService.Translate("Config.SpacesInKTKNames.Description"));
+
         if (configChanged)
         {
             _pluginConfig.Save();

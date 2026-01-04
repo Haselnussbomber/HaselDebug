@@ -2,6 +2,7 @@ using System.Globalization;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselDebug.Config;
 using HaselDebug.Extensions;
 using HaselDebug.Service;
 using HaselDebug.Utils;
@@ -22,6 +23,7 @@ public struct DrawAddonParams()
 public unsafe partial class AtkDebugRenderer
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly PluginConfig _pluginConfig;
     private readonly IAddonLifecycle _addonLifecycle;
     private readonly TypeService _typeService;
     private readonly DebugRenderer _debugRenderer;
@@ -309,9 +311,12 @@ public unsafe partial class AtkDebugRenderer
         SeStringBuilder titleBuilder;
         if (_typeService.CustomNodeTypes?.TryGetValue((nint)node, out var type) ?? false)
         {
+            var name = type.ReadableTypeName();
+            if (_pluginConfig.SpacesInKTKNames)
+                name = name.SplitCamelCase();
             titleBuilder = rssb.Builder
                                .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
-                               .Append($"{treePrefix}[#{node->NodeId}] {type.ReadableTypeName().SplitCamelCase()} ({(nint)node:X})")
+                               .Append($"{treePrefix}[#{node->NodeId}] {name} ({(nint)node:X})")
                                .PopColor();
         }
         else
@@ -390,9 +395,12 @@ public unsafe partial class AtkDebugRenderer
         SeStringBuilder titleBuilder;
         if (_typeService.CustomNodeTypes?.TryGetValue((nint)node, out var type) ?? false)
         {
+            var name = type.ReadableTypeName();
+            if (_pluginConfig.SpacesInKTKNames)
+                name = name.SplitCamelCase();
             titleBuilder = rssb.Builder
                                .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
-                               .Append($"{treePrefix}[#{node->NodeId}] {type.ReadableTypeName().SplitCamelCase()} (Node: {(nint)node:X}, Component: {(nint)component:X})")
+                               .Append($"{treePrefix}[#{node->NodeId}] {name} (Node: {(nint)node:X}, Component: {(nint)component:X})")
                                .PopColor();
         }
         else

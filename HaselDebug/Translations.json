@@ -36,6 +36,14 @@
     "en": "Resolve original Addon vtables",
     "de": "Originale Addon vtables auflösen"
   },
+  "Config.SpacesInKTKNames.Label": {
+    "en": "Better readable KTK Node Names",
+    "de": "Besser lesbare KTK-Node-Namen"
+  },
+  "Config.SpacesInKTKNames.Description": {
+    "en": "Adds spaces between words in node names ('ExampleName' -> 'Example Name').",
+    "de": "Fügt Leerzeichen zwischen Wörtern in Knotennamen ein ('BeispielName' -> 'Beispiel Name')."
+  },
 
   "SearchBar.Hint": {
     "en": "Search...",
