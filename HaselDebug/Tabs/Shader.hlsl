@@ -21,8 +21,7 @@ VS_OUT VSMain(float3 pos : POSITION)
     VS_OUT output;
 
     // The quad position in Clip Space (-1 to 1) is ALWAYS the same 
-    // because your Viewport in C# is set to the Window Size.
-    // If your viewport is Window-sized, a 0..1 quad fills it perfectly.
+    // because the Viewport in C# is set to the Window Size.
     output.Position.x = pos.x * 2.0 - 1.0;
     output.Position.y = 1.0 - pos.y * 2.0;
     output.Position.z = 0.0;
@@ -49,14 +48,14 @@ float4 PSMain(VS_OUT input) : SV_Target
 {
     float weights[5] = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
     
-    float2 currentSize = (Direction.x == 1) ? Resolution : WindowSize;
-    float2 texelSize = 1.0 / currentSize;
+    uint width, height;
+    backBuffer.GetDimensions(width, height);
+    float2 texelSize = 1.0 / float2(width, height);
     
     float3 color = backBuffer.Sample(samplerState, input.TexCoord).rgb * weights[0];
     
     for (int i = 1; i < 5; ++i)
     {
-        // Now the offset is scaled correctly for whichever texture we are holding
         float2 offset = Direction * texelSize * (float) i * BlurStrength;
         color += backBuffer.Sample(samplerState, input.TexCoord + offset).rgb * weights[i];
         color += backBuffer.Sample(samplerState, input.TexCoord - offset).rgb * weights[i];

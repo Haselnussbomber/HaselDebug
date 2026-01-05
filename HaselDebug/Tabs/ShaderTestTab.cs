@@ -440,6 +440,7 @@ public unsafe partial class ShaderTestTab : DebugTab, IDisposable
         ImGui.DragFloat("BlurStrength", ref _blurStrength, 1, 0, 10);
     }
 
+    // TODO: rework to use CopySubresourceRegion?
     private D3D11_TEXTURE2D_DESC CopyBackBuffer()
     {
         Release(ref _backBufferCopySRV);
