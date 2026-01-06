@@ -54,9 +54,11 @@ public unsafe partial class ShaderTestTab : DebugTab, IDisposable
     private ID3D11SamplerState* _sampler;
 
     private float _blurStrength = 2.0f;
+    private D3D11_TEXTURE2D_DESC _bbDesc;
 
     public override void Draw()
     {
+        var pos = ImGui.GetWindowPos();
         var size = ImGui.GetWindowSize();
         if (size.X <= 0 || size.Y <= 0)
             return;
@@ -64,15 +66,13 @@ public unsafe partial class ShaderTestTab : DebugTab, IDisposable
         if (!InitDX())
             return;
 
-        // Ensure textures match current window size
-        UpdateRenderTargets((int)size.X, (int)size.Y);
+        UpdateRenderTargets();
         CaptureBackBuffer();
 
         // 1. Setup Global State
         float[] clearColor = { 0, 0, 0, 0 };
         _context->ClearRenderTargetView(_rtv1, (float*)Unsafe.AsPointer(ref clearColor[0]));
 
-        // Update Constants 
         var parms = new ShaderParams
         {
             TexelSize = new Vector4(1f / size.X, 1f / size.Y, size.X, size.Y),
@@ -81,7 +81,12 @@ public unsafe partial class ShaderTestTab : DebugTab, IDisposable
         _context->UpdateSubresource((ID3D11Resource*)_constantBuffer, 0, null, &parms, 0, 0);
 
         // 2. Configure Pipeline for Full-Screen Triangle
-        D3D11_VIEWPORT vp = new() { Width = size.X, Height = size.Y, MaxDepth = 1.0f };
+        D3D11_VIEWPORT vp = new()
+        {
+            Width = size.X,
+            Height = size.Y,
+            MaxDepth = 1.0f
+        };
         _context->RSSetViewports(1, &vp);
         _context->IASetInputLayout(null); // No buffer needed due to SV_VertexID 
         _context->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -140,7 +145,9 @@ public unsafe partial class ShaderTestTab : DebugTab, IDisposable
         _context->PSSetShaderResources(0, 1, &nullSRV); // Unbind RT1
 
         // 5. Output to ImGui
-        ImGui.Image(new ImTextureID(_srv1), size);
+        var uv0 = new Vector2(pos.X / _bbDesc.Width, pos.Y / _bbDesc.Height);
+        var uv1 = new Vector2((pos.X + size.X) / _bbDesc.Width, (pos.Y + size.Y) / _bbDesc.Height);
+        ImGui.Image(new ImTextureID(_srv1), size, uv0, uv1);
 
         ImGui.DragFloat("Strength", ref _blurStrength, 0.1f, 0f, 10f);
     }
@@ -168,7 +175,8 @@ public unsafe partial class ShaderTestTab : DebugTab, IDisposable
             AddressV = D3D11_TEXTURE_ADDRESS_MODE.D3D11_TEXTURE_ADDRESS_CLAMP,
             AddressW = D3D11_TEXTURE_ADDRESS_MODE.D3D11_TEXTURE_ADDRESS_CLAMP
         };
-        fixed (ID3D11SamplerState** pS = &_sampler) _device->CreateSamplerState(&sDesc, pS);
+        fixed (ID3D11SamplerState** pS = &_sampler)
+            _device->CreateSamplerState(&sDesc, pS);
 
         // Create Constant Buffer 
         D3D11_BUFFER_DESC bDesc = new()
@@ -177,7 +185,8 @@ public unsafe partial class ShaderTestTab : DebugTab, IDisposable
             Usage = D3D11_USAGE.D3D11_USAGE_DEFAULT,
             BindFlags = (uint)D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER
         };
-        fixed (ID3D11Buffer** pB = &_constantBuffer) _device->CreateBuffer(&bDesc, null, pB);
+        fixed (ID3D11Buffer** pB = &_constantBuffer)
+            _device->CreateBuffer(&bDesc, null, pB);
 
         return CompileShaders();
     }
@@ -188,10 +197,12 @@ public unsafe partial class ShaderTestTab : DebugTab, IDisposable
         ID3D11Texture2D* backBuffer = null;
         Guid iid = __uuidof<ID3D11Texture2D>();
         _swapChain->GetBuffer(0, &iid, (void**)&backBuffer);
-        if (backBuffer == null) return;
+        if (backBuffer == null)
+            return;
 
         D3D11_TEXTURE2D_DESC bbDesc;
         backBuffer->GetDesc(&bbDesc);
+        _bbDesc = bbDesc;
 
         // 2. Ensure our copy texture exists and matches the screen size
         if (_backBufferCopy != null)
@@ -293,7 +304,11 @@ public unsafe partial class ShaderTestTab : DebugTab, IDisposable
     private static bool CompileShader(byte[] shaderBytes, ReadOnlySpan<byte> entrypoint, ReadOnlySpan<byte> target, ID3DBlob** ppCode)
     {
         ID3DBlob* pErrorMsgs = null;
-        uint flags = 0; // Use D3DCOMPILE_DEBUG in dev if needed
+#if DEBUG
+        uint flags = D3DCOMPILE.D3DCOMPILE_DEBUG;
+#else
+        uint flags = 0;
+#endif
 
         fixed (byte* pSrcData = shaderBytes)
         fixed (byte* pEntrypoint = entrypoint)
@@ -320,21 +335,32 @@ public unsafe partial class ShaderTestTab : DebugTab, IDisposable
         return true;
     }
 
-    private void UpdateRenderTargets(int w, int h)
+    private void UpdateRenderTargets()
     {
+        // 1. Get backbuffer description to get the TRUE game resolution
+        ID3D11Texture2D* backBuffer = null;
+        Guid iid = __uuidof<ID3D11Texture2D>();
+        _swapChain->GetBuffer(0, &iid, (void**)&backBuffer);
+
+        D3D11_TEXTURE2D_DESC bbDesc;
+        backBuffer->GetDesc(&bbDesc);
+        ((IUnknown*)backBuffer)->Release();
+
+        // 2. Only recreate if the game resolution changed
         if (_rt1 != null)
         {
             D3D11_TEXTURE2D_DESC desc;
             _rt1->GetDesc(&desc);
-            if (desc.Width == w && desc.Height == h) return;
+            if (desc.Width == bbDesc.Width && desc.Height == bbDesc.Height)
+                return;
         }
 
         ReleaseResources();
 
         D3D11_TEXTURE2D_DESC td = new()
         {
-            Width = (uint)w,
-            Height = (uint)h,
+            Width = bbDesc.Width,
+            Height = bbDesc.Height,
             MipLevels = 1,
             ArraySize = 1,
             Format = DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM,
@@ -343,13 +369,19 @@ public unsafe partial class ShaderTestTab : DebugTab, IDisposable
             BindFlags = (uint)(D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE)
         };
 
-        fixed (ID3D11Texture2D** pT = &_rt1) _device->CreateTexture2D(&td, null, pT);
-        fixed (ID3D11RenderTargetView** pR = &_rtv1) _device->CreateRenderTargetView((ID3D11Resource*)_rt1, null, pR);
-        fixed (ID3D11ShaderResourceView** pS = &_srv1) _device->CreateShaderResourceView((ID3D11Resource*)_rt1, null, pS);
+        fixed (ID3D11Texture2D** pT = &_rt1)
+            _device->CreateTexture2D(&td, null, pT);
+        fixed (ID3D11RenderTargetView** pR = &_rtv1)
+            _device->CreateRenderTargetView((ID3D11Resource*)_rt1, null, pR);
+        fixed (ID3D11ShaderResourceView** pS = &_srv1)
+            _device->CreateShaderResourceView((ID3D11Resource*)_rt1, null, pS);
 
-        fixed (ID3D11Texture2D** pT = &_rt2) _device->CreateTexture2D(&td, null, pT);
-        fixed (ID3D11RenderTargetView** pR = &_rtv2) _device->CreateRenderTargetView((ID3D11Resource*)_rt2, null, pR);
-        fixed (ID3D11ShaderResourceView** pS = &_srv2) _device->CreateShaderResourceView((ID3D11Resource*)_rt2, null, pS);
+        fixed (ID3D11Texture2D** pT = &_rt2)
+            _device->CreateTexture2D(&td, null, pT);
+        fixed (ID3D11RenderTargetView** pR = &_rtv2)
+            _device->CreateRenderTargetView((ID3D11Resource*)_rt2, null, pR);
+        fixed (ID3D11ShaderResourceView** pS = &_srv2)
+            _device->CreateShaderResourceView((ID3D11Resource*)_rt2, null, pS);
     }
 
     private void ReleaseResources()

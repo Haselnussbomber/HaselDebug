@@ -30,6 +30,8 @@ SamplerState sampler_linear_clamp;
 cbuffer Params : register(b0)
 {
     float4 _SourceTex_TexelSize;
+    float2 _CropPos;
+    float2 _CropSize;
     float _BlurOffset;
     float3 _Padding;
 };
@@ -85,9 +87,6 @@ V2F Vert(const uint vertexID : SV_VertexID)
 
 float4 Frag(const V2F input) : SV_TARGET
 {
-    // original:
-    // return _SourceTex.SampleLevel(sampler_linear_clamp, input.uv, 0);
-    
     // edit: ffxiv back buffer uses alpha to store depth
     return float4(_SourceTex.SampleLevel(sampler_linear_clamp, input.uv, 0).rgb, 1.0);
 }
