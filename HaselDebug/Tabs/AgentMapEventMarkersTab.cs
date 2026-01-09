@@ -1,6 +1,7 @@
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
+using HaselDebug.Service;
 
 namespace HaselDebug.Tabs;
 
@@ -8,6 +9,7 @@ namespace HaselDebug.Tabs;
 public unsafe partial class AgentMapEventMarkersTab : DebugTab
 {
     private readonly ITextureProvider _textureProvider;
+    private readonly ProcessInfoService _processInfoService;
 
     public override bool DrawInChild => false;
 
@@ -15,7 +17,7 @@ public unsafe partial class AgentMapEventMarkersTab : DebugTab
     {
         var agent = AgentMap.Instance();
 
-        using var table = ImRaii.Table("AgentMapEventMarkersTable"u8, 7, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("AgentMapEventMarkersTable"u8, 9, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table) return;
 
         ImGui.TableSetupColumn("Icon"u8, ImGuiTableColumnFlags.WidthFixed, 100);
@@ -24,6 +26,8 @@ public unsafe partial class AgentMapEventMarkersTab : DebugTab
         ImGui.TableSetupColumn("MapId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupColumn("Radius"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupColumn("TerritoryTypeId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("DataId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Flags"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupColumn("TooltipString");
         ImGui.TableSetupScrollFreeze(6, 1);
         ImGui.TableHeadersRow();
@@ -54,8 +58,14 @@ public unsafe partial class AgentMapEventMarkersTab : DebugTab
             ImGui.TableNextColumn(); // TerritoryTypeId
             ImGui.Text(marker.TerritoryTypeId.ToString());
 
+            ImGui.TableNextColumn(); // DataId
+            ImGui.Text(marker.DataId.ToString());
+
+            ImGui.TableNextColumn(); // Flags
+            ImGui.Text(marker.Flags.ToString());
+
             ImGui.TableNextColumn(); // TooltipString
-            if (marker.TooltipString != null && marker.TooltipString->StringPtr.Value != null)
+            if (marker.TooltipString != null && marker.TooltipString->StringPtr.Value != null && _processInfoService.IsPointerValid(marker.TooltipString->StringPtr.Value))
                 ImGui.Text(new ReadOnlySeStringSpan(marker.TooltipString->StringPtr.Value).ToString());
         }
     }
