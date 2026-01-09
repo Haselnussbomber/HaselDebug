@@ -3,7 +3,7 @@
   <!-- Project settings -->
   <PropertyGroup>
     <Name>HaselDebug</Name>
-    <Version>1.44.0</Version>
+    <Version>1.44.1</Version>
     <Author>Haselnussbomber</Author>
     <RepoUrl>https://github.com/Haselnussbomber/HaselDebug</RepoUrl>
     <Punchline>Various tools to debug things.</Punchline>
