@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.44.1] (2026-01-09)
+
+- **Fixed:** A possible crash in the Agent Map Event Markers tab due to stale pointers.
+- **Updated:** ClientStructs now at [14fcd3fc](https://github.com/aers/FFXIVClientStructs/tree/14fcd3fc) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b71506d2..14fcd3fc)).
+
 ## [1.44.0] (2026-01-04)
 
 - **Added:** The Addon Inspector now displays the class name of KTK nodes. (Thanks to @MidoriKami)
@@ -725,7 +730,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.1...main
+[1.44.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.0...v1.44.1
 [1.44.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.43.0...v1.44.0
 [1.43.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.7...v1.43.0
 [1.42.7]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.6...v1.42.7
