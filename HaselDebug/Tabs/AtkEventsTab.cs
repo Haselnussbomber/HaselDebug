@@ -17,12 +17,16 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
 
     public void Dispose()
     {
+        _dispatchEventHook?.Dispose();
+        Clear();
+    }
+
+    private void Clear()
+    {
         foreach (var e in _events)
             Marshal.FreeHGlobal(e.Item2);
 
         _events.Clear();
-
-        _dispatchEventHook?.Dispose();
     }
 
     private bool DispatchEventDetour(AtkEventDispatcher* thisPtr, AtkEventDispatcher.Event* evt)
@@ -66,7 +70,8 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
         }
 
         ImGui.SameLine();
-        if (ImGui.Button("Clear")) _events.Clear();
+        if (ImGui.Button("Clear"))
+            Clear();
 
         using var table = ImRaii.Table("EventTable"u8, 3, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable);
         if (!table) return;
