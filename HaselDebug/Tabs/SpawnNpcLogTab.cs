@@ -72,7 +72,7 @@ public unsafe partial class SpawnNpcLogTab : DebugTab, IDisposable
 
         ImGui.TableSetupColumn("Time"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupColumn("EntityId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("EventData"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Packet"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
