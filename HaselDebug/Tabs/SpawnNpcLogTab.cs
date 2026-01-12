@@ -92,8 +92,8 @@ public unsafe partial class SpawnNpcLogTab : DebugTab, IDisposable
             var objectKind = packet.Value->Common.ObjectKind;
             var name = $"[{objectKind}] ";
 
-            if (packet.Value->Common.BNpcNameId != 0)
-                name += _seStringEvaluator.EvaluateObjStr((DObjectKind)objectKind, packet.Value->Common.BNpcNameId);
+            if (packet.Value->Common.NameId != 0)
+                name += _seStringEvaluator.EvaluateObjStr((DObjectKind)objectKind, packet.Value->Common.NameId);
             else
                 name += packet.Value->Common.NameString;
 
