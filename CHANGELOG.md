@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.45.0] (2026-01-13)
+
+- **Added:** A Spawn Npc Log tab, to log `SpawnNpcPacket`s that the client receives (only stored in memory, so don't forget to disable it again).
+- **Changed:** The Object Tables were simplified.
+  - Columns:
+    - ObjectId column was removed, as it is the same as EntityId.
+    - ObjectKind column was merged into the Name column as prefix.
+    - EventHandler column was removed, because it was annoyingly big.
+  - Context Menu:
+    - New context menu entries to open the struct in a new window, to copy the name or address.
+    - Existing context menu entries (Enable/Disable Draw) were removed, because the game would update the flag anyways.
+- **Changed:** The export button in the Config tab now renames the second `LockonDefaultZoom` (index appended with `_186`) to the intended `LockonDefaultDistance`.
+- **Changed:** The plugin no longer scans for valid memory sections when the window is closed. Also the code was updated to no longer use ReadProcessMemory.
+- **Updated:** The Orchestrion unlock tab can now preview tracks, as long as you have unlocked them.
+- **Updated:** ClientStructs now at [2858c274](https://github.com/aers/FFXIVClientStructs/tree/2858c274) ([compare](https://github.com/aers/FFXIVClientStructs/compare/14fcd3fc..2858c274)).
+
 ## [1.44.1] (2026-01-09)
 
 - **Fixed:** A possible crash in the Agent Map Event Markers tab due to stale pointers.
@@ -730,7 +746,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.0...main
+[1.45.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.1...v1.45.0
 [1.44.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.0...v1.44.1
 [1.44.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.43.0...v1.44.0
 [1.43.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.42.7...v1.43.0
