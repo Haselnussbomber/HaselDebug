@@ -1,5 +1,6 @@
 using HaselDebug.Config;
 using HaselDebug.Interfaces;
+using HaselDebug.Service;
 using HaselDebug.Services;
 using HaselDebug.Tabs;
 using HaselDebug.Utils;
@@ -21,6 +22,7 @@ public partial class PluginWindow : SimpleWindow
     private readonly DebugRenderer _debugRenderer;
     private readonly ConfigWindow _configWindow;
     private readonly NavigationService _navigationService;
+    private readonly ProcessInfoService _processInfoService;
     private readonly IEnumerable<IDebugTab> _debugTabs;
 
     private IDebugTab[] _tabs;
@@ -65,6 +67,8 @@ public partial class PluginWindow : SimpleWindow
         foreach (var tab in _tabs.OfType<IDisposable>())
             tab.Dispose();
 
+        _processInfoService.Enabled = false;
+
         base.Dispose();
     }
 
@@ -82,6 +86,13 @@ public partial class PluginWindow : SimpleWindow
     {
         base.OnOpen();
         _debugRenderer.ParseCSDocs();
+        _processInfoService.Enabled = true;
+    }
+
+    public override void OnClose()
+    {
+        base.OnClose();
+        _processInfoService.Enabled = false;
     }
 
     public override bool DrawConditions()

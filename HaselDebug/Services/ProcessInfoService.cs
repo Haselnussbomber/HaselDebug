@@ -15,12 +15,16 @@ namespace HaselDebug.Service;
 public unsafe partial class ProcessInfoService : IDisposable
 {
     private readonly PluginConfig _pluginConfig;
+    private HANDLE _processHandle;
     private Timer? _timer;
 
     [AutoPostConstruct]
     private void Initialize()
     {
+        _processHandle = PInvoke.GetCurrentProcess();
+
         Refresh();
+
         _timer = new();
         _timer.Elapsed += (s, e) => Refresh();
         _timer.Interval = 1000; // every second
@@ -33,14 +37,23 @@ public unsafe partial class ProcessInfoService : IDisposable
         _timer = null;
     }
 
+    public bool Enabled
+    {
+        get => _timer?.Enabled ?? false;
+        set
+        {
+            _timer?.Enabled = value;
+            if (value) Refresh();
+        }
+    }
+
     public ModuleInfo[] Modules { get; private set; } = [];
     public SectionInfo[] Sections { get; private set; } = [];
 
     private void Refresh()
     {
-        var processHandle = PInvoke.GetCurrentProcess();
-        Modules = GetModules(processHandle);
-        Sections = GetSections(processHandle, Modules);
+        Modules = GetModules(_processHandle);
+        Sections = GetSections(_processHandle, Modules);
     }
 
     public bool IsPointerValid(nint ptr) => IsPointerValid((void*)ptr);
