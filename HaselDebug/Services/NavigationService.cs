@@ -1,5 +1,6 @@
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Extensions;
 using HaselDebug.Windows;
 
@@ -145,6 +146,7 @@ public readonly struct AddonNavigation(ushort addonId, string? addonName) : INav
 {
     public ushort AddonId { get; init; } = addonId;
     public string? AddonName { get; init; } = addonName;
+    public List<Pointer<AtkResNode>>? NodePath { get; init; }
 }
 
 public readonly struct AgentNavigation(AgentId agentId) : INavigationParams
