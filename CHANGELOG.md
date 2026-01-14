@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.45.1] (2026-01-14)
+
+- **Fixed:** The Addon Inspector node picker wouldn't draw.
+
 ## [1.45.0] (2026-01-13)
 
 - **Added:** A Spawn Npc Log tab, to log `SpawnNpcPacket`s that the client receives (only stored in memory, so don't forget to disable it again).
@@ -746,7 +750,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.1...main
+[1.45.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.0...v1.45.1
 [1.45.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.1...v1.45.0
 [1.44.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.0...v1.44.1
 [1.44.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.43.0...v1.44.0
