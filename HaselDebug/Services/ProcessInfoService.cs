@@ -186,24 +186,15 @@ public unsafe partial class ProcessInfoService : IDisposable
 
         foreach (var module in modules)
         {
-            var imageDosHeader = new IMAGE_DOS_HEADER();
-            if (!PInvoke.ReadProcessMemory(processHandle, (void*)module.BaseAddress, &imageDosHeader, (nuint)sizeof(IMAGE_DOS_HEADER)))
-                continue;
+            var imageDosHeader = (IMAGE_DOS_HEADER*)module.BaseAddress;
+            var ntHeader = (IMAGE_NT_HEADERS64*)(module.BaseAddress + imageDosHeader->e_lfanew);
 
-            var ntHeaderPtr = (void*)(module.BaseAddress + imageDosHeader.e_lfanew);
+            var firstSection = (IMAGE_SECTION_HEADER*)((byte*)ntHeader + sizeof(IMAGE_NT_HEADERS64));
 
-            var imageNtHeaders = new IMAGE_NT_HEADERS64();
-            if (!PInvoke.ReadProcessMemory(processHandle, ntHeaderPtr, &imageNtHeaders, (nuint)sizeof(IMAGE_NT_HEADERS64)))
-                continue;
-
-            var sectionHeaders = new IMAGE_SECTION_HEADER[imageNtHeaders.FileHeader.NumberOfSections];
-
-            fixed (void* sectionHeadersPtr = sectionHeaders)
-                PInvoke.ReadProcessMemory(processHandle, (void*)((nuint)ntHeaderPtr + (nuint)sizeof(IMAGE_NT_HEADERS64)), sectionHeadersPtr, imageNtHeaders.FileHeader.NumberOfSections * (nuint)sizeof(IMAGE_SECTION_HEADER));
-
-            foreach (var sectionHeader in sectionHeaders)
+            for (var i = 0; i < ntHeader->FileHeader.NumberOfSections; i++)
             {
-                var sectionAddress = module.BaseAddress + sectionHeader.VirtualAddress;
+                var sectionHeader = firstSection + i;
+                var sectionAddress = module.BaseAddress + sectionHeader->VirtualAddress;
 
                 var idx = FindSectionIndexInList(sections, (nint)sectionAddress);
                 if (idx == -1)
@@ -217,20 +208,20 @@ public unsafe partial class ProcessInfoService : IDisposable
                 if (sectionAddress >= section.Start + section.Size)
                     continue;
 
-                if (sectionHeader.VirtualAddress + sectionHeader.Misc.VirtualSize > module.Size)
+                if (sectionHeader->VirtualAddress + sectionHeader->Misc.VirtualSize > module.Size)
                     continue;
 
-                if (sectionHeader.Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_CODE))
+                if (sectionHeader->Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_CODE))
                 {
                     section.Category = SectionCategory.CODE;
                 }
-                else if (sectionHeader.Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_INITIALIZED_DATA)
-                    || sectionHeader.Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_UNINITIALIZED_DATA))
+                else if (sectionHeader->Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_INITIALIZED_DATA)
+                    || sectionHeader->Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_UNINITIALIZED_DATA))
                 {
                     section.Category = SectionCategory.DATA;
                 }
 
-                section.Name = Encoding.UTF8.GetString(sectionHeader.Name.AsSpan()).TrimEnd('\0');
+                section.Name = Encoding.UTF8.GetString(sectionHeader->Name.AsSpan()).TrimEnd('\0');
                 section.ModulePath = module.Path;
                 section.ModuleName = Path.GetFileName(module.Path);
             }
