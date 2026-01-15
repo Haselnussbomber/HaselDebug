@@ -1,7 +1,5 @@
-using System.IO;
 using System.Text;
-using System.Timers;
-using HaselDebug.Config;
+using System.Threading;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.System.Diagnostics.Debug;
@@ -14,46 +12,105 @@ namespace HaselDebug.Service;
 [RegisterSingleton, AutoConstruct]
 public unsafe partial class ProcessInfoService : IDisposable
 {
-    private readonly PluginConfig _pluginConfig;
+    private readonly CancellationTokenSource _cts = new();
+    private readonly Lock _swapLock = new();
+
     private HANDLE _processHandle;
-    private Timer? _timer;
+    private Thread _workerThread;
+
+    private ModuleInfo[] _modulesBufferA = new ModuleInfo[512];
+    private ModuleInfo[] _modulesBufferB = new ModuleInfo[512];
+    private SectionInfo[] _sectionsBufferA = new SectionInfo[4096];
+    private SectionInfo[] _sectionsBufferB = new SectionInfo[4096];
+
+    private int _activeModuleCount;
+    private int _activeSectionCount;
+
+    private volatile ModuleInfo[] _activeModules;
+    private volatile SectionInfo[] _activeSections;
+
+    public bool Enabled { get; set; }
+
+    public ReadOnlySpan<ModuleInfo> Modules
+    {
+        get
+        {
+            using var scope = _swapLock.EnterScope();
+            return new ReadOnlySpan<ModuleInfo>(_activeModules, 0, _activeModuleCount);
+        }
+    }
+
+    public ReadOnlySpan<SectionInfo> Sections
+    {
+        get
+        {
+            using var scope = _swapLock.EnterScope();
+            return new ReadOnlySpan<SectionInfo>(_activeSections, 0, _activeSectionCount);
+        }
+    }
 
     [AutoPostConstruct]
     private void Initialize()
     {
         _processHandle = PInvoke.GetCurrentProcess();
 
-        Refresh();
+        _activeModules = _modulesBufferA;
+        _activeSections = _sectionsBufferA;
 
-        _timer = new();
-        _timer.Elapsed += (s, e) => Refresh();
-        _timer.Interval = 1000; // every second
-        _timer.Start();
+        _workerThread = new Thread(WorkerLoop)
+        {
+            IsBackground = true,
+            Name = "ProcessInfoServiceWorker",
+            Priority = ThreadPriority.BelowNormal
+        };
+
+        _workerThread.Start();
     }
 
     public void Dispose()
     {
-        _timer?.Dispose();
-        _timer = null;
+        _cts.Cancel();
+
+        if (_workerThread.IsAlive)
+            _workerThread.Join(500);
     }
 
-    public bool Enabled
+    private void WorkerLoop()
     {
-        get => _timer?.Enabled ?? false;
-        set
+        while (!_cts.Token.IsCancellationRequested)
         {
-            _timer?.Enabled = value;
-            if (value) Refresh();
+            if (Enabled)
+            {
+                var isAActive = ReferenceEquals(_activeModules, _modulesBufferA);
+
+                var targetModules = isAActive ? _modulesBufferB : _modulesBufferA;
+                var targetSections = isAActive ? _sectionsBufferB : _sectionsBufferA;
+
+                var modCount = FillModules(ref targetModules);
+                var secCount = FillSections(ref targetSections, targetModules, modCount);
+
+                if (isAActive)
+                {
+                    _modulesBufferB = targetModules;
+                    _sectionsBufferB = targetSections;
+                }
+                else
+                {
+                    _modulesBufferA = targetModules;
+                    _sectionsBufferA = targetSections;
+                }
+
+                using (var lockScope = _swapLock.EnterScope())
+                {
+                    _activeModules = targetModules;
+                    _activeSections = targetSections;
+                    _activeModuleCount = modCount;
+                    _activeSectionCount = secCount;
+                }
+            }
+
+            Thread.Sleep(1000);
         }
-    }
-
-    public ModuleInfo[] Modules { get; private set; } = [];
-    public SectionInfo[] Sections { get; private set; } = [];
-
-    private void Refresh()
-    {
-        Modules = GetModules(_processHandle);
-        Sections = GetSections(_processHandle, Modules);
     }
 
     public bool IsPointerValid(nint ptr) => IsPointerValid((void*)ptr);
@@ -66,10 +123,12 @@ public unsafe partial class ProcessInfoService : IDisposable
     public string GetAddressName(nint address)
     {
         var module = GetModuleToPointer(address);
+
         if (module != default)
         {
             var moduleOffset = address - module.BaseAddress;
             var name = module.Name == "ffxiv_dx11.exe" ? "" : module.Name;
+
             return $"{name}+0x{moduleOffset:X}";
         }
 
@@ -78,176 +137,156 @@ public unsafe partial class ProcessInfoService : IDisposable
 
     public ModuleInfo GetModuleToPointer(nint address)
     {
-        var modules = Modules;
-        var index = FindModuleIndex(modules, address);
-        return index < 0 ? default : modules[index];
-
-        static int FindModuleIndex(ModuleInfo[] modules, nint address)
-        {
-            var min = 0;
-            var max = modules.Length - 1;
-            while (min <= max)
-            {
-                var mid = (min + max) / 2;
-                var module = modules[mid];
-
-                if (address >= module.BaseAddress && address < module.BaseAddress + module.Size)
-                    return mid;
-
-                if (address < module.BaseAddress)
-                    max = mid - 1;
-                else
-                    min = mid + 1;
-            }
-            return -1;
-        }
+        var index = BinarySearchMemoryRegion(Modules, address);
+        return index < 0 ? default : Modules[index];
     }
 
     public SectionInfo GetSectionToPointer(nint address)
     {
-        var sections = Sections;
-        var index = FindSectionIndex(sections, address);
-        return index < 0 ? default : sections[index];
-
-        static int FindSectionIndex(SectionInfo[] sections, nint address)
-        {
-            var min = 0;
-            var max = sections.Length - 1;
-            while (min <= max)
-            {
-                var mid = (min + max) / 2;
-                var section = sections[mid];
-
-                if (address >= section.Start && address < section.End)
-                    return mid;
-
-                if (address < section.Start)
-                    max = mid - 1;
-                else
-                    min = mid + 1;
-            }
-            return -1;
-        }
+        var index = BinarySearchMemoryRegion(Sections, address);
+        return index < 0 ? default : Sections[index];
     }
 
-    private ModuleInfo[] GetModules(HANDLE processHandle)
+    private int FillModules(ref ModuleInfo[] buffer)
     {
-        var handle = PInvoke.CreateToolhelp32Snapshot(CREATE_TOOLHELP_SNAPSHOT_FLAGS.TH32CS_SNAPMODULE, PInvoke.GetProcessId(processHandle));
-        if (handle == HANDLE.Null)
-        {
-            return [];
-        }
+        var snapshot = PInvoke.CreateToolhelp32Snapshot(CREATE_TOOLHELP_SNAPSHOT_FLAGS.TH32CS_SNAPMODULE | CREATE_TOOLHELP_SNAPSHOT_FLAGS.TH32CS_SNAPMODULE32, 0);
+        if (snapshot.IsNull)
+            return 0;
 
-        var list = new List<ModuleInfo>();
-        var me32 = new MODULEENTRY32W
-        {
-            dwSize = (uint)sizeof(MODULEENTRY32W)
-        };
+        var count = 0;
 
-        if (PInvoke.Module32FirstW(handle, ref me32))
+        try
         {
-            do
+            MODULEENTRY32W moduleEntry = new()
             {
-                list.Add(new()
+                dwSize = (uint)sizeof(MODULEENTRY32W)
+            };
+
+            if (PInvoke.Module32FirstW(snapshot, ref moduleEntry))
+            {
+                do
                 {
-                    BaseAddress = (nint)me32.modBaseAddr,
-                    Size = me32.modBaseSize,
-                    Path = me32.szExePath.ToString(),
-                    Name = Path.GetFileName(me32.szExePath.ToString())
-                });
-            } while (PInvoke.Module32NextW(handle, ref me32));
+                    if (count >= buffer.Length)
+                        Array.Resize(ref buffer, buffer.Length * 2);
+
+                    buffer[count++] = new ModuleInfo
+                    {
+                        BaseAddress = (nint)moduleEntry.modBaseAddr,
+                        Size = moduleEntry.modBaseSize,
+                        Path = moduleEntry.szExePath.ToString(),
+                        Name = moduleEntry.szModule.ToString()
+                    };
+                } while (PInvoke.Module32NextW(snapshot, ref moduleEntry));
+            }
+        }
+        finally
+        {
+            PInvoke.CloseHandle(snapshot);
         }
 
-        PInvoke.CloseHandle(handle);
-
-        return [.. list.OrderBy(m => m.BaseAddress)];
+        Array.Sort(buffer, 0, count, ModuleComparer.Instance);
+        return count;
     }
 
-    private SectionInfo[] GetSections(HANDLE processHandle, ModuleInfo[] modules)
+    private int FillSections(ref SectionInfo[] buffer, ModuleInfo[] modules, int modCount)
     {
-        var sections = new List<SectionInfo>();
-
+        var count = 0;
         nuint address = 0;
-        while (PInvoke.VirtualQuery((void*)address, out var memory) != 0 && address + memory.RegionSize > address)
+
+        while (PInvoke.VirtualQuery((void*)address, out var memory) != 0)
         {
             if (memory.State == VIRTUAL_ALLOCATION_TYPE.MEM_COMMIT)
             {
-                sections.Add(new()
+                if (count >= buffer.Length)
+                    Array.Resize(ref buffer, buffer.Length * 2);
+
+                buffer[count++] = new SectionInfo
                 {
                     Start = (nint)memory.BaseAddress,
                     End = (nint)memory.BaseAddress + (nint)memory.RegionSize,
                     Size = (nint)memory.RegionSize,
                     Category = memory.Type == PAGE_TYPE.MEM_PRIVATE ? SectionCategory.HEAP : SectionCategory.Unknown
-                });
+                };
             }
 
-            address = (nuint)memory.BaseAddress + memory.RegionSize;
+            var next = (nuint)memory.BaseAddress + memory.RegionSize;
+            if (next <= address)
+                break;
+
+            address = next;
         }
 
-        foreach (var module in modules)
+        var activeSections = new Span<SectionInfo>(buffer, 0, count);
+        for (var i = 0; i < modCount; i++)
+            ParseModuleSections(modules[i], activeSections);
+
+        return count;
+    }
+
+    private void ParseModuleSections(ModuleInfo module, Span<SectionInfo> sections)
+    {
+        if (module.BaseAddress == 0) return;
+
+        var dos = (IMAGE_DOS_HEADER*)module.BaseAddress;
+        if (dos->e_magic != 0x5A4D) return;
+
+        var nt = (IMAGE_NT_HEADERS64*)(module.BaseAddress + dos->e_lfanew);
+        if (nt->Signature != 0x00004550) return;
+
+        var sectionHeader = (IMAGE_SECTION_HEADER*)((byte*)nt + sizeof(IMAGE_NT_HEADERS64));
+        var count = nt->FileHeader.NumberOfSections;
+
+        for (var i = 0; i < count; i++)
         {
-            var imageDosHeader = (IMAGE_DOS_HEADER*)module.BaseAddress;
-            var ntHeader = (IMAGE_NT_HEADERS64*)(module.BaseAddress + imageDosHeader->e_lfanew);
+            var header = sectionHeader + i;
+            var sectionAddr = module.BaseAddress + (nint)header->VirtualAddress;
 
-            var firstSection = (IMAGE_SECTION_HEADER*)((byte*)ntHeader + sizeof(IMAGE_NT_HEADERS64));
-
-            for (var i = 0; i < ntHeader->FileHeader.NumberOfSections; i++)
+            // Use specialized binary search on the span
+            var idx = BinarySearchMemoryRegion(sections, sectionAddr);
+            if (idx >= 0)
             {
-                var sectionHeader = firstSection + i;
-                var sectionAddress = module.BaseAddress + sectionHeader->VirtualAddress;
-
-                var idx = FindSectionIndexInList(sections, (nint)sectionAddress);
-                if (idx == -1)
-                    continue;
-
-                ref var section = ref CollectionsMarshal.AsSpan(sections)[idx];
-
-                if (sectionAddress < section.Start)
-                    continue;
-
-                if (sectionAddress >= section.Start + section.Size)
-                    continue;
-
-                if (sectionHeader->VirtualAddress + sectionHeader->Misc.VirtualSize > module.Size)
-                    continue;
-
-                if (sectionHeader->Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_CODE))
-                {
-                    section.Category = SectionCategory.CODE;
-                }
-                else if (sectionHeader->Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_INITIALIZED_DATA)
-                    || sectionHeader->Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_UNINITIALIZED_DATA))
-                {
-                    section.Category = SectionCategory.DATA;
-                }
-
-                section.Name = Encoding.UTF8.GetString(sectionHeader->Name.AsSpan()).TrimEnd('\0');
-                section.ModulePath = module.Path;
-                section.ModuleName = Path.GetFileName(module.Path);
+                ref var s = ref sections[idx];
+                s.Category = header->Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_CODE)
+                             ? SectionCategory.CODE : SectionCategory.DATA;
+                s.Name = Encoding.UTF8.GetString(header->Name.AsSpan()).TrimEnd('\0');
+                s.ModuleName = module.Name;
             }
         }
+    }
 
-        return [.. sections.OrderBy(section => section.Start)];
+    private static int BinarySearchMemoryRegion<T>(ReadOnlySpan<T> regions, nint address) where T : IMemoryRegion
+    {
+        var low = 0;
+        var high = regions.Length - 1;
 
-        static int FindSectionIndexInList(List<SectionInfo> sections, nint address)
+        while (low <= high)
         {
-            var min = 0;
-            var max = sections.Count - 1;
-            while (min <= max)
+            // Bit-shift to avoid overflow and for slight speed gain
+            var mid = low + ((high - low) >> 1);
+            ref readonly var midRegion = ref regions[mid];
+
+            if (address >= midRegion.Start && address < midRegion.End)
             {
-                var mid = (min + max) / 2;
-                var section = sections[mid];
-
-                if (address >= section.Start && address < section.End)
-                    return mid;
-
-                if (address < section.Start)
-                    max = mid - 1;
-                else
-                    min = mid + 1;
+                return mid;
             }
-            return -1;
+
+            if (address < midRegion.Start)
+            {
+                high = mid - 1;
+            }
+            else
+            {
+                low = mid + 1;
+            }
         }
+
+        return -1;
+    }
+
+    private class ModuleComparer : IComparer<ModuleInfo>
+    {
+        public static readonly ModuleComparer Instance = new();
+        public int Compare(ModuleInfo x, ModuleInfo y) => x.BaseAddress.CompareTo(y.BaseAddress);
     }
 }
 
@@ -259,7 +298,13 @@ public enum SectionCategory
     HEAP
 }
 
-public record struct SectionInfo
+public interface IMemoryRegion
+{
+    nint Start { get; }
+    nint End { get; }
+}
+
+public record struct SectionInfo : IMemoryRegion
 {
     public required nint Start { get; set; }
     public required nint End { get; set; }
@@ -270,10 +315,13 @@ public record struct SectionInfo
     public string? ModulePath { get; set; }
 }
 
-public readonly record struct ModuleInfo
+public readonly record struct ModuleInfo : IMemoryRegion
 {
     public required nint BaseAddress { get; init; }
     public required uint Size { get; init; }
     public required string Path { get; init; }
     public required string Name { get; init; }
+
+    nint IMemoryRegion.Start => BaseAddress;
+    nint IMemoryRegion.End => BaseAddress + (nint)Size;
 }
