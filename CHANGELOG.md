@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.45.2] (2026-01-15)
+
+- **Fixed:** Reworked ProcessInfoService. More efficient and safer (hopefully).
+
 ## [1.45.1] (2026-01-14)
 
 - **Fixed:** The Addon Inspector node picker wouldn't draw.
@@ -750,7 +754,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.2...main
+[1.45.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.1...v1.45.2
 [1.45.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.0...v1.45.1
 [1.45.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.1...v1.45.0
 [1.44.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.0...v1.44.1
