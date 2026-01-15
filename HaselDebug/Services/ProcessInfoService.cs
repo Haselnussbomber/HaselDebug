@@ -147,7 +147,7 @@ public unsafe partial class ProcessInfoService : IDisposable
         return index < 0 ? default : Sections[index];
     }
 
-    private int FillModules(ref ModuleInfo[] buffer)
+    private static int FillModules(ref ModuleInfo[] buffer)
     {
         var snapshot = PInvoke.CreateToolhelp32Snapshot(CREATE_TOOLHELP_SNAPSHOT_FLAGS.TH32CS_SNAPMODULE | CREATE_TOOLHELP_SNAPSHOT_FLAGS.TH32CS_SNAPMODULE32, 0);
         if (snapshot.IsNull)
@@ -188,7 +188,7 @@ public unsafe partial class ProcessInfoService : IDisposable
         return count;
     }
 
-    private int FillSections(ref SectionInfo[] buffer, ModuleInfo[] modules, int modCount)
+    private static int FillSections(ref SectionInfo[] buffer, ModuleInfo[] modules, int modCount)
     {
         var count = 0;
         nuint address = 0;
@@ -223,15 +223,18 @@ public unsafe partial class ProcessInfoService : IDisposable
         return count;
     }
 
-    private void ParseModuleSections(ModuleInfo module, Span<SectionInfo> sections)
+    private static void ParseModuleSections(ModuleInfo module, Span<SectionInfo> sections)
     {
-        if (module.BaseAddress == 0) return;
+        if (module.BaseAddress == 0)
+            return;
 
         var dos = (IMAGE_DOS_HEADER*)module.BaseAddress;
-        if (dos->e_magic != 0x5A4D) return;
+        if (dos->e_magic != 0x5A4D)
+            return;
 
         var nt = (IMAGE_NT_HEADERS64*)(module.BaseAddress + dos->e_lfanew);
-        if (nt->Signature != 0x00004550) return;
+        if (nt->Signature != 0x00004550)
+            return;
 
         var sectionHeader = (IMAGE_SECTION_HEADER*)((byte*)nt + sizeof(IMAGE_NT_HEADERS64));
         var count = nt->FileHeader.NumberOfSections;
@@ -241,15 +244,15 @@ public unsafe partial class ProcessInfoService : IDisposable
             var header = sectionHeader + i;
             var sectionAddr = module.BaseAddress + (nint)header->VirtualAddress;
 
-            // Use specialized binary search on the span
             var idx = BinarySearchMemoryRegion(sections, sectionAddr);
             if (idx >= 0)
             {
-                ref var s = ref sections[idx];
-                s.Category = header->Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_CODE)
-                             ? SectionCategory.CODE : SectionCategory.DATA;
-                s.Name = Encoding.UTF8.GetString(header->Name.AsSpan()).TrimEnd('\0');
-                s.ModuleName = module.Name;
+                ref var section = ref sections[idx];
+                section.Category = header->Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_CODE)
+                    ? SectionCategory.CODE 
+                    : SectionCategory.DATA;
+                section.Name = Encoding.UTF8.GetString(header->Name.AsSpan()).TrimEnd('\0');
+                section.ModuleName = module.Name;
             }
         }
     }
@@ -261,23 +264,16 @@ public unsafe partial class ProcessInfoService : IDisposable
 
         while (low <= high)
         {
-            // Bit-shift to avoid overflow and for slight speed gain
             var mid = low + ((high - low) >> 1);
             ref readonly var midRegion = ref regions[mid];
 
             if (address >= midRegion.Start && address < midRegion.End)
-            {
                 return mid;
-            }
 
             if (address < midRegion.Start)
-            {
                 high = mid - 1;
-            }
             else
-            {
                 low = mid + 1;
-            }
         }
 
         return -1;
