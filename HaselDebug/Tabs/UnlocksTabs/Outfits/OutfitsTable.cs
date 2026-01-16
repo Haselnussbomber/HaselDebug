@@ -3,13 +3,12 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Sheets;
 using HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits;
 
 [RegisterSingleton, AutoConstruct]
-public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
+public partial class OutfitsTable : Table<MirageStoreSetItem>, IDisposable
 {
     public const float IconSize = 32;
 
@@ -24,7 +23,7 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
     public void Initialize()
     {
         Columns = [
-            RowIdColumn<CustomMirageStoreSetItem>.Create(_serviceProvider),
+            RowIdColumn<MirageStoreSetItem>.Create(_serviceProvider),
             _setColumn,
             _itemsColumn,
         ];
@@ -56,7 +55,7 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
     {
         var agent = AgentTryon.Instance();
         var cabinetSheet = _excelService.GetSheet<Cabinet>().Select(row => row.Item.RowId).ToArray();
-        foreach (var row in _excelService.GetSheet<CustomMirageStoreSetItem>())
+        foreach (var row in _excelService.GetSheet<MirageStoreSetItem>())
         {
             // is valid set item
             if (row.RowId == 0 || !row.Set.IsValid)
@@ -94,7 +93,7 @@ public partial class OutfitsTable : Table<CustomMirageStoreSetItem>, IDisposable
         }
     }
 
-    public static unsafe bool TryGetSetItemBitArray(CustomMirageStoreSetItem row, out BitArray bitArray)
+    public static unsafe bool TryGetSetItemBitArray(MirageStoreSetItem row, out BitArray bitArray)
     {
         var mirageManager = MirageManager.Instance();
         if (mirageManager->PrismBoxLoaded)

@@ -1,10 +1,9 @@
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Sheets;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
 [RegisterSingleton, AutoConstruct]
-public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
+public partial class SetColumn : ColumnString<MirageStoreSetItem>
 {
     private const float IconSize = OutfitsTable.IconSize;
 
@@ -19,10 +18,10 @@ public partial class SetColumn : ColumnString<CustomMirageStoreSetItem>
         Flags |= ImGuiTableColumnFlags.DefaultSort;
     }
 
-    public override string ToName(CustomMirageStoreSetItem row)
+    public override string ToName(MirageStoreSetItem row)
         => _textService.GetItemName(row.RowId).ToString();
 
-    public override unsafe void DrawColumn(CustomMirageStoreSetItem row)
+    public override unsafe void DrawColumn(MirageStoreSetItem row)
     {
         var isSetInGlamourDresser = OutfitsTable.TryGetSetItemBitArray(row, out var bitArray);
         var isFullSetCollected = isSetInGlamourDresser && row.Items

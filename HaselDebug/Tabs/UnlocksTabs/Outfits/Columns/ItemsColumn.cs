@@ -1,21 +1,19 @@
 using System.Text;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Gui.ImGuiTable;
-using HaselCommon.Sheets;
 using HaselDebug.Extensions;
 using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
+public unsafe partial class ItemsColumn : ColumnString<MirageStoreSetItem>
 {
     private const float IconSize = OutfitsTable.IconSize;
 
     private readonly ITextureProvider _textureProvider;
     private readonly TextService _textService;
     private readonly ImGuiContextMenuService _imGuiContextMenuService;
-    private readonly ExcelService _excelService;
     private readonly UnlocksTabUtils _unlocksTabUtils;
 
     private readonly StringBuilder _stringBuilder = new();
@@ -26,7 +24,7 @@ public unsafe partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
         Flags |= ImGuiTableColumnFlags.NoSort;
     }
 
-    public override string ToName(CustomMirageStoreSetItem row)
+    public override string ToName(MirageStoreSetItem row)
     {
         _stringBuilder.Clear();
 
@@ -36,7 +34,7 @@ public unsafe partial class ItemsColumn : ColumnString<CustomMirageStoreSetItem>
         return _stringBuilder.ToString();
     }
 
-    public override unsafe void DrawColumn(CustomMirageStoreSetItem row)
+    public override unsafe void DrawColumn(MirageStoreSetItem row)
     {
         var isSetInGlamourDresser = OutfitsTable.TryGetSetItemBitArray(row, out var bitArray);
         var isFullSetCollected = isSetInGlamourDresser && row.Items
