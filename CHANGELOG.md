@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.45.3] (2026-01-17)
+
+- **Fixed:** Using ReadProcessMemory in ProcessInfoService again, so it fails safely when reading module data from another thread.
+- **Updated:** ClientStructs now at [2eff417b](https://github.com/aers/FFXIVClientStructs/tree/2eff417b) ([compare](https://github.com/aers/FFXIVClientStructs/compare/2858c274..2eff417b)).
+
 ## [1.45.2] (2026-01-15)
 
 - **Fixed:** Reworked ProcessInfoService. More efficient and safer (hopefully).
@@ -754,7 +759,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.3...main
+[1.45.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.2...v1.45.3
 [1.45.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.1...v1.45.2
 [1.45.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.0...v1.45.1
 [1.45.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.44.1...v1.45.0
