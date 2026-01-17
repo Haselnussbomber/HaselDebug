@@ -188,7 +188,7 @@ public unsafe partial class ProcessInfoService : IDisposable
         return count;
     }
 
-    private static int FillSections(ref SectionInfo[] buffer, ModuleInfo[] modules, int modCount)
+    private int FillSections(ref SectionInfo[] buffer, ModuleInfo[] modules, int modCount)
     {
         var count = 0;
         nuint address = 0;
@@ -223,35 +223,53 @@ public unsafe partial class ProcessInfoService : IDisposable
         return count;
     }
 
-    private static void ParseModuleSections(ModuleInfo module, Span<SectionInfo> sections)
+    private void ParseModuleSections(ModuleInfo module, Span<SectionInfo> sections)
     {
         if (module.BaseAddress == 0)
             return;
 
-        var dos = (IMAGE_DOS_HEADER*)module.BaseAddress;
-        if (dos->e_magic != 0x5A4D)
+        IMAGE_DOS_HEADER dosHeader;
+        if (!PInvoke.ReadProcessMemory(_processHandle, (void*)module.BaseAddress, &dosHeader, (nuint)sizeof(IMAGE_DOS_HEADER), null))
             return;
 
-        var nt = (IMAGE_NT_HEADERS64*)(module.BaseAddress + dos->e_lfanew);
-        if (nt->Signature != 0x00004550)
+        if (dosHeader.e_magic != 0x5A4D)
             return;
 
-        var sectionHeader = (IMAGE_SECTION_HEADER*)((byte*)nt + sizeof(IMAGE_NT_HEADERS64));
-        var count = nt->FileHeader.NumberOfSections;
+        var ntAddress = module.BaseAddress + dosHeader.e_lfanew;
+        IMAGE_NT_HEADERS64 ntHeader;
+        if (!PInvoke.ReadProcessMemory(_processHandle, (void*)ntAddress, &ntHeader, (nuint)sizeof(IMAGE_NT_HEADERS64), null))
+            return;
 
-        for (var i = 0; i < count; i++)
+        if (ntHeader.Signature != 0x00004550)
+            return;
+
+        var sectionCount = ntHeader.FileHeader.NumberOfSections;
+        if (sectionCount == 0)
+            return;
+
+        var sectionHeaders = sectionCount <= 64
+            ? stackalloc IMAGE_SECTION_HEADER[sectionCount]
+            : new IMAGE_SECTION_HEADER[sectionCount];
+
+        var sectionHeadersAddr = ntAddress + sizeof(IMAGE_NT_HEADERS64);
+
+        fixed (IMAGE_SECTION_HEADER* pBuffer = sectionHeaders)
         {
-            var header = sectionHeader + i;
-            var sectionAddr = module.BaseAddress + (nint)header->VirtualAddress;
+            if (!PInvoke.ReadProcessMemory(_processHandle, (void*)sectionHeadersAddr, pBuffer, (nuint)(sizeof(IMAGE_SECTION_HEADER) * sectionCount)))
+                return;
+        }
 
+        for (var i = 0; i < sectionCount; i++)
+        {
+            var sectionAddr = module.BaseAddress + (nint)sectionHeaders[i].VirtualAddress;
             var idx = BinarySearchMemoryRegion(sections, sectionAddr);
             if (idx >= 0)
             {
                 ref var section = ref sections[idx];
-                section.Category = header->Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_CODE)
-                    ? SectionCategory.CODE 
+                section.Category = sectionHeaders[i].Characteristics.HasFlag(IMAGE_SECTION_CHARACTERISTICS.IMAGE_SCN_CNT_CODE)
+                    ? SectionCategory.CODE
                     : SectionCategory.DATA;
-                section.Name = Encoding.UTF8.GetString(header->Name.AsSpan()).TrimEnd('\0');
+                section.Name = Encoding.UTF8.GetString(sectionHeaders[i].Name.AsSpan()).TrimEnd('\0');
                 section.ModuleName = module.Name;
             }
         }
