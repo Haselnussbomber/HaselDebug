@@ -3,6 +3,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using InstanceContentSheet = Lumina.Excel.Sheets.InstanceContent;
 
 namespace HaselDebug.Tabs;
 
@@ -147,6 +148,26 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
             "PlayerState.UnlockedOrchestrionRolls",
             PlayerState.Instance()->UnlockedOrchestrionRollsBitArray,
             _excelService.GetRowCount<Orchestrion>()));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "PlayerState.CompletedBeginnerTrainingBitArray",
+            PlayerState.Instance()->CompletedBeginnerTrainingBitArray,
+            _excelService.GetSheet<Tutorial>().Max(row => Math.Max(Math.Max(row.Unknown1, row.Unknown2), row.Unknown3)) - 1));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "PlayerState.CompletedMaskedCarnivaleBitArray",
+            PlayerState.Instance()->CompletedMaskedCarnivaleBitArray,
+            (int)_excelService.GetSheet<InstanceContentSheet>().Where(row => row.InstanceContentType.RowId == 13).Max(row => row.RowId - 35000)));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "PlayerState.CompletedVVDNotebookContentsBitArray",
+            PlayerState.Instance()->CompletedVVDNotebookContentsBitArray,
+            _excelService.GetRowCount<VVDNotebookContents>() - 1));
+
+        // _bitArrays.Add(new BitArrayRecord(
+        //     "PlayerState.UnlockedRaidsBitArray",
+        //     PlayerState.Instance()->UnlockedRaidsBitArray,
+        //     (int)_excelService.GetSheet<InstanceContentSheet>().Where(row => row.RowId is > 30000 and < 35000).Max(row => row.RowId - 30000))); // they reseve more space
 
         // _bitfields.Add(new BitfieldRecord(
         //    "PlayerState.UnlockedFramersKits",

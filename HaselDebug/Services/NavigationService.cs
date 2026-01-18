@@ -58,7 +58,7 @@ public unsafe partial class NavigationService
                 Label = _textService.Translate("ContextMenu.TabPopout"),
                 ClickCallback = () =>
                 {
-                    var window = ActivatorUtilities.CreateInstance<PointerTypeWindow>(_serviceProvider, (nint)agent, agentType, agentName);
+                    var window = _serviceProvider.CreateInstance<PointerTypeWindow>((nint)agent, agentType, agentName);
                     window.WindowName = displayName;
                     _windowManager.Open(window);
                 }
@@ -119,7 +119,7 @@ public unsafe partial class NavigationService
                 Label = _textService.Translate("ContextMenu.TabPopout"),
                 ClickCallback = () =>
                 {
-                    var window = ActivatorUtilities.CreateInstance<AddonInspectorWindow>(_serviceProvider);
+                    var window = _serviceProvider.CreateInstance<AddonInspectorWindow>();
                     window.AddonId = addonId;
                     window.AddonName = addonName;
                     window.WindowName = displayName;
