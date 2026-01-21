@@ -135,16 +135,23 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
 
         ImGui.Dummy(new Vector2(0, ImGui.GetTextLineHeight()));
         ImGui.SameLine(0, 0);
-        ImGuiHelpers.SeStringWrapped(evaluated, new SeStringDrawParams()
+        if (ImGui.IsKeyDown(ImGuiKey.LeftShift))
         {
-            ForceEdgeColor = true,
-        });
+            ImGuiUtils.DrawCopyableText(evaluated.ToMacroString());
+        }
+        else
+        {
+            ImGuiHelpers.SeStringWrapped(evaluated, new SeStringDrawParams()
+            {
+                ForceEdgeColor = true,
+            });
+
+            if (ImGui.IsItemClicked())
+                ImGui.SetClipboardText(evaluated.ToString());
+        }
 
         if (ImGui.IsItemHovered())
             ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-
-        if (ImGui.IsItemClicked())
-            ImGui.SetClipboardText(ImGui.IsKeyDown(ImGuiKey.LeftShift) ? evaluated.ToMacroString() : evaluated.ToString());
     }
 
     private void DrawParameters()
