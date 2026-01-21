@@ -139,6 +139,12 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
         {
             ForceEdgeColor = true,
         });
+
+        if (ImGui.IsItemHovered())
+            ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+
+        if (ImGui.IsItemClicked())
+            ImGui.SetClipboardText(ImGui.IsKeyDown(ImGuiKey.LeftShift) ? evaluated.ToMacroString() : evaluated.ToString());
     }
 
     private void DrawParameters()
