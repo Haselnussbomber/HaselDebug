@@ -40,7 +40,7 @@ public unsafe partial class DebugRenderer
                 TextColor = ColorType
             });
             ImGui.SameLine();
-            ImGui.TextColored(ColorFieldName, propInfo.Name);
+            ImGuiUtils.DrawCopyableText(propInfo.Name, new CopyableTextOptions() { TextColor = ColorFieldName });
             ImGui.SameLine();
             DrawExdSheetColumnValue(sheetType, rowId, propInfo.Name, depth, nodeOptions.WithAddress(propInfo.Name.GetHashCode()));
         }
@@ -107,7 +107,7 @@ public unsafe partial class DebugRenderer
         if (propType == typeof(RowRef))
         {
             var columnRowId = (uint)propType.GetProperty("RowId")?.GetValue(value)!;
-            ImGui.Text(columnRowId.ToString());
+            ImGuiUtils.DrawCopyableText(columnRowId.ToString());
             return;
         }
 
@@ -185,7 +185,7 @@ public unsafe partial class DebugRenderer
                 if (collectionType == typeof(RowRef))
                 {
                     var columnRowId = (uint)collectionType.GetProperty("RowId")?.GetValue(colValue)!;
-                    ImGui.Text(columnRowId.ToString());
+                    ImGuiUtils.DrawCopyableText(columnRowId.ToString());
                     continue;
                 }
 
@@ -228,7 +228,7 @@ public unsafe partial class DebugRenderer
                             TextColor = ColorType
                         });
                         ImGui.SameLine();
-                        ImGui.TextColored(ColorFieldName, pi.Name);
+                        ImGuiUtils.DrawCopyableText(pi.Name, new CopyableTextOptions() { TextColor = ColorFieldName });
                         ImGui.SameLine();
                         DrawExcelProp(pi, colValue, rowId, depth, nodeOptions);
                     }
@@ -238,7 +238,7 @@ public unsafe partial class DebugRenderer
 
                 if (collectionType.IsPrimitive)
                 {
-                    ImGui.Text(colValue.ToString());
+                    ImGuiUtils.DrawCopyableText(colValue.ToString() ?? string.Empty);
                     continue;
                 }
 
@@ -253,6 +253,6 @@ public unsafe partial class DebugRenderer
             DrawIcon(value, propType);
         }
 
-        ImGui.Text(value.ToString());
+        ImGuiUtils.DrawCopyableText(value.ToString() ?? string.Empty);
     }
 }
