@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** Excel sheet property names and values are now copyable in the inspector.
+- **Updated:** The SeString preview is now copyable in the inspector. Hold shift to copy a macro string.
+- **Fixed:** Opening SeStrings in Excel sheets didn't work properly.
+- **Updated:** ClientStructs now at [4c80f316](https://github.com/aers/FFXIVClientStructs/tree/4c80f316) ([compare](https://github.com/aers/FFXIVClientStructs/compare/2eff417b..4c80f316)).
+
 ## [1.45.3] (2026-01-17)
 
 - **Fixed:** Using ReadProcessMemory in ProcessInfoService again, so it fails safely when reading module data from another thread.
