@@ -98,7 +98,7 @@ public unsafe partial class DebugRenderer
             {
                 AddressPath = nodeOptions.AddressPath.With(propName.GetHashCode()),
                 RenderSeString = false,
-                Title = $"{row!.GetType().Name}#{rowId} ({language})",
+                Title = $"{row!.GetType().Name}#{rowId} ({language}) {propName}",
                 Language = language
             });
             return;
@@ -176,6 +176,7 @@ public unsafe partial class DebugRenderer
                 {
                     DrawSeString(((ReadOnlySeString)colValue).AsSpan(), true, new NodeOptions()
                     {
+                        Title = $"{row!.GetType().Name}#{rowId} {propName}[{i}]",
                         RenderSeString = nodeOptions.RenderSeString,
                         AddressPath = nodeOptions.AddressPath.With(collectionType.Name.GetHashCode())
                     });
