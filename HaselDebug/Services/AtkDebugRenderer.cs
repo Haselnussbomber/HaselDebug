@@ -89,7 +89,7 @@ public unsafe partial class AtkDebugRenderer
 
         ImGuiUtilsEx.PaddedSeparator(1);
 
-        ImGuiUtilsEx.PrintFieldValuePair("Address", ((nint)unitBase).ToString("X"));
+        _navigationService.DrawAddressInspectorLink((nint)unitBase);
         ImGui.SameLine();
         var addonType = _typeService.GetAddonType(unitBase->NameString);
         _debugRenderer.DrawPointerType((nint)unitBase, addonType, nodeOptions with { DefaultOpen = false });
@@ -326,7 +326,7 @@ public unsafe partial class AtkDebugRenderer
                                .Append($"{treePrefix}[#{node->NodeId}] {node->Type} ({(nint)node:X})")
                                .PopColor();
         }
- 
+
         AddNodeFieldSuffix(titleBuilder, node, nodeOptions);
 
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
@@ -364,7 +364,7 @@ public unsafe partial class AtkDebugRenderer
 
         ImGui.Text("Node: "u8);
         ImGui.SameLine();
-        _debugRenderer.DrawAddress(node);
+        _navigationService.DrawAddressInspectorLink((nint)node);
         ImGui.SameLine();
         _debugRenderer.DrawPointerType((nint)node, typeof(AtkResNode), nodeOptions);
 
@@ -391,7 +391,7 @@ public unsafe partial class AtkDebugRenderer
             return;
 
         using var rssb = new RentedSeStringBuilder();
-        
+
         SeStringBuilder titleBuilder;
         if (_typeService.CustomNodeTypes?.TryGetValue((nint)node, out var type) ?? false)
         {
@@ -448,13 +448,13 @@ public unsafe partial class AtkDebugRenderer
 
         ImGui.Text("Node:"u8);
         ImGui.SameLine();
-        _debugRenderer.DrawAddress(node);
+        _navigationService.DrawAddressInspectorLink((nint)node);
         ImGui.SameLine();
         _debugRenderer.DrawPointerType((nint)node, typeof(AtkComponentNode), nodeOptions.WithAddress(1));
 
         ImGui.Text("Component:"u8);
         ImGui.SameLine();
-        _debugRenderer.DrawAddress(component);
+        _navigationService.DrawAddressInspectorLink((nint)component);
         ImGui.SameLine();
         _debugRenderer.DrawPointerType((nint)component, typeof(AtkComponentBase), nodeOptions.WithAddress(2));
 

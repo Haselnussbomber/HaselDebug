@@ -50,9 +50,17 @@
     "de": "Suchen..."
   },
 
+  "ContextMenu.GoToAddressInspector": {
+    "en": "Open in Address Inspector",
+    "de": "In Address Inspector öffnen"
+  },
   "ContextMenu.CopyText": {
     "en": "Copy text",
     "de": "Text kopieren"
+  },
+  "ContextMenu.CopyValueString": {
+    "en": "Copy: {0}",
+    "de": "Kopieren: {0}"
   },
   "ContextMenu.CopyRowId": {
     "en": "Copy RowId",

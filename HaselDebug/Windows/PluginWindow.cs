@@ -121,6 +121,9 @@ public partial class PluginWindow : SimpleWindow
             case AgentNavigation when _selectedTab is not AgentsTab:
                 SelectTab(nameof(AgentsTab));
                 break;
+            case AddressInspectorNavigation when _selectedTab is not AddressInspectorTab:
+                SelectTab(nameof(AddressInspectorTab));
+                break;
         }
     }
 

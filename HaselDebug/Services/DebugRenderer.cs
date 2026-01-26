@@ -1141,14 +1141,11 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (ImGui.IsKeyDown(ImGuiKey.LeftShift))
-        {
-            ImGuiUtils.DrawCopyableText($"0x{address:X}");
-            return;
-        }
+        var displayText = ImGui.IsKeyDown(ImGuiKey.LeftShift)
+            ? $"0x{address:X}"
+            : _processInfoService.GetAddressName(address);
 
-        var addressName = _processInfoService.GetAddressName(address);
-        ImGuiUtils.DrawCopyableText(addressName);
+        ImGuiUtils.DrawCopyableText(displayText);
     }
 
     public object? DrawNumeric(nint address, Type type, NodeOptions nodeOptions)

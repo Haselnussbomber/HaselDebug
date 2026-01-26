@@ -2,6 +2,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Extensions;
+using HaselDebug.Service;
 using HaselDebug.Windows;
 
 namespace HaselDebug.Services;
@@ -14,6 +15,7 @@ public unsafe partial class NavigationService
     private readonly TextService _textService;
     private readonly IServiceProvider _serviceProvider;
     private readonly ImGuiContextMenuService _imGuiContextMenu;
+    private readonly ProcessInfoService _processInfoService;
 
     private int _tooltipIndex;
 
@@ -129,6 +131,36 @@ public unsafe partial class NavigationService
         });
     }
 
+    public void DrawAddressInspectorLink(nint address, uint size = 0)
+    {
+        if (address == 0)
+        {
+            ImGui.Text("null");
+            return;
+        }
+
+        var displayText = ImGui.IsKeyDown(ImGuiKey.LeftShift)
+            ? $"0x{address:X}"
+            : _processInfoService.GetAddressName(address);
+
+        ImGuiUtils.DrawCopyableText(displayText);
+
+        _imGuiContextMenu.Draw($"Address_AddressInspectorNavigation_ContextMenu{_tooltipIndex++}", (builder) =>
+        {
+            builder.AddCopyAddress(address);
+            if (displayText != $"0x{address:X}")
+                builder.AddCopyValueString(displayText);
+
+            builder.AddSeparator();
+
+            builder.Add(new ImGuiContextMenuEntry()
+            {
+                Label = _textService.Translate("ContextMenu.GoToAddressInspector"),
+                ClickCallback = () => CurrentNavigation = new AddressInspectorNavigation(address, size)
+            });
+        });
+    }
+
     public void Reset()
     {
         CurrentNavigation = null;
@@ -152,4 +184,10 @@ public readonly struct AddonNavigation(ushort addonId, string? addonName) : INav
 public readonly struct AgentNavigation(AgentId agentId) : INavigationParams
 {
     public AgentId AgentId { get; init; } = agentId;
+}
+
+public readonly struct AddressInspectorNavigation(nint address, uint size = 0) : INavigationParams
+{
+    public nint Address { get; init; } = address;
+    public uint Size { get; init; } = size;
 }

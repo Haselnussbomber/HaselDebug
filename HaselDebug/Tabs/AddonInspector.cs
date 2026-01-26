@@ -132,9 +132,6 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
         foreach (AtkUnitBase* unitBase in allUnitsList)
         {
-            // if ((unitBase->Flags198 & 0b1100_0000) != 0 || unitBase->HostId != 0)
-            //     continue;
-
             var addonId = unitBase->Id;
             var addonName = unitBase->NameString;
 
@@ -205,6 +202,12 @@ public unsafe partial class AddonInspectorTab : DebugTab
                             AddonName = addonName
                         });
                     }
+                });
+
+                builder.Add(new ImGuiContextMenuEntry()
+                {
+                    Label = _textService.Translate("ContextMenu.GoToAddressInspector"),
+                    ClickCallback = () => _navigationService.NavigateTo(new AddressInspectorNavigation((nint)unitBase, type != typeof(AtkUnitBase) ? (uint)type.SizeOf() : 0))
                 });
             });
         }

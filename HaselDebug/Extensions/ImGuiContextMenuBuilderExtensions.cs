@@ -37,6 +37,16 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
         });
     }
 
+    public static void AddCopyValueString(this ImGuiContextMenuBuilder builder, string text)
+    {
+        builder.Add(new ImGuiContextMenuEntry()
+        {
+            Visible = !string.IsNullOrEmpty(text),
+            Label = ServiceLocator.GetService<TextService>()?.Translate("ContextMenu.CopyValueString", text) ?? $"Copy {text}",
+            ClickCallback = () => ImGui.SetClipboardText(text)
+        });
+    }
+
     public static void AddViewOutfitGlamourReadyItems(this ImGuiContextMenuBuilder builder, ItemHandle item)
     {
         builder.Add(new ViewOutfitGlamourReadyItemsContextMenuEntry(item));

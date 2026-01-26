@@ -116,6 +116,12 @@ public unsafe partial class AgentsTab : DebugTab
 
                 builder.Add(new ImGuiContextMenuEntry()
                 {
+                    Label = _textService.Translate("ContextMenu.GoToAddressInspector"),
+                    ClickCallback = () => _navigationService.NavigateTo(new AddressInspectorNavigation((nint)agent.Value, agentType != typeof(AgentInterface) ? (uint)agentType.SizeOf() : 0))
+                });
+
+                builder.Add(new ImGuiContextMenuEntry()
+                {
                     Visible = !isPinned,
                     Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
                     ClickCallback = () => _pinnedInstances.Add((nint)agent.Value, agentType)

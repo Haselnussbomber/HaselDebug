@@ -14,6 +14,7 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
     private readonly DebugRenderer _debugRenderer;
     private readonly TextService _textService;
     private readonly IGameInteropProvider _gameInteropProvider;
+    private readonly NavigationService _navigationService;
 
     private readonly List<(DateTime, nint, EventSceneTaskInterface)> _taskTypeHistory = [];
     private Hook<EventSceneModuleTaskManager.Delegates.AddTask>? _addTaskHook;
@@ -123,7 +124,7 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
             var eventHandler = kv.Item2.Value;
             var type = eventHandler->Info.EventId.ContentId;
 
-            _debugRenderer.DrawAddress(eventHandler);
+            _navigationService.DrawAddressInspectorLink((nint)eventHandler);
             ImGui.SameLine(110);
 
             ImGui.Text(kv.Item1.ToString("X4"));

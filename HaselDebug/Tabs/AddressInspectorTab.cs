@@ -10,15 +10,16 @@ using Iced.Intel;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class PointerInspectorTab : DebugTab
+public unsafe partial class AddressInspectorTab : DebugTab
 {
+    private readonly ILogger<AddressInspectorTab> _logger;
     private readonly DataYmlService _dataYml;
     private readonly TypeService _typeService;
     private readonly DebugRenderer _debugRenderer;
     private readonly ISigScanner _sigScanner;
     private readonly ProcessInfoService _processInfoService;
     private readonly IAddonLifecycle _addonLifecycle;
-    private readonly ILogger<PointerInspectorTab> _logger;
+    private readonly NavigationService _navigationService;
 
     private readonly List<OffsetInfo> _offsetMappings = [];
     private OffsetInfo? _currentStructInfo;
@@ -45,6 +46,21 @@ public unsafe partial class PointerInspectorTab : DebugTab
     public override void Draw()
     {
         _freeMemoryAddress ??= _sigScanner.ScanText("E8 ?? ?? ?? ?? 48 89 5D ?? 48 8B 74 24") - _sigScanner.Module.BaseAddress;
+
+        if (_navigationService.CurrentNavigation is AddressInspectorNavigation navData)
+        {
+            _memoryAddress = navData.Address;
+            _memorySize = navData.Size;
+
+            _addressInput = "0x" + _memoryAddress.ToString("X");
+            _addressSize = "0x" + _memorySize.ToString("X");
+
+            if (_memorySize == 0)
+                FindSize();
+
+            ParsePointer();
+            _navigationService.Reset();
+        }
 
         DrawSearchBox();
 
