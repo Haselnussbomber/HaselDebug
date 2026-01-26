@@ -148,21 +148,32 @@ public partial class TypeService : IHostedService
                 && fieldInfo.FieldType.GetCustomAttribute<InlineArrayAttribute>() is InlineArrayAttribute inlineArrayAttribute)
             {
                 var innerType = fieldInfo.FieldType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)[0].FieldType;
-                for (var i = 0; i < inlineArrayAttribute.Length; i++)
+
+                if (innerType.IsGenericType && innerType.Name.StartsWith("Pointer`1"))
+                    innerType = innerType.GenericTypeArguments[0].MakePointerType();
+
+                if (innerType.IsStruct())
                 {
-                    LoadTypeMapping(fields, $"{prefix}{fieldInfo.Name[1..].FirstCharToUpper()}[{i}].", offset + fieldOffsetAttribute.Value + i * innerType.SizeOf(), innerType);
+                    for (var i = 0; i < inlineArrayAttribute.Length; i++)
+                    {
+                        LoadTypeMapping(fields, $"{prefix}{fieldInfo.Name[1..].FirstCharToUpper()}[{i}].", offset + fieldOffsetAttribute.Value + i * innerType.SizeOf(), innerType);
+                    }
+                }
+                else
+                {
+                    for (var i = 0; i < inlineArrayAttribute.Length; i++)
+                    {
+                        fields[offset + fieldOffsetAttribute.Value + i * innerType.SizeOf()] = ($"{prefix}{fieldInfo.Name[1..].FirstCharToUpper()}[{i}]", innerType);
+                    }
                 }
             }
             else if (fieldInfo.FieldType.IsStruct())
             {
                 LoadTypeMapping(fields, prefix + fieldInfo.Name + ".", offset + fieldOffsetAttribute.Value, fieldInfo.FieldType);
             }
-            else
+            else if (!fields.ContainsKey(offset + fieldOffsetAttribute.Value))
             {
-                if (!fields.ContainsKey(offset + fieldOffsetAttribute.Value))
-                {
-                    fields[offset + fieldOffsetAttribute.Value] = (prefix + fieldInfo.Name, fieldInfo.FieldType);
-                }
+                fields[offset + fieldOffsetAttribute.Value] = (prefix + fieldInfo.Name, fieldInfo.FieldType);
             }
         }
     }
