@@ -1,11 +1,16 @@
 # Changelog
 
-## [Unreleased]
+## [1.46.0] (2026-01-27)
 
+- **Changed:** Renamed Pointer Inspector to Address Inspector.
+- **Added:** Right-clicking on a nodes/components address, addon or agent now opens a context menu to open the address in the Address Inspector.
+- **Added:** Spawn Object Log and Spawn Treasure Log tabs.
 - **Updated:** Excel sheet property names and values are now copyable in the inspector.
-- **Updated:** The SeString preview is now copyable in the inspector. Hold shift to copy a macro string.
+- **Updated:** The SeString preview is now copyable in the inspector.
+- **Updated:** The SeString preview now shows the macro string when holding shift, also letting you copy it.
 - **Fixed:** Opening SeStrings in Excel sheets didn't work properly.
-- **Updated:** ClientStructs now at [4c80f316](https://github.com/aers/FFXIVClientStructs/tree/4c80f316) ([compare](https://github.com/aers/FFXIVClientStructs/compare/2eff417b..4c80f316)).
+- **Fixed:** In the Address Inspector, some FixedArrays weren't displayed and pointers of type `Pointer<T>` are now unboxed.
+- **Updated:** ClientStructs now at [5b9ecbd8](https://github.com/aers/FFXIVClientStructs/tree/5b9ecbd8) ([compare](https://github.com/aers/FFXIVClientStructs/compare/2eff417b..5b9ecbd8)).
 
 ## [1.45.3] (2026-01-17)
 
@@ -766,7 +771,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.3...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.46.0...main
+[1.46.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.3...v1.46.0
 [1.45.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.2...v1.45.3
 [1.45.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.1...v1.45.2
 [1.45.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.0...v1.45.1
