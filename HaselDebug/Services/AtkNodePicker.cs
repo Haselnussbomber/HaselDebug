@@ -1,5 +1,7 @@
+using System.Drawing;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Bounds = FFXIVClientStructs.FFXIV.Common.Math.Bounds;
 
 namespace HaselDebug.Services;
 
@@ -59,17 +61,26 @@ public unsafe partial class AtkNodePicker : IDisposable
 
         var hoveredDepthLayerAddonNodes = new Dictionary<uint, Dictionary<Pointer<AtkUnitBase>, List<Pointer<AtkResNode>>>>();
         var nodeCount = 0;
-        var bounds = stackalloc FFXIVClientStructs.FFXIV.Common.Math.Bounds[1];
+        var bounds = new Bounds();
+        var cursorPoint = new Point((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y);
 
         var currentHoveredNodePtrs = new HashSet<Pointer<AtkResNode>>();
 
         foreach (AtkUnitBase* unitBase in allUnitsList)
         {
-            unitBase->GetWindowBounds(bounds);
-            var pos = new Vector2(bounds->Pos1.X, bounds->Pos1.Y);
-            var size = new Vector2(bounds->Size.X, bounds->Size.Y);
+            unitBase->GetWindowBounds(&bounds);
+            var isInBounds = bounds.ContainsPoint(cursorPoint);
 
-            if (!bounds->ContainsPoint((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y))
+            foreach (var additionalNode in unitBase->AdditionalFocusableNodes)
+            {
+                if (additionalNode.Value == null)
+                    continue;
+
+                additionalNode.Value->GetBounds(&bounds);
+                isInBounds |= bounds.ContainsPoint(cursorPoint);
+            }
+
+            if (!isInBounds)
                 continue;
 
             FindHoveredNodes(hoveredDepthLayerAddonNodes, ref nodeCount, currentHoveredNodePtrs, &unitBase->UldManager, unitBase);
@@ -112,7 +123,7 @@ public unsafe partial class AtkNodePicker : IDisposable
                 for (var i = nodes.Count - 1; i >= 0; i--)
                 {
                     var node = nodes[i].Value;
-                    node->GetBounds(bounds);
+                    node->GetBounds(&bounds);
 
                     if (NodePickerSelectionIndex == nodeIndex)
                     {
@@ -121,8 +132,8 @@ public unsafe partial class AtkNodePicker : IDisposable
                         ImGui.SameLine(0, 0);
 
                         ImGui.GetBackgroundDrawList().AddRectFilled(
-                            new Vector2(bounds->Pos1.X, bounds->Pos1.Y),
-                            new Vector2(bounds->Pos2.X, bounds->Pos2.Y),
+                            new Vector2(bounds.Pos1.X, bounds.Pos1.Y),
+                            new Vector2(bounds.Pos2.X, bounds.Pos2.Y),
                             new Color(1, 1, 0, 0.5f).ToUInt());
 
                         if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
@@ -182,14 +193,15 @@ public unsafe partial class AtkNodePicker : IDisposable
         AtkUldManager* uldManager,
         AtkUnitBase* unitBase)
     {
-        var bounds = stackalloc FFXIVClientStructs.FFXIV.Common.Math.Bounds[1];
+        var bounds = new Bounds();
+        var cursorPoint = new Point((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y);
 
         for (var i = 0; i < uldManager->NodeListCount; i++)
         {
             var node = uldManager->NodeList[i];
-            node->GetBounds(bounds);
+            node->GetBounds(&bounds);
 
-            if (!bounds->ContainsPoint((int)ImGui.GetMousePos().X, (int)ImGui.GetMousePos().Y))
+            if (!bounds.ContainsPoint(cursorPoint))
                 continue;
 
             currentHoveredNodePtrs.Add(node);
