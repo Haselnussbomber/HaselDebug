@@ -24,6 +24,7 @@ public partial class PluginWindow : SimpleWindow
     private readonly NavigationService _navigationService;
     private readonly ProcessInfoService _processInfoService;
     private readonly IEnumerable<IDebugTab> _debugTabs;
+    private readonly AtkNodePicker _nodePicker;
 
     private IDebugTab[] _tabs;
     private IDebugTab? _selectedTab;
@@ -97,7 +98,7 @@ public partial class PluginWindow : SimpleWindow
 
     public override bool DrawConditions()
     {
-        return true;
+        return !_nodePicker.ShowPicker;
     }
 
     public override void Draw()

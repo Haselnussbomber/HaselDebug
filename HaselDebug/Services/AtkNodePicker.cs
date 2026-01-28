@@ -6,7 +6,7 @@ namespace HaselDebug.Services;
 // TODO: pick GameObjects?
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class AtkNodePicker
+public unsafe partial class AtkNodePicker : IDisposable
 {
     private readonly IDalamudPluginInterface _pluginInterface;
     private readonly NavigationService _navigationService;
@@ -15,6 +15,18 @@ public unsafe partial class AtkNodePicker
 
     public bool ShowPicker { get; set; }
     public int NodePickerSelectionIndex { get; set; }
+
+
+    [AutoPostConstruct]
+    private void Initialize()
+    {
+        _pluginInterface.UiBuilder.Draw += Draw;
+    }
+
+    public void Dispose()
+    {
+        _pluginInterface.UiBuilder.Draw -= Draw;
+    }
 
     public void Draw()
     {

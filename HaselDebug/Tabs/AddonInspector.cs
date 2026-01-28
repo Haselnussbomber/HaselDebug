@@ -61,8 +61,6 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
         if (_nodePath != null)
             _nodePath = null;
-
-        _nodePicker.Draw();
     }
 
     private void DrawAddonList()
