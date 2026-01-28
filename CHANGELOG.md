@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.47.0] (2026-01-28)
+
+- **Changed:** The plugin window now hides itself when picking a node in the Addon Inspector.
+- **Added:** It is now possible to pick nodes in `AtkUnitBase.AdditionalFocusableNodes`, for example the docked detail window in the Mogpendium.
+- **Added:** Added an Actor Control Log tab to log ActorControl packets that the client receives (only non-recorded packets and only stored in memory, so don't forget to disable it again).
+
 ## [1.46.0] (2026-01-27)
 
 - **Changed:** Renamed Pointer Inspector to Address Inspector.
@@ -771,7 +777,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.46.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.47.0...main
+[1.47.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.46.0...v1.47.0
 [1.46.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.3...v1.46.0
 [1.45.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.2...v1.45.3
 [1.45.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.1...v1.45.2
