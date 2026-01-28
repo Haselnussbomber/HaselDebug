@@ -126,8 +126,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
     private void OnLanguageChanged(string langCode)
     {
-        if (_inspectorWindow != null)
-            _inspectorWindow.Language = _languageProvider.ClientLanguage;
+        _inspectorWindow?.Language = _languageProvider.ClientLanguage;
     }
 
     public override unsafe void Draw()
@@ -451,7 +450,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
 
         if (_inspectorWindow == null)
         {
-            _inspectorWindow = _windowManager.CreateOrOpen("StringMaker Preview", () => new SeStringInspectorWindow(_windowManager, _textService, _addonObserver, _serviceProvider)
+            _inspectorWindow = _windowManager.CreateOrOpen("StringMaker Preview", () => new SeStringInspectorWindow(_windowManager, _textService, _serviceProvider)
             {
                 String = "",
                 Language = _languageProvider.ClientLanguage,

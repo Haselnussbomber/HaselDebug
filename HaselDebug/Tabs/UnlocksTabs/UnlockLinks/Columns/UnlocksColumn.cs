@@ -11,7 +11,6 @@ public partial class UnlocksColumn : ColumnString<UnlockLinkEntry>
     private readonly WindowManager _windowManager;
     private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly TextService _textService;
-    private readonly AddonObserver _addonObserver;
     private readonly LanguageProvider _languageProvider;
 
     [AutoPostConstruct]
@@ -30,7 +29,7 @@ public partial class UnlocksColumn : ColumnString<UnlockLinkEntry>
             if (ImGui.Selectable($"{unlock.RowType.Name}#{unlock.RowId}{unlock.ExtraSheetText}"))
             {
                 var title = $"{unlock.RowType.Name}#{unlock.RowId} ({_languageProvider.ClientLanguage})";
-                _windowManager.CreateOrOpen(title, () => new ExcelRowTab(_windowManager, _textService, _addonObserver, _serviceProvider, unlock.RowType, unlock.RowId, _languageProvider.ClientLanguage, title));
+                _windowManager.CreateOrOpen(title, () => new ExcelRowTab(_windowManager, _textService, _serviceProvider, unlock.RowType, unlock.RowId, _languageProvider.ClientLanguage, title));
             }
 
             _imGuiContextMenu.Draw($"Entry{entry.Index}_{unlock.RowType.Name}{unlock.RowId}_RowIdContextMenu", builder =>

@@ -194,7 +194,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
                     Label = _textService.Translate("ContextMenu.TabPopout"),
                     ClickCallback = () =>
                     {
-                        _windowManager.Open(new AddonInspectorWindow(_windowManager, _textService, _addonObserver, _atkDebugRenderer)
+                        _windowManager.Open(new AddonInspectorWindow(_windowManager, _textService, _atkDebugRenderer)
                         {
                             AddonId = addonId,
                             AddonName = addonName

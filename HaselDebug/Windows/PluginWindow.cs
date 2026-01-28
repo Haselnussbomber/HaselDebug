@@ -16,7 +16,6 @@ public partial class PluginWindow : SimpleWindow
     private readonly WindowManager _windowManager;
     private readonly PluginConfig _pluginConfig;
     private readonly TextService _textService;
-    private readonly AddonObserver _addonObserver;
     private readonly PinnedInstancesService _pinnedInstances;
     private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly DebugRenderer _debugRenderer;
@@ -161,7 +160,7 @@ public partial class PluginWindow : SimpleWindow
                     {
                         Visible = tab.CanPopOut && !_windowManager.Contains(win => win.WindowName == tab.Title),
                         Label = _textService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, _addonObserver, tab))
+                        ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, tab))
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()
@@ -209,7 +208,7 @@ public partial class PluginWindow : SimpleWindow
                 {
                     Visible = tab.CanPopOut && !_windowManager.Contains(win => win.WindowName == tab.Title),
                     Label = _textService.Translate("ContextMenu.TabPopout"),
-                    ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, _addonObserver, tab))
+                    ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, tab))
                 });
             });
 
@@ -236,7 +235,7 @@ public partial class PluginWindow : SimpleWindow
                         {
                             Visible = subTab.CanPopOut && !_windowManager.Contains(win => win.WindowName == subTab.Title),
                             Label = _textService.Translate("ContextMenu.TabPopout"),
-                            ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, _addonObserver, subTab))
+                            ClickCallback = () => _windowManager.Open(new TabPopoutWindow(_windowManager, _textService, subTab))
                         });
                     });
 

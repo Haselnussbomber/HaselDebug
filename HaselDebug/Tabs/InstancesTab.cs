@@ -11,7 +11,6 @@ public partial class InstancesTab : DebugTab
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly TextService _textService;
-    private readonly AddonObserver _addonObserver;
     private readonly DebugRenderer _debugRenderer;
     private readonly WindowManager _windowManager;
     private readonly TypeService _typeService;
@@ -49,7 +48,7 @@ public partial class InstancesTab : DebugTab
                     {
                         Visible = !_windowManager.Contains(win => win.WindowName == windowName),
                         Label = _textService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_windowManager, _textService, _addonObserver, _serviceProvider, ptr, type, string.Empty))
+                        ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_windowManager, _textService, _serviceProvider, ptr, type, string.Empty))
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()

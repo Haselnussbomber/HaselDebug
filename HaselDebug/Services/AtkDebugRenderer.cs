@@ -216,7 +216,7 @@ public unsafe partial class AtkDebugRenderer
             var addonName = unitBase->NameString;
             _windowManager.CreateOrOpen(
                 addonName + " - AtkValues Observer",
-                () => new AddonAtkValuesObserverWindow(_windowManager, _textService, _addonObserver, _addonLifecycle, _debugRenderer) { AddonName = addonName });
+                () => new AddonAtkValuesObserverWindow(_windowManager, _textService, _addonLifecycle, _debugRenderer) { AddonName = addonName });
         }
 
         ImGuiUtilsEx.PaddedSeparator();
@@ -344,7 +344,7 @@ public unsafe partial class AtkDebugRenderer
                     Label = _textService.Translate("ContextMenu.TabPopout"),
                     ClickCallback = () =>
                     {
-                        _windowManager.Open(new NodeInspectorWindow(_windowManager, _textService, _addonObserver, this)
+                        _windowManager.Open(new NodeInspectorWindow(_windowManager, _textService, this)
                         {
                             WindowName = nodeOptions.SeStringTitle?.ToString() ?? $"Node at 0x{(nint)node:X}",
                             NodeAddress = (nint)node
@@ -428,7 +428,7 @@ public unsafe partial class AtkDebugRenderer
                     Label = _textService.Translate("ContextMenu.TabPopout"),
                     ClickCallback = () =>
                     {
-                        _windowManager.Open(new NodeInspectorWindow(_windowManager, _textService, _addonObserver, this)
+                        _windowManager.Open(new NodeInspectorWindow(_windowManager, _textService, this)
                         {
                             WindowName = nodeOptions.SeStringTitle?.ToString() ?? $"Node at 0x{(nint)node:X}",
                             NodeAddress = (nint)node
@@ -1070,7 +1070,7 @@ public unsafe partial class AtkDebugRenderer
                 if (ImGui.Selectable(str.ToString() + $"##TextNodeText{(nint)node:X}"))
                 {
                     var windowTitle = $"Text Node #{node->NodeId} (0x{(nint)node:X})";
-                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _addonObserver, _serviceProvider)
+                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _serviceProvider)
                     {
                         String = str,
                         Language = _languageProvider.ClientLanguage,
@@ -1139,7 +1139,7 @@ public unsafe partial class AtkDebugRenderer
                 if (ImGui.Selectable(str.ToString() + $"##CounterNodeText{(nint)node:X}"))
                 {
                     var windowTitle = $"Counter Node #{node->NodeId} (0x{(nint)node:X})";
-                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _addonObserver, _serviceProvider)
+                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _serviceProvider)
                     {
                         String = str,
                         Language = _languageProvider.ClientLanguage,
