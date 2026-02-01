@@ -133,7 +133,7 @@ public unsafe partial class AtkDebugRenderer
                     {
                         Visible = !isPinned,
                         Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
-                        ClickCallback = () => _pinnedInstancesService.Add((nint)agent, agentType)
+                        ClickCallback = () => _pinnedInstancesService.Add(agentType)
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()

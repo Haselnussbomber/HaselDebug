@@ -72,7 +72,7 @@ public unsafe partial class NavigationService
             {
                 Visible = !isPinned,
                 Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
-                ClickCallback = () => pinnedInstancesService.Add((nint)agent, agentType)
+                ClickCallback = () => pinnedInstancesService.Add(agentType)
             });
 
             builder.Add(new ImGuiContextMenuEntry()

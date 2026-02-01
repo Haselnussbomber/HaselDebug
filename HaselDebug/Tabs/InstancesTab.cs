@@ -1,3 +1,4 @@
+using System.Reflection;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -7,7 +8,7 @@ using HaselDebug.Windows;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public partial class InstancesTab : DebugTab
+public unsafe partial class InstancesTab : DebugTab
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly TextService _textService;
@@ -26,7 +27,7 @@ public partial class InstancesTab : DebugTab
 
         using var contentChild = ImRaii.Child("Content", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
 
-        foreach (var (i, (ptr, type)) in _typeService.Instances.Index())
+        foreach (var (i, type) in _typeService.Instances.Index())
         {
             if (_typeService.AgentTypes != null && _typeService.AgentTypes.ContainsValue(type))
                 continue;
@@ -34,9 +35,19 @@ public partial class InstancesTab : DebugTab
             if (hasSearchTerm && !type.FullName!.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            _debugRenderer.DrawAddress(ptr);
+            var instanceMethod = type.GetMethod("Instance", BindingFlags.Static | BindingFlags.Public);
+            if (instanceMethod == null)
+                continue;
+
+            var ptr = (Pointer?)instanceMethod.Invoke(null, null);
+            if (ptr == null)
+                return;
+
+            var address = (nint)Pointer.Unbox(ptr);
+
+            _debugRenderer.DrawAddress(address);
             ImGui.SameLine(120);
-            _debugRenderer.DrawPointerType(ptr, type, new NodeOptions()
+            _debugRenderer.DrawPointerType(address, type, new NodeOptions()
             {
                 AddressPath = new AddressPath(i),
                 DrawContextMenu = (nodeOptions, builder) =>
@@ -48,14 +59,14 @@ public partial class InstancesTab : DebugTab
                     {
                         Visible = !_windowManager.Contains(win => win.WindowName == windowName),
                         Label = _textService.Translate("ContextMenu.TabPopout"),
-                        ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_windowManager, _textService, _serviceProvider, ptr, type, string.Empty))
+                        ClickCallback = () => _windowManager.Open(new PointerTypeWindow(_windowManager, _textService, _serviceProvider, address, type, string.Empty))
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()
                     {
                         Visible = !isPinned,
                         Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
-                        ClickCallback = () => _pinnedInstances.Add(ptr, type)
+                        ClickCallback = () => _pinnedInstances.Add(type)
                     });
 
                     builder.Add(new ImGuiContextMenuEntry()

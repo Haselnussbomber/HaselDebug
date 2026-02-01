@@ -123,7 +123,7 @@ public unsafe partial class AgentsTab : DebugTab
                 {
                     Visible = !isPinned,
                     Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
-                    ClickCallback = () => _pinnedInstances.Add((nint)agent.Value, agentType)
+                    ClickCallback = () => _pinnedInstances.Add(agentType)
                 });
 
                 builder.Add(new ImGuiContextMenuEntry()
@@ -193,7 +193,7 @@ public unsafe partial class AgentsTab : DebugTab
                 {
                     Visible = !isPinned,
                     Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
-                    ClickCallback = () => _pinnedInstances.Add((nint)agent, agentType)
+                    ClickCallback = () => _pinnedInstances.Add(agentType)
                 });
 
                 builder.Add(new ImGuiContextMenuEntry()

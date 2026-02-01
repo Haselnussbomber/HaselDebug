@@ -26,16 +26,14 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
         await _typeService.Loaded;
 
         // make sure the types of pinned instances exist
-        _pluginConfig.PinnedInstances = _pluginConfig.PinnedInstances
-            .Where(name => _typeService.Instances.Any(inst => inst.Type.FullName == name))
-            .ToArray();
+        _pluginConfig.PinnedInstances = [.. _pluginConfig.PinnedInstances.Where(name => _typeService.Instances.Any(type => type.FullName == name))];
 
         // restore saved pinned instances
         foreach (var name in _pluginConfig.PinnedInstances)
         {
-            var inst = _typeService.Instances.FirstOrDefault(inst => inst.Type.FullName == name);
-            if (inst == default) continue;
-            _tabs.Add(new PinnedInstanceTab(_debugRenderer, inst.Address, inst.Type));
+            var type = _typeService.Instances.FirstOrDefault(type => type.FullName == name);
+            if (type != null)
+                _tabs.Add(new PinnedInstanceTab(_debugRenderer, type));
         }
 
         Sort();
@@ -48,9 +46,9 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
         _tabs.Sort((a, b) => a.InternalName.CompareTo(b.InternalName));
     }
 
-    public void Add(nint address, Type type)
+    public void Add(Type type)
     {
-        _tabs.Add(new PinnedInstanceTab(_debugRenderer, address, type));
+        _tabs.Add(new PinnedInstanceTab(_debugRenderer, type));
         Sort();
 
         var nameList = new List<string>(_pluginConfig.PinnedInstances)
@@ -80,15 +78,6 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
     public void Remove(Type type)
     {
         var tab = _tabs.FirstOrDefault(tab => tab.Type == type);
-        if (tab == null)
-            return;
-
-        Remove(tab);
-    }
-
-    public void Remove(Type type, nint address)
-    {
-        var tab = _tabs.FirstOrDefault(tab => tab.Type == type && tab.Address == address);
         if (tab == null)
             return;
 

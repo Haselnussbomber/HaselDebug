@@ -25,7 +25,7 @@ public partial class TypeService : IHostedService
     public ImmutableSortedDictionary<string, Type>? AddonTypes { get; private set; }
     public ImmutableSortedDictionary<AgentId, Type>? AgentTypes { get; private set; }
     public ConcurrentDictionary<nint, Type>? CustomNodeTypes { get; private set; }
-    public Instance[] Instances { get; private set; } = [];
+    public Type[] Instances { get; private set; } = [];
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -110,26 +110,7 @@ public partial class TypeService : IHostedService
 
     private void LoadInstances(Assembly csAssembly)
     {
-        Instances = csAssembly.GetTypes()
-            .Where(type => type.IsStruct())
-            .Select(type =>
-            {
-                var method = type.GetMethod("Instance", BindingFlags.Static | BindingFlags.Public);
-                if (method == null || method.GetParameters().Length != 0 || !method.ReturnType.IsPointer)
-                    return default;
-
-                var pointer = method?.Invoke(null, null);
-                if (pointer == null)
-                    return default;
-
-                unsafe
-                {
-                    var address = (nint)Pointer.Unbox(pointer);
-                    return new Instance(address, type);
-                }
-            })
-            .Where(tuple => tuple != default)
-            .ToArray();
+        Instances = [.. csAssembly.GetTypes().Where(type => type.IsStruct() && type.GetMethod("Instance", BindingFlags.Static | BindingFlags.Public) is { } method && method.GetParameters().Length == 0 && method.ReturnType.IsPointer)];
 
         _logger.LogDebug("Loaded {count} instances", Instances.Length);
     }
@@ -177,6 +158,4 @@ public partial class TypeService : IHostedService
             }
         }
     }
-
-    public record struct Instance(nint Address, Type Type);
 }
