@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.47.1] (2026-02-01)
+
+- **Fixed:** Instances with a `StaticAddresses` that had `isPointer: true` were incorrectly cached.
+- **Updated:** ClientStructs now at [cb1f076a](https://github.com/aers/FFXIVClientStructs/tree/cb1f076a) ([compare](https://github.com/aers/FFXIVClientStructs/compare/5b9ecbd8..cb1f076a)).
+
 ## [1.47.0] (2026-01-28)
 
 - **Changed:** The plugin window now hides itself when picking a node in the Addon Inspector.
@@ -777,7 +782,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.47.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.47.1...main
+[1.47.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.47.0...v1.47.1
 [1.47.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.46.0...v1.47.0
 [1.46.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.3...v1.46.0
 [1.45.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.45.2...v1.45.3
