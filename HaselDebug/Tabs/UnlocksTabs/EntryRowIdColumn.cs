@@ -13,7 +13,6 @@ public partial class EntryRowIdColumn<T, TRow> : ColumnNumber<T>
     private readonly IServiceProvider _serviceProvider;
     private readonly WindowManager _windowManager;
     private readonly LanguageProvider _languageProvider;
-    private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly Type _rowType;
 
     public override int ToValue(T entry)
@@ -27,7 +26,7 @@ public partial class EntryRowIdColumn<T, TRow> : ColumnNumber<T>
             _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, _rowType, entry.RowId, _languageProvider.ClientLanguage, title));
         }
 
-        _imGuiContextMenu.Draw($"{_rowType.Name}{entry.RowId}RowIdContextMenu", builder =>
+        ImGuiContextMenu.Draw($"{_rowType.Name}{entry.RowId}RowIdContextMenu", builder =>
         {
             builder.AddCopyRowId(entry.RowId);
         });
@@ -39,7 +38,6 @@ public partial class EntryRowIdColumn<T, TRow> : ColumnNumber<T>
             serviceProvider.GetRequiredService<IServiceProvider>(),
             serviceProvider.GetRequiredService<WindowManager>(),
             serviceProvider.GetRequiredService<LanguageProvider>(),
-            serviceProvider.GetRequiredService<ImGuiContextMenuService>(),
             typeof(TRow)
         )
         {

@@ -16,7 +16,6 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
     private readonly DebugRenderer _debugRenderer;
     private readonly WindowManager _windowManager;
     private readonly PropertyInfo _propertyInfo;
-    private readonly ImGuiContextMenuService _imGuiContextMenu;
 
     public Type RowType => typeof(T);
     public Type ColumnType => _propertyInfo.PropertyType;
@@ -120,7 +119,7 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
             {
                 OpenSheet(RowType.Name, rowId);
             }
-            _imGuiContextMenu.Draw($"{RowType.Name}{rowId}RowIdContextMenu", builder =>
+            ImGuiContextMenu.Draw($"{RowType.Name}{rowId}RowIdContextMenu", builder =>
             {
                 builder.AddCopyRowId(rowId);
             });

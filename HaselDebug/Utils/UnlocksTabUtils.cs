@@ -4,7 +4,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Game.Enums;
 using HaselDebug.Services;
 using HaselDebug.Sheets;
-using Lumina.Data.Files;
 using Companion = Lumina.Excel.Sheets.Companion;
 using Ornament = Lumina.Excel.Sheets.Ornament;
 
@@ -18,7 +17,6 @@ public unsafe partial class UnlocksTabUtils
     private readonly ITextureProvider _textureProvider;
     private readonly UldService _uldService;
     private readonly ItemService _itemService;
-    private readonly ImGuiContextMenuService _imGuiContextMenuService;
     private readonly IDataManager _dataManager;
     private readonly TripleTriadNumberFont _tripleTriadNumberFont;
     private readonly ISeStringEvaluator _seStringEvaluator;
@@ -29,13 +27,13 @@ public unsafe partial class UnlocksTabUtils
 
     public bool DrawSelectableItem(ItemHandle item, ImGuiId id, bool drawIcon = true, bool isHq = false, float? iconSize = null, bool selected = false, ImGuiSelectableFlags flags = ImGuiSelectableFlags.None)
     {
-        var itemName = item.Name.ToString();
+        var itemName = _itemService.GetItemName(item).ToString();
         var isHovered = false;
         iconSize ??= ImGui.GetTextLineHeight();
 
         if (drawIcon)
         {
-            _debugRenderer.DrawIcon(item.Icon, isHq, drawInfo: (float)iconSize, noTooltip: true);
+            _debugRenderer.DrawIcon(_itemService.GetItemIcon(item), isHq, drawInfo: (float)iconSize, noTooltip: true);
             isHovered |= ImGui.IsItemHovered();
         }
         var clicked = ImGui.Selectable(itemName, selected, flags);
@@ -49,7 +47,7 @@ public unsafe partial class UnlocksTabUtils
             DrawItemTooltip(item);
         }
 
-        _imGuiContextMenuService.Draw($"##{id}_ItemContextMenu{item.ItemId}_IconTooltip", builder =>
+        ImGuiContextMenu.Draw($"##{id}_ItemContextMenu{item.ItemId}_IconTooltip", builder =>
         {
             builder.AddTryOn(item);
             builder.AddItemFinder(item);
@@ -59,7 +57,7 @@ public unsafe partial class UnlocksTabUtils
             builder.AddOpenOnGarlandTools("item", item.ItemId);
         });
 
-        if (item.IsUnlockable && item.IsUnlocked)
+        if (_itemService.IsUnlocked(item))
         {
             ImGui.SameLine(1, 0);
 
@@ -146,9 +144,9 @@ public unsafe partial class UnlocksTabUtils
             DrawEventItemTooltip(eventItem);
     }
 
-    public void DrawItemTooltip(ItemHandle item, string? descriptionOverride = null)
+    public void DrawItemTooltip(ItemHandle item, string? description = null)
     {
-        if (!_textureProvider.TryGetFromGameIcon(item.Icon, out var tex) || !tex.TryGetWrap(out var icon, out _))
+        if (!_textureProvider.TryGetFromGameIcon(_itemService.GetItemIcon(item), out var tex) || !tex.TryGetWrap(out var icon, out _))
             return;
 
         using var id = ImRaii.PushId($"ItemTooltip{item.ItemId}");
@@ -160,7 +158,7 @@ public unsafe partial class UnlocksTabUtils
         if (!popuptable) return;
 
         var itemInnerSpacing = ImGui.GetStyle().ItemInnerSpacing * ImGuiHelpers.GlobalScale;
-        var title = item.Name.ToString();
+        var title = _itemService.GetItemName(item).ToString();
 
         ImGui.TableSetupColumn("Icon"u8, ImGuiTableColumnFlags.WidthFixed, 40 * ImGuiHelpers.GlobalScale + itemInnerSpacing.X);
         ImGui.TableSetupColumn("Text"u8, ImGuiTableColumnFlags.WidthFixed, Math.Max(ImGui.CalcTextSize(title).X + itemInnerSpacing.X, 300 * ImGuiHelpers.GlobalScale));
@@ -168,7 +166,7 @@ public unsafe partial class UnlocksTabUtils
         ImGui.TableNextColumn(); // Icon
         ImGui.Image(icon.Handle, ImGuiHelpers.ScaledVector2(40));
 
-        var isUnlocked = item.IsUnlockable && item.IsUnlocked;
+        var isUnlocked = _itemService.IsUnlocked(item);
         if (isUnlocked)
         {
             ImGui.SameLine(1 + ImGui.GetStyle().CellPadding.X + itemInnerSpacing.X, 0);
@@ -189,7 +187,7 @@ public unsafe partial class UnlocksTabUtils
         if (isUnlocked)
             ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 40 * ImGuiHelpers.GlobalScale / 2f - 3); // wtf
 
-        var isItem = item.TryGetItem(out var itemRow);
+        var isItem = _itemService.TryGetItem(item, out var itemRow);
 
         var category = isItem && itemRow.ItemUICategory.IsValid ? itemRow.ItemUICategory.Value.Name.ToString() : null;
         if (!string.IsNullOrEmpty(category))
@@ -199,7 +197,15 @@ public unsafe partial class UnlocksTabUtils
                 ImGui.Text(category);
         }
 
-        var description = descriptionOverride ?? (!item.Description.IsEmpty ? item.Description.ToString() : null);
+        if (description == null)
+        {
+            var itemDescription = _itemService.GetItemDescription(item);
+            if (!itemDescription.IsEmpty)
+            {
+                description = itemDescription.ToString();
+            }
+        }
+
         if (!string.IsNullOrEmpty(description))
         {
             DrawSeparator(marginTop: 1, marginBottom: 4);
@@ -207,36 +213,36 @@ public unsafe partial class UnlocksTabUtils
             ImGui.TextWrapped(description);
         }
 
-        if (isItem)
+        if (isItem && itemRow.ItemAction.TryGetRow(out var itemAction))
         {
-            switch (item.ItemActionType)
+            switch ((ItemActionType)itemAction.Action.RowId)
             {
-                case ItemActionType.Mount when _excelService.TryGetRow<Mount>(itemRow.ItemAction.Value.Data[0], out var mount):
+                case ItemActionType.Mount when _excelService.TryGetRow<Mount>(itemAction.Data[0], out var mount):
                     _textureProvider.DrawIcon(64000 + mount.Icon, new DrawInfo() { Scale = 0.5f * ImGuiHelpers.GlobalScale });
                     break;
 
-                case ItemActionType.Companion when _excelService.TryGetRow<Companion>(itemRow.ItemAction.Value.Data[0], out var companion):
+                case ItemActionType.Companion when _excelService.TryGetRow<Companion>(itemAction.Data[0], out var companion):
                     _textureProvider.DrawIcon(64000 + companion.Icon, new DrawInfo() { Scale = 0.5f * ImGuiHelpers.GlobalScale });
                     break;
 
-                case ItemActionType.Ornament when _excelService.TryGetRow<Ornament>(itemRow.ItemAction.Value.Data[0], out var ornament):
+                case ItemActionType.Ornament when _excelService.TryGetRow<Ornament>(itemAction.Data[0], out var ornament):
                     _textureProvider.DrawIcon(59000 + ornament.Icon, new DrawInfo() { Scale = 0.5f * ImGuiHelpers.GlobalScale });
                     break;
 
-                case ItemActionType.UnlockLink when itemRow.ItemAction.Value.Data[1] == 5211 && _excelService.TryGetRow<Emote>(itemRow.ItemAction.Value.Data[2], out var emote):
+                case ItemActionType.UnlockLink when itemAction.Data[1] == 5211 && _excelService.TryGetRow<Emote>(itemAction.Data[2], out var emote):
                     _textureProvider.DrawIcon((uint)emote.Icon, new DrawInfo() { Scale = 0.5f * ImGuiHelpers.GlobalScale });
                     break;
 
-                case ItemActionType.UnlockLink when itemRow.ItemAction.Value.Data[1] == 4659 && _itemService.GetHairstyleIconId(item) is { } hairStyleIconId && hairStyleIconId != 0:
+                case ItemActionType.UnlockLink when itemAction.Data[1] == 4659 && _itemService.GetHairstyleIconId(item) is { } hairStyleIconId && hairStyleIconId != 0:
                     _textureProvider.DrawIcon(hairStyleIconId, new DrawInfo() { Scale = ImGuiHelpers.GlobalScale });
                     break;
 
-                case ItemActionType.UnlockLink when itemRow.ItemAction.Value.Data[1] == 9390 && TryGetFacePaintIconId(itemRow.ItemAction.Value.Data[0], out var facePaintIconId):
+                case ItemActionType.UnlockLink when itemAction.Data[1] == 9390 && TryGetFacePaintIconId(itemAction.Data[0], out var facePaintIconId):
                     _textureProvider.DrawIcon(facePaintIconId, new DrawInfo() { Scale = ImGuiHelpers.GlobalScale });
                     break;
 
                 case ItemActionType.TripleTriadCard:
-                    if (_excelService.TryGetRow<TripleTriadCardResident>(itemRow.ItemAction.Value.Data[0], out var residentRow) &&
+                    if (_excelService.TryGetRow<TripleTriadCardResident>(itemAction.Data[0], out var residentRow) &&
                         _excelService.TryGetRow<TripleTriadCardObtain>(residentRow.AcquisitionType.RowId, out var obtainRow) &&
                         obtainRow.Icon != 0)
                     {
@@ -245,7 +251,7 @@ public unsafe partial class UnlocksTabUtils
                         ImGui.SameLine();
                         ImGui.TextWrapped(_seStringEvaluator.EvaluateFromAddon(obtainRow.Icon, [
                             residentRow.Acquisition.RowId,
-                    residentRow.Location.RowId
+                            residentRow.Location.RowId
                         ]).ToString());
                     }
 
@@ -255,7 +261,7 @@ public unsafe partial class UnlocksTabUtils
                 default:
                     if (itemRow.ItemUICategory.RowId == 95 && _excelService.TryGetRow<Picture>(itemRow.AdditionalData.RowId, out var picture)) // Paintings
                     {
-                        _textureProvider.DrawIcon(picture.Image, ResizeToFit(GetIconSize((uint)picture.Image), ImGui.GetContentRegionAvail().X));
+                        _textureProvider.DrawIcon(picture.Image, new DrawInfo() { Fit = ContentFit.Cover });
                     }
                     break;
             }
@@ -458,33 +464,6 @@ public unsafe partial class UnlocksTabUtils
 
         _facePaintIconCache.Add(dataId, iconId = charaMakeCustomize.Icon);
         return true;
-    }
-
-    // TODO: move to TextureService?
-    private Vector2 GetIconSize(uint iconId)
-    {
-        if (_iconSizeCache.TryGetValue(iconId, out var size))
-            return size;
-
-        var iconPath = _textureProvider.GetIconPath(iconId);
-        if (string.IsNullOrEmpty(iconPath))
-        {
-            _iconSizeCache.Add(iconId, size = Vector2.Zero);
-            return size;
-        }
-
-        var file = _dataManager.GetFile<TexFile>(iconPath);
-        _iconSizeCache.Add(iconId, size = file != null ? new Vector2(file.Header.Width, file.Header.Height) : Vector2.Zero);
-        return size;
-    }
-
-    private static Vector2 ResizeToFit(Vector2 imageSize, float outerWidth)
-    {
-        if (imageSize.X <= outerWidth)
-            return new Vector2(imageSize.X, imageSize.Y);
-
-        var aspectRatio = imageSize.Y / imageSize.X;
-        return new Vector2(outerWidth, outerWidth * aspectRatio);
     }
 
     public void DrawEventItemTooltip(EventItem item)

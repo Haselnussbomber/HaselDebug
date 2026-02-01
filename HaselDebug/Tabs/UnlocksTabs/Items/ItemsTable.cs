@@ -8,6 +8,7 @@ public unsafe partial class ItemsTable : Table<Item>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
+    private readonly ItemService _itemService;
     private readonly TypeColumn _typeColumn;
     private readonly UnlockedColumn _unlockedColumn;
     private readonly ItemColumn _itemColumn;
@@ -25,8 +26,6 @@ public unsafe partial class ItemsTable : Table<Item>
 
     public override void LoadRows()
     {
-        Rows = _excelService.GetSheet<Item>()
-            .Where(row => new ItemHandle(row.RowId).IsUnlockable)
-            .ToList();
+        Rows = [.. _excelService.FindRows<Item>(row => _itemService.IsUnlockable(row))];
     }
 }

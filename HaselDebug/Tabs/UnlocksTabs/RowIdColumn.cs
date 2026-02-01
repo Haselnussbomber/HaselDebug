@@ -10,7 +10,6 @@ public partial class RowIdColumn<TRow> : ColumnNumber<TRow> where TRow : struct,
     private readonly IServiceProvider _serviceProvider;
     private readonly WindowManager _windowManager;
     private readonly LanguageProvider _languageProvider;
-    private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly Type _rowType;
 
     public override int ToValue(TRow row)
@@ -24,7 +23,7 @@ public partial class RowIdColumn<TRow> : ColumnNumber<TRow> where TRow : struct,
             _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, _rowType, row.RowId, _languageProvider.ClientLanguage, title));
         }
 
-        _imGuiContextMenu.Draw($"{_rowType.Name}{row.RowId}RowIdContextMenu", builder =>
+        ImGuiContextMenu.Draw($"{_rowType.Name}{row.RowId}RowIdContextMenu", builder =>
         {
             builder.AddCopyRowId(row.RowId);
         });
@@ -36,7 +35,6 @@ public partial class RowIdColumn<TRow> : ColumnNumber<TRow> where TRow : struct,
             serviceProvider.GetRequiredService<IServiceProvider>(),
             serviceProvider.GetRequiredService<WindowManager>(),
             serviceProvider.GetRequiredService<LanguageProvider>(),
-            serviceProvider.GetRequiredService<ImGuiContextMenuService>(),
             typeof(TRow)
         )
         {

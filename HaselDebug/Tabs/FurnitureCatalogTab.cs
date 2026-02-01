@@ -213,7 +213,6 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
             private readonly WindowManager _windowManager;
             private readonly TextService _textService;
             private readonly LanguageProvider _languageProvider;
-            private readonly ImGuiContextMenuService _imGuiContextMenu;
 
             [AutoPostConstruct]
             private void Initialize()
@@ -236,7 +235,7 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
                     _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, row.SheetType, row.RowId, _languageProvider.ClientLanguage, title));
                 }
 
-                _imGuiContextMenu.Draw($"{row.SheetType.Name}{row.RowId}RowIdContextMenu", builder =>
+                ImGuiContextMenu.Draw($"{row.SheetType.Name}{row.RowId}RowIdContextMenu", builder =>
                 {
                     builder.AddCopyRowId(row.RowId);
                 });
@@ -291,6 +290,7 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
         [RegisterTransient, AutoConstruct]
         public partial class ItemColumn : ColumnString<FurnitureCatalogItem>
         {
+            private readonly ItemService _itemService;
             private readonly UnlocksTabUtils _unlocksTabUtils;
             private HousingTerritoryType _housingTerritoryType;
 
@@ -304,7 +304,7 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
 
             public override string ToName(FurnitureCatalogItem row)
             {
-                return row.Item.Name.ToString();
+                return _itemService.GetItemName(row.Item).ToString();
             }
 
             public override void DrawColumn(FurnitureCatalogItem row)

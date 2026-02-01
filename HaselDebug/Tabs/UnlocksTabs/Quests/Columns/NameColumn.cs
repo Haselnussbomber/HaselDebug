@@ -13,7 +13,6 @@ public partial class NameColumn : ColumnString<Quest>
     private readonly ExcelService _excelService;
     private readonly ITextureProvider _textureProvider;
     private readonly UnlocksTabUtils _unlocksTabUtils;
-    private readonly ImGuiContextMenuService _imGuiContextMenu;
 
     [AutoPostConstruct]
     public void Initialize()
@@ -60,7 +59,7 @@ public partial class NameColumn : ColumnString<Quest>
             }
         }
 
-        _imGuiContextMenu.Draw($"Quest{row.RowId}ContextMenu", builder =>
+        ImGuiContextMenu.Draw($"Quest{row.RowId}ContextMenu", builder =>
         {
             builder.AddCopyName(ToName(row));
             builder.AddOpenOnGarlandTools("quest", row.RowId);

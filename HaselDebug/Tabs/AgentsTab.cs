@@ -20,7 +20,6 @@ public unsafe partial class AgentsTab : DebugTab
     private readonly LanguageProvider _languageProvider;
     private readonly TypeService _typeService;
     private readonly DebugRenderer _debugRenderer;
-    private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly PinnedInstancesService _pinnedInstances;
     private readonly WindowManager _windowManager;
     private readonly NavigationService _navigationService;
@@ -97,7 +96,7 @@ public unsafe partial class AgentsTab : DebugTab
                     _selectedAgentId = agentId;
                 }
             }
-            _imGuiContextMenu.Draw($"ContextMenuAgent{i}", builder =>
+            ImGuiContextMenu.Draw($"ContextMenuAgent{i}", builder =>
             {
                 var agentType = _typeService.GetAgentType(agentId);
                 var isPinned = _pinnedInstances.Contains(agentType);

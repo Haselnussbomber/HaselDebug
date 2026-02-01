@@ -233,31 +233,28 @@ public static unsafe class ImGuiUtilsEx
                     changed |= true;
                 }
 
-                if (ServiceLocator.TryGetService<ImGuiContextMenuService>(out var contextMenuService))
+                ImGuiContextMenu.Draw(popupKey, builder =>
                 {
-                    contextMenuService.Draw(popupKey, builder =>
+                    builder.Add(new ImGuiContextMenuEntry()
                     {
-                        builder.Add(new ImGuiContextMenuEntry()
-                        {
-                            Label = "Copy PartId",
-                            ClickCallback = () => ImGui.SetClipboardText(i.ToString())
-                        });
-                        builder.Add(new ImGuiContextMenuEntry()
-                        {
-                            Label = "Copy Position",
-                            ClickCallback = () => ImGui.SetClipboardText(ImGui.IsKeyDown(ImGuiKey.LeftShift)
-                                ? $"new Vector2({part.U}, {part.V})"
-                                : $"({part.U}, {part.V})")
-                        });
-                        builder.Add(new ImGuiContextMenuEntry()
-                        {
-                            Label = "Copy Size",
-                            ClickCallback = () => ImGui.SetClipboardText(ImGui.IsKeyDown(ImGuiKey.LeftShift)
-                                ? $"new Vector2({part.Width}, {part.Height})"
-                                : $"{part.Width}x{part.Height}")
-                        });
+                        Label = "Copy PartId",
+                        ClickCallback = () => ImGui.SetClipboardText(i.ToString())
                     });
-                }
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
+                        Label = "Copy Position",
+                        ClickCallback = () => ImGui.SetClipboardText(ImGui.IsKeyDown(ImGuiKey.LeftShift)
+                            ? $"new Vector2({part.U}, {part.V})"
+                            : $"({part.U}, {part.V})")
+                    });
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
+                        Label = "Copy Size",
+                        ClickCallback = () => ImGui.SetClipboardText(ImGui.IsKeyDown(ImGuiKey.LeftShift)
+                            ? $"new Vector2({part.Width}, {part.Height})"
+                            : $"{part.Width}x{part.Height}")
+                    });
+                });
             }
 
             ImGui.SetCursorPos(posAfter);

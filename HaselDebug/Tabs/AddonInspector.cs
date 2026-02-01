@@ -17,7 +17,6 @@ public unsafe partial class AddonInspectorTab : DebugTab
     private readonly LanguageProvider _languageProvider;
     private readonly TypeService _typeService;
     private readonly DebugRenderer _debugRenderer;
-    private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly PinnedInstancesService _pinnedInstances;
     private readonly WindowManager _windowManager;
     private readonly AddonObserver _addonObserver;
@@ -178,7 +177,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
                 }
             }
 
-            _imGuiContextMenu.Draw($"##Addon_{addonId}_{addonName}_Context", builder =>
+            ImGuiContextMenu.Draw($"##Addon_{addonId}_{addonName}_Context", builder =>
             {
                 var type = _typeService.GetAddonType(addonName);
                 var isPinned = _pinnedInstances.Contains(addonName);

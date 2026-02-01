@@ -9,7 +9,6 @@ public partial class UnlocksColumn : ColumnString<UnlockLinkEntry>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly WindowManager _windowManager;
-    private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly TextService _textService;
     private readonly LanguageProvider _languageProvider;
 
@@ -32,7 +31,7 @@ public partial class UnlocksColumn : ColumnString<UnlockLinkEntry>
                 _windowManager.CreateOrOpen(title, () => new ExcelRowTab(_windowManager, _textService, _serviceProvider, unlock.RowType, unlock.RowId, _languageProvider.ClientLanguage, title));
             }
 
-            _imGuiContextMenu.Draw($"Entry{entry.Index}_{unlock.RowType.Name}{unlock.RowId}_RowIdContextMenu", builder =>
+            ImGuiContextMenu.Draw($"Entry{entry.Index}_{unlock.RowType.Name}{unlock.RowId}_RowIdContextMenu", builder =>
             {
                 builder.AddCopyRowId(unlock.RowId);
             });

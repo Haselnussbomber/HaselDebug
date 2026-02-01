@@ -5,12 +5,16 @@ namespace HaselDebug.Tabs.UnlocksTabs.Items.Columns;
 [RegisterTransient]
 public class UnlockedColumn : ColumnYesNo<Item>
 {
-    public UnlockedColumn()
+    private readonly ItemService _itemService;
+
+    public UnlockedColumn(ItemService itemService)
     {
+        _itemService = itemService;
+
         SetFixedWidth(75);
         LabelKey = "UnlockedColumn.Label";
     }
 
     public override unsafe bool ToBool(Item row)
-        => new ItemHandle(row.RowId).IsUnlocked;
+        => _itemService.IsUnlocked(row);
 }

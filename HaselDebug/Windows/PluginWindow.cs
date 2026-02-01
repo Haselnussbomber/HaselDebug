@@ -17,7 +17,6 @@ public partial class PluginWindow : SimpleWindow
     private readonly PluginConfig _pluginConfig;
     private readonly TextService _textService;
     private readonly PinnedInstancesService _pinnedInstances;
-    private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly DebugRenderer _debugRenderer;
     private readonly ConfigWindow _configWindow;
     private readonly NavigationService _navigationService;
@@ -154,7 +153,7 @@ public partial class PluginWindow : SimpleWindow
 
                 var selected = ImGui.Selectable($"{tab.Title}##Selectable_{tab.InternalName}", _selectedTab == tab);
 
-                _imGuiContextMenu.Draw($"{tab.InternalName}ContextMenu", builder =>
+                ImGuiContextMenu.Draw($"{tab.InternalName}ContextMenu", builder =>
                 {
                     builder.Add(new ImGuiContextMenuEntry()
                     {
@@ -202,7 +201,7 @@ public partial class PluginWindow : SimpleWindow
 
             disabled.Pop();
 
-            _imGuiContextMenu.Draw($"{tab.InternalName}ContextMenu", builder =>
+            ImGuiContextMenu.Draw($"{tab.InternalName}ContextMenu", builder =>
             {
                 builder.Add(new ImGuiContextMenuEntry()
                 {
@@ -229,7 +228,7 @@ public partial class PluginWindow : SimpleWindow
 
                     subTabDisabled.Pop();
 
-                    _imGuiContextMenu.Draw($"{subTab.InternalName}ContextMenu", builder =>
+                    ImGuiContextMenu.Draw($"{subTab.InternalName}ContextMenu", builder =>
                     {
                         builder.Add(new ImGuiContextMenuEntry()
                         {

@@ -11,7 +11,6 @@ public partial class NameColumn : ColumnString<FishParameter>
     private readonly DebugRenderer _debugRenderer;
     private readonly TextService _textService;
     private readonly UnlocksTabUtils _unlocksTabUtils;
-    private readonly ImGuiContextMenuService _imGuiContextMenuService;
 
     [AutoPostConstruct]
     public void Initialize()
@@ -34,7 +33,7 @@ public partial class NameColumn : ColumnString<FishParameter>
         if (ImGui.IsItemHovered())
             _unlocksTabUtils.DrawItemTooltip(row.Item);
 
-        _imGuiContextMenuService.Draw($"###FishItem_{row.RowId}_ItemContextMenu", builder =>
+        ImGuiContextMenu.Draw($"###FishItem_{row.RowId}_ItemContextMenu", builder =>
         {
             if (isItem)
             {

@@ -11,7 +11,6 @@ public partial class NameColumn : ColumnString<SpearfishingItem>
     private readonly DebugRenderer _debugRenderer;
     private readonly TextService _textService;
     private readonly UnlocksTabUtils _unlocksTabUtils;
-    private readonly ImGuiContextMenuService _imGuiContextMenuService;
 
     [AutoPostConstruct]
     public void Initialize()
@@ -34,7 +33,7 @@ public partial class NameColumn : ColumnString<SpearfishingItem>
         if (ImGui.IsItemHovered())
             _unlocksTabUtils.DrawItemTooltip(item);
 
-        _imGuiContextMenuService.Draw($"###SpearfishItem_{row.RowId}_ItemContextMenu", builder =>
+        ImGuiContextMenu.Draw($"###SpearfishItem_{row.RowId}_ItemContextMenu", builder =>
         {
             builder.AddItemFinder(item.RowId);
             builder.AddCopyItemName(item.RowId);

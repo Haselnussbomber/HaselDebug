@@ -17,10 +17,13 @@ public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
     private readonly IGameInteropProvider _gameInteropProvider;
     private readonly ISigScanner _sigScanner;
     private readonly DebugRenderer _debugRenderer;
+    private readonly ItemService _itemService;
+
     private readonly List<IInventoryAction> _actions = [];
-    private int _typeBase;
+
     private Hook<RemoveOperationByIdDelegate>? _removeOperationByIdHook;
     private Hook<PacketDispatcher.Delegates.HandleUpdateInventorySlotPacket>? _handleUpdateInventorySlotPacketHook;
+    private int _typeBase;
     private bool _enabled;
 
     private interface IInventoryAction : IDisposable
@@ -172,7 +175,7 @@ public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
             else if (action.Type == typeof(UpdateInventorySlotPacket))
             {
                 var data = (UpdateInventorySlotPacket*)action.Pointer;
-                nodeOptions = nodeOptions with { Title = $"[UpdateInventorySlotPacket] {(InventoryType)data->InventoryType}#{data->InventorySlot}, Item: {((ItemHandle)data->ItemId).Name} ({data->ItemId}), Quantity: {data->Quantity}, Condition: {data->Condition}" };
+                nodeOptions = nodeOptions with { Title = $"[UpdateInventorySlotPacket] {(InventoryType)data->InventoryType}#{data->InventorySlot}, Item: {_itemService.GetItemName(data->ItemId)} ({data->ItemId}), Quantity: {data->Quantity}, Condition: {data->Condition}" };
             }
 
             _debugRenderer.DrawPointerType(action.Pointer, action.Type, nodeOptions);

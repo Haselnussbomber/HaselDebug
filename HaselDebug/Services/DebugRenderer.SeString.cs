@@ -184,7 +184,7 @@ public unsafe partial class DebugRenderer
             using (ImRaii.PushColor(ImGuiCol.Text, ColorTreeNode.ToVector(), nodeOptions.RenderSeString))
                 clicked = ImGui.Selectable(text + nodeOptions.GetKey("SeStringSelectable"));
 
-            _imGuiContextMenu.Draw(nodeOptions.GetKey("SeStringSelectableContextMenu"), (builder) =>
+            ImGuiContextMenu.Draw(nodeOptions.GetKey("SeStringSelectableContextMenu"), (builder) =>
             {
                 builder.Add(new ImGuiContextMenuEntry()
                 {

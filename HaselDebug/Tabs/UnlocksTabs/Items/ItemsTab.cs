@@ -4,7 +4,7 @@ using HaselDebug.Interfaces;
 namespace HaselDebug.Tabs.UnlocksTabs.Items;
 
 [RegisterSingleton<IUnlockTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class ItemsTab(ItemsTable table) : DebugTab, IUnlockTab
+public unsafe class ItemsTab(ItemsTable table, ItemService itemService) : DebugTab, IUnlockTab
 {
     public override string Title => "Items";
     public override bool DrawInChild => false;
@@ -16,8 +16,8 @@ public unsafe class ItemsTab(ItemsTable table) : DebugTab, IUnlockTab
 
         return new UnlockProgress()
         {
-            TotalUnlocks = table.Rows.Count(row => new ItemHandle(row.RowId).IsUnlockable),
-            NumUnlocked = table.Rows.Count(row => new ItemHandle(row.RowId).IsUnlocked),
+            TotalUnlocks = table.Rows.Count(row => itemService.IsUnlockable(row)),
+            NumUnlocked = table.Rows.Count(row => itemService.IsUnlocked(row)),
         };
     }
 

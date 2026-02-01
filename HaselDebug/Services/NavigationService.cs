@@ -14,7 +14,6 @@ public unsafe partial class NavigationService
     private readonly WindowManager _windowManager;
     private readonly TextService _textService;
     private readonly IServiceProvider _serviceProvider;
-    private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly ProcessInfoService _processInfoService;
 
     private int _tooltipIndex;
@@ -43,7 +42,7 @@ public unsafe partial class NavigationService
             CurrentNavigation = new AgentNavigation(agentId);
         }
 
-        _imGuiContextMenu.Draw($"AgentNavigationContextMenu{_tooltipIndex++}", (builder) =>
+        ImGuiContextMenu.Draw($"AgentNavigationContextMenu{_tooltipIndex++}", (builder) =>
         {
             var agentType = _typeService.GetAgentType(agentId);
             var agentName = agentId.ToString();
@@ -102,7 +101,7 @@ public unsafe partial class NavigationService
             CurrentNavigation = new AddonNavigation(addonId, addonName);
         }
 
-        _imGuiContextMenu.Draw($"AddonNavigationContextMenu{_tooltipIndex++}", (builder) =>
+        ImGuiContextMenu.Draw($"AddonNavigationContextMenu{_tooltipIndex++}", (builder) =>
         {
             var type = _typeService.GetAddonType(addonName);
 
@@ -145,7 +144,7 @@ public unsafe partial class NavigationService
 
         ImGuiUtils.DrawCopyableText(displayText);
 
-        _imGuiContextMenu.Draw($"Address_AddressInspectorNavigation_ContextMenu{_tooltipIndex++}", (builder) =>
+        ImGuiContextMenu.Draw($"Address_AddressInspectorNavigation_ContextMenu{_tooltipIndex++}", (builder) =>
         {
             builder.AddCopyAddress(address);
             if (displayText != $"0x{address:X}")

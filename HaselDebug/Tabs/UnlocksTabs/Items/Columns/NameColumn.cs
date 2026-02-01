@@ -10,7 +10,6 @@ public partial class ItemColumn : ColumnString<Item>
     private readonly DebugRenderer _debugRenderer;
     private readonly TextService _textService;
     private readonly UnlocksTabUtils _unlocksTabUtils;
-    private readonly ImGuiContextMenuService _imGuiContextMenuService;
 
     [AutoPostConstruct]
     public void Initialize()
@@ -30,7 +29,7 @@ public partial class ItemColumn : ColumnString<Item>
         if (ImGui.IsItemHovered())
             _unlocksTabUtils.DrawItemTooltip(row);
 
-        _imGuiContextMenuService.Draw($"###Item_{row.RowId}_ItemContextMenu", builder =>
+        ImGuiContextMenu.Draw($"###Item_{row.RowId}_ItemContextMenu", builder =>
         {
             builder.AddItemFinder(row.RowId);
             builder.AddCopyItemName(row.RowId);

@@ -9,7 +9,6 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
 
     private readonly TextService _textService;
     private readonly ITextureProvider _textureProvider;
-    private readonly ImGuiContextMenuService _imGuiContextMenuService;
 
     [AutoPostConstruct]
     public void Initialize()
@@ -65,7 +64,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
         ImGui.EndGroup();
 
         // TODO: preview whole set??
-        _imGuiContextMenuService.Draw($"###Set_{row.RowId}_ItemContextMenu", builder =>
+        ImGuiContextMenu.Draw($"###Set_{row.RowId}_ItemContextMenu", builder =>
         {
             builder.AddTryOn(row.Set.RowId);
             builder.AddItemFinder(row.Set.RowId);

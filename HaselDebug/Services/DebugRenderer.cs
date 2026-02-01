@@ -59,7 +59,6 @@ public unsafe partial class DebugRenderer
     private readonly IDalamudPluginInterface _pluginInterface;
     private readonly WindowManager _windowManager;
     private readonly ITextureProvider _textureProvider;
-    private readonly ImGuiContextMenuService _imGuiContextMenu;
     private readonly ISeStringEvaluator _seStringEvaluator;
     private readonly TextService _textService;
     private readonly GfdService _gfdService;
@@ -641,7 +640,7 @@ public unsafe partial class DebugRenderer
         }
 
         if (nodeOptions.DrawContextMenu != null)
-            _imGuiContextMenu.Draw(nodeOptions.GetKey("ContextMenu"), builder => nodeOptions.DrawContextMenu(nodeOptions, builder));
+            ImGuiContextMenu.Draw(nodeOptions.GetKey("ContextMenu"), builder => nodeOptions.DrawContextMenu(nodeOptions, builder));
 
         if (nodeOptions.DrawSeStringTreeNode && nodeOptions.SeStringTitle != null)
         {

@@ -13,6 +13,7 @@ public unsafe partial class ItemActionTab : DebugTab
 {
     private readonly ExcelService _excelService;
     private readonly DebugRenderer _debugRenderer;
+    private readonly ItemService _itemService;
 
     private ImmutableSortedDictionary<uint, ItemHandle[]> _dict;
     private Task? _loadTask;
@@ -56,7 +57,7 @@ public unsafe partial class ItemActionTab : DebugTab
                 _debugRenderer.DrawExdRow(typeof(Item), item.ItemId, 0, new NodeOptions()
                 {
                     AddressPath = new AddressPath([(nint)type]),
-                    Title = $"[Item#{item.ItemId}] {item.Name}"
+                    Title = $"[Item#{item.ItemId}] {_itemService.GetItemName(item)}"
                 });
             }
         }

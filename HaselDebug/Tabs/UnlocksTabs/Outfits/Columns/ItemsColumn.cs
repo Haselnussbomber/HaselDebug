@@ -13,7 +13,6 @@ public unsafe partial class ItemsColumn : ColumnString<MirageStoreSetItem>
 
     private readonly ITextureProvider _textureProvider;
     private readonly TextService _textService;
-    private readonly ImGuiContextMenuService _imGuiContextMenuService;
     private readonly UnlocksTabUtils _unlocksTabUtils;
 
     private readonly StringBuilder _stringBuilder = new();
@@ -75,7 +74,7 @@ public unsafe partial class ItemsColumn : ColumnString<MirageStoreSetItem>
             {
                 ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                 _unlocksTabUtils.DrawItemTooltip(item.Value,
-                    descriptionOverride: true switch
+                    description: true switch
                     {
                         _ when isFullSetCollected => _textService.GetAddonText(15643), // Used as part of an outfit glamour.
                         _ when isItemCollectedInPartialSet => _textService.GetAddonText(15636), // Outfit Glamour-ready Item
@@ -85,7 +84,7 @@ public unsafe partial class ItemsColumn : ColumnString<MirageStoreSetItem>
                     });
             }
 
-            _imGuiContextMenuService.Draw($"###SetItem_{row.RowId}_{item.RowId}_ItemContextMenu", builder =>
+            ImGuiContextMenu.Draw($"###SetItem_{row.RowId}_{item.RowId}_ItemContextMenu", builder =>
             {
                 builder.AddRestoreItem(item);
                 builder.AddViewOutfitGlamourReadyItems(item);
