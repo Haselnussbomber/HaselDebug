@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [c1430546](https://github.com/aers/FFXIVClientStructs/tree/c1430546) ([compare](https://github.com/aers/FFXIVClientStructs/compare/cb1f076a..c1430546)).
+
 ## [1.47.1] (2026-02-01)
 
 - **Fixed:** Instances with a `StaticAddresses` that had `isPointer: true` were incorrectly cached.
