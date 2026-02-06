@@ -22,13 +22,17 @@ public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
     private readonly List<IInventoryAction> _actions = [];
 
     private Hook<RemoveOperationByIdDelegate>? _removeOperationByIdHook;
-    private Hook<PacketDispatcher.Delegates.HandleUpdateInventorySlotPacket>? _handleUpdateInventorySlotPacketHook;
+    private Hook<PacketDispatcher.Delegates.HandleInventoryItemPacket>? _handleInventoryItemPacketHook;
+    private Hook<PacketDispatcher.Delegates.HandleInventoryItemUpdatePacket>? _handleInventoryItemUpdatePacketHook;
+    private Hook<PacketDispatcher.Delegates.HandleInventoryItemCurrencyPacket>? _handleSetInventoryItemCurrencyPacketHook;
+    private Hook<PacketDispatcher.Delegates.HandleInventoryItemSymbolicPacket>? _handleSetInventoryItemSymbolicPacketHook;
     private int _typeBase;
     private bool _enabled;
 
     private interface IInventoryAction : IDisposable
     {
         Type Type { get; }
+        int TypeIndex { get; }
         void* Pointer { get; }
         DateTime Time { get; }
     }
@@ -36,6 +40,7 @@ public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
     private class InventoryAction<T> : IInventoryAction where T : unmanaged
     {
         public Type Type { get; } = typeof(T);
+        public int TypeIndex { get; init; } = 0;
         public void* Pointer { get; private set; }
         public DateTime Time { get; init; }
 
@@ -69,7 +74,10 @@ public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
     public void Dispose()
     {
         _removeOperationByIdHook?.Dispose();
-        _handleUpdateInventorySlotPacketHook?.Dispose();
+        _handleInventoryItemPacketHook?.Dispose();
+        _handleInventoryItemUpdatePacketHook?.Dispose();
+        _handleSetInventoryItemCurrencyPacketHook?.Dispose();
+        _handleSetInventoryItemSymbolicPacketHook?.Dispose();
 
         foreach (var action in _actions)
             action.Dispose();
@@ -90,10 +98,28 @@ public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
         _removeOperationByIdHook!.Original(thisPtr, contextId);
     }
 
-    private void HandleUpdateInventorySlotPacketDetour(uint targetId, UpdateInventorySlotPacket* packet)
+    private void HandleInventoryItemPacketDetour(uint targetId, InventoryItemPacket* packet)
     {
-        _actions.Insert(0, new InventoryAction<UpdateInventorySlotPacket>(*packet));
-        _handleUpdateInventorySlotPacketHook!.Original(targetId, packet);
+        _actions.Insert(0, new InventoryAction<InventoryItemPacket>(*packet));
+        _handleInventoryItemPacketHook!.OriginalDisposeSafe(targetId, packet);
+    }
+
+    private void HandleInventoryItemUpdatePacketDetour(uint targetId, InventoryItemPacket* packet)
+    {
+        _actions.Insert(0, new InventoryAction<InventoryItemPacket>(*packet) { TypeIndex = 1 });
+        _handleInventoryItemUpdatePacketHook!.Original(targetId, packet);
+    }
+
+    private void HandleInventoryItemCurrencyPacketDetour(uint targetId, InventoryItemCurrencyPacket* packet)
+    {
+        _actions.Insert(0, new InventoryAction<InventoryItemCurrencyPacket>(*packet));
+        _handleSetInventoryItemCurrencyPacketHook!.OriginalDisposeSafe(targetId, packet);
+    }
+
+    private void HandleInventoryItemSymbolicPacketDetour(uint targetId, InventoryItemSymbolicPacket* packet)
+    {
+        _actions.Insert(0, new InventoryAction<InventoryItemSymbolicPacket>(*packet));
+        _handleSetInventoryItemSymbolicPacketHook!.OriginalDisposeSafe(targetId, packet);
     }
 
     public override void Draw()
@@ -102,11 +128,23 @@ public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
             "E8 ?? ?? ?? ?? 48 8B CF E8 ?? ?? ?? ?? 4C 8B 45",
             RemoveOperationByIdDetour);
 
-        _handleUpdateInventorySlotPacketHook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleUpdateInventorySlotPacket>(
-            PacketDispatcher.Addresses.HandleUpdateInventorySlotPacket.Value,
-            HandleUpdateInventorySlotPacketDetour);
+        _handleInventoryItemPacketHook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleInventoryItemPacket>(
+            PacketDispatcher.MemberFunctionPointers.HandleInventoryItemPacket,
+            HandleInventoryItemPacketDetour);
 
-        if (_removeOperationByIdHook == null || _handleUpdateInventorySlotPacketHook == null)
+        _handleInventoryItemUpdatePacketHook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleInventoryItemUpdatePacket>(
+            PacketDispatcher.Addresses.HandleInventoryItemUpdatePacket.Value,
+            HandleInventoryItemUpdatePacketDetour);
+
+        _handleSetInventoryItemCurrencyPacketHook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleInventoryItemCurrencyPacket>(
+            PacketDispatcher.MemberFunctionPointers.HandleInventoryItemCurrencyPacket,
+            HandleInventoryItemCurrencyPacketDetour);
+
+        _handleSetInventoryItemSymbolicPacketHook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleInventoryItemSymbolicPacket>(
+            PacketDispatcher.MemberFunctionPointers.HandleInventoryItemSymbolicPacket,
+            HandleInventoryItemSymbolicPacketDetour);
+
+        if (_removeOperationByIdHook == null || _handleInventoryItemUpdatePacketHook == null)
         {
             ImGui.Text("Hook not created"u8);
             return;
@@ -119,16 +157,31 @@ public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
                 if (!_removeOperationByIdHook.IsEnabled)
                     _removeOperationByIdHook.Enable();
 
-                if (!_handleUpdateInventorySlotPacketHook.IsEnabled)
-                    _handleUpdateInventorySlotPacketHook.Enable();
+                if (!_handleInventoryItemPacketHook.IsEnabled)
+                    _handleInventoryItemPacketHook.Enable();
+
+                if (!_handleInventoryItemUpdatePacketHook.IsEnabled)
+                    _handleInventoryItemUpdatePacketHook.Enable();
+
+                if (!_handleSetInventoryItemCurrencyPacketHook.IsEnabled)
+                    _handleSetInventoryItemCurrencyPacketHook.Enable();
+
+                if (!_handleSetInventoryItemSymbolicPacketHook.IsEnabled)
+                    _handleSetInventoryItemSymbolicPacketHook.Enable();
             }
             else
             {
                 if (_removeOperationByIdHook.IsEnabled)
                     _removeOperationByIdHook.Disable();
 
-                if (_handleUpdateInventorySlotPacketHook.IsEnabled)
-                    _handleUpdateInventorySlotPacketHook.Disable();
+                if (_handleSetInventoryItemCurrencyPacketHook.IsEnabled)
+                    _handleSetInventoryItemCurrencyPacketHook.Disable();
+
+                if (_handleInventoryItemUpdatePacketHook.IsEnabled)
+                    _handleInventoryItemUpdatePacketHook.Disable();
+
+                if (_handleSetInventoryItemSymbolicPacketHook.IsEnabled)
+                    _handleSetInventoryItemSymbolicPacketHook.Disable();
             }
         }
 
@@ -172,10 +225,25 @@ public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
                 var data = (InventoryManager.InventoryOperation*)action.Pointer;
                 nodeOptions = nodeOptions with { Title = $"[InventoryOperation] {(InventoryOperationType)(data->Type - _typeBase)}" };
             }
-            else if (action.Type == typeof(UpdateInventorySlotPacket))
+            else if (action.Type == typeof(InventoryItemPacket) && action.TypeIndex == 0)
             {
-                var data = (UpdateInventorySlotPacket*)action.Pointer;
-                nodeOptions = nodeOptions with { Title = $"[UpdateInventorySlotPacket] {(InventoryType)data->InventoryType}#{data->InventorySlot}, Item: {_itemService.GetItemName(data->ItemId)} ({data->ItemId}), Quantity: {data->Quantity}, Condition: {data->Condition}" };
+                var data = (InventoryItemPacket*)action.Pointer;
+                nodeOptions = nodeOptions with { Title = $"[InventoryItem] {(InventoryType)data->InventoryType}#{data->Slot}, Item: {_itemService.GetItemName(data->ItemId)} ({data->ItemId}), Quantity: {data->Quantity}, Condition: {data->Condition}" };
+            }
+            else if (action.Type == typeof(InventoryItemPacket) && action.TypeIndex == 1)
+            {
+                var data = (InventoryItemPacket*)action.Pointer;
+                nodeOptions = nodeOptions with { Title = $"[InventoryItemUpdate] {(InventoryType)data->InventoryType}#{data->Slot}, Item: {_itemService.GetItemName(data->ItemId)} ({data->ItemId}), Quantity: {data->Quantity}, Condition: {data->Condition}" };
+            }
+            else if (action.Type == typeof(InventoryItemCurrencyPacket))
+            {
+                var data = (InventoryItemCurrencyPacket*)action.Pointer;
+                nodeOptions = nodeOptions with { Title = $"[InventoryItemCurrency] {(InventoryType)data->InventoryType}#{data->Slot}, Item: {_itemService.GetItemName(data->ItemId)} ({data->ItemId}), Quantity: {data->Quantity}" };
+            }
+            else if (action.Type == typeof(InventoryItemSymbolicPacket))
+            {
+                var data = (InventoryItemSymbolicPacket*)action.Pointer;
+                nodeOptions = nodeOptions with { Title = $"[InventoryItemSymbolic] {(InventoryType)data->InventoryType}#{data->Slot} -> {(InventoryType)data->TargetInventoryType}#{data->TargetSlot}, Quantity: {data->Quantity}" };
             }
 
             _debugRenderer.DrawPointerType(action.Pointer, action.Type, nodeOptions);
