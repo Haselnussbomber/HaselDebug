@@ -41,9 +41,17 @@ public unsafe partial class InstancesTab : DebugTab
 
             var ptr = (Pointer?)instanceMethod.Invoke(null, null);
             if (ptr == null)
-                return;
+                continue;
 
             var address = (nint)Pointer.Unbox(ptr);
+
+            if (address == 0)
+            {
+                _debugRenderer.DrawAddress(address);
+                ImGui.SameLine(120);
+                ImGui.TextColored(DebugRenderer.ColorTreeNode with { A = 0.5f }, type.FullName ?? "null");
+                continue;
+            }
 
             _debugRenderer.DrawAddress(address);
             ImGui.SameLine(120);
