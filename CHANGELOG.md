@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.48.1] (2026-02-10)
+
+- **Updated:** ClientStructs now at [a97e9f89](https://github.com/aers/FFXIVClientStructs/tree/a97e9f89) ([compare](https://github.com/aers/FFXIVClientStructs/compare/ba66cafa..a97e9f89)).
+
 ## [1.48.0] (2026-02-10)
 
 - **Updated:** The Inventory Operation tab now additionally tracks the following packet handlers:
@@ -796,7 +800,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.48.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.48.1...main
+[1.48.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.48.0...v1.48.1
 [1.48.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.47.2...v1.48.0
 [1.47.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.47.1...v1.47.2
 [1.47.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.47.0...v1.47.1
