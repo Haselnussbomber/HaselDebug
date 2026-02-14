@@ -663,10 +663,7 @@ public unsafe partial class DebugRenderer
     {
         nodeOptions = nodeOptions.WithAddress(address);
 
-        var fields = type
-            .GetFields(BindingFlags.Default | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-            .Where(fieldInfo => !fieldInfo.IsLiteral) // no constants
-            .Where(fieldInfo => !fieldInfo.IsStatic);
+        var fields = GetAllInheritedFields(type);
 
         using var disabled = ImRaii.Disabled(!fields.Any());
         using var node = DrawTreeNode(nodeOptions.WithSeStringTitleIfNull(type.FullName ?? "Unknown Type Name"));
