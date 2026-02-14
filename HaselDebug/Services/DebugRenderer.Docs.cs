@@ -88,7 +88,7 @@ public partial class DebugRenderer
 
             foreach (var member in doc.Members)
             {
-                if (member.Name[0] != 'F') // fields are enough
+                if (member.Name[0] is not ('F' or 'P')) // fields and properties are enough
                     continue;
 
                 summaries.Clear();
