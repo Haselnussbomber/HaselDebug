@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.49.0] (2026-02-14)
+
+- **Added:** Bit fields are now rendered.
+- **Added:** Private/internal fields from parent structs (that the inheritance generator doesn't copy) are now rendered.
+- **Updated:** ClientStructs now at [302aacc9](https://github.com/aers/FFXIVClientStructs/tree/302aacc9) ([compare](https://github.com/aers/FFXIVClientStructs/compare/a97e9f89..302aacc9)).
+
 ## [1.48.1] (2026-02-10)
 
 - **Updated:** ClientStructs now at [a97e9f89](https://github.com/aers/FFXIVClientStructs/tree/a97e9f89) ([compare](https://github.com/aers/FFXIVClientStructs/compare/ba66cafa..a97e9f89)).
@@ -800,7 +806,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.48.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.49.0...main
+[1.49.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.48.1...v1.49.0
 [1.48.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.48.0...v1.48.1
 [1.48.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.47.2...v1.48.0
 [1.47.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.47.1...v1.47.2
