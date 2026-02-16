@@ -3,6 +3,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
+using ContentsNoteSheet = Lumina.Excel.Sheets.ContentsNote;
 using InstanceContentSheet = Lumina.Excel.Sheets.InstanceContent;
 
 namespace HaselDebug.Tabs;
@@ -208,6 +209,11 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
             "UIState.UnlockedTripleTriadCards",
             UIState.Instance()->UnlockedTripleTriadCardsBitArray,
             _excelService.GetRowCount<TripleTriadCard>()));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "UIState.ContentsNote.CompletionFlags",
+            UIState.Instance()->ContentsNote.CompletionFlagsBitArray,
+            _excelService.GetRowCount<ContentsNoteSheet>()));
         /*
         _bitArrays.Add(new BitArrayRecord(
             "QuestManager.CompletedQuests",
