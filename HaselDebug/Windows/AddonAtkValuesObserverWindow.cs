@@ -12,14 +12,13 @@ public partial class AddonAtkValuesObserverWindow : SimpleWindow
     private readonly IAddonLifecycle _addonLifecycle;
     private readonly DebugRenderer _debugRenderer;
     private readonly List<AtkValuesCopy> _refreshValues = [];
-    private string _addonName;
 
     private record RefreshEntry(DateTime Time, Pointer<AtkValue> Values, uint ValueCount);
 
     public string AddonName
     {
-        get => _addonName;
-        set { _addonName = value; WindowName = value + " - AtkValues Observer"; }
+        get;
+        set { field = value; WindowName = value + " - AtkValues Observer"; }
     }
 
     public override void Dispose()
