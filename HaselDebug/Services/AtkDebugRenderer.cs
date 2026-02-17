@@ -27,7 +27,6 @@ public unsafe partial class AtkDebugRenderer
     private readonly TextService _textService;
     private readonly WindowManager _windowManager;
     private readonly LanguageProvider _languageProvider;
-    private readonly AddonObserver _addonObserver;
     private readonly PinnedInstancesService _pinnedInstancesService;
     private readonly NavigationService _navigationService;
     private readonly ProcessInfoService _processInfoService;
@@ -56,44 +55,8 @@ public unsafe partial class AtkDebugRenderer
         if (RaptureAtkUnitManager.Instance()->AtkUnitManager.GetAddonByNodeSafe(_selectedNode) != _ctx.Addon)
             _selectedNode = null;
 
-        var windowSize = ImGui.GetContentRegionAvail();
-        var mainContentWidth = windowSize.X - _sidebarWidth - ImGui.GetStyle().ItemSpacing.X;
-        var sidebarWidth = _sidebarWidth;
+        using var child = ImRaii.Child("MainContent"u8, new Vector2(-1), true);
 
-        using (var child = ImRaii.Child("MainContent"u8, new Vector2(mainContentWidth, 0), true))
-        {
-            DrawMainContent();
-        }
-
-        ImGui.SameLine();
-        var splitterPos = ImGui.GetCursorPos() - new Vector2(SplitterWidth / 2f + ImGui.GetStyle().ItemSpacing.X / 2f, 0);
-
-        using (var child = ImRaii.Child("Sidebar"u8, new Vector2(sidebarWidth, 0), true))
-        {
-            DrawSidebar();
-        }
-
-        ImGui.SetCursorPos(splitterPos);
-
-        using (ImRaii.PushStyle(ImGuiStyleVar.FrameRounding, 0))
-        using (ImRaii.PushColor(ImGuiCol.Button, ImGui.GetColorU32(ImGuiCol.Border)))
-        {
-            ImGui.Button("##splitter"u8, new Vector2(SplitterWidth, -1));
-        }
-
-        if (ImGui.IsItemHovered())
-            ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeEw);
-
-        if (ImGui.IsItemActive())
-        {
-            _sidebarWidth -= ImGui.GetIO().MouseDelta.X;
-            if (_sidebarWidth < MinWidth) _sidebarWidth = MinWidth;
-            if (_sidebarWidth > windowSize.X - MinWidth) _sidebarWidth = windowSize.X - MinWidth;
-        }
-    }
-
-    private void DrawMainContent()
-    {
         var nodeOptions = new NodeOptions()
         {
             AddressPath = new([(nint)_ctx.Addon, 1]),
@@ -102,7 +65,6 @@ public unsafe partial class AtkDebugRenderer
         };
 
         DrawAddonHeader(nodeOptions);
-        ImGuiUtilsEx.PaddedSeparator();
 
         using var tabBar = ImRaii.TabBar(nodeOptions.GetKey("TabBar"));
         if (!tabBar) return;
@@ -192,50 +154,83 @@ public unsafe partial class AtkDebugRenderer
         using var tabChild = ImRaii.Child("TabChild"u8, new Vector2(-1));
         if (!tabChild) return;
 
-        var unitBase = _ctx.Addon;
+        var windowSize = ImGui.GetContentRegionAvail();
+        var mainContentWidth = windowSize.X - _sidebarWidth - ImGui.GetStyle().ItemSpacing.X;
+        var sidebarWidth = _sidebarWidth;
 
-        if (unitBase->RootNode != null)
+        using (var child = ImRaii.Child("NodesContent"u8, new Vector2(mainContentWidth, 0)))
         {
-            PrintNode(unitBase->RootNode, true, string.Empty, nodeOptions with { DefaultOpen = true });
+            var unitBase = _ctx.Addon;
+
+            if (unitBase->RootNode != null)
+            {
+                PrintNode(unitBase->RootNode, true, string.Empty, nodeOptions with { DefaultOpen = true });
+            }
+
+            if (unitBase->UldManager.NodeListCount > 0)
+            {
+                ImGui.Dummy(ImGuiHelpers.ScaledVector2(25));
+                ImGui.Separator();
+
+                using var nodeTree = _debugRenderer.DrawTreeNode(new NodeOptions()
+                {
+                    AddressPath = nodeOptions.AddressPath,
+                    Title = "Node List",
+                    TitleColor = Color.FromUInt(0xFFFFAAAA),
+                });
+
+                if (nodeTree)
+                {
+                    if (ImGui.InputTextWithHint("##NodeSearch"u8, _textService.Translate("SearchBar.Hint"), ref _nodeQuery, 256, ImGuiInputTextFlags.AutoSelectAll))
+                    {
+                        UpdateSearchTokens();
+                    }
+
+                    var j = 0;
+                    foreach (var node in unitBase->UldManager.Nodes)
+                    {
+                        if (node == null)
+                        {
+                            j++;
+                            continue;
+                        }
+
+                        if (!IsNodeMatchingSearch(node))
+                        {
+                            j++;
+                            continue;
+                        }
+
+                        PrintNode(node, false, $"[{j++}] ", nodeOptions with { DefaultOpen = false });
+                    }
+                }
+            }
         }
 
-        if (unitBase->UldManager.NodeListCount > 0)
+        ImGui.SameLine();
+        var splitterPos = ImGui.GetCursorPos() - new Vector2(SplitterWidth / 2f + ImGui.GetStyle().ItemSpacing.X / 2f, 0);
+
+        using (var child = ImRaii.Child("Sidebar"u8, new Vector2(sidebarWidth, 0)))
         {
-            ImGui.Dummy(ImGuiHelpers.ScaledVector2(25));
-            ImGui.Separator();
+            DrawSidebar();
+        }
 
-            using var nodeTree = _debugRenderer.DrawTreeNode(new NodeOptions()
-            {
-                AddressPath = nodeOptions.AddressPath,
-                Title = "Node List",
-                TitleColor = Color.FromUInt(0xFFFFAAAA),
-            });
+        ImGui.SetCursorPos(splitterPos);
 
-            if (!nodeTree)
-                return;
+        using (ImRaii.PushStyle(ImGuiStyleVar.FrameRounding, 0))
+        using (ImRaii.PushColor(ImGuiCol.Button, ImGui.GetColorU32(ImGuiCol.Border)))
+        {
+            ImGui.Button("##splitter"u8, new Vector2(SplitterWidth, -1));
+        }
 
-            if (ImGui.InputTextWithHint("##NodeSearch"u8, _textService.Translate("SearchBar.Hint"), ref _nodeQuery, 256, ImGuiInputTextFlags.AutoSelectAll))
-            {
-                UpdateSearchTokens();
-            }
+        if (ImGui.IsItemHovered())
+            ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeEw);
 
-            var j = 0;
-            foreach (var node in unitBase->UldManager.Nodes)
-            {
-                if (node == null)
-                {
-                    j++;
-                    continue;
-                }
-
-                if (!IsNodeMatchingSearch(node))
-                {
-                    j++;
-                    continue;
-                }
-
-                PrintNode(node, false, $"[{j++}] ", nodeOptions with { DefaultOpen = false });
-            }
+        if (ImGui.IsItemActive())
+        {
+            _sidebarWidth -= ImGui.GetIO().MouseDelta.X;
+            if (_sidebarWidth < MinWidth) _sidebarWidth = MinWidth;
+            if (_sidebarWidth > windowSize.X - MinWidth) _sidebarWidth = windowSize.X - MinWidth;
         }
     }
 
@@ -323,7 +318,7 @@ public unsafe partial class AtkDebugRenderer
                 {
                     Visible = !isPinned,
                     Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
-                    ClickCallback = () => _pinnedInstancesService.Add((nint)agent, agentType)
+                    ClickCallback = () => _pinnedInstancesService.Add(agentType)
                 });
 
                 builder.Add(new ImGuiContextMenuEntry()
@@ -359,7 +354,7 @@ public unsafe partial class AtkDebugRenderer
             var addonName = addon->NameString;
             _windowManager.CreateOrOpen(
                 addonName + " - AtkValues Observer",
-                () => new AddonAtkValuesObserverWindow(_windowManager, _textService, _addonObserver, _addonLifecycle, _debugRenderer) { AddonName = addonName });
+                () => new AddonAtkValuesObserverWindow(_windowManager, _textService, _addonLifecycle, _debugRenderer) { AddonName = addonName });
         }
 
         _debugRenderer.DrawAtkValues(addon->AtkValues, valueCount, nodeOptions, false);
@@ -422,14 +417,14 @@ public unsafe partial class AtkDebugRenderer
                 name = name.SplitCamelCase();
             titleBuilder = rssb.Builder
                                .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
-                               .Append($"{treePrefix}[#{node->NodeId}] {name} ({(nint)node:X})")
+                               .Append($"{treePrefix}[#{node->NodeId}] {name}")
                                .PopColor();
         }
         else
         {
             titleBuilder = rssb.Builder
                                .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
-                               .Append($"{treePrefix}[#{node->NodeId}] {node->Type} ({(nint)node:X})")
+                               .Append($"{treePrefix}[#{node->NodeId}] {node->Type}")
                                .PopColor();
         }
 
@@ -496,14 +491,14 @@ public unsafe partial class AtkDebugRenderer
                 name = name.SplitCamelCase();
             titleBuilder = rssb.Builder
                                .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
-                               .Append($"{treePrefix}[#{node->NodeId}] {name} (Node: {(nint)node:X}, Component: {(nint)component:X})")
+                               .Append($"{treePrefix}[#{node->NodeId}] {name}")
                                .PopColor();
         }
         else
         {
             titleBuilder = rssb.Builder
                                .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
-                               .Append($"{treePrefix}[#{node->NodeId}] {objectInfo->ComponentType} Component Node (Node: {(nint)node:X}, Component: {(nint)component:X})")
+                               .Append($"{treePrefix}[#{node->NodeId}] \uE03D {objectInfo->ComponentType}")
                                .PopColor();
         }
 
@@ -725,7 +720,7 @@ public unsafe partial class AtkDebugRenderer
                 if (ImGui.Selectable(str.ToString() + $"##TextNodeText{(nint)node:X}"))
                 {
                     var windowTitle = $"Text Node #{node->NodeId} (0x{(nint)node:X})";
-                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _addonObserver, _serviceProvider)
+                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _serviceProvider)
                     {
                         String = str,
                         Language = _languageProvider.ClientLanguage,
@@ -794,7 +789,7 @@ public unsafe partial class AtkDebugRenderer
                 if (ImGui.Selectable(str.ToString() + $"##CounterNodeText{(nint)node:X}"))
                 {
                     var windowTitle = $"Counter Node #{node->NodeId} (0x{(nint)node:X})";
-                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _addonObserver, _serviceProvider)
+                    _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _serviceProvider)
                     {
                         String = str,
                         Language = _languageProvider.ClientLanguage,
@@ -1554,49 +1549,49 @@ public unsafe struct InspectorContext
 
             return field = typeService.GetTypeFields(addonType);
         }
+    }
 
-        static bool MatchesNodeImage(AtkResNode* node, string value)
-        {
-            if (node->GetNodeType() != NodeType.Image)
-                return false;
-
-            var imageNode = (AtkImageNode*)node;
-            if (imageNode->PartsList == null || imageNode->PartId >= imageNode->PartsList->PartCount)
-                return false;
-
-            var asset = imageNode->PartsList->Parts[imageNode->PartId].UldAsset;
-            if (asset == null || asset->AtkTexture.TextureType != TextureType.Resource)
-                return false;
-
-            var resource = asset->AtkTexture.Resource;
-            if (resource == null)
-                return false;
-
-            if (asset->AtkTexture.Resource->IconId.ToString() == value)
-                return true;
-
-            if (asset->AtkTexture.Resource->TexFileResourceHandle->FileName.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase))
-                return true;
-
+    private static bool MatchesNodeImage(AtkResNode* node, string value)
+    {
+        if (node->GetNodeType() != NodeType.Image)
             return false;
-        }
 
-        static bool MatchesNodeImagePart(AtkResNode* node, string value)
-        {
-            if (node->GetNodeType() != NodeType.Image)
-                return false;
+        var imageNode = (AtkImageNode*)node;
+        if (imageNode->PartsList == null || imageNode->PartId >= imageNode->PartsList->PartCount)
+            return false;
 
-            var imageNode = (AtkImageNode*)node;
-            return imageNode->PartId.ToString() == value;
-        }
+        var asset = imageNode->PartsList->Parts[imageNode->PartId].UldAsset;
+        if (asset == null || asset->AtkTexture.TextureType != TextureType.Resource)
+            return false;
 
-        static bool MatchesNodeText(AtkResNode* node, string value)
-        {
-            if (node->GetNodeType() != NodeType.Text)
-                return false;
+        var resource = asset->AtkTexture.Resource;
+        if (resource == null)
+            return false;
 
-            var textNode = (AtkTextNode*)node;
-            return textNode->NodeText.StringPtr.AsReadOnlySeStringSpan().ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase);
-        }
+        if (asset->AtkTexture.Resource->IconId.ToString() == value)
+            return true;
+
+        if (asset->AtkTexture.Resource->TexFileResourceHandle->FileName.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        return false;
+    }
+
+    private static bool MatchesNodeImagePart(AtkResNode* node, string value)
+    {
+        if (node->GetNodeType() != NodeType.Image)
+            return false;
+
+        var imageNode = (AtkImageNode*)node;
+        return imageNode->PartId.ToString() == value;
+    }
+
+    private static bool MatchesNodeText(AtkResNode* node, string value)
+    {
+        if (node->GetNodeType() != NodeType.Text)
+            return false;
+
+        var textNode = (AtkTextNode*)node;
+        return textNode->NodeText.StringPtr.AsReadOnlySeStringSpan().ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase);
     }
 }
