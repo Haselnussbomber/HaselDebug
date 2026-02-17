@@ -80,12 +80,13 @@ public unsafe partial class AddonInspectorTab : DebugTab
             _nodePicker.NodePickerSelectionIndex = 0;
         }
 
-        using var table = ImRaii.Table("AddonsTable"u8, 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable, new Vector2(-1));
+        using var table = ImRaii.Table("AddonsTable"u8, 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable, new Vector2(-1));
         if (!table) return;
 
         ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.PreferSortDescending, 40);
         ImGui.TableSetupColumn("Name");
-        ImGui.TableSetupScrollFreeze(2, 1);
+        ImGui.TableSetupColumn("DepthLayer"u8, ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.PreferSortDescending, 20);
+        ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
         var unitManager = RaptureAtkUnitManager.Instance();
@@ -116,13 +117,16 @@ public unsafe partial class AddonInspectorTab : DebugTab
             focusedList.Add(unitBase);
         }
 
-        allUnitsList.Sort((a, b) => _sortColumnIndex switch
+        allUnitsList.Sort((a, b) =>
         {
-            0 when _sortDirection == ImGuiSortDirection.Ascending => a.Value->Id - b.Value->Id,
-            0 when _sortDirection == ImGuiSortDirection.Descending => b.Value->Id - a.Value->Id,
-            1 when _sortDirection == ImGuiSortDirection.Ascending => a.Value->NameString.CompareTo(b.Value->NameString),
-            1 when _sortDirection == ImGuiSortDirection.Descending => b.Value->NameString.CompareTo(a.Value->NameString),
-            _ => 0,
+            var result = _sortColumnIndex switch
+            {
+                0 => a.Value->Id.CompareTo(b.Value->Id),
+                1 => a.Value->NameString.CompareTo(b.Value->NameString),
+                2 => a.Value->DepthLayer.CompareTo(b.Value->DepthLayer) is var r && r != 0 ? r : a.Value->Id.CompareTo(b.Value->Id),
+                _ => 0
+            };
+            return _sortDirection == ImGuiSortDirection.Ascending ? result : -result;
         });
 
         var bounds = stackalloc FFXIVClientStructs.FFXIV.Common.Math.Bounds[1];
@@ -207,6 +211,9 @@ public unsafe partial class AddonInspectorTab : DebugTab
                     ClickCallback = () => _navigationService.NavigateTo(new AddressInspectorNavigation((nint)unitBase, type != typeof(AtkUnitBase) ? (uint)type.SizeOf() : 0))
                 });
             });
+
+            ImGui.TableNextColumn(); // DepthLayer
+            ImGui.Text(unitBase->DepthLayer.ToString());
         }
 
         var sortSpecs = ImGui.TableGetSortSpecs();
