@@ -440,6 +440,10 @@ public unsafe partial class AtkDebugRenderer
             OnClicked = () => _selectedNode = node,
             IsLeafNode = node->ChildNode == null,
             IsSelected = _selectedNode == node,
+            OnHovered = () =>
+            {
+                ImGui.SetTooltip($"{node->Width}x{node->Height}");
+            },
             /*
             DrawContextMenu = (nodeOptions, builder) =>
             {
