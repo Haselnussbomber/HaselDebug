@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Dalamud.NET.Sdk/14.0.1">
+<Project Sdk="Dalamud.NET.Sdk/14.0.2">
   <!-- Project settings -->
   <PropertyGroup>
     <Name>HaselDebug</Name>
@@ -42,11 +42,11 @@
 
   <!-- NuGet dependencies -->
   <ItemGroup>
-    <PackageReference Include="AutoCtor" Version="2.10.0" PrivateAssets="all" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="AutoCtor" Version="2.12.0" PrivateAssets="all" ExcludeAssets="compile;runtime" />
     <PackageReference Include="Injectio" Version="5.1.0" PrivateAssets="all" />
     <PackageReference Include="Iced" Version="1.21.0" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.264" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.269" PrivateAssets="All" />
   </ItemGroup>
 
   <!-- FFXIVClientStructs -->
