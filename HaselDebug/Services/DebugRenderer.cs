@@ -17,6 +17,7 @@ using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine.Group;
+using FFXIVClientStructs.FFXIV.Client.Sound;
 using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -627,6 +628,16 @@ public unsafe partial class DebugRenderer
                         HighlightNode(component->AtkResNode);
                     else if (component != null && component->OwnerNode != null)
                         HighlightNode((AtkResNode*)component->OwnerNode);
+                }
+                else if (Inherits<ISoundData>(highlightType))
+                {
+                    var soundData = (ISoundData*)highlightAddress;
+                    if (soundData->GetIsPositional())
+                    {
+                        var pos = new Vector3(soundData->GetPositionX(), soundData->GetPositionY(), soundData->GetPositionZ());
+                        if (pos.LengthSquared() > 0.001f)
+                            DrawLine(pos);
+                    }
                 }
 
                 void DrawLine(Vector3 pos)
