@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [008914bf](https://github.com/aers/FFXIVClientStructs/tree/008914bf) ([compare](https://github.com/aers/FFXIVClientStructs/compare/302aacc9..008914bf)).
+
 ## [1.49.0] (2026-02-14)
 
 - **Added:** Bit fields are now rendered.
