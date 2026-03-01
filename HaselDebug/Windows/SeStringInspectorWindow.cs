@@ -18,19 +18,15 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
     private WindowManager _windowManager;
     private DebugRenderer _debugRenderer;
     private ISeStringEvaluator _seStringEvaluator;
-
-    private SeStringParameter[]? _localParameters = null;
     private string _macroString = string.Empty;
-    private ReadOnlySeString _string;
-    private Utf8String* _utf8string;
 
     public ReadOnlySeString String
     {
-        get => _string;
+        get;
         set
         {
-            _string = value;
-            _localParameters = null;
+            field = value;
+            LocalParameters = null;
         }
     }
 
@@ -41,10 +37,10 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
     public AtkResNode* Node { get; set; }
     public Utf8String* Utf8String
     {
-        get => _utf8string;
+        get;
         set
         {
-            _utf8string = value;
+            field = value;
             _macroString = value != null ? new ReadOnlySeStringSpan(value->AsSpan()).ToString() : string.Empty;
         }
     }
@@ -53,6 +49,8 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
         => Node != null &&
             Utf8String != null &&
             RaptureAtkUnitManager.Instance()->AtkUnitManager.GetAddonByNodeSafe(Node) != null;
+
+    public SeStringParameter[]? LocalParameters { get; set; } = null;
 
     [AutoPostConstruct]
     private void Initialize()
@@ -112,13 +110,13 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
             }
         }
 
-        _localParameters ??= GetLocalParameters(StringSpan, []);
+        LocalParameters ??= GetLocalParameters(StringSpan, []);
 
-        var evaluated = _seStringEvaluator.Evaluate(StringSpan, _localParameters, Language);
+        var evaluated = _seStringEvaluator.Evaluate(StringSpan, LocalParameters, Language);
 
         DrawPreview(evaluated);
 
-        if (_localParameters!.Length != 0)
+        if (LocalParameters!.Length != 0)
         {
             ImGui.Spacing();
             DrawParameters();
@@ -159,22 +157,22 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
         using var node = _debugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(2), Title = "Parameters", TitleColor = Color.Green, DefaultOpen = true });
         if (!node) return;
 
-        for (var i = 0; i < _localParameters!.Length; i++)
+        for (var i = 0; i < LocalParameters!.Length; i++)
         {
-            if (_localParameters[i].IsString)
+            if (LocalParameters[i].IsString)
             {
-                var str = _localParameters[i].StringValue.ToString();
+                var str = LocalParameters[i].StringValue.ToString();
                 if (ImGui.InputText($"lstr({i + 1})", ref str, 255))
                 {
-                    _localParameters[i] = new(str);
+                    LocalParameters[i] = new(str);
                 }
             }
             else
             {
-                var num = (int)_localParameters[i].UIntValue;
+                var num = (int)LocalParameters[i].UIntValue;
                 if (ImGui.InputInt($"lnum({i + 1})", ref num))
                 {
-                    _localParameters[i] = new((uint)num);
+                    LocalParameters[i] = new((uint)num);
                 }
             }
         }

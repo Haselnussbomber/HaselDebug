@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- **Added:** A LogMessage Log tab that lists all dispatched IChatGui.LogMessage events.
 - **Added:** A new Sound Manager tab for playing around with sounds.
 - **Added:** Highlighting a positional SoundData entry will draw a line to its position.
 - **Updated:** ClientStructs now at [008914bf](https://github.com/aers/FFXIVClientStructs/tree/008914bf) ([compare](https://github.com/aers/FFXIVClientStructs/compare/302aacc9..008914bf)).
