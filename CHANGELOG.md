@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.50.0] (2026-03-01)
 
 - **Added:** A LogMessage Log tab that lists all dispatched IChatGui.LogMessage events.
 - **Added:** A new Sound Manager tab for playing around with sounds.
@@ -813,7 +813,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.49.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.50.0...main
+[1.50.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.49.0...v1.50.0
 [1.49.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.48.1...v1.49.0
 [1.48.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.48.0...v1.48.1
 [1.48.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.47.2...v1.48.0
