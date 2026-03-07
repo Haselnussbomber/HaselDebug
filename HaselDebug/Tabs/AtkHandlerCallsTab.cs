@@ -42,7 +42,7 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
                 1 => "UnregisterAddonCallback",
                 2 => "AddonAgentCallback",
                 3 => "AddonEventCallback",
-                4 => "AddonEventCallback2",
+                4 => "AddonEventCallbackWithResult",
                 5 => "SubscribeAtkArrayData",
                 6 => "UnsubscribeAtkArrayData",
                 11 => "SetCursor",
