@@ -39,12 +39,14 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
         {
             var additionalText = handlerIndex switch
             {
+                0 => "HudInitialized",
                 1 => "UnregisterAddonCallback",
                 2 => "AddonAgentCallback",
                 3 => "AddonEventCallback",
                 4 => "AddonEventCallbackWithResult",
                 5 => "SubscribeAtkArrayData",
                 6 => "UnsubscribeAtkArrayData",
+                10 => "CalculateTextLength",
                 11 => "SetCursor",
                 14 => "OpenMapWithMapLink",
                 17 => "SaveAddonConfig",
