@@ -61,7 +61,7 @@ public static unsafe class DebugUtils
         if (FieldCache.TryGetValue(type, out var fields))
             return fields;
 
-        var fieldsByOffset = new SortedDictionary<int, FieldInfo>();
+        var fieldsByOffsetAndName = new SortedDictionary<(int, string), FieldInfo>();
 
         void CollectFieldsRecursive(Type currentType)
         {
@@ -74,7 +74,7 @@ public static unsafe class DebugUtils
                 if (field.GetCustomAttribute<FieldOffsetAttribute>() is not FieldOffsetAttribute fieldOffsetAttr)
                     continue;
 
-                fieldsByOffset.TryAdd(fieldOffsetAttr.Value, field);
+                fieldsByOffsetAndName.TryAdd((fieldOffsetAttr.Value, field.Name), field);
             }
 
             var inheritAttrs = currentType.GetCustomAttributes()
@@ -91,6 +91,6 @@ public static unsafe class DebugUtils
 
         CollectFieldsRecursive(type);
 
-        return FieldCache[type] = [.. fieldsByOffset.Values];
+        return FieldCache[type] = [.. fieldsByOffsetAndName.Values];
     }
 }
