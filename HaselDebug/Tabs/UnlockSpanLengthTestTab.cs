@@ -200,6 +200,11 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
             UIState.Instance()->UnlockedChocoboTaxiStandsBitArray,
             _excelService.GetRowCount<ChocoboTaxiStand>()));
 
+         _bitArrays.Add(new BitArrayRecord(
+             "UIState.BeatenTripleTriadResidents",
+             UIState.Instance()->BeatenTripleTriadResidentsBitArray,
+             _excelService.GetSheet<TripleTriadResident>().Where(row => row.Order != ushort.MaxValue).Max(row => row.Order)));
+
         _bitArrays.Add(new BitArrayRecord(
             "UIState.SeenCutscenes",
             UIState.Instance()->SeenCutscenesBitArray,
