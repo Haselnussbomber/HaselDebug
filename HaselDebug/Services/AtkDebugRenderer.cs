@@ -211,6 +211,16 @@ public unsafe partial class AtkDebugRenderer
             ("Size (scaled)", $"{scaledWidth}x{scaledHeight}"),
             ("Widget Count", $"{unitBase->UldManager.ObjectCount}"));
 
+        if (ImGui.Button("Observe Events"))
+        {
+            var addonName = unitBase->NameString;
+            _windowManager.CreateOrOpen(
+                addonName + " - Events Observer",
+                () => new AddonEventsObserverWindow(_windowManager, _textService, _addonLifecycle, _debugRenderer) { AddonName = addonName });
+        }
+
+        ImGui.SameLine();
+
         if (ImGui.Button("Observe AtkValues"))
         {
             var addonName = unitBase->NameString;
