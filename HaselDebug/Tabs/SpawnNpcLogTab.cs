@@ -97,7 +97,7 @@ public unsafe partial class SpawnNpcLogTab : DebugTab, IDisposable
             else
                 name += packet.Value->Common.NameString;
 
-            _debugRenderer.DrawPointerType(packet, typeof(SpawnNpcPacket), new NodeOptions()
+            _debugRenderer.DrawPointerType(packet, new NodeOptions()
             {
                 AddressPath = new(i),
                 Title = name,

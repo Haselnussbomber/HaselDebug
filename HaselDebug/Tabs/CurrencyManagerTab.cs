@@ -22,7 +22,7 @@ public unsafe partial class CurrencyManagerTab : DebugTab
     public override void Draw()
     {
         var currencyManager = CurrencyManager.Instance();
-        _debugRenderer.DrawPointerType(currencyManager, typeof(CurrencyManager), new NodeOptions());
+        _debugRenderer.DrawPointerType(currencyManager);
 
         using (var node = ImRaii.TreeNode(nameof(CurrencyManager.SpecialItemBucket), ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.SpanAvailWidth))
         {

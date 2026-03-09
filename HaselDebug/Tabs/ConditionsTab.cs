@@ -17,7 +17,7 @@ public unsafe partial class ConditionsTab : DebugTab
         var conditions = Conditions.Instance();
         if (conditions == null) return;
 
-        _debugRenderer.DrawPointerType(conditions, typeof(Conditions), new Utils.NodeOptions());
+        _debugRenderer.DrawPointerType(conditions);
 
         foreach (var fieldInfo in typeof(Conditions)
             .GetFields(BindingFlags.Instance | BindingFlags.Public)

@@ -82,7 +82,7 @@ public unsafe partial class SpawnTreasureLogTab : DebugTab, IDisposable
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawPointerType(packet, typeof(SpawnTreasurePacket), new NodeOptions()
+            _debugRenderer.DrawPointerType(packet, new NodeOptions()
             {
                 AddressPath = new(i)
             });

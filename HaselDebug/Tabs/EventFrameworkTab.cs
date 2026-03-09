@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -77,8 +76,7 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
         if (!child) return;
 
         var eventFramework = EventFramework.Instance();
-
-        _debugRenderer.DrawPointerType(eventFramework, typeof(EventFramework), new NodeOptions());
+        _debugRenderer.DrawPointerType(eventFramework);
 
         ImGui.Separator();
 
@@ -130,7 +128,7 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
             ImGui.Text(kv.Item1.ToString("X4"));
             ImGui.SameLine(155);
 
-            _debugRenderer.DrawPointerType(eventHandler, typeof(EventHandler), new NodeOptions() { UseSimpleEventHandlerName = true });
+            _debugRenderer.DrawPointerType(eventHandler, new NodeOptions() { UseSimpleEventHandlerName = true });
 
             using var indent = ImRaii.PushIndent();
             DrawEventObjects(eventHandler);
@@ -201,7 +199,7 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
             ImGui.Text(i.ToString());
 
             ImGui.TableNextColumn(); // Object
-            _debugRenderer.DrawPointerType(eventObject.Value, typeof(GameObject), new NodeOptions());
+            _debugRenderer.DrawPointerType(eventObject.Value);
             i++;
         }
     }

@@ -1,6 +1,7 @@
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselDebug.Extensions;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 
@@ -131,7 +132,7 @@ public partial class AddonEventsObserverWindow : SimpleWindow
             ImGui.Text(eventType.ToString() + (Enum.GetName(eventType) != null ? $" ({(int)eventType})" : string.Empty));
 
             ImGui.TableNextColumn(); // EventData
-            var type = GetAtkEventDataType(eventType);
+            var type = eventType.GetAtkEventDataType();
             _debugRenderer.DrawPointerType(eventData, type, new NodeOptions() { AddressPath = new(i) });
         }
     }

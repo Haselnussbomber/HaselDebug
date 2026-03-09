@@ -1,10 +1,8 @@
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
-using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs.ObjectTables;
 
@@ -32,7 +30,7 @@ public unsafe partial class CharaSelectCharacterListTab : DebugTab, IObjectTable
                 continue;
 
             ImGui.SameLine();
-            _debugRenderer.DrawPointerType(obj, typeof(BattleChara), new NodeOptions());
+            _debugRenderer.DrawPointerType(obj);
         }
     }
 }

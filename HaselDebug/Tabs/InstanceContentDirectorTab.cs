@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
-using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -40,7 +39,7 @@ public unsafe partial class InstanceContentDirectorTab : DebugTab
             else
                 ImGui.Text($"[{directorPtr.Value->EventHandlerInfo->EventId.ContentId}]");
             ImGui.SameLine();
-            _debugRenderer.DrawPointerType(directorPtr.Value, typeof(Director), new NodeOptions() { AddressPath = new([1, (nint)directorPtr.Value]) });
+            _debugRenderer.DrawPointerType(directorPtr.Value, new NodeOptions() { AddressPath = new([1, (nint)directorPtr.Value]) });
         }
 
         ImGui.Text("ContentDirector:"u8);
@@ -52,7 +51,7 @@ public unsafe partial class InstanceContentDirectorTab : DebugTab
         }
         else
         {
-            _debugRenderer.DrawPointerType(contentDirector, typeof(ContentDirector), new NodeOptions() { AddressPath = new([2, (nint)contentDirector]) });
+            _debugRenderer.DrawPointerType(contentDirector, new NodeOptions() { AddressPath = new([2, (nint)contentDirector]) });
         }
 
         ImGui.Separator();

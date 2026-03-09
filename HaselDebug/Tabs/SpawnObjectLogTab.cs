@@ -87,7 +87,7 @@ public unsafe partial class SpawnObjectLogTab : DebugTab, IDisposable
             var objectKind = packet.Value->ObjectKind;
             var name = $"[{(ObjectKind)objectKind}] ";
 
-            _debugRenderer.DrawPointerType(packet, typeof(SpawnObjectPacket), new NodeOptions()
+            _debugRenderer.DrawPointerType(packet, new NodeOptions()
             {
                 AddressPath = new(i),
                 Title = name

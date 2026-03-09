@@ -188,7 +188,7 @@ public unsafe partial class SoundManagerTab : DebugTab, IDisposable
             return;
         }
 
-        _debugRenderer.DrawPointerType(manager, typeof(SoundManager), new NodeOptions());
+        _debugRenderer.DrawPointerType(manager);
 
         using (var node = ImRaii.TreeNode("Play Sound", ImGuiTreeNodeFlags.SpanAvailWidth))
         {
@@ -281,7 +281,7 @@ public unsafe partial class SoundManagerTab : DebugTab, IDisposable
                 entry.SetVolume(volume, 0);
 
             ImGui.TableNextColumn(); // Struct
-            _debugRenderer.DrawPointerType(Unsafe.AsPointer(ref entry), typeof(SoundData), new NodeOptions());
+            _debugRenderer.DrawPointerType(Unsafe.AsPointer(ref entry), typeof(SoundData));
         }
     }
 }

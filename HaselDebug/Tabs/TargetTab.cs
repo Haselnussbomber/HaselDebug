@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -21,6 +20,6 @@ public unsafe partial class TargetTab : DebugTab
             return;
         }
 
-        _debugRenderer.DrawPointerType(target, typeof(GameObject), new NodeOptions() { DefaultOpen = true });
+        _debugRenderer.DrawPointerType(target, new NodeOptions() { DefaultOpen = true });
     }
 }

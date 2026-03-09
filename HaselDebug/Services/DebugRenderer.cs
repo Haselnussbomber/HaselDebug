@@ -1,17 +1,10 @@
 using System.Collections.Immutable;
 using System.Collections.Specialized;
-using FFXIVClientStructs.FFXIV.Client.Game.Event;
-using FFXIVClientStructs.FFXIV.Client.Game.Fate;
-using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
-using FFXIVClientStructs.FFXIV.Client.Game.MassivePcContent;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
-using FFXIVClientStructs.FFXIV.Client.LayoutEngine.Group;
 using FFXIVClientStructs.FFXIV.Client.Sound;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
@@ -20,8 +13,6 @@ using HaselDebug.Extensions;
 using HaselDebug.Service;
 using HaselDebug.Services.Data;
 using HaselDebug.Utils;
-using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
-using InstanceContentType = FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.InstanceContentType;
 using KernelTexture = FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Texture;
 
 namespace HaselDebug.Services;
@@ -65,10 +56,16 @@ public unsafe partial class DebugRenderer
     private readonly PluginConfig _pluginConfig;
     private readonly IAddonLifecycle _addonLifecycle;
 
-    public void DrawPointerType(void* obj, Type? type, NodeOptions nodeOptions)
+    public void DrawPointerType<T>(T* obj, NodeOptions nodeOptions = default) where T : unmanaged
+        => DrawPointerType((nint)obj, typeof(T), nodeOptions);
+
+    public void DrawPointerType<T>(Pointer<T> obj, NodeOptions nodeOptions = default) where T : unmanaged
+        => DrawPointerType((nint)obj.Value, typeof(T), nodeOptions);
+
+    public void DrawPointerType(void* obj, Type type, NodeOptions nodeOptions = default)
         => DrawPointerType((nint)obj, type, nodeOptions);
 
-    public void DrawPointerType(nint address, Type? type, NodeOptions nodeOptions)
+    public void DrawPointerType(nint address, Type type, NodeOptions nodeOptions = default)
     {
         if (type == null)
         {
@@ -92,12 +89,6 @@ public unsafe partial class DebugRenderer
         {
             address = *(nint*)address;
             type = type.GenericTypeArguments[0];
-        }
-
-        if (type == null)
-        {
-            ImGui.Text(""u8);
-            return;
         }
 
         if (address == 0)
@@ -138,317 +129,11 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        if (!nodeOptions.ResolvedInheritedTypeAddresses.Path.Contains(address))
-        {
-            if (Inherits<ILayoutInstance>(type))
-            {
-                switch (((ILayoutInstance*)address)->Id.Type)
-                {
-                    case InstanceType.SharedGroup:
-                        type = typeof(SharedGroupLayoutInstance);
-                        break;
-                }
-            }
-            else if (Inherits<GameObject>(type))
-            {
-                switch (((GameObject*)address)->ObjectKind)
-                {
-                    case ObjectKind.Pc:
-                    case ObjectKind.BattleNpc:
-                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara);
-                        break;
-                    case ObjectKind.EventNpc:
-                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Character);
-                        break;
-                    case ObjectKind.Treasure:
-                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.Treasure);
-                        break;
-                    case ObjectKind.Aetheryte:
-                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.Aetheryte);
-                        break;
-                    case ObjectKind.GatheringPoint:
-                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.GatheringPointObject);
-                        break;
-                    case ObjectKind.EventObj:
-                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.EventObject);
-                        break;
-                    case ObjectKind.Companion:
-                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Companion);
-                        break;
-                    case ObjectKind.HousingEventObject:
-                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.HousingObject);
-                        break;
-                    case ObjectKind.ReactionEventObject:
-                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Object.ReactionEventObject);
-                        break;
-                    case ObjectKind.Ornament:
-                        type = typeof(FFXIVClientStructs.FFXIV.Client.Game.Character.Ornament);
-                        break;
-                }
-            }
-            else if (Inherits<DrawObject>(type))
-            {
-                switch (((DrawObject*)address)->GetObjectType())
-                {
-                    case ObjectType.CharacterBase:
-                        type = typeof(CharacterBase);
-                        switch (((CharacterBase*)address)->GetModelType())
-                        {
-                            case CharacterBase.ModelType.Human:
-                                type = typeof(Human);
-                                break;
-                            case CharacterBase.ModelType.DemiHuman:
-                                type = typeof(Demihuman);
-                                break;
-                            case CharacterBase.ModelType.Monster:
-                                type = typeof(Monster);
-                                break;
-                            case CharacterBase.ModelType.Weapon:
-                                type = typeof(Weapon);
-                                break;
-                        }
-                        break;
-                }
-            }
-            else if (Inherits<EventHandler>(type))
-            {
-                var eventId = ((EventHandler*)address)->Info.EventId;
-                string? additionalName = null;
-
-                switch (eventId.ContentId)
-                {
-                    case EventHandlerContent.Quest:
-                        type = typeof(QuestEventHandler);
-                        additionalName = _textService.GetQuestName(eventId.Id);
-                        break;
-
-                    case EventHandlerContent.GatheringPoint:
-                        type = typeof(GatheringPointEventHandler);
-                        break;
-
-                    case EventHandlerContent.Shop:
-                        type = typeof(ShopEventHandler);
-                        additionalName = new ReadOnlySeStringSpan(((ShopEventHandler*)address)->ShopName.AsSpan()).ToString();
-                        break;
-
-                    case EventHandlerContent.Aetheryte:
-                        type = typeof(AetheryteEventHandler);
-                        break;
-
-                    case EventHandlerContent.Craft:
-                        type = typeof(CraftEventHandler);
-                        break;
-
-                    case EventHandlerContent.CustomTalk:
-                        type = typeof(CustomTalkEventHandler);
-                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ToString();
-                        break;
-
-                    case EventHandlerContent.Fishing:
-                        type = typeof(FishingEventHandler);
-                        break;
-
-                    case EventHandlerContent.FateDirector:
-                        type = typeof(FateDirector);
-                        break;
-
-                    case EventHandlerContent.BattleLeveDirector:
-                        type = typeof(BattleLeveDirector);
-                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ToString();
-                        break;
-
-                    case EventHandlerContent.CompanyLeveDirector:
-                    case EventHandlerContent.CompanyLeveOfficer:
-                    case EventHandlerContent.GatheringLeveDirector:
-                        type = typeof(LeveDirector);
-                        additionalName = new ReadOnlySeStringSpan(((LuaEventHandler*)address)->LuaClass.AsSpan()).ToString();
-                        break;
-
-                    case EventHandlerContent.InstanceContentDirector:
-                        type = ((InstanceContentDirector*)address)->InstanceContentType switch
-                        {
-                            InstanceContentType.DeepDungeon => typeof(InstanceContentDeepDungeon),
-                            InstanceContentType.OceanFishing => typeof(InstanceContentOceanFishing),
-                            _ => typeof(InstanceContentDirector)
-                        };
-                        additionalName = ((InstanceContentDirector*)address)->InstanceContentType.ToString();
-                        break;
-
-                    case EventHandlerContent.PublicContentDirector:
-                        type = ((PublicContentDirector*)address)->Type switch
-                        {
-                            PublicContentDirectorType.Bozja => typeof(PublicContentBozja),
-                            PublicContentDirectorType.Eureka => typeof(PublicContentEureka),
-                            PublicContentDirectorType.OccultCrescent => typeof(PublicContentOccultCrescent),
-                            _ => typeof(PublicContentDirector)
-                        };
-                        additionalName = ((PublicContentDirector*)address)->Type.ToString();
-                        break;
-
-                    case EventHandlerContent.GoldSaucerDirector:
-                        type = typeof(GoldSaucerDirector);
-                        break;
-
-                    case EventHandlerContent.MassivePcContentDirector:
-                        type = typeof(MassivePcContentDirector);
-                        break;
-                }
-
-                if (nodeOptions.UseSimpleEventHandlerName && string.IsNullOrEmpty(nodeOptions.Title))
-                {
-                    nodeOptions = nodeOptions with
-                    {
-                        UseSimpleEventHandlerName = false,
-                        Title = string.IsNullOrEmpty(additionalName)
-                        ? $"{eventId.ContentId} {eventId.Id}"
-                        : $"{eventId.ContentId} {eventId.Id} ({additionalName})"
-                    };
-                }
-            }
-            else if (Inherits<AtkResNode>(type))
-            {
-                switch (((AtkResNode*)address)->GetNodeType())
-                {
-                    case NodeType.Image:
-                        type = typeof(AtkImageNode);
-                        break;
-                    case NodeType.Text:
-                        type = typeof(AtkTextNode);
-                        break;
-                    case NodeType.NineGrid:
-                        type = typeof(AtkNineGridNode);
-                        break;
-                    case NodeType.Counter:
-                        type = typeof(AtkCounterNode);
-                        break;
-                    case NodeType.Collision:
-                        type = typeof(AtkCollisionNode);
-                        break;
-                    case NodeType.ClippingMask:
-                        type = typeof(AtkClippingMaskNode);
-                        break;
-                    case NodeType.Component:
-                        type = typeof(AtkComponentNode);
-                        break;
-                }
-            }
-            else if (Inherits<AtkComponentBase>(type))
-            {
-                var compBase = (AtkComponentBase*)address;
-                if (compBase->UldManager.ResourceFlags.HasFlag(AtkUldManagerResourceFlag.Initialized) &&
-                    compBase->UldManager.BaseType == AtkUldManagerBaseType.Component)
-                {
-                    switch (((AtkUldComponentInfo*)compBase->UldManager.Objects)->ComponentType)
-                    {
-                        case ComponentType.Base:
-                            type = typeof(AtkComponentBase);
-                            break;
-                        case ComponentType.Button:
-                            type = typeof(AtkComponentButton);
-                            break;
-                        case ComponentType.Window:
-                            type = typeof(AtkComponentWindow);
-                            break;
-                        case ComponentType.CheckBox:
-                            type = typeof(AtkComponentCheckBox);
-                            break;
-                        case ComponentType.RadioButton:
-                            type = typeof(AtkComponentRadioButton);
-                            break;
-                        case ComponentType.GaugeBar:
-                            type = typeof(AtkComponentGaugeBar);
-                            break;
-                        case ComponentType.Slider:
-                            type = typeof(AtkComponentSlider);
-                            break;
-                        case ComponentType.TextInput:
-                            type = typeof(AtkComponentTextInput);
-                            break;
-                        case ComponentType.NumericInput:
-                            type = typeof(AtkComponentNumericInput);
-                            break;
-                        case ComponentType.List:
-                            type = typeof(AtkComponentList);
-                            break;
-                        case ComponentType.DropDownList:
-                            type = typeof(AtkComponentDropDownList);
-                            break;
-                        case ComponentType.Tab:
-                            type = typeof(AtkComponentTab);
-                            break;
-                        case ComponentType.TreeList:
-                            type = typeof(AtkComponentTreeList);
-                            break;
-                        case ComponentType.ScrollBar:
-                            type = typeof(AtkComponentScrollBar);
-                            break;
-                        case ComponentType.ListItemRenderer:
-                            type = typeof(AtkComponentListItemRenderer);
-                            break;
-                        case ComponentType.Icon:
-                            type = typeof(AtkComponentIcon);
-                            break;
-                        case ComponentType.IconText:
-                            type = typeof(AtkComponentIconText);
-                            break;
-                        case ComponentType.DragDrop:
-                            type = typeof(AtkComponentDragDrop);
-                            break;
-                        case ComponentType.GuildLeveCard:
-                            type = typeof(AtkComponentGuildLeveCard);
-                            break;
-                        case ComponentType.TextNineGrid:
-                            type = typeof(AtkComponentTextNineGrid);
-                            break;
-                        case ComponentType.JournalCanvas:
-                            type = typeof(AtkComponentJournalCanvas);
-                            break;
-                        case ComponentType.Multipurpose:
-                            type = typeof(AtkComponentMultipurpose);
-                            break;
-                        case ComponentType.Map:
-                            type = typeof(AtkComponentMap);
-                            break;
-                        case ComponentType.Preview:
-                            type = typeof(AtkComponentPreview);
-                            break;
-                        case ComponentType.HoldButton:
-                            type = typeof(AtkComponentHoldButton);
-                            break;
-                        case ComponentType.Portrait:
-                            type = typeof(AtkComponentPortrait);
-                            break;
-                    }
-                }
-            }
-            else if (type == typeof(AtkUnitBase))
-            {
-                nodeOptions = nodeOptions.WithTitle($"{type.FullName} ({((AtkUnitBase*)address)->NameString})");
-            }
-            else if (type == typeof(AgentInterface))
-            {
-                var agent = (AgentInterface*)address;
-                var agentModule = AgentModule.Instance();
-                for (var i = 0; i < agentModule->Agents.Length; i++)
-                {
-                    var ptr = agentModule->Agents.GetPointer(i);
-                    if (ptr->Value != null && ptr->Value == agent)
-                    {
-                        nodeOptions = nodeOptions.WithTitle($"{type.FullName} ({(AgentId)i})");
-                        break;
-                    }
-                }
-            }
-
-            nodeOptions = nodeOptions with
-            {
-                ResolvedInheritedTypeAddresses = nodeOptions.ResolvedInheritedTypeAddresses.With(address)
-            };
-        }
+        TypeResolver.Resolve(address, ref type, ref nodeOptions);
 
         if (type.IsPointer)
         {
-            type = type.GetElementType();
+            type = type.GetElementType() ?? type;
             address = *(nint*)address;
             DrawPointerType(address, type, nodeOptions);
             return;
@@ -561,81 +246,7 @@ public unsafe partial class DebugRenderer
 
             if (nodeOptions.HighlightType != null && nodeOptions.HighlightAddress != 0)
             {
-                var highlightType = nodeOptions.HighlightType;
-                var highlightAddress = nodeOptions.HighlightAddress;
-
-                if (highlightType.IsGenericType && highlightType.GetGenericTypeDefinition() == typeof(Pointer<>))
-                {
-                    highlightType = highlightType.GenericTypeArguments[0];
-                    highlightAddress = *(nint*)highlightAddress;
-                }
-
-                if (highlightType.IsPointer)
-                {
-                    highlightType = highlightType.GetElementType()!;
-                    highlightAddress = *(nint*)highlightAddress;
-                }
-
-                if (Inherits<ILayoutInstance>(highlightType))
-                {
-                    var inst = (ILayoutInstance*)highlightAddress;
-                    if (inst != null)
-                    {
-                        var transform = inst->GetTransformImpl();
-                        if (transform != null)
-                            DrawLine(transform->Translation);
-                    }
-                }
-                else if (Inherits<GameObject>(highlightType))
-                {
-                    var gameObject = (GameObject*)highlightAddress;
-                    var gameObjectExists = GameObjectManager.Instance()->Objects.IndexSorted.Contains(gameObject);
-                    if (gameObjectExists && gameObject->VirtualTable != null)
-                    {
-                        var pos = gameObject->GetPosition();
-                        if (pos != null)
-                            DrawLine((Vector3)(*pos));
-                    }
-                }
-                else if (Inherits<AtkUnitBase>(highlightType))
-                {
-                    var unitBase = (AtkUnitBase*)highlightAddress;
-                    if (unitBase->WindowNode != null)
-                        HighlightNode((AtkResNode*)unitBase->WindowNode);
-                    else if (unitBase->RootNode != null)
-                        HighlightNode(unitBase->RootNode);
-                }
-                else if (Inherits<AtkResNode>(highlightType))
-                {
-                    HighlightNode((AtkResNode*)highlightAddress);
-                }
-                else if (Inherits<AtkComponentBase>(highlightType))
-                {
-                    var component = (AtkComponentBase*)highlightAddress;
-                    if (component != null && component->AtkResNode != null)
-                        HighlightNode(component->AtkResNode);
-                    else if (component != null && component->OwnerNode != null)
-                        HighlightNode((AtkResNode*)component->OwnerNode);
-                }
-                else if (Inherits<ISoundData>(highlightType))
-                {
-                    var soundData = (ISoundData*)highlightAddress;
-                    if (soundData->GetIsPositional())
-                    {
-                        var pos = new Vector3(soundData->GetPositionX(), soundData->GetPositionY(), soundData->GetPositionZ());
-                        if (pos.LengthSquared() > 0.001f)
-                            DrawLine(pos);
-                    }
-                }
-
-                void DrawLine(Vector3 pos)
-                {
-                    if (_gameGui.WorldToScreen(pos, out var screenPos))
-                    {
-                        ImGui.GetForegroundDrawList().AddLine(ImGui.GetMousePos(), screenPos, Color.Orange.ToUInt());
-                        ImGui.GetForegroundDrawList().AddCircleFilled(screenPos, 3f, Color.Orange.ToUInt());
-                    }
-                }
+                HighlightPointerType(nodeOptions.HighlightAddress, nodeOptions.HighlightType);
             }
         }
 
@@ -659,6 +270,73 @@ public unsafe partial class DebugRenderer
         return node;
     }
 
+    private void HighlightPointerType(nint address, Type type)
+    {
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Pointer<>))
+        {
+            type = type.GenericTypeArguments[0];
+            address = *(nint*)address;
+        }
+
+        if (type.IsPointer)
+        {
+            type = type.GetElementType()!;
+            address = *(nint*)address;
+        }
+
+        if (Inherits<ILayoutInstance>(type))
+        {
+            var inst = (ILayoutInstance*)address;
+            if (inst != null)
+            {
+                var transform = inst->GetTransformImpl();
+                if (transform != null)
+                    DrawLineToGamePos(transform->Translation);
+            }
+        }
+        else if (Inherits<GameObject>(type))
+        {
+            var gameObject = (GameObject*)address;
+            var gameObjectExists = GameObjectManager.Instance()->Objects.IndexSorted.Contains(gameObject);
+            if (gameObjectExists && gameObject->VirtualTable != null)
+            {
+                var pos = gameObject->GetPosition();
+                if (pos != null)
+                    DrawLineToGamePos((Vector3)(*pos));
+            }
+        }
+        else if (Inherits<AtkUnitBase>(type))
+        {
+            var unitBase = (AtkUnitBase*)address;
+            if (unitBase->WindowNode != null)
+                HighlightNode((AtkResNode*)unitBase->WindowNode);
+            else if (unitBase->RootNode != null)
+                HighlightNode(unitBase->RootNode);
+        }
+        else if (Inherits<AtkResNode>(type))
+        {
+            HighlightNode((AtkResNode*)address);
+        }
+        else if (Inherits<AtkComponentBase>(type))
+        {
+            var component = (AtkComponentBase*)address;
+            if (component != null && component->AtkResNode != null)
+                HighlightNode(component->AtkResNode);
+            else if (component != null && component->OwnerNode != null)
+                HighlightNode((AtkResNode*)component->OwnerNode);
+        }
+        else if (Inherits<ISoundData>(type))
+        {
+            var soundData = (ISoundData*)address;
+            if (soundData->GetIsPositional())
+            {
+                var pos = new Vector3(soundData->GetPositionX(), soundData->GetPositionY(), soundData->GetPositionZ());
+                if (pos.LengthSquared() > 0.001f)
+                    DrawLineToGamePos(pos);
+            }
+        }
+    }
+
     private void HighlightNode(AtkResNode* node)
     {
         if (!_processInfoService.IsPointerValid(node))
@@ -670,7 +348,17 @@ public unsafe partial class DebugRenderer
             scale *= addon->Scale;
 
         var pos = ImGui.GetMainViewport().Pos + new Vector2(node->ScreenX, node->ScreenY);
-        var size = new Vector2(node->Width, node->Height) * scale;
+        var size = node->Size * scale;
         ImGui.GetForegroundDrawList().AddRect(pos, pos + size, Color.Gold.ToUInt());
+    }
+
+    private void DrawLineToGamePos(Vector3 pos)
+    {
+        if (_gameGui.WorldToScreen(pos, out var screenPos))
+        {
+            var drawList = ImGui.GetForegroundDrawList();
+            drawList.AddLine(ImGui.GetMousePos(), screenPos, Color.Orange.ToUInt());
+            drawList.AddCircleFilled(screenPos, 3f, Color.Orange.ToUInt());
+        }
     }
 }

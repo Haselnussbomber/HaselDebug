@@ -209,14 +209,14 @@ public unsafe partial class DebugRenderer
                 {
                     case AtkUldManagerBaseType.Component:
                         if (objectCount == 1)
-                            DrawPointerType(*(nint**)fieldAddress, typeof(AtkUldComponentInfo), fieldNodeOptions);
+                            DrawPointerType(*(AtkUldComponentInfo**)fieldAddress, fieldNodeOptions);
                         else
                             DrawArray(new Span<AtkUldComponentInfo>(*(nint**)fieldAddress, objectCount), fieldNodeOptions);
                         break;
 
                     case AtkUldManagerBaseType.Widget:
                         if (objectCount == 1)
-                            DrawPointerType(*(nint**)fieldAddress, typeof(AtkUldWidgetInfo), fieldNodeOptions);
+                            DrawPointerType(*(AtkUldWidgetInfo**)fieldAddress, fieldNodeOptions);
                         else
                             DrawArray(new Span<AtkUldWidgetInfo>(*(nint**)fieldAddress, objectCount), fieldNodeOptions);
                         break;
@@ -245,7 +245,7 @@ public unsafe partial class DebugRenderer
             if (type == typeof(AtkTimelineManager) && fieldType == typeof(AtkTimeline*) && fieldInfo.Name == nameof(AtkTimelineManager.Timelines))
             {
                 DrawFieldName(fieldInfo);
-                DrawArray(new Span<AtkTimeline>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->TimelineCount), fieldNodeOptions);
+                DrawArray(new Span<AtkTimeline>(*(nint**)fieldAddress, ((AtkTimelineManager*)address)->TimelineCount), fieldNodeOptions);
                 continue;
             }
 

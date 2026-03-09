@@ -16,7 +16,7 @@ public unsafe partial class GameWindowTab : DebugTab
         var gameWindow = Framework.Instance()->GameWindow;
         if (gameWindow == null) return;
 
-        _debugRenderer.DrawPointerType(gameWindow, typeof(GameWindow), new NodeOptions() { DefaultOpen = true });
+        _debugRenderer.DrawPointerType(gameWindow, new NodeOptions() { DefaultOpen = true });
 
         var i = 0;
         foreach (var arg in gameWindow->ArgumentsSpan)

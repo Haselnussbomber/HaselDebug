@@ -92,7 +92,7 @@ public unsafe partial class AtkDebugRenderer
         _navigationService.DrawAddressInspectorLink((nint)unitBase);
         ImGui.SameLine();
         var addonType = _typeService.GetAddonType(unitBase->NameString);
-        _debugRenderer.DrawPointerType((nint)unitBase, addonType, nodeOptions with { DefaultOpen = false });
+        _debugRenderer.DrawPointerType(unitBase, addonType, nodeOptions with { DefaultOpen = false });
 
         // Agent
         var agentModule = AgentModule.Instance();
@@ -376,7 +376,7 @@ public unsafe partial class AtkDebugRenderer
         ImGui.SameLine();
         _navigationService.DrawAddressInspectorLink((nint)node);
         ImGui.SameLine();
-        _debugRenderer.DrawPointerType((nint)node, typeof(AtkResNode), nodeOptions);
+        _debugRenderer.DrawPointerType(node, nodeOptions);
 
         ImGui.Text("NodeId:"u8);
         ImGui.SameLine();
@@ -460,13 +460,13 @@ public unsafe partial class AtkDebugRenderer
         ImGui.SameLine();
         _navigationService.DrawAddressInspectorLink((nint)node);
         ImGui.SameLine();
-        _debugRenderer.DrawPointerType((nint)node, typeof(AtkComponentNode), nodeOptions.WithAddress(1));
+        _debugRenderer.DrawPointerType(node, nodeOptions.WithAddress(1));
 
         ImGui.Text("Component:"u8);
         ImGui.SameLine();
         _navigationService.DrawAddressInspectorLink((nint)component);
         ImGui.SameLine();
-        _debugRenderer.DrawPointerType((nint)component, typeof(AtkComponentBase), nodeOptions.WithAddress(2));
+        _debugRenderer.DrawPointerType(component, nodeOptions.WithAddress(2));
 
         ImGuiUtilsEx.PrintFieldValuePairs(
             ("NodeId", node->NodeId.ToString()),
@@ -600,7 +600,7 @@ public unsafe partial class AtkDebugRenderer
             }
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawPointerType(evt, typeof(AtkEvent), new() { AddressPath = new((nint)evt) });
+            _debugRenderer.DrawPointerType(evt);
 
             evt = evt->NextEvent;
         }

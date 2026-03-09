@@ -1,4 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
@@ -21,6 +20,6 @@ public unsafe partial class LocalPlayerTab : DebugTab
             return;
         }
 
-        _debugRenderer.DrawPointerType(localPlayer, typeof(BattleChara), new NodeOptions() { DefaultOpen = true });
+        _debugRenderer.DrawPointerType(localPlayer, new NodeOptions() { DefaultOpen = true });
     }
 }

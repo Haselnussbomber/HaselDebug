@@ -66,7 +66,7 @@ public unsafe partial class ObjectTableRenderer
             ImGuiUtils.DrawCopyableText(entityId.ToString("X"));
 
             ImGui.TableNextColumn(); // Name
-            _debugRenderer.DrawPointerType(gameObject, typeof(GameObject), new NodeOptions()
+            _debugRenderer.DrawPointerType(gameObject, new NodeOptions()
             {
                 AddressPath = new AddressPath((nint)gameObject),
                 Title = title,

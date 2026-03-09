@@ -19,7 +19,7 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
     {
         var raptureHotbarModule = RaptureHotbarModule.Instance();
 
-        _debugRenderer.DrawPointerType(raptureHotbarModule, typeof(RaptureHotbarModule), new NodeOptions());
+        _debugRenderer.DrawPointerType(raptureHotbarModule);
 
         ImGui.Spacing();
         ImGui.Separator();
@@ -77,7 +77,7 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
                 if (!slot->IsEmpty)
                 {
                     _debugRenderer.DrawIcon(slot->IconId);
-                    _debugRenderer.DrawPointerType(slot, typeof(RaptureHotbarModule.HotbarSlot), new NodeOptions()
+                    _debugRenderer.DrawPointerType(slot, new NodeOptions()
                     {
                         Title = slot->CommandType switch
                         {

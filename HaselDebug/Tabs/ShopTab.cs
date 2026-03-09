@@ -24,7 +24,7 @@ public unsafe partial class ShopTab : DebugTab
             return;
         }
 
-        _debugRenderer.DrawPointerType(addon->List, typeof(AtkComponentList), new());
+        _debugRenderer.DrawPointerType(addon->List);
 
         ImGui.Text($"ItemCount: {addon->List->GetItemCount()}");
 

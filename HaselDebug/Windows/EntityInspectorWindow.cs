@@ -60,7 +60,7 @@ public partial class EntityInspectorWindow : SimpleWindow
         if (string.IsNullOrEmpty(title))
             title = "Unnamed Object";
 
-        _debugRenderer.DrawPointerType(gameObject, typeof(GameObject), new()
+        _debugRenderer.DrawPointerType(gameObject, new()
         {
             DefaultOpen = true,
             Title = title,

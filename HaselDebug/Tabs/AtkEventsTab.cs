@@ -1,5 +1,6 @@
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
+using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
@@ -95,8 +96,8 @@ public unsafe partial class AtkEventsTab : DebugTab, IDisposable
             ImGui.Text(eventType.ToString() + (Enum.GetName(eventType) != null ? $" ({(int)eventType})" : string.Empty));
 
             ImGui.TableNextColumn();
-            var type = GetAtkEventDataType(eventType);
-            _debugRenderer.DrawPointerType(evt + 0x8, type, new NodeOptions() { AddressPath = new(i) });
+            var type = eventType.GetAtkEventDataType();
+            _debugRenderer.DrawPointerType((void*)(evt + 0x8), type, new NodeOptions() { AddressPath = new(i) });
         }
     }
 }
