@@ -56,17 +56,19 @@ public unsafe partial class DebugRenderer
     private readonly PluginConfig _pluginConfig;
     private readonly IAddonLifecycle _addonLifecycle;
 
-    public void DrawPointerType<T>(T* obj, NodeOptions nodeOptions = default) where T : unmanaged
+    public void DrawPointerType<T>(T* obj, NodeOptions? nodeOptions = null) where T : unmanaged
         => DrawPointerType((nint)obj, typeof(T), nodeOptions);
 
-    public void DrawPointerType<T>(Pointer<T> obj, NodeOptions nodeOptions = default) where T : unmanaged
+    public void DrawPointerType<T>(Pointer<T> obj, NodeOptions? nodeOptions = null) where T : unmanaged
         => DrawPointerType((nint)obj.Value, typeof(T), nodeOptions);
 
-    public void DrawPointerType(void* obj, Type type, NodeOptions nodeOptions = default)
+    public void DrawPointerType(void* obj, Type type, NodeOptions? nodeOptions = null)
         => DrawPointerType((nint)obj, type, nodeOptions);
 
-    public void DrawPointerType(nint address, Type type, NodeOptions nodeOptions = default)
+    public void DrawPointerType(nint address, Type type, NodeOptions? nodeOptions = null)
     {
+        var options = nodeOptions ?? new();
+
         if (type == null)
         {
             ImGui.Text(""u8);
@@ -117,7 +119,7 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        nodeOptions = nodeOptions.WithAddress(address) with
+        options = options.WithAddress(address) with
         {
             HighlightAddress = address,
             HighlightType = type,
@@ -129,13 +131,13 @@ public unsafe partial class DebugRenderer
             return;
         }
 
-        TypeResolver.Resolve(address, ref type, ref nodeOptions);
+        TypeResolver.Resolve(address, ref type, ref options);
 
         if (type.IsPointer)
         {
             type = type.GetElementType() ?? type;
             address = *(nint*)address;
-            DrawPointerType(address, type, nodeOptions);
+            DrawPointerType(address, type, options);
             return;
         }
         else if (type == typeof(bool))
@@ -150,22 +152,22 @@ public unsafe partial class DebugRenderer
         }
         else if (type == typeof(Utf8String))
         {
-            DrawUtf8String(address, nodeOptions);
+            DrawUtf8String(address, options);
             return;
         }
         else if (type == typeof(KernelTexture))
         {
-            DrawTexture(address, nodeOptions);
+            DrawTexture(address, options);
             return;
         }
         else if (type == typeof(AtkValue))
         {
-            DrawAtkValue(address, nodeOptions);
+            DrawAtkValue(address, options);
             return;
         }
         else if (type == typeof(CStringPointer))
         {
-            DrawSeString(*(byte**)address, nodeOptions);
+            DrawSeString(*(byte**)address, options);
             return;
         }
         else if (type == typeof(StdString))
@@ -180,47 +182,47 @@ public unsafe partial class DebugRenderer
         }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdVector<>))
         {
-            DrawStdVector(address, type.GenericTypeArguments[0], nodeOptions);
+            DrawStdVector(address, type.GenericTypeArguments[0], options);
             return;
         }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdMap<,>))
         {
-            DrawStdMap(address, type.GenericTypeArguments[0], type.GenericTypeArguments[1], nodeOptions);
+            DrawStdMap(address, type.GenericTypeArguments[0], type.GenericTypeArguments[1], options);
             return;
         }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdSet<>))
         {
-            DrawStdSet(address, type.GenericTypeArguments[0], nodeOptions);
+            DrawStdSet(address, type.GenericTypeArguments[0], options);
             return;
         }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdList<>))
         {
-            DrawStdList(address, type.GenericTypeArguments[0], nodeOptions);
+            DrawStdList(address, type.GenericTypeArguments[0], options);
             return;
         }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdLinkedList<>))
         {
-            DrawStdLinkedList(address, type.GenericTypeArguments[0], nodeOptions);
+            DrawStdLinkedList(address, type.GenericTypeArguments[0], options);
             return;
         }
         else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(StdDeque<>))
         {
-            DrawStdDeque(address, type.GenericTypeArguments[0], nodeOptions);
+            DrawStdDeque(address, type.GenericTypeArguments[0], options);
             return;
         }
         else if (type.IsEnum)
         {
-            DrawEnum(address, type, nodeOptions);
+            DrawEnum(address, type, options);
             return;
         }
         else if (type.IsNumericType())
         {
-            DrawNumeric(address, type, nodeOptions);
+            DrawNumeric(address, type, options);
             return;
         }
         else if (type.IsStruct() || type.IsClass)
         {
-            DrawStruct(address, type, nodeOptions);
+            DrawStruct(address, type, options);
             return;
         }
 
