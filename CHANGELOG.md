@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.51.1] (2026-03-13)
+
+- **Fixed:** NodeOptions were using `default`, causing properties not to be initialized.
+- **Updated:** ClientStructs now at [bc101ec2](https://github.com/aers/FFXIVClientStructs/tree/bc101ec2) ([compare](https://github.com/aers/FFXIVClientStructs/compare/1757d8f3..bc101ec2)).
+
 ## [1.51.0] (2026-03-11)
 
 - **Added:** The Addon Inspector now has an "Observe Events" button on addons, which opens a window to log ReceiveEvent calls.
@@ -820,7 +825,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.51.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.51.1...main
+[1.51.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.51.0...v1.51.1
 [1.51.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.50.0...v1.51.0
 [1.50.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.49.0...v1.50.0
 [1.49.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.48.1...v1.49.0
