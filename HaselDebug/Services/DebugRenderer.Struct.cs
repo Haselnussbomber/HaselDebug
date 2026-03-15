@@ -61,6 +61,9 @@ public unsafe partial class DebugRenderer
 
             if ((fieldType == typeof(int) || fieldType == typeof(long)) && fieldInfo.Name.Contains("Timestamp"))
                 fieldNodeOptions = fieldNodeOptions with { IsTimestampField = true };
+            
+            if ((fieldType == typeof(short) || fieldType == typeof(int) || fieldType == typeof(ushort) || fieldType == typeof(uint)) && fieldInfo.Name.Contains("WorldId"))
+                fieldNodeOptions = fieldNodeOptions with { IsWorldIdField = true };
 
             if (fieldInfo.GetCustomAttribute<ObsoleteAttribute>() is ObsoleteAttribute obsoleteAttribute)
             {

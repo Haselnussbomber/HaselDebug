@@ -131,6 +131,35 @@ public unsafe partial class DebugRenderer
 
             return;
         }
+        else if (nodeOptions.IsWorldIdField)
+        {
+            ImGuiUtils.DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+
+            switch (value)
+            {
+                case short shortWorldId when shortWorldId != 0 && _excelService.TryGetRow<World>((ushort)shortWorldId, out var worldRow):
+                    ImGui.SameLine();
+                    ImGuiUtils.DrawCopyableText(worldRow.Name.ToString());
+                    break;
+
+                case int intWorldId when intWorldId != 0 && _excelService.TryGetRow<World>((uint)intWorldId, out var worldRow):
+                    ImGui.SameLine();
+                    ImGuiUtils.DrawCopyableText(worldRow.Name.ToString());
+                    break;
+
+                case ushort ushortWorldId when ushortWorldId != 0 && _excelService.TryGetRow<World>(ushortWorldId, out var worldRow):
+                    ImGui.SameLine();
+                    ImGuiUtils.DrawCopyableText(worldRow.Name.ToString());
+                    break;
+
+                case uint uintWorldId when uintWorldId != 0 && _excelService.TryGetRow<World>(uintWorldId, out var worldRow):
+                    ImGui.SameLine();
+                    ImGuiUtils.DrawCopyableText(worldRow.Name.ToString());
+                    break;
+            }
+
+            return;
+        }
         else if (nodeOptions.HexOnShift)
         {
             if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || ImGui.IsKeyDown(ImGuiKey.RightShift))

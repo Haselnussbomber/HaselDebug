@@ -21,6 +21,7 @@ public record struct NodeOptions
     public ClientLanguage? Language { get; set; } = null;
     public bool IsIconIdField { get; set; } = false;
     public bool IsTimestampField { get; set; } = false;
+    public bool IsWorldIdField { get; set; } = false;
     public bool HexOnShift { get; set; } = false;
     public Pointer<AtkUnitBase>? UnitBase { get; set; } = null;
     public nint HighlightAddress { get; set; } = 0;
