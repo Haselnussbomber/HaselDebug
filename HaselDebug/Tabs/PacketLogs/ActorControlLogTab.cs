@@ -2,16 +2,25 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
+using static HaselDebug.Tabs.PacketLogs.ActorControlLogTab;
 
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class ActorControlLogTab : DebugTab, IPacketLogTab, IDisposable
+public unsafe partial class ActorControlLogTab : PacketLogTab<ActorControlEntry>, IDisposable
 {
-    private readonly IGameInteropProvider _gameInteropProvider;
-    private readonly List<(DateTime Time, uint entityId, uint category, uint arg1, uint arg2, uint arg3, uint arg4)> _records = [];
     private Hook<PacketDispatcher.Delegates.HandleActorControlPacket>? _hook;
-    private bool _enabled = false;
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ActorControlEntry
+    {
+        public uint EntityId;
+        public uint Category;
+        public uint Arg1;
+        public uint Arg2;
+        public uint Arg3;
+        public uint Arg4;
+    }
 
     public void Dispose()
     {
@@ -19,15 +28,20 @@ public unsafe partial class ActorControlLogTab : DebugTab, IPacketLogTab, IDispo
         Clear();
     }
 
-    private void Clear()
-    {
-        _records.Clear();
-    }
-
     private void HandleActorControlPacketDetour(uint entityId, uint category, uint arg1, uint arg2, uint arg3, uint arg4, uint arg5, uint arg6, uint arg7, uint arg8, GameObjectId targetId, bool isRecorded)
     {
         if (!isRecorded)
-            _records.Add((DateTime.Now, entityId, category, arg1, arg2, arg3, arg4));
+        {
+            AddRecord(new ActorControlEntry()
+            {
+                EntityId = entityId,
+                Category = category,
+                Arg1 = arg1,
+                Arg2 = arg2,
+                Arg3 = arg3,
+                Arg4 = arg4,
+            });
+        }
 
         _hook!.Original(entityId, category, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, targetId, isRecorded);
     }
@@ -36,23 +50,15 @@ public unsafe partial class ActorControlLogTab : DebugTab, IPacketLogTab, IDispo
     {
         _hook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleActorControlPacket>(PacketDispatcher.MemberFunctionPointers.HandleActorControlPacket, HandleActorControlPacketDetour);
 
-        if (ImGui.Checkbox("Enabled", ref _enabled))
-        {
-            if (_enabled && !_hook.IsEnabled)
-            {
-                _hook.Enable();
-            }
-            else if (!_enabled && _hook.IsEnabled)
-            {
-                _hook.Disable();
-            }
-        }
+        var enabled = IsPacketLogEnabled;
+        if (ImGui.Checkbox("Enabled", ref enabled))
+            TogglePacketLog();
 
         ImGui.SameLine();
         if (ImGui.Button("Clear"))
             Clear();
 
-        using var table = ImRaii.Table("SpawnNpcTable"u8, 7, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable);
+        using var table = ImRaii.Table("ActorControlLogTable"u8, 7, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable);
         if (!table) return;
 
         ImGui.TableSetupColumn("Time"u8, ImGuiTableColumnFlags.WidthFixed, 100);
@@ -65,31 +71,41 @@ public unsafe partial class ActorControlLogTab : DebugTab, IPacketLogTab, IDispo
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
-        for (var i = _records.Count - 1; i >= 0; i--)
+        foreach (var (index, time, payload) in Records)
         {
-            var (time, entityId, category, arg1, arg2, arg3, arg4) = _records[i];
-
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn();
-            ImGuiUtils.DrawCopyableText(entityId.ToString("X"));
+            ImGuiUtils.DrawCopyableText(payload.EntityId.ToString("X"));
 
             ImGui.TableNextColumn();
-            ImGuiUtils.DrawCopyableText(category.ToString());
+            ImGuiUtils.DrawCopyableText(payload.Category.ToString());
 
             ImGui.TableNextColumn();
-            ImGuiUtils.DrawCopyableText(arg1.ToString());
+            ImGuiUtils.DrawCopyableText(payload.Arg1.ToString());
 
             ImGui.TableNextColumn();
-            ImGuiUtils.DrawCopyableText(arg2.ToString());
+            ImGuiUtils.DrawCopyableText(payload.Arg2.ToString());
 
             ImGui.TableNextColumn();
-            ImGuiUtils.DrawCopyableText(arg3.ToString());
+            ImGuiUtils.DrawCopyableText(payload.Arg3.ToString());
 
             ImGui.TableNextColumn();
-            ImGuiUtils.DrawCopyableText(arg4.ToString());
+            ImGuiUtils.DrawCopyableText(payload.Arg4.ToString());
         }
+    }
+
+    public override void EnablePacketLog()
+    {
+        _hook!.Enable();
+        IsPacketLogEnabled = _hook.IsEnabled;
+    }
+
+    public override void DisablePacketLog()
+    {
+        _hook!.Disable();
+        IsPacketLogEnabled = _hook.IsEnabled;
     }
 }

@@ -1,60 +1,36 @@
+using System.Runtime.CompilerServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using HaselDebug.Services;
+using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class PartyFinderListingLogTab : DebugTab, IPacketLogTab, IDisposable
+public unsafe partial class PartyFinderListingLogTab : PacketLogTab<CrossRealmListingSegmentPacket>, IDisposable
 {
-    private readonly ILogger<PartyFinderListingLogTab> _logger;
-    private readonly DebugRenderer _debugRenderer;
-    private readonly IGameInteropProvider _gameInteropProvider;
-
-    private readonly List<(DateTime Time, Pointer<CrossRealmListingSegmentPacket> Packet)> _records = [];
-    private Hook<InfoProxyCrossRealm.Delegates.ReceiveListing>? _receiveListingHook;
-
-    private bool _enabled = false;
+    private Hook<InfoProxyCrossRealm.Delegates.ReceiveListing>? _hook;
 
     public void Dispose()
     {
-        _receiveListingHook?.Dispose();
+        _hook?.Dispose();
         Clear();
-    }
-
-    private void Clear()
-    {
-        foreach (var (_, Packet) in _records)
-            Marshal.FreeHGlobal((nint)Packet.Value);
-
-        _records.Clear();
     }
 
     private void ReceiveListingDetour(InfoProxyCrossRealm* thisPtr, nint packet)
     {
-        var ptr = (CrossRealmListingSegmentPacket*)Marshal.AllocHGlobal(sizeof(CrossRealmListingSegmentPacket));
-        *ptr = *(CrossRealmListingSegmentPacket*)packet;
-        _records.Add((DateTime.Now, (Pointer<CrossRealmListingSegmentPacket>)ptr));
-        _receiveListingHook!.Original(thisPtr, packet);
+        AddRecord(*(CrossRealmListingSegmentPacket*)packet);
+        _hook!.Original(thisPtr, packet);
     }
 
     public override void Draw()
     {
-        _receiveListingHook ??= _gameInteropProvider.HookFromAddress<InfoProxyCrossRealm.Delegates.ReceiveListing>((nint)InfoProxyCrossRealm.MemberFunctionPointers.ReceiveListing, ReceiveListingDetour);
+        _hook ??= _gameInteropProvider.HookFromAddress<InfoProxyCrossRealm.Delegates.ReceiveListing>((nint)InfoProxyCrossRealm.MemberFunctionPointers.ReceiveListing, ReceiveListingDetour);
 
-        if (ImGui.Checkbox("Enabled", ref _enabled))
-        {
-            if (_enabled && !_receiveListingHook.IsEnabled)
-            {
-                _receiveListingHook.Enable();
-            }
-            else if (!_enabled && _receiveListingHook.IsEnabled)
-            {
-                _receiveListingHook.Disable();
-            }
-        }
+        var enabled = IsPacketLogEnabled;
+        if (ImGui.Checkbox("Enabled", ref enabled))
+            TogglePacketLog();
 
         ImGui.SameLine();
         if (ImGui.Button("Clear"))
@@ -68,16 +44,26 @@ public unsafe partial class PartyFinderListingLogTab : DebugTab, IPacketLogTab, 
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
-        for (var i = _records.Count - 1; i >= 0; i--)
+        foreach (var (index, time, packet) in Records)
         {
-            var (time, packet) = _records[i];
-
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Time
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn(); // Packet
-            _debugRenderer.DrawPointerType(packet);
+            _debugRenderer.DrawPointerType((CrossRealmListingSegmentPacket*)Unsafe.AsPointer(in packet), new NodeOptions() { AddressPath = new([index]) });
         }
+    }
+
+    public override void EnablePacketLog()
+    {
+        _hook!.Enable();
+        IsPacketLogEnabled = _hook.IsEnabled;
+    }
+
+    public override void DisablePacketLog()
+    {
+        _hook!.Disable();
+        IsPacketLogEnabled = _hook.IsEnabled;
     }
 }

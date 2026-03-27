@@ -1,66 +1,39 @@
+using System.Runtime.CompilerServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using HaselDebug.Services;
 using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class SpawnObjectLogTab : DebugTab, IPacketLogTab, IDisposable
+public unsafe partial class SpawnObjectLogTab : PacketLogTab<SpawnObjectPacket>, IDisposable
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly TextService _textService;
-    private readonly WindowManager _windowManager;
-    private readonly DebugRenderer _debugRenderer;
-    private readonly IGameGui _gameGui;
-    private readonly IGameInteropProvider _gameInteropProvider;
-    private readonly ISeStringEvaluator _seStringEvaluator;
-    private readonly List<(DateTime Time, Pointer<SpawnObjectPacket> Packet)> _npcRecords = [];
-    private Hook<PacketDispatcher.Delegates.HandleSpawnObjectPacket>? _spawnObjectHook;
-    private bool _enabled = false;
+    private Hook<PacketDispatcher.Delegates.HandleSpawnObjectPacket>? _hook;
 
     public void Dispose()
     {
-        _spawnObjectHook?.Dispose();
+        _hook?.Dispose();
         Clear();
-    }
-
-    private void Clear()
-    {
-        foreach (var (_, Packet) in _npcRecords)
-            Marshal.FreeHGlobal((nint)Packet.Value);
-
-        _npcRecords.Clear();
     }
 
     private void HandleSpawnObjectPacketDetour(uint targetId, SpawnObjectPacket* packet)
     {
-        var ptr = (SpawnObjectPacket*)Marshal.AllocHGlobal(sizeof(SpawnObjectPacket));
-        *ptr = *packet;
-        _npcRecords.Add((DateTime.Now, (Pointer<SpawnObjectPacket>)ptr));
-        _spawnObjectHook!.Original(targetId, packet);
+        AddRecord(*packet);
+        _hook!.Original(targetId, packet);
     }
 
     public delegate void HandleSpawnObjectPacket(PacketDispatcher* a1, SpawnObjectPacket* packet);
 
     public override void Draw()
     {
-        _spawnObjectHook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleSpawnObjectPacket>(PacketDispatcher.MemberFunctionPointers.HandleSpawnObjectPacket, HandleSpawnObjectPacketDetour);
+        _hook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleSpawnObjectPacket>(PacketDispatcher.MemberFunctionPointers.HandleSpawnObjectPacket, HandleSpawnObjectPacketDetour);
 
-        if (ImGui.Checkbox("Enabled", ref _enabled))
-        {
-            if (_enabled && !_spawnObjectHook.IsEnabled)
-            {
-                _spawnObjectHook.Enable();
-            }
-            else if (!_enabled && _spawnObjectHook.IsEnabled)
-            {
-                _spawnObjectHook.Disable();
-            }
-        }
+        var enabled = IsPacketLogEnabled;
+        if (ImGui.Checkbox("Enabled", ref enabled))
+            TogglePacketLog();
 
         ImGui.SameLine();
         if (ImGui.Button("Clear"))
@@ -74,24 +47,34 @@ public unsafe partial class SpawnObjectLogTab : DebugTab, IPacketLogTab, IDispos
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
-        for (var i = _npcRecords.Count - 1; i >= 0; i--)
+        foreach (var (i, time, packet) in Records)
         {
-            var (time, packet) = _npcRecords[i];
-
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn();
 
-            var objectKind = packet.Value->ObjectKind;
+            var objectKind = packet.ObjectKind;
             var name = $"[{(ObjectKind)objectKind}] ";
 
-            _debugRenderer.DrawPointerType(packet, new NodeOptions()
+            _debugRenderer.DrawPointerType((SpawnObjectPacket*)Unsafe.AsPointer(in packet), new NodeOptions()
             {
                 AddressPath = new(i),
                 Title = name
             });
         }
+    }
+
+    public override void EnablePacketLog()
+    {
+        _hook!.Enable();
+        IsPacketLogEnabled = _hook.IsEnabled;
+    }
+
+    public override void DisablePacketLog()
+    {
+        _hook!.Disable();
+        IsPacketLogEnabled = _hook.IsEnabled;
     }
 }

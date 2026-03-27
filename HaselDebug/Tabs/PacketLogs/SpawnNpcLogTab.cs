@@ -1,67 +1,59 @@
+using System.Runtime.CompilerServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
-using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
+using static HaselDebug.Tabs.PacketLogs.SpawnNpcLogTab;
 using DObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class SpawnNpcLogTab : DebugTab, IPacketLogTab, IDisposable
+public unsafe partial class SpawnNpcLogTab : PacketLogTab<SpawnNpcEntry>, IDisposable
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly TextService _textService;
     private readonly WindowManager _windowManager;
-    private readonly DebugRenderer _debugRenderer;
     private readonly IGameGui _gameGui;
-    private readonly IGameInteropProvider _gameInteropProvider;
     private readonly ISeStringEvaluator _seStringEvaluator;
-    private readonly List<(DateTime Time, uint entityId, Pointer<SpawnNpcPacket> Packet)> _npcRecords = [];
-    private Hook<PacketDispatcher.Delegates.HandleSpawnNpcPacket>? _spawnNpcHook;
-    private bool _enabled = false;
+
+    private Hook<PacketDispatcher.Delegates.HandleSpawnNpcPacket>? _hook;
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SpawnNpcEntry
+    {
+        public uint EntityId;
+        public SpawnNpcPacket Packet;
+    }
 
     public void Dispose()
     {
-        _spawnNpcHook?.Dispose();
+        _hook?.Dispose();
         Clear();
-    }
-
-    private void Clear()
-    {
-        foreach (var (_, _, Packet) in _npcRecords)
-            Marshal.FreeHGlobal((nint)Packet.Value);
-
-        _npcRecords.Clear();
     }
 
     private void HandleSpawnNpcPacketDetour(uint entityId, SpawnNpcPacket* packet)
     {
-        var ptr = (SpawnNpcPacket*)Marshal.AllocHGlobal(sizeof(SpawnNpcPacket));
-        *ptr = *packet;
-        _npcRecords.Add((DateTime.Now, entityId, (Pointer<SpawnNpcPacket>)ptr));
-        _spawnNpcHook!.Original(entityId, packet);
+        AddRecord(new SpawnNpcEntry()
+        {
+            EntityId = entityId,
+            Packet = *packet,
+        });
+
+        _hook!.Original(entityId, packet);
     }
 
     public override void Draw()
     {
-        _spawnNpcHook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleSpawnNpcPacket>(PacketDispatcher.MemberFunctionPointers.HandleSpawnNpcPacket, HandleSpawnNpcPacketDetour);
+        _hook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleSpawnNpcPacket>(PacketDispatcher.MemberFunctionPointers.HandleSpawnNpcPacket, HandleSpawnNpcPacketDetour);
 
-        if (ImGui.Checkbox("Enabled", ref _enabled))
-        {
-            if (_enabled && !_spawnNpcHook.IsEnabled)
-            {
-                _spawnNpcHook.Enable();
-            }
-            else if (!_enabled && _spawnNpcHook.IsEnabled)
-            {
-                _spawnNpcHook.Disable();
-            }
-        }
+        var enabled = IsPacketLogEnabled;
+        if (ImGui.Checkbox("Enabled", ref enabled))
+            TogglePacketLog();
 
         ImGui.SameLine();
         if (ImGui.Button("Clear"))
@@ -76,34 +68,32 @@ public unsafe partial class SpawnNpcLogTab : DebugTab, IPacketLogTab, IDisposabl
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
-        for (var i = _npcRecords.Count - 1; i >= 0; i--)
+        foreach (var (index, time, entry) in Records)
         {
-            var (time, entityId, packet) = _npcRecords[i];
-
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn();
-            ImGuiUtils.DrawCopyableText(entityId.ToString("X"));
+            ImGuiUtils.DrawCopyableText(entry.EntityId.ToString("X"));
 
             ImGui.TableNextColumn();
 
-            var objectKind = packet.Value->Common.ObjectKind;
+            var objectKind = entry.Packet.Common.ObjectKind;
             var name = $"[{objectKind}] ";
 
-            if (packet.Value->Common.NameId != 0)
-                name += _seStringEvaluator.EvaluateObjStr((DObjectKind)objectKind, packet.Value->Common.NameId);
+            if (entry.Packet.Common.NameId != 0)
+                name += _seStringEvaluator.EvaluateObjStr((DObjectKind)objectKind, entry.Packet.Common.NameId);
             else
-                name += packet.Value->Common.NameString;
+                name += entry.Packet.Common.NameString;
 
-            _debugRenderer.DrawPointerType(packet, new NodeOptions()
+            _debugRenderer.DrawPointerType((SpawnNpcPacket*)Unsafe.AsPointer(in entry.Packet), new NodeOptions()
             {
-                AddressPath = new(i),
+                AddressPath = new(index),
                 Title = name,
                 OnHovered = () =>
                 {
-                    var gameObject = GameObjectManager.Instance()->Objects.GetObjectByEntityId(entityId);
+                    var gameObject = GameObjectManager.Instance()->Objects.GetObjectByEntityId(entry.EntityId);
                     if (gameObject != null)
                     {
                         var pos = gameObject->GetPosition();
@@ -116,18 +106,18 @@ public unsafe partial class SpawnNpcLogTab : DebugTab, IPacketLogTab, IDisposabl
                 },
                 DrawContextMenu = (nodeOptions, builder) =>
                 {
-                    var gameObject = GameObjectManager.Instance()->Objects.GetObjectByEntityId(entityId);
+                    var gameObject = GameObjectManager.Instance()->Objects.GetObjectByEntityId(entry.EntityId);
                     builder.Add(new ImGuiContextMenuEntry()
                     {
                         Label = _textService.Translate("ContextMenu.TabPopout"),
                         Visible = gameObject != null,
                         ClickCallback = () =>
                         {
-                            var windowName = $"Entity #{entityId:X}";
+                            var windowName = $"Entity #{entry.EntityId:X}";
                             var window = _windowManager.CreateOrOpen(windowName, () => _serviceProvider.CreateInstance<EntityInspectorWindow>());
                             window.WindowNameKey = string.Empty;
                             window.WindowName = windowName;
-                            window.EntityId = entityId;
+                            window.EntityId = entry.EntityId;
                         }
                     });
                     builder.AddCopyName(name);
@@ -135,5 +125,17 @@ public unsafe partial class SpawnNpcLogTab : DebugTab, IPacketLogTab, IDisposabl
                 }
             });
         }
+    }
+
+    public override void EnablePacketLog()
+    {
+        _hook!.Enable();
+        IsPacketLogEnabled = _hook.IsEnabled;
+    }
+
+    public override void DisablePacketLog()
+    {
+        _hook!.Disable();
+        IsPacketLogEnabled = _hook.IsEnabled;
     }
 }

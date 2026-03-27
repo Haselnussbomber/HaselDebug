@@ -1,65 +1,38 @@
+using System.Runtime.CompilerServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using HaselDebug.Services;
 using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class SpawnTreasureLogTab : DebugTab, IPacketLogTab, IDisposable
+public unsafe partial class SpawnTreasureLogTab : PacketLogTab<SpawnTreasurePacket>, IDisposable
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly TextService _textService;
-    private readonly WindowManager _windowManager;
-    private readonly DebugRenderer _debugRenderer;
-    private readonly IGameGui _gameGui;
-    private readonly IGameInteropProvider _gameInteropProvider;
-    private readonly ISeStringEvaluator _seStringEvaluator;
-    private readonly List<(DateTime Time, Pointer<SpawnTreasurePacket> Packet)> _npcRecords = [];
-    private Hook<PacketDispatcher.Delegates.HandleSpawnTreasurePacket>? _spawnTreasureHook;
-    private bool _enabled = false;
+    private Hook<PacketDispatcher.Delegates.HandleSpawnTreasurePacket>? _hook;
 
     public void Dispose()
     {
-        _spawnTreasureHook?.Dispose();
+        _hook?.Dispose();
         Clear();
-    }
-
-    private void Clear()
-    {
-        foreach (var (_, Packet) in _npcRecords)
-            Marshal.FreeHGlobal((nint)Packet.Value);
-
-        _npcRecords.Clear();
     }
 
     private void HandleSpawnTreasurePacketDetour(uint targetId, SpawnTreasurePacket* packet)
     {
-        var ptr = (SpawnTreasurePacket*)Marshal.AllocHGlobal(sizeof(SpawnTreasurePacket));
-        *ptr = *packet;
-        _npcRecords.Add((DateTime.Now, (Pointer<SpawnTreasurePacket>)ptr));
-        _spawnTreasureHook!.Original(targetId, packet);
+        AddRecord(*packet);
+        _hook!.Original(targetId, packet);
     }
 
     public delegate void HandleSpawnTreasurePacket(PacketDispatcher* a1, SpawnTreasurePacket* packet);
 
     public override void Draw()
     {
-        _spawnTreasureHook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleSpawnTreasurePacket>(PacketDispatcher.MemberFunctionPointers.HandleSpawnTreasurePacket, HandleSpawnTreasurePacketDetour);
+        _hook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleSpawnTreasurePacket>(PacketDispatcher.MemberFunctionPointers.HandleSpawnTreasurePacket, HandleSpawnTreasurePacketDetour);
 
-        if (ImGui.Checkbox("Enabled", ref _enabled))
-        {
-            if (_enabled && !_spawnTreasureHook.IsEnabled)
-            {
-                _spawnTreasureHook.Enable();
-            }
-            else if (!_enabled && _spawnTreasureHook.IsEnabled)
-            {
-                _spawnTreasureHook.Disable();
-            }
-        }
+        var enabled = IsPacketLogEnabled;
+        if (ImGui.Checkbox("Enabled", ref enabled))
+            TogglePacketLog();
 
         ImGui.SameLine();
         if (ImGui.Button("Clear"))
@@ -73,19 +46,29 @@ public unsafe partial class SpawnTreasureLogTab : DebugTab, IPacketLogTab, IDisp
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
-        for (var i = _npcRecords.Count - 1; i >= 0; i--)
+        foreach (var (index, time, packet) in Records)
         {
-            var (time, packet) = _npcRecords[i];
-
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawPointerType(packet, new NodeOptions()
+            _debugRenderer.DrawPointerType((SpawnTreasurePacket*)Unsafe.AsPointer(in packet), new NodeOptions()
             {
-                AddressPath = new(i)
+                AddressPath = new(index)
             });
         }
+    }
+
+    public override void EnablePacketLog()
+    {
+        _hook!.Enable();
+        IsPacketLogEnabled = _hook.IsEnabled;
+    }
+
+    public override void DisablePacketLog()
+    {
+        _hook!.Disable();
+        IsPacketLogEnabled = _hook.IsEnabled;
     }
 }
