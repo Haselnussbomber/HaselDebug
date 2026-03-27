@@ -9,7 +9,6 @@ public partial class AetherytesTab : DebugTab
 {
     private readonly IAetheryteList _aetheryteList;
     private readonly TextService _textService;
-    private readonly ExcelService _excelService;
     private readonly UldService _uldService;
 
     public override bool DrawInChild => false;
@@ -82,9 +81,6 @@ public partial class AetherytesTab : DebugTab
     // int GetRegion(Client::UI::Agent::AgentTeleport* thisPtr, Client::Game::UI::TeleportInfo* teleportInfo)
     private static AetheryteRegion GetRegion(TerritoryType territoryType)
     {
-        //if (territoryType == null)
-        //    return AetheryteRegion.Others;
-
         if (territoryType.TerritoryIntendedUse.RowId == 13)
             return AetheryteRegion.HousingArea;
 
@@ -117,9 +113,9 @@ public partial class AetherytesTab : DebugTab
     {
         return region switch
         {
-            AetheryteRegion.LaNoscea => _excelService.TryGetRow<PlaceName>(22, out var placeName) ? placeName.Name.ToString() : string.Empty, // La Noscea
-            AetheryteRegion.TheBlackShroud => _excelService.TryGetRow<PlaceName>(23, out var placeName) ? placeName.Name.ToString() : string.Empty, // The Black Shroud
-            AetheryteRegion.Thanalan => _excelService.TryGetRow<PlaceName>(24, out var placeName) ? placeName.Name.ToString() : string.Empty, // Thanalan
+            AetheryteRegion.LaNoscea => _textService.GetPlaceName(22), // La Noscea
+            AetheryteRegion.TheBlackShroud => _textService.GetPlaceName(23), // The Black Shroud
+            AetheryteRegion.Thanalan => _textService.GetPlaceName(24), // Thanalan
             AetheryteRegion.Coerthas or AetheryteRegion.Dravania or AetheryteRegion.AbalathiasSpine => _textService.GetAddonText(8486), // Ishgard and Surrounding Areas
             AetheryteRegion.GyrAbania => _textService.GetAddonText(8488), // Gyr Abania
             AetheryteRegion.Hingashi or AetheryteRegion.Othard => _textService.GetAddonText(8489), // Othard
