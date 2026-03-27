@@ -4,10 +4,10 @@ using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 
-namespace HaselDebug.Tabs;
+namespace HaselDebug.Tabs.PacketLogs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class PartyFinderListingLogTab : DebugTab, IDisposable
+[RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class PartyFinderListingLogTab : DebugTab, IPacketLogTab, IDisposable
 {
     private readonly ILogger<PartyFinderListingLogTab> _logger;
     private readonly DebugRenderer _debugRenderer;
@@ -73,10 +73,10 @@ public unsafe partial class PartyFinderListingLogTab : DebugTab, IDisposable
             var (time, packet) = _records[i];
 
             ImGui.TableNextRow();
-            ImGui.TableNextColumn();
+            ImGui.TableNextColumn(); // Time
             ImGui.Text(time.ToLongTimeString());
 
-            ImGui.TableNextColumn();
+            ImGui.TableNextColumn(); // Packet
             _debugRenderer.DrawPointerType(packet);
         }
     }

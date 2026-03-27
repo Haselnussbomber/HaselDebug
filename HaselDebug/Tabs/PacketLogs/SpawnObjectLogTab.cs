@@ -1,14 +1,15 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 
-namespace HaselDebug.Tabs;
+namespace HaselDebug.Tabs.PacketLogs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class SpawnTreasureLogTab : DebugTab, IDisposable
+[RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class SpawnObjectLogTab : DebugTab, IPacketLogTab, IDisposable
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly TextService _textService;
@@ -17,13 +18,13 @@ public unsafe partial class SpawnTreasureLogTab : DebugTab, IDisposable
     private readonly IGameGui _gameGui;
     private readonly IGameInteropProvider _gameInteropProvider;
     private readonly ISeStringEvaluator _seStringEvaluator;
-    private readonly List<(DateTime Time, Pointer<SpawnTreasurePacket> Packet)> _npcRecords = [];
-    private Hook<PacketDispatcher.Delegates.HandleSpawnTreasurePacket>? _spawnTreasureHook;
+    private readonly List<(DateTime Time, Pointer<SpawnObjectPacket> Packet)> _npcRecords = [];
+    private Hook<PacketDispatcher.Delegates.HandleSpawnObjectPacket>? _spawnObjectHook;
     private bool _enabled = false;
 
     public void Dispose()
     {
-        _spawnTreasureHook?.Dispose();
+        _spawnObjectHook?.Dispose();
         Clear();
     }
 
@@ -35,29 +36,29 @@ public unsafe partial class SpawnTreasureLogTab : DebugTab, IDisposable
         _npcRecords.Clear();
     }
 
-    private void HandleSpawnTreasurePacketDetour(uint targetId, SpawnTreasurePacket* packet)
+    private void HandleSpawnObjectPacketDetour(uint targetId, SpawnObjectPacket* packet)
     {
-        var ptr = (SpawnTreasurePacket*)Marshal.AllocHGlobal(sizeof(SpawnTreasurePacket));
+        var ptr = (SpawnObjectPacket*)Marshal.AllocHGlobal(sizeof(SpawnObjectPacket));
         *ptr = *packet;
-        _npcRecords.Add((DateTime.Now, (Pointer<SpawnTreasurePacket>)ptr));
-        _spawnTreasureHook!.Original(targetId, packet);
+        _npcRecords.Add((DateTime.Now, (Pointer<SpawnObjectPacket>)ptr));
+        _spawnObjectHook!.Original(targetId, packet);
     }
 
-    public delegate void HandleSpawnTreasurePacket(PacketDispatcher* a1, SpawnTreasurePacket* packet);
+    public delegate void HandleSpawnObjectPacket(PacketDispatcher* a1, SpawnObjectPacket* packet);
 
     public override void Draw()
     {
-        _spawnTreasureHook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleSpawnTreasurePacket>(PacketDispatcher.MemberFunctionPointers.HandleSpawnTreasurePacket, HandleSpawnTreasurePacketDetour);
+        _spawnObjectHook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleSpawnObjectPacket>(PacketDispatcher.MemberFunctionPointers.HandleSpawnObjectPacket, HandleSpawnObjectPacketDetour);
 
         if (ImGui.Checkbox("Enabled", ref _enabled))
         {
-            if (_enabled && !_spawnTreasureHook.IsEnabled)
+            if (_enabled && !_spawnObjectHook.IsEnabled)
             {
-                _spawnTreasureHook.Enable();
+                _spawnObjectHook.Enable();
             }
-            else if (!_enabled && _spawnTreasureHook.IsEnabled)
+            else if (!_enabled && _spawnObjectHook.IsEnabled)
             {
-                _spawnTreasureHook.Disable();
+                _spawnObjectHook.Disable();
             }
         }
 
@@ -65,7 +66,7 @@ public unsafe partial class SpawnTreasureLogTab : DebugTab, IDisposable
         if (ImGui.Button("Clear"))
             Clear();
 
-        using var table = ImRaii.Table("SpawnTreasureTable"u8, 2, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable);
+        using var table = ImRaii.Table("SpawnObjectTable"u8, 2, ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable);
         if (!table) return;
 
         ImGui.TableSetupColumn("Time"u8, ImGuiTableColumnFlags.WidthFixed, 100);
@@ -82,9 +83,14 @@ public unsafe partial class SpawnTreasureLogTab : DebugTab, IDisposable
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn();
+
+            var objectKind = packet.Value->ObjectKind;
+            var name = $"[{(ObjectKind)objectKind}] ";
+
             _debugRenderer.DrawPointerType(packet, new NodeOptions()
             {
-                AddressPath = new(i)
+                AddressPath = new(i),
+                Title = name
             });
         }
     }

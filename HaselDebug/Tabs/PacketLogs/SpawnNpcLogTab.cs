@@ -9,10 +9,10 @@ using HaselDebug.Utils;
 using HaselDebug.Windows;
 using DObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 
-namespace HaselDebug.Tabs;
+namespace HaselDebug.Tabs.PacketLogs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class SpawnNpcLogTab : DebugTab, IDisposable
+[RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class SpawnNpcLogTab : DebugTab, IPacketLogTab, IDisposable
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly TextService _textService;

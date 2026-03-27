@@ -3,10 +3,10 @@ using FFXIVClientStructs.FFXIV.Client.Network;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 
-namespace HaselDebug.Tabs;
+namespace HaselDebug.Tabs.PacketLogs;
 
-[RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class ActorControlLogTab : DebugTab, IDisposable
+[RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
+public unsafe partial class ActorControlLogTab : DebugTab, IPacketLogTab, IDisposable
 {
     private readonly IGameInteropProvider _gameInteropProvider;
     private readonly List<(DateTime Time, uint entityId, uint category, uint arg1, uint arg2, uint arg3, uint arg4)> _records = [];
