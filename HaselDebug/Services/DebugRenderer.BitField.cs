@@ -161,7 +161,7 @@ public unsafe partial class DebugRenderer
                     var value = BitOps.GetBits(fieldValue, index, BitOps.CreateLowBitMask<ulong>(length));
 
                     if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || ImGui.IsKeyDown(ImGuiKey.RightShift))
-                        ImGuiUtils.DrawCopyableText(ToHexString(value, bitfieldType));
+                        ImGuiUtils.DrawCopyableText(ToHexString(value, typeof(ulong)));
                     else
                         ImGuiUtils.DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
 
