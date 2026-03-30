@@ -20,6 +20,14 @@
     "en": "HaselDebug Configuration",
     "de": "HaselDebug-Konfiguration"
   },
+  "Config.ShowInDevMenu.Label": {
+    "en": "Show in dev menu",
+    "de": "In Entwicklermenü anzeigen"
+  },
+  "Config.ShowInDevMenu.Description": {
+    "en": "Adds a HaselDebug menu entry to the /xldev menu bar",
+    "de": "Fügt den Menüeintrag HaselDebug zur /xldev Menüleiste hinzu"
+  },
   "Config.AutoOpenPluginWindow.Label": {
     "en": "Auto-open HaselDebug",
     "de": "HaselDebug automatisch öffnen"

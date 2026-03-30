@@ -30,6 +30,12 @@ public partial class ConfigWindow : SimpleWindow
     {
         var configChanged = false;
 
+        // ShowInDevMenu
+        configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.ShowInDevMenu.Label")}##ShowInDevMenu", ref _pluginConfig.ShowInDevMenu);
+
+        using (ImGuiUtils.ConfigIndent())
+            ImGui.TextColoredWrapped(Color.Grey3, _textService.Translate("Config.ShowInDevMenu.Description"));
+
         // AutoOpenPluginWindow
         configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.AutoOpenPluginWindow.Label")}##AutoOpenPluginWindow", ref _pluginConfig.AutoOpenPluginWindow);
 

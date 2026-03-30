@@ -69,6 +69,7 @@ public partial class PluginConfig : IPluginConfiguration
 public partial class PluginConfig
 {
     public int Version { get; set; } = CURRENT_CONFIG_VERSION;
+    public bool ShowInDevMenu = true;
     public bool AutoOpenPluginWindow = false;
     public bool EnableLuaLogger = false;
     public bool ResolveAddonLifecycleVTables = true;
