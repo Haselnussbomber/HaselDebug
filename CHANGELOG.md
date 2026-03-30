@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.52.0] (2026-03-30)
+
+- **Added:** A config option to toggle the /xldev menu entry.
+- **Added:** Support for AgentLifecycle vtable replacements. The original vtable address is now resolved. Can be disabled in the plugin configuration.
+- **Added:** Fields of type short, int, ushort or uint and name containing "WorldId" will now additionally display the World name.
+- **Added:** A Party Finder Listing Log tab was added to log incoming CrossRealmListingSegmentPackets.
+- **Updated:** Packet Log tabs are now grouped together.
+- **Updated:** The Chara Select Character List tab was overhauled and is now displayed as table, like in other tabs.
+- **Fixed:** An exception in the BitField renderer when the underlying type is not ulong and shift was held for the hex view.
+- **Updated:** ClientStructs now at [4245e53d](https://github.com/aers/FFXIVClientStructs/tree/4245e53d) ([compare](https://github.com/aers/FFXIVClientStructs/compare/bc101ec2..4245e53d)).
+
 ## [1.51.1] (2026-03-13)
 
 - **Fixed:** NodeOptions were using `default`, causing properties not to be initialized.
@@ -825,7 +836,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.51.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.52.0...main
+[1.52.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.51.1...v1.52.0
 [1.51.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.51.0...v1.51.1
 [1.51.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.50.0...v1.51.0
 [1.50.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.49.0...v1.50.0
