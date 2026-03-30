@@ -25,8 +25,6 @@ public unsafe partial class SpawnObjectLogTab : PacketLogTab<SpawnObjectPacket>,
         _hook!.Original(targetId, packet);
     }
 
-    public delegate void HandleSpawnObjectPacket(PacketDispatcher* a1, SpawnObjectPacket* packet);
-
     public override void Draw()
     {
         _hook ??= _gameInteropProvider.HookFromAddress<PacketDispatcher.Delegates.HandleSpawnObjectPacket>(PacketDispatcher.MemberFunctionPointers.HandleSpawnObjectPacket, HandleSpawnObjectPacketDetour);
