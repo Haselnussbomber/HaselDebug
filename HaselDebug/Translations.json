@@ -41,8 +41,12 @@
     "de": "Schreibt print und panics in die Debug-Log."
   },
   "Config.ResolveAddonLifecycleVTables.Label": {
-    "en": "Resolve original Addon vtables",
-    "de": "Originale Addon vtables auflösen"
+    "en": "Resolve original Addon VTable addresses",
+    "de": "Originale Addon VTable-Adressen auflösen"
+  },
+  "Config.ResolveAgentLifecycleVTables.Label": {
+    "en": "Resolve original Agent VTable addresses",
+    "de": "Originale Agent VTable-Addressen auflösen"
   },
   "Config.SpacesInKTKNames.Label": {
     "en": "Better readable KTK Node Names",

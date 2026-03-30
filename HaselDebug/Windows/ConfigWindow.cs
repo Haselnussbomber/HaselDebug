@@ -48,6 +48,9 @@ public partial class ConfigWindow : SimpleWindow
         // ResolveAddonLifecycleVTables
         configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.ResolveAddonLifecycleVTables.Label")}##ResolveAddonLifecycleVTables", ref _pluginConfig.ResolveAddonLifecycleVTables);
 
+        // ResolveAgentLifecycleVTables
+        configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.ResolveAgentLifecycleVTables.Label")}##ResolveAgentLifecycleVTables", ref _pluginConfig.ResolveAgentLifecycleVTables);
+
         // SpacesInKTKNames
         configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.SpacesInKTKNames.Label")}##SpacesInKTKNames", ref _pluginConfig.SpacesInKTKNames);
 

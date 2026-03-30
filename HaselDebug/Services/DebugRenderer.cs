@@ -55,6 +55,7 @@ public unsafe partial class DebugRenderer
     private readonly ProcessInfoService _processInfoService;
     private readonly PluginConfig _pluginConfig;
     private readonly IAddonLifecycle _addonLifecycle;
+    private readonly IAgentLifecycle _agentLifecycle;
 
     public void DrawPointerType<T>(T* obj, NodeOptions? nodeOptions = null) where T : unmanaged
         => DrawPointerType((nint)obj, typeof(T), nodeOptions);
@@ -109,6 +110,14 @@ public unsafe partial class DebugRenderer
         if (_pluginConfig.ResolveAddonLifecycleVTables)
         {
             var originalAddress = _addonLifecycle.GetOriginalVirtualTable(address);
+            if (originalAddress != 0 && _processInfoService.IsPointerValid(originalAddress))
+                address = originalAddress;
+        }
+
+        // Get the original VTable address for addons from IAgentLifecycle, if it replaced it
+        if (_pluginConfig.ResolveAgentLifecycleVTables)
+        {
+            var originalAddress = _agentLifecycle.GetOriginalVirtualTable(address);
             if (originalAddress != 0 && _processInfoService.IsPointerValid(originalAddress))
                 address = originalAddress;
         }
