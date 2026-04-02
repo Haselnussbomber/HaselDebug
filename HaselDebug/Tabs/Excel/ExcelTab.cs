@@ -64,7 +64,7 @@ public unsafe partial class ExcelTab : DebugTab
         _sheetTypes = sheetsType.Assembly
             .GetExportedTypes()
             .Where(type => type.Namespace == sheetsType.Namespace && !string.IsNullOrEmpty(type.GetCustomAttribute<SheetAttribute>()?.Name))
-            .ToDictionary(type => type.GetCustomAttribute<SheetAttribute>()!.Name!);
+            .ToDictionary(type => type.GetCustomAttribute<SheetAttribute>()!.Name!, StringComparer.Ordinal);
 
         try
         {
@@ -127,7 +127,7 @@ public unsafe partial class ExcelTab : DebugTab
         {
             if (dropdown)
             {
-                var values = Enum.GetValues<ClientLanguage>().OrderBy((ClientLanguage lang) => lang.ToString());
+                var values = Enum.GetValues<ClientLanguage>().OrderBy(lang => lang.ToString(), StringComparer.Ordinal);
                 foreach (var value in values)
                 {
                     if (ImGui.Selectable(Enum.GetName(value), value == SelectedLanguage))
@@ -174,7 +174,7 @@ public unsafe partial class ExcelTab : DebugTab
         ImGui.TableHeadersRow();
 
         var i = 0;
-        foreach (var sheetName in _allSheetNames.OrderBy(sheetName => sheetName))
+        foreach (var sheetName in _allSheetNames.Order(StringComparer.Ordinal))
         {
             if (hasSearchTerm && !sheetName.Contains(_sheetNameSearchTerm, StringComparison.InvariantCultureIgnoreCase))
                 continue;
@@ -316,11 +316,11 @@ public unsafe partial class ExcelTab : DebugTab
 
         _logger.LogInformation("[Excel2Tab] Searching {SheetCount} sheets", _allSheetNames.Count);
 
-        Task.Run(() =>
+        _ = Task.Run(() =>
         {
             try
             {
-                var dict = new ConcurrentDictionary<string, List<GlobalSearchResult>>();
+                var dict = new ConcurrentDictionary<string, List<GlobalSearchResult>>(StringComparer.Ordinal);
 
                 Parallel.ForEach(_allSheetNames, new ParallelOptions() { CancellationToken = token }, (sheetName) =>
                 {
@@ -345,7 +345,7 @@ public unsafe partial class ExcelTab : DebugTab
 
                 if (!token.IsCancellationRequested)
                 {
-                    _globalSearchResults = [.. dict.OrderBy(kv => kv.Key).SelectMany(kv => kv.Value)];
+                    _globalSearchResults = [.. dict.OrderBy(kv => kv.Key, StringComparer.Ordinal).SelectMany(kv => kv.Value)];
                     _openResultsWindowOnNextFrame = true;
                 }
             }

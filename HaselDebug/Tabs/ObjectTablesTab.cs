@@ -15,7 +15,8 @@ public class ObjectTablesTab : DebugTab
     public ObjectTablesTab(IEnumerable<IObjectTableTab> subTabs)
     {
         SubTabs = subTabs
-            .OrderBy(t => t.Title).ToArray()
-            .Cast<IDebugTab>().ToImmutableArray();
+            .OrderBy(t => t.Title, StringComparer.Ordinal)
+            .Cast<IDebugTab>()
+            .ToImmutableArray();
     }
 }

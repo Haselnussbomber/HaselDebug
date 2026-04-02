@@ -19,8 +19,9 @@ public partial class UnlocksTab : DebugTab
     private void Initialize(IEnumerable<IUnlockTab> subTabs)
     {
         SubTabs = subTabs
-            .OrderBy(t => t.Title).ToArray()
-            .Cast<IDebugTab>().ToImmutableArray();
+            .OrderBy(t => t.Title, StringComparer.Ordinal)
+            .Cast<IDebugTab>()
+            .ToImmutableArray();
     }
 
     public override unsafe void Draw()
@@ -39,7 +40,7 @@ public partial class UnlocksTab : DebugTab
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
-        foreach (IUnlockTab tab in SubTabs)
+        foreach (var tab in SubTabs.Cast<IUnlockTab>())
         {
             ImGui.TableNextRow();
             var progress = tab.GetUnlockProgress();

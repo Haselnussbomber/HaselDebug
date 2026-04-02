@@ -28,7 +28,7 @@ public partial class DataYmlService
     [AutoPostConstruct]
     private void Initialize()
     {
-        Task.Run(Load);
+        _ = Task.Run(Load);
     }
 
     private async Task Load()

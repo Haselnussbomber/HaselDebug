@@ -91,7 +91,7 @@ public partial class TypeService : IHostedService
     private void LoadAddons(Assembly csAssembly)
     {
         AddonTypes = csAssembly.GetTypes()
-            .Where(type => type.GetCustomAttribute<AddonAttribute>() != null)
+            .Where(type => Attribute.IsDefined(type, typeof(AddonAttribute)))
             .SelectMany(type => type.GetCustomAttribute<AddonAttribute>()!.AddonIdentifiers, (type, addonName) => (type, addonName))
             .ToImmutableSortedDictionary(
                 tuple => tuple.addonName,
@@ -101,7 +101,7 @@ public partial class TypeService : IHostedService
     private void LoadAgents(Assembly csAssembly)
     {
         AgentTypes = csAssembly.GetTypes()
-            .Where(type => type.GetCustomAttribute<AgentAttribute>() != null)
+            .Where(type => Attribute.IsDefined(type, typeof(AgentAttribute)))
             .Select(type => (type, agentId: type.GetCustomAttribute<AgentAttribute>()!.Id))
             .ToImmutableSortedDictionary(
                 tuple => tuple.agentId,
@@ -130,7 +130,7 @@ public partial class TypeService : IHostedService
             {
                 var innerType = fieldInfo.FieldType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)[0].FieldType;
 
-                if (innerType.IsGenericType && innerType.Name.StartsWith("Pointer`1"))
+                if (innerType.IsGenericType && innerType.Name.StartsWith("Pointer`1", StringComparison.Ordinal))
                     innerType = innerType.GenericTypeArguments[0].MakePointerType();
 
                 if (innerType.IsStruct())

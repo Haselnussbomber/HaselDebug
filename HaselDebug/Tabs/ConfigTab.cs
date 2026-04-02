@@ -214,7 +214,7 @@ public unsafe partial class ConfigTab : DebugTab
 
     private void ProcessConfigBase(StringBuilder sb, Dictionary<int, string> dict, ref ConfigBase configBase, string configName)
     {
-        sb.AppendLine("");
+        sb.AppendLine();
         sb.AppendLine($"    #region {configName}");
 
         var configEntry = configBase.ConfigEntry;
@@ -258,10 +258,10 @@ public unsafe partial class ConfigTab : DebugTab
     {
         var dict = new Dictionary<int, string>();
 
-        sb.AppendLine("");
+        sb.AppendLine();
         sb.AppendLine($"public enum {configName}ConfigOption {{");
 
-        var usedNames = new HashSet<string>();
+        var usedNames = new HashSet<string>(StringComparer.Ordinal);
 
         var configEntry = configBase.ConfigEntry;
         for (var i = 0; i < configBase.ConfigCount; i++, configEntry++)

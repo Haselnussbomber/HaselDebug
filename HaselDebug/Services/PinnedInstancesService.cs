@@ -18,12 +18,12 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
     [AutoPostConstruct]
     public void Initialize()
     {
-        Task.Run(InitAsync);
+        _ = Task.Run(InitAsync);
     }
 
     private async Task InitAsync()
     {
-        await _typeService.Loaded;
+        await _typeService.Loaded.ConfigureAwait(false);
 
         // make sure the types of pinned instances exist
         _pluginConfig.PinnedInstances = [.. _pluginConfig.PinnedInstances.Where(name => _typeService.Instances.Any(type => type.FullName == name))];
@@ -56,7 +56,7 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
             type.FullName!
         };
 
-        nameList.Sort();
+        nameList.Sort(StringComparer.Ordinal);
 
         _pluginConfig.PinnedInstances = [.. nameList];
         _pluginConfig.Save();
@@ -69,7 +69,7 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
 
         _pluginConfig.PinnedInstances = _pluginConfig.PinnedInstances
             .Where(name => name != tab.Type.FullName!)
-            .Order()
+            .Order(StringComparer.Ordinal)
             .ToArray();
 
         _pluginConfig.Save();

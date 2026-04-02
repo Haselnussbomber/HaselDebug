@@ -369,7 +369,7 @@ public unsafe partial class AtkDebugRenderer
         if (!treeNode)
             return;
 
-        if (nodePath != null && nodePath.Count > 0 && node == nodePath.Last())
+        if (nodePath != null && nodePath.Count > 0 && node == nodePath[^1])
             ImGui.SetScrollHereY();
 
         ImGui.Text("Node: "u8);
@@ -453,7 +453,7 @@ public unsafe partial class AtkDebugRenderer
         if (!treeNode)
             return;
 
-        if (nodePath != null && nodePath.Count > 0 && node == nodePath.Last())
+        if (nodePath != null && nodePath.Count > 0 && node == nodePath[^1])
             ImGui.SetScrollHereY();
 
         ImGui.Text("Node:"u8);
@@ -1246,7 +1246,7 @@ public unsafe partial class AtkDebugRenderer
         if (_searchTokens == null || _searchTokens.Count == 0)
             return true;
 
-        return _searchTokens.All(token =>
+        return _searchTokens.TrueForAll(token =>
         {
             var match = false;
 
@@ -1324,7 +1324,7 @@ public unsafe partial class AtkDebugRenderer
         {
             nint address;
 
-            if (value.StartsWith("0x"))
+            if (value.StartsWith("0x", StringComparison.Ordinal))
             {
                 if (nint.TryParse(value[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out address))
                     return (nint)node == address;

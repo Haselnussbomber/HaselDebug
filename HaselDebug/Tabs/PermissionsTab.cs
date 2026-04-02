@@ -19,7 +19,7 @@ public unsafe partial class PermissionsTab : DebugTab
     {
         _conditionNames = typeof(Conditions)
             .GetFields(BindingFlags.Instance | BindingFlags.Public)
-            .Where(fi => fi.FieldType == typeof(bool) && fi.GetCustomAttribute<ObsoleteAttribute>() == null)
+            .Where(fi => fi.FieldType == typeof(bool) && !Attribute.IsDefined(fi, typeof(ObsoleteAttribute)))
             .Select(fi => (fi.GetFieldOffset(), fi.Name))
             .DistinctBy(t => t.Item1)
             .ToDictionary();
@@ -44,7 +44,8 @@ public unsafe partial class PermissionsTab : DebugTab
 
             if (_hideSetting == 1 && hasPermission)
                 continue;
-            else if (_hideSetting == 2 && !hasPermission)
+
+            if (_hideSetting == 2 && !hasPermission)
                 continue;
 
             using var color = ImRaii.PushColor(ImGuiCol.Text, hasPermission ? Color.Green : Color.Red);
@@ -91,7 +92,7 @@ public unsafe partial class PermissionsTab : DebugTab
         }
     }
 
-    private string GetPermissionName(uint rowId)
+    private static string GetPermissionName(uint rowId)
     {
         var name = $"Permission #{rowId}";
 

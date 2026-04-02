@@ -185,6 +185,7 @@ public readonly struct AgentNavigation(AgentId agentId) : INavigationParams
     public AgentId AgentId { get; init; } = agentId;
 }
 
+[StructLayout(LayoutKind.Auto)]
 public readonly struct AddressInspectorNavigation(nint address, uint size = 0) : INavigationParams
 {
     public nint Address { get; init; } = address;

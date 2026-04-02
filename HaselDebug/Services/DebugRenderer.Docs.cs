@@ -43,20 +43,20 @@ public partial class DebugRenderer
             if (doc == null || doc.Members == null)
                 return;
 
-            var tempDict = doc.Members.ToDictionary(member => member.Name);
+            var tempDict = doc.Members.ToDictionary(member => member.Name, StringComparer.Ordinal);
 
             var summaries = new List<string>();
             var remarks = new List<string>();
-            var parameters = new Dictionary<string, string>();
+            var parameters = new Dictionary<string, string>(StringComparer.Ordinal);
             var returns = new List<string>();
             var processedMembers = new List<string>();
 
             void ProcessMemberText(XmlDocMember member)
             {
-                if (member.Summary != null && !string.IsNullOrEmpty(member.Summary.Value) && !member.Summary.Value.StartsWith("Inherited parent class"))
+                if (member.Summary != null && !string.IsNullOrEmpty(member.Summary.Value) && !member.Summary.Value.StartsWith("Inherited parent class", StringComparison.Ordinal))
                     summaries.AddRange(member.Summary.Value.Split('\n'));
 
-                if (member.Remarks != null && !string.IsNullOrEmpty(member.Remarks.Value) && !member.Remarks.Value.StartsWith("Field inherited"))
+                if (member.Remarks != null && !string.IsNullOrEmpty(member.Remarks.Value) && !member.Remarks.Value.StartsWith("Field inherited", StringComparison.Ordinal))
                     remarks.AddRange(member.Remarks.Value.Split('\n'));
 
                 if (member.Returns != null && !string.IsNullOrEmpty(member.Returns.Value))
@@ -101,7 +101,7 @@ public partial class DebugRenderer
 
                 var name = member.Name[2..];
                 var lastDotIndex = name.LastIndexOf('.');
-                var parentName = lastDotIndex > -1 ? name.Substring(0, lastDotIndex) : name;
+                var parentName = lastDotIndex > -1 ? name[..lastDotIndex] : name;
 
                 var summariesText = ListToText(parentName, summaries);
                 var remarksText = ListToText(parentName, remarks);
@@ -136,12 +136,12 @@ public partial class DebugRenderer
                                 .TakeWhile(part => part != null);
 
         // Join the common parts back into a namespace string
-        return string.Join(".", commonParts);
+        return string.Join('.', commonParts);
     }
 
     private static string RemovePrefix(string value, string parentName)
     {
-        return value.Replace(GetLongestCommonPrefix(parentName, value) + ".", string.Empty);
+        return value.Replace(GetLongestCommonPrefix(parentName, value) + ".", string.Empty, StringComparison.Ordinal);
     }
 
     private static string ListToText(string parentName, List<string> list)
@@ -164,17 +164,17 @@ public partial class DebugRenderer
             if (firstLineIndentation <= indentation)
                 cutLine = cutLine[firstLineIndentation..];
 
-            cutLine = RegexXmlNewLine().Replace(cutLine, "\n");
-            cutLine = RegexXmlSeeAlsoWithText().Replace(cutLine, match => RemovePrefix(match.Groups[1].Value, parentName));
-            cutLine = RegexXmlSeeAlso().Replace(cutLine, match => match.Groups[1].Value.Replace(GetLongestCommonPrefix(parentName, match.Groups[1].Value) + ".", string.Empty));
-            cutLine = RegexXmlCode().Replace(cutLine, "$1");
-            cutLine = RegexXmlList().Replace(cutLine, match =>
+            cutLine = RegexXmlNewLine.Replace(cutLine, "\n");
+            cutLine = RegexXmlSeeAlsoWithText.Replace(cutLine, match => RemovePrefix(match.Groups[1].Value, parentName));
+            cutLine = RegexXmlSeeAlso.Replace(cutLine, match => match.Groups[1].Value.Replace(GetLongestCommonPrefix(parentName, match.Groups[1].Value) + ".", string.Empty, StringComparison.Ordinal));
+            cutLine = RegexXmlCode.Replace(cutLine, "$1");
+            cutLine = RegexXmlList.Replace(cutLine, match =>
             {
                 if (match.Groups[1].Value == "table")
                     return match.Value; // not supported
 
                 var index = 1;
-                return RegexXmlItem().Replace(match.Groups[2].Value, lineMatch =>
+                return RegexXmlItem.Replace(match.Groups[2].Value, lineMatch =>
                 {
                     var prefix = match.Groups[1].Value switch
                     {
@@ -193,22 +193,22 @@ public partial class DebugRenderer
     }
 
     [GeneratedRegex("<br\\s*/?>", RegexOptions.IgnoreCase)]
-    private static partial Regex RegexXmlNewLine();
+    private static partial Regex RegexXmlNewLine { get; }
 
     [GeneratedRegex("<see\\s*cref=\"\\w:([^\"]*)\"\\s*/>", RegexOptions.IgnoreCase)]
-    private static partial Regex RegexXmlSeeAlso();
+    private static partial Regex RegexXmlSeeAlso { get; }
 
     [GeneratedRegex("<see\\s*cref=\"\\w:[^\"]*\"\\s*>(.*)</see>", RegexOptions.IgnoreCase)]
-    private static partial Regex RegexXmlSeeAlsoWithText();
+    private static partial Regex RegexXmlSeeAlsoWithText { get; }
 
     [GeneratedRegex("<c>(.*?)</c>", RegexOptions.IgnoreCase)]
-    private static partial Regex RegexXmlCode();
+    private static partial Regex RegexXmlCode { get; }
 
     [GeneratedRegex("<list(?: type=\"(bullet|number)\")?>(.*?)</list>", RegexOptions.IgnoreCase)]
-    private static partial Regex RegexXmlList();
+    private static partial Regex RegexXmlList { get; }
 
     [GeneratedRegex("<item>(.*?)</item>", RegexOptions.IgnoreCase)]
-    private static partial Regex RegexXmlItem();
+    private static partial Regex RegexXmlItem { get; }
 
     [XmlRoot("doc")]
     public record XmlDoc

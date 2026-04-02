@@ -33,7 +33,7 @@ public unsafe partial class AgentsTab : DebugTab
     public override void Draw()
     {
         _agents ??= typeof(AgentAttribute).Assembly.GetTypes()
-            .Where(t => t.GetCustomAttribute<AgentAttribute>() != null)
+            .Where(t => Attribute.IsDefined(t, typeof(AgentAttribute)))
             .ToImmutableSortedDictionary(
                 type => type.GetCustomAttribute<AgentAttribute>()!.Id,
                 type => ((Pointer<AgentInterface>)AgentModule.Instance()->GetAgentByInternalId(type.GetCustomAttribute<AgentAttribute>()!.Id), type));
@@ -157,7 +157,7 @@ public unsafe partial class AgentsTab : DebugTab
     private (string, bool) GetAgentName(AgentId agentId)
     {
         var name = Enum.GetName(agentId);
-        if (!string.IsNullOrEmpty(name) && !name.StartsWith("Unk"))
+        if (!string.IsNullOrEmpty(name) && !name.StartsWith("Unk", StringComparison.Ordinal))
             return (name, false);
 
         if (TryGetAddon<AtkUnitBase>(agentId, out var addon) && !string.IsNullOrEmpty(addon->NameString))

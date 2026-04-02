@@ -55,7 +55,7 @@ public partial class PluginWindow : SimpleWindow
 
         _tabs = [.. _debugTabs
             //.Where(t => !t.GetType().GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition().IsAssignableTo(typeof(ISubTab<>)))) // no sub tabs
-            .OrderBy(t => t.Title)
+            .OrderBy(t => t.Title, StringComparer.Ordinal)
         ];
 
         _pinnedInstances.Loaded += OnPinnedInstancesLoaded;

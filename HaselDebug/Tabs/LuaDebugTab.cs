@@ -97,7 +97,7 @@ public unsafe partial class LuaDebugTab : DebugTab
     {
         var drawTop = L->lua_gettop();
 
-        nodeOptions = nodeOptions.WithAddress(key.GetHashCode());
+        nodeOptions = nodeOptions.WithAddress(StringComparer.Ordinal.GetHashCode(key));
 
         ImGui.TextColored(DebugRenderer.ColorType, type.ToString());
         ImGui.SameLine();
@@ -296,7 +296,7 @@ public unsafe partial class LuaDebugTab : DebugTab
         ImGui.EndTable();
     }
 
-    private static IEnumerable<LuaGlobal> EnumGlobals()
+    private static List<LuaGlobal> EnumGlobals()
     {
         var list = new List<LuaGlobal>();
 

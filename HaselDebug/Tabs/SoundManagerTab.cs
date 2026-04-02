@@ -72,11 +72,11 @@ public unsafe partial class SoundManagerTab : DebugTab, IDisposable
 
     private SoundData* PlaySoundDetour(SoundManager* thisPtr, CStringPointer path, float volume, uint fadeInDuration, float posX, float posY, float posZ, float speed, int a9, uint soundNumber, bool autoRelease, SoundVolumeCategory volumeCategory, bool a13, int note, bool a15, bool a16, bool a17, bool a18)
     {
-        if (!path.ToString().StartsWith("sound/battle/") && !path.ToString().StartsWith("sound/foot/"))
+        if (!path.ToString().StartsWith("sound/battle/", StringComparison.Ordinal) && !path.ToString().StartsWith("sound/foot/", StringComparison.Ordinal))
         {
             _logger.LogTrace(
                 "PlaySound(path: {path}, volume: {volume}, fadeInDuration: {fadeInDuration}, x: {x}, y: {y}, z: {z}, speed: {speed}, a9: {a9}, soundNumber: {soundNumber}, autoRelease: {autoRelease}, volumeCategory: {volumeCategory}, a13: {a13}, note: {note}, a15: {a15}, a16: {a16}, a17: {a17}, a18: {a18})",
-                path, volume, fadeInDuration, posX, posY, posZ, speed, a9, soundNumber, autoRelease, volumeCategory, a13, note, a15, a16, a17, a18);
+                path.ToString(), volume, fadeInDuration, posX, posY, posZ, speed, a9, soundNumber, autoRelease, volumeCategory, a13, note, a15, a16, a17, a18);
         }
 
         return _hook1!.OriginalDisposeSafe(thisPtr, path, volume, fadeInDuration, posX, posY, posZ, speed, a9, soundNumber, autoRelease, volumeCategory, a13, note, a15, a16, a17, a18);
@@ -86,7 +86,7 @@ public unsafe partial class SoundManagerTab : DebugTab, IDisposable
     {
         _logger.LogTrace(
             "PlayClipSound(path: {path}, volume: {volume}, fadeInDuration: {fadeInDuration}, x: {x}, y: {y}, z: {z}, speed: {speed}, priority: {priority}, soundNumber: {soundNumber}, autoRelease: {autoRelease}, a12: {a12})",
-            path, volume, fadeInDuration, posX, posY, posZ, speed, priority, soundNumber, autoRelease, a12);
+            path.ToString(), volume, fadeInDuration, posX, posY, posZ, speed, priority, soundNumber, autoRelease, a12);
 
         return _hook2!.OriginalDisposeSafe(thisPtr, path, volume, fadeInDuration, posX, posY, posZ, speed, priority, soundNumber, autoRelease, a12);
     }
@@ -103,7 +103,7 @@ public unsafe partial class SoundManagerTab : DebugTab, IDisposable
                 filename = resourceHandle->FileName.ToString();
         }
 
-        var type = options != null ? options->Type : 0;
+        var type = options != null ? options->Type : SoundObjectType.Null;
 
         _logger.LogTrace("PlayLayoutSound(FileName: {fileName}, type: {type}, size: 0x{size:X})", filename, type, size);
         return _hook3!.OriginalDisposeSafe(thisPtr, resourceHandle, options, size);
@@ -111,37 +111,37 @@ public unsafe partial class SoundManagerTab : DebugTab, IDisposable
 
     private SoundData* PlayBGMSoundDetour(SoundManager* thisPtr, CStringPointer path)
     {
-        _logger.LogTrace("PlayBGMSound(path: {path})", path);
+        _logger.LogTrace("PlayBGMSound(path: {path})", path.ToString());
         return _hook4!.OriginalDisposeSafe(thisPtr, path);
     }
 
     private SoundData* PlayGAYATitleSoundDetour(SoundManager* thisPtr, CStringPointer path, float volume, uint fadeInDuration)
     {
-        _logger.LogTrace("PlayGAYATitleSound(path: {path}, volume: {volume}, fadeInDuration: {fadeInDuration})", path, volume, fadeInDuration);
+        _logger.LogTrace("PlayGAYATitleSound(path: {path}, volume: {volume}, fadeInDuration: {fadeInDuration})", path.ToString(), volume, fadeInDuration);
         return _hook5!.OriginalDisposeSafe(thisPtr, path, volume, fadeInDuration);
     }
 
     private SoundData* PlayOrchestrionSoundDetour(SoundManager* thisPtr, CStringPointer path, float posX, float posY, float posZ, bool a6)
     {
-        _logger.LogTrace("PlayOrchestrionSound(path: {path}, x: {x}, y: {y}, z: {z}, a6: {a6})", path, posX, posY, posZ, a6);
+        _logger.LogTrace("PlayOrchestrionSound(path: {path}, x: {x}, y: {y}, z: {z}, a6: {a6})", path.ToString(), posX, posY, posZ, a6);
         return _hook6!.OriginalDisposeSafe(thisPtr, path, posX, posY, posZ, a6);
     }
 
     private SoundData* PlaySystemSoundDetour(SoundManager* thisPtr, CStringPointer path, float volume, uint soundNumber, uint fadeInDuration, bool autoRelease, SoundVolumeCategory volumeCategory)
     {
-        _logger.LogTrace("PlaySystemSound(path: {path}, volume: {volume}, soundNumber: {soundNumber}, fadeInDuration: {fadeInDuration}, autoRelease: {autoRelease}, volumeCategory: {volumeCategory})", path, volume, soundNumber, fadeInDuration, autoRelease, volumeCategory);
+        _logger.LogTrace("PlaySystemSound(path: {path}, volume: {volume}, soundNumber: {soundNumber}, fadeInDuration: {fadeInDuration}, autoRelease: {autoRelease}, volumeCategory: {volumeCategory})", path.ToString(), volume, soundNumber, fadeInDuration, autoRelease, volumeCategory);
         return _hook7!.OriginalDisposeSafe(thisPtr, path, volume, soundNumber, fadeInDuration, autoRelease, volumeCategory);
     }
 
     private SoundData* PlayMovieSoundDetour(SoundManager* thisPtr, CStringPointer path, float volume, uint soundNumber, uint fadeInDuration, bool autoRelease)
     {
-        _logger.LogTrace("PlayMovieSound(path: {path}, volume: {volume}, soundNumber: {soundNumber}, fadeInDuration: {fadeInDuration}, autoRelease: {autoRelease})", path, volume, soundNumber, fadeInDuration, autoRelease);
+        _logger.LogTrace("PlayMovieSound(path: {path}, volume: {volume}, soundNumber: {soundNumber}, fadeInDuration: {fadeInDuration}, autoRelease: {autoRelease})", path.ToString(), volume, soundNumber, fadeInDuration, autoRelease);
         return _hook8!.OriginalDisposeSafe(thisPtr, path, volume, soundNumber, fadeInDuration, autoRelease);
     }
 
     private SoundData* PlayCutsceneVoSoundDetour(SoundManager* thisPtr, CStringPointer path)
     {
-        _logger.LogTrace("PlayCutsceneVoSound(path: {path})", path);
+        _logger.LogTrace("PlayCutsceneVoSound(path: {path})", path.ToString());
         return _hook9!.OriginalDisposeSafe(thisPtr, path);
     }
 

@@ -145,7 +145,7 @@ public unsafe partial class AddressInspectorTab : DebugTab
                 if (cl == null || cl.VirtualTables == null || cl.VirtualTables.Count == 0)
                     continue;
 
-                if (cl.VirtualTables.First().Address != vtablePtr - _sigScanner.Module.BaseAddress)
+                if (cl.VirtualTables[0].Address != vtablePtr - _sigScanner.Module.BaseAddress)
                     continue;
 
                 _logger.LogDebug("Found struct {name} vtbl at {add:X}", name, vtablePtr);
@@ -210,7 +210,7 @@ public unsafe partial class AddressInspectorTab : DebugTab
                     if (cl == null || cl.VirtualTables == null || cl.VirtualTables.Count == 0)
                         continue;
 
-                    if (cl.VirtualTables.First().Address != virtualTablePointer - _sigScanner.Module.BaseAddress)
+                    if (cl.VirtualTables[0].Address != virtualTablePointer - _sigScanner.Module.BaseAddress)
                         continue;
 
                     _logger.LogDebug("Found {name} vtbl at {add:X}", name, virtualTablePointer);
@@ -231,7 +231,7 @@ public unsafe partial class AddressInspectorTab : DebugTab
         if (T.TryParse(numberString, null, out var parsedNumber))
             return parsedNumber;
 
-        if (T.TryParse(numberString.StartsWith("0x") ? numberString[2..] : numberString, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var parsedHex))
+        if (T.TryParse(numberString.StartsWith("0x", StringComparison.Ordinal) ? numberString[2..] : numberString, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var parsedHex))
             return parsedHex;
 
         return default;
@@ -294,7 +294,7 @@ public unsafe partial class AddressInspectorTab : DebugTab
         if (_typeService.CSTypes == null)
             return null;
 
-        if (!_typeService.CSTypes.TryGetValue("FFXIVClientStructs.FFXIV." + name.Replace("::", "."), out var type))
+        if (!_typeService.CSTypes.TryGetValue("FFXIVClientStructs.FFXIV." + name.Replace("::", ".", StringComparison.Ordinal), out var type))
             return null;
 
         return type;

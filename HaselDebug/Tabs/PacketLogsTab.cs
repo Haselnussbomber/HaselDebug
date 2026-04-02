@@ -15,7 +15,8 @@ public class PacketLogsTab : DebugTab
     public PacketLogsTab(IEnumerable<IPacketLogTab> subTabs)
     {
         SubTabs = subTabs
-            .OrderBy(t => t.Title).ToArray()
-            .Cast<IDebugTab>().ToImmutableArray();
+            .OrderBy(t => t.Title, StringComparer.Ordinal)
+            .Cast<IDebugTab>()
+            .ToImmutableArray();
     }
 }

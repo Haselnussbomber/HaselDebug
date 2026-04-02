@@ -25,7 +25,7 @@ public unsafe partial class UnlocksTabUtils
     private readonly Dictionary<uint, Vector2> _iconSizeCache = [];
     private readonly Dictionary<ushort, uint> _facePaintIconCache = [];
 
-    public bool DrawSelectableItem(ItemHandle item, ImGuiId id, bool drawIcon = true, bool isHq = false, float? iconSize = null, bool selected = false, ImGuiSelectableFlags flags = ImGuiSelectableFlags.None)
+    public bool DrawSelectableItem(ItemHandle item, string id, bool drawIcon = true, bool isHq = false, float? iconSize = null, bool selected = false, ImGuiSelectableFlags flags = ImGuiSelectableFlags.None)
     {
         var itemName = _itemService.GetItemName(item).ToString();
         var isHovered = false;
@@ -288,7 +288,7 @@ public unsafe partial class UnlocksTabUtils
         var order = (uint)cardResident.Order;
         var addonRowId = isEx ? 9773u : 9772;
 
-        var infoText = $"{_seStringEvaluator.EvaluateFromAddon(addonRowId, [order]).ToString()} - {card.Name}";
+        var infoText = $"{_seStringEvaluator.EvaluateFromAddon(addonRowId, [order])} - {card.Name}";
         ImGui.SetCursorPosX(ImGui.GetCursorPosX() - ImGui.GetStyle().IndentSpacing + ImGui.GetContentRegionAvail().X / 2f - ImGui.CalcTextSize(infoText).X / 2f);
         ImGui.Text(infoText);
 
@@ -585,7 +585,7 @@ public unsafe partial class UnlocksTabUtils
             ImGui.Image(image.Handle, new Vector2(newWidth, newHeight));
         }
 
-        var questText = _excelService.GetSheet<QuestText>($"quest/{(quest.RowId - 0x10000) / 100:000}/{quest.Id.ToString()}");
+        var questText = _excelService.GetSheet<QuestText>($"quest/{(quest.RowId - 0x10000) / 100:000}/{quest.Id}");
         var questSequence = QuestManager.GetQuestSequence((ushort)(quest.RowId - 0x10000));
         if (questSequence == 0xFF) questSequence = 1;
         for (var seq = questSequence == 0 ? 0 : 1; seq <= questSequence; seq++)

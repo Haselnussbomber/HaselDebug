@@ -50,7 +50,7 @@ public partial class PluginConfig : IPluginConfiguration
         try
         {
             var serialized = JsonSerializer.Serialize(this, SerializerOptions);
-            var hash = serialized.GetHashCode();
+            var hash = serialized.GetHashCode(StringComparison.Ordinal);
 
             if (LastSavedConfigHash != hash)
             {
