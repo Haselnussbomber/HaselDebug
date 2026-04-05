@@ -68,6 +68,17 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             dict.TryAdd(i, []);
         }
 
+        // manual
+        {
+            if (dict.TryGetValue(466, out var names))
+            {
+                names.Add(new UnlockEntry()
+                {
+                    Label = "Mogpendium"
+                });
+            }
+        }
+
         foreach (var row in _excelService.GetSheet<Lumina.Excel.Sheets.Action>())
         {
             if (row.UnlockLink.RowId is > 0 and < 65536)
