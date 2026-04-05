@@ -68,16 +68,28 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             dict.TryAdd(i, []);
         }
 
-        // manual
+        void AddLabel(uint unlockLink, string label)
         {
-            if (dict.TryGetValue(466, out var names))
-            {
-                names.Add(new UnlockEntry()
-                {
-                    Label = "Mogpendium"
-                });
-            }
+            if (dict.TryGetValue(unlockLink, out var names))
+                names.Add(new UnlockEntry() { Label = label });
         }
+
+        // manual
+        AddLabel(5, "Related to Scolar/Summoner Pet/Soul Crystal?");
+        AddLabel(6, "Related to Scolar/Summoner Pet/Soul Crystal?");
+        AddLabel(7, "Guild Orders?");
+        AddLabel(9, "Recommendations");
+        AddLabel(18, "Saddlebag");
+        AddLabel(21, "Hunting Log");
+        AddLabel(22, "Hunting Log for Grand Company");
+        AddLabel(93, "Ventures");
+        AddLabel(97, "Sight Seeing");
+        AddLabel(255, "Bard Performance");
+        AddLabel(247, "Hall of the Novice");
+        AddLabel(282, "Wondrous Tails");
+        AddLabel(307, "Orchestrion");
+        AddLabel(372, "Adventurer Squadrons");
+        AddLabel(466, "Mogpendium");
 
         foreach (var row in _excelService.GetSheet<Lumina.Excel.Sheets.Action>())
         {
@@ -98,7 +110,6 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
         }
 
         // no entries
-        /*
         foreach (var row in _excelService.GetSubrowSheet<BGMSwitch>())
         {
             foreach (var subrow in row)
@@ -117,7 +128,6 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
                 }
             }
         }
-        */
 
         foreach (var row in _excelService.GetSheet<BannerCondition>())
         {
@@ -325,34 +335,40 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             }
         }
 
-        foreach (var row in _excelService.GetSubrowSheet<DescriptionSection>())
+        void AddDescriptionPage(uint unlockLink, DescriptionPage page)
         {
-            foreach (var sectionRow in row)
+            if (unlockLink is not > 0 or not < 65536)
+                return;
+
+            if (!dict.TryGetValue(unlockLink, out var names))
+                dict.Add(unlockLink, names = []);
+
+            if (names.Any(entry => entry.RowType == typeof(DescriptionPage) && entry.RowId == page.RowId && entry.SubrowId == page.SubrowId))
+                return;
+
+            names.Add(new UnlockEntry()
             {
-                foreach (var pageRow in sectionRow.Page.Value)
+                RowType = typeof(DescriptionPage),
+                RowId = page.RowId,
+                SubrowId = page.SubrowId,
+                Label = page.Text[0].ValueNullable?.Text.ToString() ?? string.Empty
+            });
+        }
+
+        foreach (var row in _excelService.GetSubrowSheet<DescriptionPage>())
+        {
+            foreach (var subrow in row)
+            {
+                switch (subrow.Unknown1)
                 {
-                    var isValid = pageRow.Unknown1 switch
-                    {
-                        2 => pageRow.Quest.RowId is > 0 and < 65536,
-                        4 => pageRow.Quest.RowId is > 0 and < 65536 || pageRow.Unknown2 is > 0 and < 65536,
-                        _ => false,
-                    };
-                    if (isValid)
-                    {
-                        if (!dict.TryGetValue(pageRow.Quest.RowId, out var names))
-                            dict.Add(pageRow.Quest.RowId, names = []);
+                    case 2:
+                        AddDescriptionPage(subrow.Quest.RowId, subrow);
+                        break;
 
-                        if (names.Any(entry => entry.RowType == typeof(DescriptionPage) && entry.RowId == sectionRow.Page.RowId && entry.SubrowId == pageRow.RowId))
-                            continue;
-
-                        names.Add(new UnlockEntry()
-                        {
-                            RowType = typeof(DescriptionPage),
-                            RowId = sectionRow.Page.RowId,
-                            SubrowId = pageRow.RowId,
-                            Label = sectionRow.String.Value.Text.ToString()
-                        });
-                    }
+                    case 4:
+                        AddDescriptionPage(subrow.Quest.RowId, subrow);
+                        AddDescriptionPage(subrow.Unknown2, subrow);
+                        break;
                 }
             }
         }
@@ -569,6 +585,23 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
                     IconId = (uint)row.Icon,
                     Label = row.Name.ToString(),
                     Category = _textService.GetAddonText(102478)
+                });
+            }
+        }
+
+        // no entries
+        foreach (var row in _excelService.GetSheet<TopicSelect>())
+        {
+            if (row.Unknown0 != 0)
+            {
+                if (!dict.TryGetValue(row.Unknown0, out var names))
+                    dict.Add(row.Unknown0, names = []);
+
+                names.Add(new UnlockEntry()
+                {
+                    RowType = typeof(TopicSelect),
+                    RowId = row.RowId,
+                    Label = row.Name.ToString(),
                 });
             }
         }
