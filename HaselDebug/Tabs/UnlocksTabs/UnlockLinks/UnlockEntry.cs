@@ -2,7 +2,7 @@ namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks;
 
 public class UnlockEntry
 {
-    public required Type RowType { get; set; }
+    public Type? RowType { get; set; }
     public uint RowId { get; set; }
     public uint? SubrowId { get; set; }
     public string ExtraSheetText { get; set; } = string.Empty;

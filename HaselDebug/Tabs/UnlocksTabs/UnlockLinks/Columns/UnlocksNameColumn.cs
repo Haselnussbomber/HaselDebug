@@ -14,10 +14,16 @@ public partial class UnlocksNameColumn : ColumnString<UnlockLinkEntry>
     public override string ToName(UnlockLinkEntry entry)
         => string.Join(' ', entry.Unlocks.Select(unlock => unlock.Label));
 
-    public override unsafe void DrawColumn(UnlockLinkEntry entry)
+    public override void DrawColumn(UnlockLinkEntry entry)
     {
         foreach (var unlock in entry.Unlocks)
         {
+            if (unlock.RowType == null)
+            {
+                ImGui.Text(unlock.Label);
+                continue;
+            }
+
             switch (unlock.RowType.Name)
             {
                 case "Item":

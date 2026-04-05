@@ -19,13 +19,13 @@ public partial class UnlocksColumn : ColumnString<UnlockLinkEntry>
     }
 
     public override string ToName(UnlockLinkEntry entry)
-        => string.Join(' ', entry.Unlocks.Select(unlock => $"{unlock.RowType.Name}#{unlock.RowId}"));
+        => string.Join(' ', entry.Unlocks.Where(unlock => unlock.RowType != null).Select(unlock => $"{unlock.RowType!.Name}#{unlock.RowId}"));
 
-    public override unsafe void DrawColumn(UnlockLinkEntry entry)
+    public override void DrawColumn(UnlockLinkEntry entry)
     {
-        foreach (var unlock in entry.Unlocks)
+        foreach (var unlock in entry.Unlocks.Where(unlock => unlock.RowType != null))
         {
-            if (ImGui.Selectable($"{unlock.RowType.Name}#{unlock.RowId}{unlock.ExtraSheetText}"))
+            if (ImGui.Selectable($"{unlock.RowType!.Name}#{unlock.RowId}{unlock.ExtraSheetText}"))
             {
                 var title = $"{unlock.RowType.Name}#{unlock.RowId} ({_languageProvider.ClientLanguage})";
                 _windowManager.CreateOrOpen(title, () => new ExcelRowTab(_windowManager, _textService, _serviceProvider, unlock.RowType, unlock.RowId, _languageProvider.ClientLanguage, title));

@@ -63,6 +63,11 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
         var tribeId = isLoggedIn ? playerState->Tribe : 1;
         var sexId = isLoggedIn ? playerState->Sex : 1;
 
+        for (var i = 0u; i < UIState.Instance()->UnlockLinksBitArray.BitCount; i++)
+        {
+            dict.TryAdd(i, []);
+        }
+
         foreach (var row in _excelService.GetSheet<Lumina.Excel.Sheets.Action>())
         {
             if (row.UnlockLink.RowId is > 0 and < 65536)
