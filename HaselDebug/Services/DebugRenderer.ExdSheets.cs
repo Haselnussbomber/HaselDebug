@@ -192,7 +192,7 @@ public partial class DebugRenderer
             return;
         }
 
-        if (columnType.IsGenericType && columnType.GetGenericTypeDefinition() == typeof(RowRef<>))
+        if (columnType.IsGenericType && (columnType.GetGenericTypeDefinition() == typeof(RowRef<>) || columnType.GetGenericTypeDefinition() == typeof(SubrowRef<>)))
         {
             var isValid = (bool)columnType.GetProperty("IsValid")?.GetValue(value)!;
             var columnRowId = (uint)columnType.GetProperty("RowId")?.GetValue(value)!;
@@ -209,36 +209,6 @@ public partial class DebugRenderer
 
             var columnRowType = columnType.GenericTypeArguments[0];
             DrawExdRow(columnRowType, columnRowId, depth + 1, new NodeOptions()
-            {
-                RenderSeString = nodeOptions.RenderSeString,
-                Language = nodeOptions.Language,
-                AddressPath = nodeOptions.AddressPath.With((StringComparer.Ordinal.GetHashCode(columnRowType.Name), (nint)columnRowId).GetHashCode())
-            });
-            return;
-        }
-
-        if (columnType.IsGenericType && columnType.GetGenericTypeDefinition() == typeof(SubrowRef<>))
-        {
-            var isValid = (bool)columnType.GetProperty("IsValid")?.GetValue(value)!;
-            var columnRowId = (uint)columnType.GetProperty("RowId")?.GetValue(value)!;
-            var columnSubrowId = (ushort)columnType.GetProperty("SubrowId")?.GetValue(value)!;
-
-            if (!isValid)
-            {
-                ImGui.Text("Invalid (RowId: "u8);
-                ImGui.SameLine(0, 0);
-                ImGuiUtils.DrawCopyableText(columnRowId.ToString());
-                ImGui.SameLine(0, 0);
-                ImGui.Text("."u8);
-                ImGui.SameLine(0, 0);
-                ImGuiUtils.DrawCopyableText(columnSubrowId.ToString());
-                ImGui.SameLine(0, 0);
-                ImGui.Text(")"u8);
-                return;
-            }
-
-            var columnRowType = columnType.GenericTypeArguments[0];
-            DrawExdSubrow(columnRowType, columnRowId, columnSubrowId, depth + 1, new NodeOptions()
             {
                 RenderSeString = nodeOptions.RenderSeString,
                 Language = nodeOptions.Language,

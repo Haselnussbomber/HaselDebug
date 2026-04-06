@@ -158,7 +158,7 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
                 using var color = DebugRenderer.ColorTreeNode.Push(ImGuiCol.Text);
 
                 if (ImGui.Selectable(text))
-                    OpenSheet(rowRefType.Name, rowRefRowId, 0);
+                    OpenSheet(rowRefType.Name, rowRefRowId, null);
             }
             else
             {
@@ -181,7 +181,7 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
                 using var color = DebugRenderer.ColorTreeNode.Push(ImGuiCol.Text);
 
                 if (ImGui.Selectable(text))
-                    OpenSheet(rowRefType.Name, rowRefRowId, 0);
+                    OpenSheet(rowRefType.Name, rowRefRowId, null);
             }
             else
             {
