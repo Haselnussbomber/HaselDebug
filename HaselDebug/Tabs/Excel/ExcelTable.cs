@@ -32,7 +32,7 @@ public partial class ExcelTable<T> : Table<T> where T : struct
             if (property.Name is "ExcelPage" or "RowOffset")
                 continue;
 
-            var column = ActivatorUtilities.CreateInstance<ExcelSheetColumn<T>>(_serviceProvider, _excelTab, this, property);
+            var column = ActivatorUtilities.CreateInstance<ExcelSheetColumn<T>>(_serviceProvider, _excelTab, property);
 
             AvailableColumns.Add(column);
 

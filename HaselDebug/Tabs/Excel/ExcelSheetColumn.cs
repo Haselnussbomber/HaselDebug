@@ -3,7 +3,6 @@ using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Extensions;
 using HaselDebug.Services;
 using HaselDebug.Utils;
-using HaselDebug.Windows;
 
 namespace HaselDebug.Tabs.Excel;
 
@@ -12,9 +11,7 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelTab _excelTab;
-    private readonly ExcelTable<T> _excelTable;
     private readonly DebugRenderer _debugRenderer;
-    private readonly WindowManager _windowManager;
     private readonly PropertyInfo _propertyInfo;
 
     public Type RowType => typeof(T);
@@ -214,7 +211,7 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
         if (!_excelTab.TryGetSheetType(sheetName, out var sheetType))
             return;
 
-        var title = $"{sheetName}#{rowId}{(subrowId != null ? $".{subrowId}" : string.Empty)} ({_excelTab.SelectedLanguage})";
-        _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, sheetType, rowId, subrowId ?? 0, _excelTab.SelectedLanguage, title));
+        new ExcelRowIdentifier(sheetType, rowId, subrowId, _excelTab.SelectedLanguage)
+            .OpenWindow(_serviceProvider);
     }
 }

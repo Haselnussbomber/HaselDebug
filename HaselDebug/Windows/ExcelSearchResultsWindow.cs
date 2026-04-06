@@ -1,4 +1,5 @@
 using HaselDebug.Tabs.Excel;
+using HaselDebug.Utils;
 
 namespace HaselDebug.Windows;
 
@@ -6,7 +7,6 @@ namespace HaselDebug.Windows;
 public partial class ExcelSearchResultsWindow : SimpleWindow
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly WindowManager _windowManager;
     private readonly ExcelTab _excelTab;
     private readonly string _searchTerm;
     private readonly List<GlobalSearchResult> _results;
@@ -99,7 +99,7 @@ public partial class ExcelSearchResultsWindow : SimpleWindow
         if (!_excelTab.TryGetSheetType(sheetName, out var sheetType))
             return;
 
-        var title = $"{sheetName}#{rowId}{(subrowId != null ? $".{subrowId}" : string.Empty)} ({_excelTab.SelectedLanguage})";
-        _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, sheetType, rowId, subrowId ?? 0, _excelTab.SelectedLanguage, title));
+        new ExcelRowIdentifier(sheetType, rowId, subrowId, _excelTab.SelectedLanguage)
+            .OpenWindow(_serviceProvider);
     }
 }

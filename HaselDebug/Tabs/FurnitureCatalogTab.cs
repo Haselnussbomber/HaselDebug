@@ -9,7 +9,6 @@ using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Utils;
-using HaselDebug.Windows;
 using HousingFurniture = Lumina.Excel.Sheets.HousingFurniture;
 
 namespace HaselDebug.Tabs;
@@ -210,8 +209,6 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
         public partial class RowIdColumn : ColumnNumber<FurnitureCatalogItem>
         {
             private readonly IServiceProvider _serviceProvider;
-            private readonly WindowManager _windowManager;
-            private readonly TextService _textService;
             private readonly LanguageProvider _languageProvider;
 
             [AutoPostConstruct]
@@ -231,8 +228,8 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
             {
                 if (ImGui.Selectable(ToName(row)))
                 {
-                    var title = $"{row.SheetType.Name}#{row.RowId} ({_languageProvider.ClientLanguage})";
-                    _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, row.SheetType, row.RowId, 0, _languageProvider.ClientLanguage, title));
+                    new ExcelRowIdentifier(row.SheetType, row.RowId, _languageProvider.ClientLanguage)
+                        .OpenWindow(_serviceProvider);
                 }
 
                 ImGuiContextMenu.Draw($"{row.SheetType.Name}{row.RowId}RowIdContextMenu", builder =>

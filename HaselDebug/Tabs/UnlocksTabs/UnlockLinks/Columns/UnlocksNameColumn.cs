@@ -8,7 +8,6 @@ namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks.Columns;
 public partial class UnlocksNameColumn : ColumnString<UnlockLinkEntry>
 {
     private readonly DebugRenderer _debugRenderer;
-    private readonly ITextureProvider _textureProvider;
     private readonly UnlocksTabUtils _unlocksTabUtils;
 
     public override string ToName(UnlockLinkEntry entry)
@@ -18,16 +17,16 @@ public partial class UnlocksNameColumn : ColumnString<UnlockLinkEntry>
     {
         foreach (var unlock in entry.Unlocks)
         {
-            if (unlock.RowType == null)
+            if (unlock.ExcelRowIdentifier == null)
             {
                 ImGui.Text(unlock.Label);
                 continue;
             }
 
-            switch (unlock.RowType.Name)
+            switch (unlock.ExcelRowIdentifier.SheetType.Name)
             {
                 case "Item":
-                    _unlocksTabUtils.DrawSelectableItem(unlock.RowId, $"Unlock{entry.Index}Item{unlock.RowId}");
+                    _unlocksTabUtils.DrawSelectableItem(unlock.ExcelRowIdentifier.RowId, $"Unlock{entry.Index}{unlock.ExcelRowIdentifier.GetKey()}");
                     break;
 
                 default:
@@ -55,7 +54,7 @@ public partial class UnlocksNameColumn : ColumnString<UnlockLinkEntry>
                                 unlock.Label,
                                 !string.IsNullOrEmpty(unlock.Category)
                                     ? unlock.Category
-                                    : unlock.RowType.Name);
+                                    : unlock.ExcelRowIdentifier.SheetType.Name);
                         }
                         else if (!string.IsNullOrEmpty(unlock.TexturePath))
                         {
@@ -65,7 +64,7 @@ public partial class UnlocksNameColumn : ColumnString<UnlockLinkEntry>
                                 unlock.Label,
                                 !string.IsNullOrEmpty(unlock.Category)
                                     ? unlock.Category
-                                    : unlock.RowType.Name);
+                                    : unlock.ExcelRowIdentifier.SheetType.Name);
                         }
                     }
 

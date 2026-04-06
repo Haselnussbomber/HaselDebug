@@ -100,8 +100,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(Lumina.Excel.Sheets.Action),
-                    RowId = row.RowId,
+                    ExcelRowIdentifier = new(typeof(Lumina.Excel.Sheets.Action), row.RowId),
                     IconId = row.Icon,
                     Label = row.Name.ToString(),
                     Category = _excelService.TryFindRow<AozAction>(aozRow => aozRow.Action.RowId == row.RowId, out var aozAction) ? $"Blue Mage Action {aozAction.RowId}" : "Action"
@@ -121,9 +120,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                     names.Add(new UnlockEntry()
                     {
-                        RowType = typeof(BGMSwitch),
-                        RowId = row.RowId,
-                        SubrowId = subrow.SubrowId
+                        ExcelRowIdentifier = new(typeof(BGMSwitch), row.RowId, subrow.SubrowId),
                     });
                 }
             }
@@ -141,8 +138,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             {
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(BannerBg),
-                    RowId = bgRow.RowId,
+                    ExcelRowIdentifier = new(typeof(BannerBg), bgRow.RowId),
                     IconId = (uint)bgRow.Icon,
                     Label = bgRow.Name.ToString(),
                     Category = _textService.GetAddonText(14687)
@@ -153,8 +149,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             {
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(BannerFrame),
-                    RowId = frameRow.RowId,
+                    ExcelRowIdentifier = new(typeof(BannerFrame), frameRow.RowId),
                     IconId = (uint)frameRow.Icon,
                     Label = frameRow.Name.ToString(),
                     Category = _textService.GetAddonText(14688)
@@ -165,8 +160,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             {
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(BannerDecoration),
-                    RowId = decorationRow.RowId,
+                    ExcelRowIdentifier = new(typeof(BannerDecoration), decorationRow.RowId),
                     IconId = (uint)decorationRow.Icon,
                     Label = decorationRow.Name.ToString(),
                     Category = _textService.GetAddonText(14689)
@@ -179,8 +173,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
                 {
                     names.Add(new UnlockEntry()
                     {
-                        RowType = typeof(BannerFacial),
-                        RowId = facialRow.RowId,
+                        ExcelRowIdentifier = new(typeof(BannerFacial), facialRow.RowId),
                         IconId = facialRow.Emote.Value.Icon,
                         Label = facialRow.Emote.Value.Name.ToString(),
                         Category = _textService.GetAddonText(14691)
@@ -192,8 +185,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             {
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(BannerTimeline),
-                    RowId = timelineRow.RowId,
+                    ExcelRowIdentifier = new(typeof(BannerTimeline), timelineRow.RowId),
                     IconId = (uint)timelineRow.Icon,
                     Label = timelineRow.Name.ToString(),
                     Category = _textService.GetAddonText(14690)
@@ -210,8 +202,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(BuddyAction),
-                    RowId = row.RowId,
+                    ExcelRowIdentifier = new(typeof(BuddyAction), row.RowId),
                     IconId = (uint)row.Icon,
                     Label = row.Name.ToString(),
                     Category = "Pet Action"
@@ -229,8 +220,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
             names.Add(new UnlockEntry()
             {
-                RowType = typeof(CSBonusContentType),
-                RowId = row.RowId,
+                ExcelRowIdentifier = new(typeof(CSBonusContentType), row.RowId),
                 IconId = row.ContentType.Value.Icon,
                 Label = row.ContentType.Value.Name.ToString()
             });
@@ -308,8 +298,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
             names.Add(new UnlockEntry()
             {
-                RowType = typeof(CharaMakeCustomize),
-                RowId = row.RowId,
+                ExcelRowIdentifier = new(typeof(CharaMakeCustomize), row.RowId),
                 ExtraSheetText = $" (FeatureID: {row.FeatureID})",
                 IconId = row.Icon,
                 Label = title,
@@ -326,8 +315,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(CraftAction),
-                    RowId = row.RowId,
+                    ExcelRowIdentifier = new(typeof(CraftAction), row.RowId),
                     IconId = row.Icon,
                     Label = row.Name.ToString(),
                     Category = "Crafting Action"
@@ -343,14 +331,12 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
             if (!dict.TryGetValue(unlockLink, out var names))
                 dict.Add(unlockLink, names = []);
 
-            if (names.Any(entry => entry.RowType == typeof(DescriptionPage) && entry.RowId == page.RowId && entry.SubrowId == page.SubrowId))
+            if (names.Any(entry => entry.ExcelRowIdentifier is { } id && id.SheetType == typeof(DescriptionPage) && id.RowId == page.RowId && id.SubrowId == page.SubrowId))
                 return;
 
             names.Add(new UnlockEntry()
             {
-                RowType = typeof(DescriptionPage),
-                RowId = page.RowId,
-                SubrowId = page.SubrowId,
+                ExcelRowIdentifier = new(typeof(DescriptionPage), page.RowId, page.SubrowId),
                 Label = page.Text[0].ValueNullable?.Text.ToString() ?? string.Empty
             });
         }
@@ -383,8 +369,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
             names.Add(new UnlockEntry()
             {
-                RowType = typeof(EmjVoiceNpc),
-                RowId = row.RowId,
+                ExcelRowIdentifier = new(typeof(EmjVoiceNpc), row.RowId),
                 Label = row.Name.ToString(),
             });
         }
@@ -398,8 +383,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(Emote),
-                    RowId = row.RowId,
+                    ExcelRowIdentifier = new(typeof(Emote), row.RowId),
                     IconId = row.Icon,
                     Label = row.Name.ToString()
                 });
@@ -416,8 +400,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
             names.Add(new UnlockEntry()
             {
-                RowType = typeof(EventTutorial),
-                RowId = row.RowId,
+                ExcelRowIdentifier = new(typeof(EventTutorial), row.RowId),
                 TexturePath = "ui/uld/EventTutorial_hr1.tex",
                 Label = row.Singular.ToString(),
             });
@@ -432,8 +415,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(GeneralAction),
-                    RowId = row.RowId,
+                    ExcelRowIdentifier = new(typeof(GeneralAction), row.RowId),
                     IconId = (uint)row.Icon,
                     Label = row.Name.ToString(),
                     Category = "General Action"
@@ -451,8 +433,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
             names.Add(new UnlockEntry()
             {
-                RowType = typeof(Item),
-                RowId = row.RowId,
+                ExcelRowIdentifier = new(typeof(Item), row.RowId),
                 IconId = row.Icon,
                 Label = _textService.GetItemName(row.RowId).ToString()
             });
@@ -468,8 +449,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
             names.Add(new UnlockEntry()
             {
-                RowType = typeof(MJILandmark),
-                RowId = row.RowId,
+                ExcelRowIdentifier = new(typeof(MJILandmark), row.RowId),
                 IconId = row.Icon,
                 Label = row.Name.Value.Text.ToString(),
                 Category = _textService.GetAddonText(14269)
@@ -486,8 +466,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
             names.Add(new UnlockEntry()
             {
-                RowType = typeof(MKDLore),
-                RowId = row.RowId,
+                ExcelRowIdentifier = new(typeof(MKDLore), row.RowId),
                 IconId = row.Image,
                 Label = row.Name.ToString(),
             });
@@ -502,8 +481,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(NotebookDivision),
-                    RowId = row.RowId,
+                    ExcelRowIdentifier = new(typeof(NotebookDivision), row.RowId),
                     Label = row.Name.ToString()
                 });
             }
@@ -519,8 +497,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
             names.Add(new UnlockEntry()
             {
-                RowType = typeof(PatchMark),
-                RowId = row.RowId
+                ExcelRowIdentifier = new(typeof(PatchMark), row.RowId),
             });
         }
 
@@ -533,8 +510,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(Perform),
-                    RowId = row.RowId,
+                    ExcelRowIdentifier = new(typeof(Perform), row.RowId),
                     Label = row.Name.ToString()
                 });
             }
@@ -549,8 +525,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(QuestAcceptAdditionCondition),
-                    RowId = row.RowId,
+                    ExcelRowIdentifier = new(typeof(QuestAcceptAdditionCondition), row.RowId),
                     ExtraSheetText = " (Requirement 0)",
                     Label = _textService.GetQuestName(row.RowId)
                 });
@@ -563,8 +538,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(QuestAcceptAdditionCondition),
-                    RowId = row.RowId,
+                    ExcelRowIdentifier = new(typeof(QuestAcceptAdditionCondition), row.RowId),
                     ExtraSheetText = " (Requirement 1)",
                     Label = _textService.GetQuestName(row.RowId)
                 });
@@ -580,8 +554,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(Trait),
-                    RowId = row.RowId,
+                    ExcelRowIdentifier = new(typeof(Trait), row.RowId),
                     IconId = (uint)row.Icon,
                     Label = row.Name.ToString(),
                     Category = _textService.GetAddonText(102478)
@@ -599,8 +572,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    RowType = typeof(TopicSelect),
-                    RowId = row.RowId,
+                    ExcelRowIdentifier = new(typeof(TopicSelect), row.RowId),
                     Label = row.Name.ToString(),
                 });
             }
