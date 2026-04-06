@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using Dalamud.Utility;
 using HaselDebug.Utils;
@@ -259,9 +260,15 @@ public partial class DebugRenderer
             return;
         }
 
-        if (nodeOptions.IsIconIdField && columnType.IsNumericType())
+        if (columnType.IsNumericType())
         {
-            DrawIcon(value, columnType);
+            if (nodeOptions.IsIconIdField)
+            {
+                DrawIcon(value, columnType);
+            }
+
+            ImGuiUtils.DrawCopyableText(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+            return;
         }
 
         ImGuiUtils.DrawCopyableText(value.ToString() ?? string.Empty);
