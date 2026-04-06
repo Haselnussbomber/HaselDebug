@@ -205,7 +205,7 @@ public unsafe partial class ExcelTab : DebugTab
         // Handle typed sheets with type definitions
         if (TryGetSheetType(sheetName, out var sheetType))
         {
-            // For typed sheets, use ExcelV2SheetWrapper
+            // For typed sheets, use ExcelSheetWrapper
             _nextSheetWrapper = (IExcelSheetWrapper)ActivatorUtilities.CreateInstance(
                 _serviceProvider,
                 typeof(ExcelSheetWrapper<>).MakeGenericType(sheetType),

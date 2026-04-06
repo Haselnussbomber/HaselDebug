@@ -4,7 +4,7 @@ public class UnlockEntry
 {
     public Type? RowType { get; set; }
     public uint RowId { get; set; }
-    public uint? SubrowId { get; set; }
+    public ushort? SubrowId { get; set; }
     public string ExtraSheetText { get; set; } = string.Empty;
     public uint IconId { get; set; }
     public string TexturePath { get; set; } = string.Empty;

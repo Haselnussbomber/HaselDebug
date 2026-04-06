@@ -23,7 +23,7 @@ public partial class EntryRowIdColumn<T, TRow> : ColumnNumber<T>
         if (ImGui.Selectable(ToName(entry)))
         {
             var title = $"{_rowType.Name}#{entry.RowId} ({_languageProvider.ClientLanguage})";
-            _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, _rowType, entry.RowId, _languageProvider.ClientLanguage, title));
+            _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, _rowType, entry.RowId, 0, _languageProvider.ClientLanguage, title));
         }
 
         ImGuiContextMenu.Draw($"{_rowType.Name}{entry.RowId}RowIdContextMenu", builder =>

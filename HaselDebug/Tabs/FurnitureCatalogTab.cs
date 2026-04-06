@@ -232,7 +232,7 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
                 if (ImGui.Selectable(ToName(row)))
                 {
                     var title = $"{row.SheetType.Name}#{row.RowId} ({_languageProvider.ClientLanguage})";
-                    _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, row.SheetType, row.RowId, _languageProvider.ClientLanguage, title));
+                    _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, row.SheetType, row.RowId, 0, _languageProvider.ClientLanguage, title));
                 }
 
                 ImGuiContextMenu.Draw($"{row.SheetType.Name}{row.RowId}RowIdContextMenu", builder =>

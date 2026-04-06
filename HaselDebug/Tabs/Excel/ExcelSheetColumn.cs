@@ -106,6 +106,7 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
     {
         var value = _propertyInfo.GetValue(row);
         var rowId = (uint)RowType.GetProperty("RowId", BindingFlags.Public | BindingFlags.Instance)!.GetValue(row)!;
+        var subrowId = (ushort?)RowType.GetProperty("SubrowId", BindingFlags.Public | BindingFlags.Instance)?.GetValue(row);
 
         if (value == null)
         {
@@ -113,11 +114,11 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
             return;
         }
 
-        if (!_excelTable.IsSubrowType && Label is "RowId" or "SubrowId")
+        if (Label is "RowId" or "SubrowId")
         {
             if (ImGui.Selectable(value.ToString()))
             {
-                OpenSheet(RowType.Name, rowId);
+                OpenSheet(RowType.Name, rowId, subrowId);
             }
             ImGuiContextMenu.Draw($"{RowType.Name}{rowId}RowIdContextMenu", builder =>
             {
@@ -157,7 +158,7 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
                 using var color = DebugRenderer.ColorTreeNode.Push(ImGuiCol.Text);
 
                 if (ImGui.Selectable(text))
-                    OpenSheet(rowRefType.Name, rowRefRowId);
+                    OpenSheet(rowRefType.Name, rowRefRowId, 0);
             }
             else
             {
@@ -180,7 +181,7 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
                 using var color = DebugRenderer.ColorTreeNode.Push(ImGuiCol.Text);
 
                 if (ImGui.Selectable(text))
-                    OpenSheet(rowRefType.Name, rowRefRowId);
+                    OpenSheet(rowRefType.Name, rowRefRowId, 0);
             }
             else
             {
@@ -208,12 +209,12 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
         ImGui.Text(value.ToString()); // TODO: invariant culture
     }
 
-    private void OpenSheet(string sheetName, uint rowId)
+    private void OpenSheet(string sheetName, uint rowId, ushort? subrowId)
     {
         if (!_excelTab.TryGetSheetType(sheetName, out var sheetType))
             return;
 
-        var title = $"{sheetName}#{rowId} ({_excelTab.SelectedLanguage})";
-        _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, sheetType, rowId, _excelTab.SelectedLanguage, title));
+        var title = $"{sheetName}#{rowId}{(subrowId != null ? $".{subrowId}" : string.Empty)} ({_excelTab.SelectedLanguage})";
+        _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, sheetType, rowId, subrowId ?? 0, _excelTab.SelectedLanguage, title));
     }
 }

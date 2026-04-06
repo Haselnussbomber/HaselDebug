@@ -20,7 +20,7 @@ public partial class RowIdColumn<TRow> : ColumnNumber<TRow> where TRow : struct,
         if (ImGui.Selectable(ToName(row)))
         {
             var title = $"{_rowType.Name}#{row.RowId} ({_languageProvider.ClientLanguage})";
-            _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, _rowType, row.RowId, _languageProvider.ClientLanguage, title));
+            _windowManager.CreateOrOpen(title, () => ActivatorUtilities.CreateInstance<ExcelRowTab>(_serviceProvider, _rowType, row.RowId, 0, _languageProvider.ClientLanguage, title));
         }
 
         ImGuiContextMenu.Draw($"{_rowType.Name}{row.RowId}RowIdContextMenu", builder =>

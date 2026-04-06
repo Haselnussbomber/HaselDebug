@@ -51,8 +51,7 @@ public partial class ExcelTable<T> : Table<T> where T : struct
 
             var getSheetMethodInfo = typeof(ExcelService)
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(mi => mi.Name == "GetSubrowSheet" && mi.IsGenericMethod && mi.GetParameters().Length == 1)
-                .First();
+                .First(mi => mi.Name == "GetSubrowSheet" && mi.IsGenericMethod && mi.GetParameters().Length == 1);
             var getSheetTyped = getSheetMethodInfo.MakeGenericMethod(typeof(T));
             var collection = (System.Collections.IEnumerable)getSheetTyped.Invoke(_excelService, [_excelTab.SelectedLanguage])!;
             Rows = [.. collection.Cast<IReadOnlyList<T>>().SelectMany(row => row)];
@@ -63,8 +62,7 @@ public partial class ExcelTable<T> : Table<T> where T : struct
 
             var getSheetMethodInfo = typeof(ExcelService)
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(mi => mi.Name == "GetSheet" && mi.IsGenericMethod && mi.GetParameters().Length == 1)
-                .First();
+                .First(mi => mi.Name == "GetSheet" && mi.IsGenericMethod && mi.GetParameters().Length == 1);
             var getSheetTyped = getSheetMethodInfo.MakeGenericMethod(typeof(T));
             var collection = (IReadOnlyCollection<T>)getSheetTyped.Invoke(_excelService, [_excelTab.SelectedLanguage])!;
             Rows = [.. collection];

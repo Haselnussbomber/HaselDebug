@@ -35,7 +35,7 @@ public partial class UnlocksColumn : ColumnString<UnlockLinkEntry>
                 if (ImGui.Selectable($"{GetSheetRowLabel(unlock)}{unlock.ExtraSheetText}"))
                 {
                     var title = $"{GetSheetRowLabel(unlock)} ({_languageProvider.ClientLanguage})";
-                    _windowManager.CreateOrOpen(title, () => new ExcelRowTab(_windowManager, _textService, _serviceProvider, unlock.RowType, unlock.RowId, _languageProvider.ClientLanguage, title));
+                    _windowManager.CreateOrOpen(title, () => new ExcelRowTab(_windowManager, _textService, _serviceProvider, unlock.RowType, unlock.RowId, unlock.SubrowId ?? 0, _languageProvider.ClientLanguage, title));
                 }
 
                 ImGuiContextMenu.Draw($"Entry{entry.Index}_{unlock.RowType.Name}{unlock.RowId}_RowIdContextMenu", builder =>

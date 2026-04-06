@@ -123,7 +123,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
                     {
                         RowType = typeof(BGMSwitch),
                         RowId = row.RowId,
-                        SubrowId = subrow.RowId
+                        SubrowId = subrow.SubrowId
                     });
                 }
             }
