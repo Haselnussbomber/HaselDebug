@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+- **Updated:** The excel renderer now supports Subrow sheets and SubrowRefs.
 - **Updated:** The Unlock Links tab now displays unknown entries and a couple system unlocks have been manually added.
 - **Fixed:** Region names in the Aetherytes tab have been corrected.
 - **Fixed:** DescriptionPages in the Unlock Links tab now properly display the Subrow id.
+- **Updated:** ClientStructs now at [9c7551ac](https://github.com/aers/FFXIVClientStructs/tree/9c7551ac) ([compare](https://github.com/aers/FFXIVClientStructs/compare/4245e53d..9c7551ac)).
 
 ## [1.52.0] (2026-03-30)
 
