@@ -51,10 +51,7 @@ public unsafe partial class SpawnTreasureLogTab : PacketLogTab<SpawnTreasurePack
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawPointerType((SpawnTreasurePacket*)Unsafe.AsPointer(in packet), new NodeOptions()
-            {
-                AddressPath = new(index)
-            });
+            _debugRenderer.DrawPointerType(packet);
         }
     }
 

@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Network;
@@ -26,8 +25,8 @@ public unsafe partial class SpawnNpcLogTab : PacketLogTab<SpawnNpcEntry>, IDispo
     [StructLayout(LayoutKind.Sequential)]
     public struct SpawnNpcEntry
     {
-        public uint EntityId;
         public SpawnNpcPacket Packet;
+        public uint EntityId;
     }
 
     public void Dispose()
@@ -75,25 +74,24 @@ public unsafe partial class SpawnNpcLogTab : PacketLogTab<SpawnNpcEntry>, IDispo
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn();
-            ImGuiUtils.DrawCopyableText(entry.EntityId.ToString("X"));
+            ImGuiUtils.DrawCopyableText(entry.Value->EntityId.ToString("X"));
 
             ImGui.TableNextColumn();
 
-            var objectKind = entry.Packet.Common.ObjectKind;
+            var objectKind = entry.Value->Packet.Common.ObjectKind;
             var name = $"[{objectKind}] ";
 
-            if (entry.Packet.Common.NameId != 0)
-                name += _seStringEvaluator.EvaluateObjStr((DObjectKind)objectKind, entry.Packet.Common.NameId);
+            if (entry.Value->Packet.Common.NameId != 0)
+                name += _seStringEvaluator.EvaluateObjStr((DObjectKind)objectKind, entry.Value->Packet.Common.NameId);
             else
-                name += entry.Packet.Common.NameString;
+                name += entry.Value->Packet.Common.NameString;
 
-            _debugRenderer.DrawPointerType((SpawnNpcPacket*)Unsafe.AsPointer(in entry.Packet), new NodeOptions()
+            _debugRenderer.DrawPointerType(&entry.Value->Packet, new NodeOptions()
             {
-                AddressPath = new(index),
                 Title = name,
                 OnHovered = () =>
                 {
-                    var gameObject = GameObjectManager.Instance()->Objects.GetObjectByEntityId(entry.EntityId);
+                    var gameObject = GameObjectManager.Instance()->Objects.GetObjectByEntityId(entry.Value->EntityId);
                     if (gameObject != null)
                     {
                         var pos = gameObject->GetPosition();
@@ -106,18 +104,18 @@ public unsafe partial class SpawnNpcLogTab : PacketLogTab<SpawnNpcEntry>, IDispo
                 },
                 DrawContextMenu = (nodeOptions, builder) =>
                 {
-                    var gameObject = GameObjectManager.Instance()->Objects.GetObjectByEntityId(entry.EntityId);
+                    var gameObject = GameObjectManager.Instance()->Objects.GetObjectByEntityId(entry.Value->EntityId);
                     builder.Add(new ImGuiContextMenuEntry()
                     {
                         Label = _textService.Translate("ContextMenu.TabPopout"),
                         Visible = gameObject != null,
                         ClickCallback = () =>
                         {
-                            var windowName = $"Entity #{entry.EntityId:X}";
+                            var windowName = $"Entity #{entry.Value->EntityId:X}";
                             var window = _windowManager.CreateOrOpen(windowName, () => _serviceProvider.CreateInstance<EntityInspectorWindow>());
                             window.WindowNameKey = string.Empty;
                             window.WindowName = windowName;
-                            window.EntityId = entry.EntityId;
+                            window.EntityId = entry.Value->EntityId;
                         }
                     });
                     builder.AddCopyName(name);

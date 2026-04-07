@@ -51,7 +51,7 @@ public unsafe partial class PartyFinderListingLogTab : PacketLogTab<CrossRealmLi
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn(); // Packet
-            _debugRenderer.DrawPointerType((CrossRealmListingSegmentPacket*)Unsafe.AsPointer(in packet), new NodeOptions() { AddressPath = new([index]) });
+            _debugRenderer.DrawPointerType(packet);
         }
     }
 

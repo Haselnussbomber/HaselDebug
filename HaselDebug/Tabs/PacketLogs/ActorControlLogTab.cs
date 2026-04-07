@@ -79,22 +79,22 @@ public unsafe partial class ActorControlLogTab : PacketLogTab<ActorControlEntry>
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn();
-            ImGuiUtils.DrawCopyableText(payload.EntityId.ToString("X"));
+            ImGuiUtils.DrawCopyableText(payload.Value->EntityId.ToString("X"));
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawNumeric(payload.Category, typeof(uint), new NodeOptions() { HexOnShift = true });
+            _debugRenderer.DrawNumeric(payload.Value->Category, typeof(uint), new NodeOptions() { HexOnShift = true });
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawNumeric(payload.Arg1, typeof(uint), new NodeOptions() { HexOnShift = true });
+            _debugRenderer.DrawNumeric(payload.Value->Arg1, typeof(uint), new NodeOptions() { HexOnShift = true });
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawNumeric(payload.Arg2, typeof(uint), new NodeOptions() { HexOnShift = true });
+            _debugRenderer.DrawNumeric(payload.Value->Arg2, typeof(uint), new NodeOptions() { HexOnShift = true });
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawNumeric(payload.Arg3, typeof(uint), new NodeOptions() { HexOnShift = true });
+            _debugRenderer.DrawNumeric(payload.Value->Arg3, typeof(uint), new NodeOptions() { HexOnShift = true });
 
             ImGui.TableNextColumn();
-            _debugRenderer.DrawNumeric(payload.Arg4, typeof(uint), new NodeOptions() { HexOnShift = true });
+            _debugRenderer.DrawNumeric(payload.Value->Arg4, typeof(uint), new NodeOptions() { HexOnShift = true });
         }
     }
 

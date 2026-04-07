@@ -51,11 +51,7 @@ public unsafe partial class ZoneInitLogTab : PacketLogTab<ZoneInitPacket>, IDisp
             ImGui.Text(time.ToLongTimeString());
 
             ImGui.TableNextColumn();
-
-            _debugRenderer.DrawPointerType((ZoneInitPacket*)Unsafe.AsPointer(in packet), new NodeOptions()
-            {
-                AddressPath = new(i)
-            });
+            _debugRenderer.DrawPointerType(packet);
         }
     }
 

@@ -1,3 +1,5 @@
+using Dalamud.Game.Text.SeStringHandling;
+using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
 
@@ -13,7 +15,7 @@ public partial class PacketLogTab<T> : DebugTab, IPacketLogTab where T : unmanag
     private struct RecordEntry
     {
         public DateTime Time;
-        public T Payload;
+        public Pointer<T> Payload;
     }
 
     private readonly List<RecordEntry> _records = [];
@@ -41,20 +43,32 @@ public partial class PacketLogTab<T> : DebugTab, IPacketLogTab where T : unmanag
         }
     }
 
-    public IEnumerable<(int Index, DateTime Time, T Entry)> Records
+    public IEnumerable<(int Index, DateTime Time, Pointer<T> Entry)> Records
     {
         get
         {
             for (var i = _records.Count - 1; i >= 0; i--)
             {
                 var entry = _records[i];
+
+                unsafe
+                {
+                    if (entry.Payload.Value == null)
+                        continue;
+                }
+
                 yield return (i, entry.Time, entry.Payload);
             }
         }
     }
 
-    public virtual void AddRecord(T payload)
+    public virtual unsafe void AddRecord(T payload)
     {
-        _records.Add(new RecordEntry() { Time = DateTime.Now, Payload = payload });
+        var copy = IMemorySpace.GetDefaultSpace()->Malloc<T>();
+        *copy = payload;
+        _records.Add(new RecordEntry() {
+            Time = DateTime.Now,
+            Payload = copy
+        });
     }
 }
