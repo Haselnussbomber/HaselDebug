@@ -1,4 +1,3 @@
-using Dalamud.Game.Text.SeStringHandling;
 using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -66,7 +65,8 @@ public partial class PacketLogTab<T> : DebugTab, IPacketLogTab where T : unmanag
     {
         var copy = IMemorySpace.GetDefaultSpace()->Malloc<T>();
         *copy = payload;
-        _records.Add(new RecordEntry() {
+        _records.Add(new RecordEntry()
+        {
             Time = DateTime.Now,
             Payload = copy
         });
