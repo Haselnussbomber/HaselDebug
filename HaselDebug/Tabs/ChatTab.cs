@@ -32,7 +32,7 @@ public unsafe partial class ChatTab : DebugTab
         var count = raptureLogModule->LogMessageCount - start;
 
         ImGui.Text($"{count} Message");
-
+        
         using var table = ImRaii.Table("ChatTabTable"u8, 5, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table)
             return;
@@ -44,53 +44,44 @@ public unsafe partial class ChatTab : DebugTab
         ImGui.TableSetupColumn("Formatted Message"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(5, 1);
         ImGui.TableHeadersRow();
+        
+        using var clipper = new ImRaiiListClipper(count, ImGui.GetTextLineHeightWithSpacing());
 
-        var clipper = ImGui.ImGuiListClipper();
-        clipper.Begin(count, ImGui.GetTextLineHeightWithSpacing());
-        while (clipper.Step())
+        foreach (var i in clipper)
         {
-            for (var i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+            if (!raptureLogModule->GetLogMessageDetail(i + start, out var sender, out var message, out var logKind, out EntityRelationKind casterKind, out var targetKind, out var time))
+                continue;
+            
+            ImGui.TableNextRow();
+
+            ImGui.TableNextColumn(); // Timestamp
+            ImGui.Text(DateTimeOffset.FromUnixTimeSeconds(time).LocalDateTime.ToString());
+
+            ImGui.TableNextColumn(); // LogKind
+            ImGui.Text(logKind.ToString());
+
+            ImGui.TableNextColumn(); // Caster
+            ImGui.Text(GetLabel(casterKind));
+
+            ImGui.TableNextColumn(); // Target
+            ImGui.Text(GetLabel(targetKind));
+
+            ImGui.TableNextColumn(); // Formatted Message
+            var senderEvaluated = _seStringEvaluator.Evaluate((ReadOnlySeStringSpan)sender);
+            var messageEvaluated = _seStringEvaluator.Evaluate((ReadOnlySeStringSpan)message);
+            var format = _excelService.TryGetRow<LogKind>((uint)logKind, out var logKindRow) ? logKindRow.Format : new();
+            var formatted = _seStringEvaluator.Evaluate(format, [senderEvaluated, messageEvaluated]).AsSpan();
+
+            if (!formatted.IsEmpty)
             {
-                if (i >= count)
-                    return;
-
-                if (i >= 0 && raptureLogModule->GetLogMessageDetail(i + start, out var sender, out var message, out var logKind, out EntityRelationKind casterKind, out var targetKind, out var time))
+                _debugRenderer.DrawSeString(formatted, new NodeOptions()
                 {
-                    ImGui.TableNextRow();
-
-                    ImGui.TableNextColumn(); // Timestamp
-                    ImGui.Text(DateTimeOffset.FromUnixTimeSeconds(time).LocalDateTime.ToString());
-
-                    ImGui.TableNextColumn(); // LogKind
-                    ImGui.Text(logKind.ToString());
-
-                    ImGui.TableNextColumn(); // Caster
-                    ImGui.Text(GetLabel(casterKind));
-
-                    ImGui.TableNextColumn(); // Target
-                    ImGui.Text(GetLabel(targetKind));
-
-                    ImGui.TableNextColumn(); // Formatted Message
-                    var senderEvaluated = _seStringEvaluator.Evaluate((ReadOnlySeStringSpan)sender);
-                    var messageEvaluated = _seStringEvaluator.Evaluate((ReadOnlySeStringSpan)message);
-                    var format = _excelService.TryGetRow<LogKind>((uint)logKind, out var logKindRow) ? logKindRow.Format : new();
-                    var formatted = _seStringEvaluator.Evaluate(format, [senderEvaluated, messageEvaluated]).AsSpan();
-
-                    if (!formatted.IsEmpty)
-                    {
-                        _debugRenderer.DrawSeString(formatted, new NodeOptions()
-                        {
-                            AddressPath = new AddressPath(i),
-                            Indent = false,
-                            Title = $"Chat Line {i}"
-                        });
-                    }
-                }
+                    AddressPath = new AddressPath(i),
+                    Indent = false,
+                    Title = $"Chat Line {i}"
+                });
             }
         }
-
-        clipper.End();
-        clipper.Destroy();
     }
 
     private string GetLabel(EntityRelationKind index)
