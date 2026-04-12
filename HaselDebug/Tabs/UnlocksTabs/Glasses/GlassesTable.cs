@@ -5,7 +5,7 @@ using GlassesSheet = Lumina.Excel.Sheets.Glasses;
 namespace HaselDebug.Tabs.UnlocksTabs.Glasses;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class GlassesTable : Table<GlassesSheet>
+public partial class GlassesTable : Table<GlassesSheet>
 {
     private readonly IServiceProvider _serviceProvider;
     internal readonly ExcelService _excelService;
