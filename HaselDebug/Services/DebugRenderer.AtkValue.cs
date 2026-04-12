@@ -22,14 +22,15 @@ public unsafe partial class DebugRenderer
         nodeOptions = nodeOptions.WithAddress(address);
 
         var value = (AtkValue*)address;
+        ImGui.Text(value->Type.ToString());
+        if (value->Type is ValueType.Undefined or ValueType.Null)
+            return;
+
+        ImGui.SameLine(0, 0);
+        ImGui.Text(":"u8);
+        ImGui.SameLine();
         switch (value->Type)
         {
-            case ValueType.Undefined:
-                ImGui.Text("Undefined"u8);
-                break;
-            case ValueType.Null:
-                ImGui.Text("Null"u8);
-                break;
             case ValueType.Bool:
                 ImGuiUtils.DrawCopyableText($"{value->Byte == 0x01}");
                 break;
