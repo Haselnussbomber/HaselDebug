@@ -39,7 +39,7 @@ public unsafe partial class DebugRenderer
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
 
-            using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey3.ToUInt()))
+            using (ImRaii.PushColor(ImGuiCol.Text, Color.Text600.ToUInt()))
                 ImGuiUtils.DrawCopyableText($"{address + line * numColumns:X}", new() { AsSelectable = true });
 
             var colpos = pos;

@@ -32,15 +32,15 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
             using var titleColor = ImRaii.PushColor(ImGuiCol.Text, 0xFF00FFFF);
             using var node = ImRaii.TreeNode($"##Hotbar{i}", ImGuiTreeNodeFlags.SpanAvailWidth);
 
-            ImGui.SameLine(ImGui.GetStyle().FramePadding.X * 3f + ImGui.GetFontSize(), 0);
+            ImGui.SameLine(ImStyle.FramePadding.X * 3f + ImGui.GetFontSize(), 0);
             ImGui.Text($"Hotbar {i}");
-            ImGui.SameLine(0, ImGui.GetStyle().FramePadding.X * 3);
+            ImGui.SameLine(0, ImStyle.FramePadding.X * 3);
 
             for (var j = 0; j < hotbar.Slots.Length; j++)
             {
                 var slot = hotbar.Slots[j];
                 DrawHotbarSlotIcon(slot);
-                ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+                ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
             }
             ImGui.NewLine();
 
@@ -151,11 +151,11 @@ public unsafe partial class RaptureHotbarModuleTab : DebugTab
     {
         if (_textureProvider.TryGetFromGameIcon(slot.IconId, out var tex) && tex.TryGetWrap(out var texture, out _))
         {
-            ImGui.Image(texture.Handle, new Vector2(ImGui.GetTextLineHeight()));
+            ImGui.Image(texture.Handle, new Vector2(ImStyle.TextLineHeight));
         }
         else
         {
-            ImGui.Dummy(new Vector2(ImGui.GetTextLineHeight()));
+            ImGui.Dummy(new Vector2(ImStyle.TextLineHeight));
         }
     }
 }

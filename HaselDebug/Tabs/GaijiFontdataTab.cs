@@ -44,7 +44,7 @@ public partial class GaijiFontdataTable : Table<GfdEntry>, IDisposable
 
     public override float CalculateLineHeight()
     {
-        return 20 + ImGui.GetStyle().ItemSpacing.Y;
+        return 20 + ImStyle.ItemSpacing.Y;
     }
 
     public override unsafe void LoadRows()

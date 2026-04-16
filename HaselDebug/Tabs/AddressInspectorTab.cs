@@ -252,7 +252,7 @@ public unsafe partial class AddressInspectorTab : DebugTab
             ImGuiUtils.DrawCopyableText($"[0x{info.Offset:X}]", new()
             {
                 CopyText = ImGui.IsKeyDown(ImGuiKey.LeftShift) ? $"{info.Address + info.Offset:X}" : $"0x{info.Offset:X}",
-                TextColor = Color.Grey3
+                TextColor = Color.Text600
             });
 
             ImGui.SameLine();

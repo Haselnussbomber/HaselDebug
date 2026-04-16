@@ -39,11 +39,11 @@ public partial class NameColumn : ColumnString<Quest>
             _textureProvider.TryGetFromGameIcon(eventIconType.MapIconAvailable + iconOffset, out var tex) &&
             tex.TryGetWrap(out var icon, out _))
         {
-            ImGui.Image(icon.Handle, ImGuiHelpers.ScaledVector2(ImGui.GetTextLineHeight()));
+            ImGui.Image(icon.Handle, ImGuiHelpers.ScaledVector2(ImStyle.TextLineHeight));
         }
         else
         {
-            ImGui.Dummy(ImGuiHelpers.ScaledVector2(ImGui.GetTextLineHeight()));
+            ImGui.Dummy(ImGuiHelpers.ScaledVector2(ImStyle.TextLineHeight));
         }
 
         ImGui.SameLine();

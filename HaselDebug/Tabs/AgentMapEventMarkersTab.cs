@@ -38,7 +38,7 @@ public unsafe partial class AgentMapEventMarkersTab : DebugTab
 
             ImGui.TableNextColumn(); // Icon
             if (_textureProvider.TryGetFromGameIcon(marker.IconId, out var sharedTex) && sharedTex.TryGetWrap(out var tex, out var _))
-                ImGui.Image(tex.Handle, new(ImGui.GetTextLineHeight()));
+                ImGui.Image(tex.Handle, new(ImStyle.TextLineHeight));
 
             ImGui.SameLine();
             ImGui.Text(marker.IconId.ToString());

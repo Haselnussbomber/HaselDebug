@@ -52,7 +52,7 @@ public partial class RawSheetWrapper : IExcelSheetWrapper
         // Header (SheetName, Type, RowCount, ColumnCount)
         ImGui.Text(SheetName);
         ImGui.SameLine();
-        using (Color.Grey.Push(ImGuiCol.Text))
+        using (Color.Text700.Push(ImGuiCol.Text))
             ImGui.Text(" (Raw Sheet)");
         ImGui.SameLine();
         ImGui.Text($"{_filteredRows.Count} row{(_filteredRows.Count != 1 ? "s" : "")}");

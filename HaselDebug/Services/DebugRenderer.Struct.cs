@@ -49,7 +49,7 @@ public unsafe partial class DebugRenderer
             ImGuiUtils.DrawCopyableText($"[0x{offset:X}]", new()
             {
                 CopyText = ImGui.IsKeyDown(ImGuiKey.LeftShift) ? $"{address + offset:X}" : $"0x{offset:X}",
-                TextColor = Color.Grey3
+                TextColor = Color.Text600
             });
 
             ImGui.SameLine();
@@ -297,7 +297,7 @@ public unsafe partial class DebugRenderer
                 }
 
                 ImGui.SameLine();
-                ImGui.Dummy(new Vector2(ImGui.GetTextLineHeight()));
+                ImGui.Dummy(new Vector2(ImStyle.TextLineHeight));
                 ImGui.GetWindowDrawList().AddRectFilled(
                     ImGui.GetItemRectMin(),
                     ImGui.GetItemRectMax(),
@@ -404,7 +404,7 @@ public unsafe partial class DebugRenderer
         var name = fieldNameOverride ?? fieldInfo.Name;
         var fullName = (fieldInfo.DeclaringType != null ? fieldInfo.DeclaringType.FullName + "." : string.Empty) + fieldInfo.Name;
         var hasDoc = HasDocumentation(fullName);
-        var startPos = ImGui.GetCursorScreenPos();
+        var startPos = ImCursor.ScreenPosition;
 
         ImGuiUtils.DrawCopyableText(name, new CopyableTextOptions() { NoTooltip = true, TextColor = ColorFieldName });
 

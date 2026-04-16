@@ -68,7 +68,7 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
             var text = _textService.Translate("FurnitureCatalogTab.AlertText");
             var buttonText = _textService.Translate("FurnitureCatalogTab.OpenButton.Label", _textService.GetAddonText(isInside ? 6263u : 6264));
             var style = ImGui.GetStyle();
-            var iconSize = ImGui.GetTextLineHeight();
+            var iconSize = ImStyle.TextLineHeight;
             var outerSize = new Vector2(ImGui.GetContentRegionMax().X - style.FramePadding.X * 2, 0);
             var innerWidth = outerSize.X
                 - iconSize
@@ -80,8 +80,8 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
                 + (showButton // line 2: button
                     ? (style.ItemSpacing.Y + ImGuiHelpers.GetButtonSize(buttonText).Y) // spacing between text and button + button
                     : 0);
-
-            using (ImGuiUtilsEx.AlertBox("InfoBox", Color.FromHSL(190, 1f, 0.5f), outerSize))
+            
+            using (ImGuiUtilsEx.AlertBox("InfoBox", Color.FromHSV(0.527f, 1, 1), outerSize))
             {
                 if (ServiceLocator.TryGetService<ITextureProvider>(out var textureProvider))
                     textureProvider.DrawIcon(60071, iconSize);

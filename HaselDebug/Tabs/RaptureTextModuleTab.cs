@@ -634,7 +634,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
                 ImGui.Dummy(ArrowUpButtonSize);
             }
 
-            ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+            ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
 
             if (i < _entries.Count - 1)
             {
@@ -648,7 +648,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
                 ImGui.Dummy(ArrowDownButtonSize);
             }
 
-            ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+            ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
 
             if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || ImGui.IsKeyDown(ImGuiKey.RightShift))
             {

@@ -53,17 +53,17 @@ public unsafe partial class ItemsColumn : ColumnString<MirageStoreSetItem>
             var isItemCollected = isFullSetCollected || isItemCollectedInPartialSet;
 
             ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
-            var afterIconPos = ImGui.GetCursorPos();
+            var afterIconPos = ImCursor.Position;
             ImGui.SameLine(0, 0);
-            ImGuiUtils.PushCursorX(-IconSize * ImGuiHelpers.GlobalScale);
+            ImCursor.X -= IconSize * ImStyle.Scale;
             _textureProvider.DrawIcon(
                 (uint)item.Value.Icon,
-                new(IconSize * ImGuiHelpers.GlobalScale)
+                new(IconSize * ImStyle.Scale)
                 {
                     TintColor = isItemCollected || isItemInDresser || isItemInInventory
                         ? Color.White
                         : ImGui.IsItemHovered() || ImGui.IsPopupOpen($"###SetItem_{row.RowId}_{item.RowId}_ItemContextMenu")
-                            ? Color.White : Color.Grey3
+                            ? Color.White : Color.Text600
                 }
             );
 
@@ -99,9 +99,9 @@ public unsafe partial class ItemsColumn : ColumnString<MirageStoreSetItem>
             if (!isFullSetCollected && (isItemCollected || isItemInDresser || isItemInInventory))
             {
                 ImGui.SameLine(0, 0);
-                var dotSize = IconSize / 5f * ImGuiHelpers.GlobalScale;
+                var dotSize = IconSize / 5f * ImStyle.Scale;
                 ImGui.GetWindowDrawList().AddCircleFilled(
-                    ImGui.GetCursorScreenPos() + new Vector2(-dotSize, dotSize), dotSize / 2f,
+                    ImCursor.ScreenPosition + new Vector2(-dotSize, dotSize), dotSize / 2f,
                     true switch
                     {
                         _ when isItemCollectedInPartialSet => Color.Green.ToUInt(), // Outfit Glamour-ready Item

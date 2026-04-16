@@ -44,7 +44,7 @@ public unsafe partial class InventoryTab : DebugTab
         if (_selectedInventoryType == null)
             return;
 
-        ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+        ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
 
         DrawInventoryType((InventoryType)_selectedInventoryType);
     }

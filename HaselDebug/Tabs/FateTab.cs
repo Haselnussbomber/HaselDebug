@@ -73,7 +73,7 @@ public partial class FateTab : DebugTab
             {
                 if (_textureProvider.GetFromGameIcon(fate.IconId).TryGetWrap(out var texture, out _))
                 {
-                    ImGui.Image(texture.Handle, new(ImGui.GetTextLineHeight()));
+                    ImGui.Image(texture.Handle, new(ImStyle.TextLineHeight));
 
                     if (ImGui.IsItemHovered())
                     {
@@ -98,7 +98,7 @@ public partial class FateTab : DebugTab
             {
                 if (_textureProvider.GetFromGameIcon(fate.MapIconId).TryGetWrap(out var texture, out _))
                 {
-                    ImGui.Image(texture.Handle, new(ImGui.GetTextLineHeight()));
+                    ImGui.Image(texture.Handle, new(ImStyle.TextLineHeight));
 
                     if (ImGui.IsItemHovered())
                     {

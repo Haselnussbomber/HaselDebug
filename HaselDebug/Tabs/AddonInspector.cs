@@ -49,7 +49,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
 
         DrawAddonList();
 
-        ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+        ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
 
         _atkDebugRenderer.DrawAddon(new DrawAddonParams()
         {
@@ -67,7 +67,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
         using var sidebarchild = ImRaii.Child("AddonListChild", new Vector2(300, -1), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
         if (!sidebarchild) return;
 
-        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - ImGuiUtils.GetIconButtonSize(FontAwesomeIcon.ObjectUngroup).X - ImGui.GetStyle().ItemSpacing.X);
+        ImGui.SetNextItemWidth(ImStyle.ContentRegionAvail.X - ImGuiUtils.GetIconButtonSize(FontAwesomeIcon.ObjectUngroup).X - ImStyle.ItemSpacing.X);
         var hasSearchTermChanged = ImGui.InputTextWithHint("##TextSearch", _textService.Translate("SearchBar.Hint"), ref _addonNameSearchTerm, 256, ImGuiInputTextFlags.AutoSelectAll);
         var hasSearchTerm = !string.IsNullOrWhiteSpace(_addonNameSearchTerm);
         var hasSearchTermAutoSelected = false;
@@ -174,7 +174,7 @@ public unsafe partial class AddonInspectorTab : DebugTab
                 if (ImGui.Begin("AddonHighligher", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoInputs))
                 {
                     var drawList = ImGui.GetForegroundDrawList();
-                    var textPos = pos + new Vector2(0, -ImGui.GetTextLineHeight());
+                    var textPos = pos + new Vector2(0, -ImStyle.TextLineHeight);
                     drawList.AddText(textPos + Vector2.One, Color.Black.ToUInt(), addonName);
                     drawList.AddText(textPos, Color.Gold.ToUInt(), addonName);
                     ImGui.End();

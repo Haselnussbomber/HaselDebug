@@ -28,7 +28,7 @@ public partial class LocationColumn : ColumnString<AozEntry>
         switch (entry.AozActionTransient.LocationKey)
         {
             case 1 when entry.AozActionTransient.Location.TryGetValue<PlaceName>(out var placeName):
-                _uldService.DrawPart("AozNoteBook", 7, 2, ImGui.GetTextLineHeight());
+                _uldService.DrawPart("AozNoteBook", 7, 2, ImStyle.TextLineHeight);
                 ImGui.SameLine();
                 ImGui.Text(placeName.Name.ToString());
                 break;
@@ -39,7 +39,7 @@ public partial class LocationColumn : ColumnString<AozEntry>
                 break;
 
             case 3:
-                _uldService.DrawPart("AozNoteBook", 7, 2, ImGui.GetTextLineHeight());
+                _uldService.DrawPart("AozNoteBook", 7, 2, ImStyle.TextLineHeight);
                 ImGui.SameLine();
                 ImGui.Text(_textService.GetAddonText(12270)); // Learned First
                 break;

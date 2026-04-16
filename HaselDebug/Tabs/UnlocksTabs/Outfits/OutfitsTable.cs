@@ -48,7 +48,7 @@ public partial class OutfitsTable : Table<MirageStoreSetItem>, IDisposable
 
     public override float CalculateLineHeight()
     {
-        return IconSize * ImGuiHelpers.GlobalScaleSafe + ImGui.GetStyle().ItemSpacing.Y; // I honestly don't know why using ItemSpacing here works
+        return IconSize * ImStyle.Scale + ImStyle.ItemSpacing.Y; // I honestly don't know why using ItemSpacing here works
     }
 
     public override unsafe void LoadRows()
@@ -85,10 +85,10 @@ public partial class OutfitsTable : Table<MirageStoreSetItem>, IDisposable
     public static void DrawCollectedCheckmark(ITextureProvider textureProvider)
     {
         ImGui.SameLine(0, 0);
-        ImGuiUtils.PushCursorX(-IconSize * ImGuiHelpers.GlobalScale);
+        ImCursor.X -= IconSize * ImStyle.Scale;
         if (textureProvider.GetFromGame("ui/uld/RecipeNoteBook_hr1.tex").TryGetWrap(out var tex, out _))
         {
-            var pos = ImGui.GetWindowPos() + ImGui.GetCursorPos() - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY()) + ImGuiHelpers.ScaledVector2(IconSize / 2.5f + 4);
+            var pos = ImCursor.ScreenPosition + ImGuiHelpers.ScaledVector2(IconSize / 2.5f + 4);
             ImGui.GetWindowDrawList().AddImage(tex.Handle, pos, pos + ImGuiHelpers.ScaledVector2(IconSize) / 1.5f, new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
         }
     }

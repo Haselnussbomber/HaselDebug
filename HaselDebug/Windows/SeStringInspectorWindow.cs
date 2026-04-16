@@ -131,7 +131,7 @@ public unsafe partial class SeStringInspectorWindow : SimpleWindow
         using var node = _debugRenderer.DrawTreeNode(new NodeOptions() { AddressPath = new(1), Title = "Preview", TitleColor = Color.Green, DefaultOpen = true });
         if (!node) return;
 
-        ImGui.Dummy(new Vector2(0, ImGui.GetTextLineHeight()));
+        ImGui.Dummy(new Vector2(0, ImStyle.TextLineHeight));
         ImGui.SameLine(0, 0);
         if (ImGui.IsKeyDown(ImGuiKey.LeftShift))
         {

@@ -46,7 +46,7 @@ public unsafe partial class AgentsTab : DebugTab
 
         DrawAgentsList();
 
-        ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+        ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
 
         DrawAgent(_selectedAgentId);
     }

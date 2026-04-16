@@ -26,7 +26,7 @@ public partial class DebugRenderer
 
     public void DrawIcon(uint iconId, bool isHq = false, bool sameLine = true, DrawInfo drawInfo = default, bool canCopy = true, bool noTooltip = false)
     {
-        drawInfo.DrawSize ??= new Vector2(ImGui.GetTextLineHeight());
+        drawInfo.DrawSize ??= new Vector2(ImStyle.TextLineHeight);
 
         if (iconId == 0)
         {
@@ -78,7 +78,7 @@ public partial class DebugRenderer
 
     public void DrawTexture(string path, bool sameLine = true, DrawInfo drawInfo = default, bool canCopy = true, bool noTooltip = false)
     {
-        drawInfo.DrawSize ??= new Vector2(ImGui.GetTextLineHeight());
+        drawInfo.DrawSize ??= new Vector2(ImStyle.TextLineHeight);
 
         if (string.IsNullOrEmpty(path))
         {

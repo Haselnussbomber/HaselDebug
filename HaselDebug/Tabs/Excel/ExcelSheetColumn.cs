@@ -192,7 +192,7 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
         if (ColumnType.IsGenericType && ColumnType.GetGenericTypeDefinition() == typeof(Collection<>))
         {
             var count = (int)ColumnType.GetProperty("Count")?.GetValue(value)!;
-            using (Color.Grey.Push(ImGuiCol.Text))
+            using (Color.Text700.Push(ImGuiCol.Text))
                 ImGui.Text($"{count} value{(count != 1 ? "s" : "")}"); // TODO: click to open
             return;
         }

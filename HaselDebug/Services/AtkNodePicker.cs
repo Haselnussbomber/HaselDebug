@@ -227,28 +227,28 @@ public unsafe partial class AtkNodePicker : IDisposable
 
     private static void DrawText(string text)
     {
-        var position = ImGui.GetCursorPos();
+        var position = ImCursor.Position;
         var outlineColor = Color.Black with { A = 0.5f };
 
         // outline
-        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(-1));
+        ImCursor.Position = position + ImGuiHelpers.ScaledVector2(-1);
         using (outlineColor.Push(ImGuiCol.Text))
             ImGui.Text(text);
 
-        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(1));
+        ImCursor.Position = position + ImGuiHelpers.ScaledVector2(1);
         using (outlineColor.Push(ImGuiCol.Text))
             ImGui.Text(text);
 
-        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(1, -1));
+        ImCursor.Position = position + ImGuiHelpers.ScaledVector2(1, -1);
         using (outlineColor.Push(ImGuiCol.Text))
             ImGui.Text(text);
 
-        ImGui.SetCursorPos(position + ImGuiHelpers.ScaledVector2(-1, 1));
+        ImCursor.Position = position + ImGuiHelpers.ScaledVector2(-1, 1);
         using (outlineColor.Push(ImGuiCol.Text))
             ImGui.Text(text);
 
         // text
-        ImGui.SetCursorPos(position);
+        ImCursor.Position = position;
         ImGui.Text(text);
     }
 }

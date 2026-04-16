@@ -194,7 +194,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
         if (_selectedNumberArray >= atkArrayDataHolder.NumberArrayCount || atkArrayDataHolder.NumberArrayKeys[_selectedNumberArray] == -1)
             _selectedNumberArray = 0;
 
-        ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+        ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
 
         using var child = ImRaii.Child("AtkArrayContent", new Vector2(-1), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
         if (!child) return;
@@ -269,7 +269,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
         if (_selectedStringArray >= atkArrayDataHolder.StringArrayCount || atkArrayDataHolder.StringArrayKeys[_selectedStringArray] == -1)
             _selectedStringArray = 0;
 
-        ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+        ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
 
         using var child = ImRaii.Child("AtkArrayContent", new Vector2(-1), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
         if (!child) return;
@@ -364,7 +364,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
         if (_selectedExtendArray >= atkArrayDataHolder.ExtendArrayCount || atkArrayDataHolder.ExtendArrayKeys[_selectedExtendArray] == -1)
             _selectedExtendArray = 0;
 
-        ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+        ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
 
         using var child = ImRaii.Child("AtkArrayContent", new Vector2(-1), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings);
 

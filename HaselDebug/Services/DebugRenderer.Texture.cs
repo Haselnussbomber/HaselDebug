@@ -95,7 +95,7 @@ public unsafe partial class DebugRenderer
         if (!node) return;
 
         var size = new Vector2(tex->ActualWidth, tex->ActualHeight);
-        var availSize = ImGui.GetContentRegionAvail();
+        var availSize = ImStyle.ContentRegionAvail;
 
         var scale = availSize.X / size.X;
         var scaledSize = new Vector2(size.X * scale, size.Y * scale);

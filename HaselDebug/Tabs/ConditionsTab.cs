@@ -28,8 +28,8 @@ public unsafe partial class ConditionsTab : DebugTab
             if (!value) continue;
 
             ImGui.Text($"#{offset}:");
-            ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
-            var startPos = ImGui.GetWindowPos() + ImGui.GetCursorPos() - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY());
+            ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
+            var screenPos = ImCursor.ScreenPosition;
             ImGui.Text(fieldInfo.Name);
 
             var fullName = (fieldInfo.DeclaringType != null ? fieldInfo.DeclaringType.FullName + "." : string.Empty) + fieldInfo.Name;
@@ -38,7 +38,10 @@ public unsafe partial class ConditionsTab : DebugTab
                 continue;
 
             var textSize = ImGui.CalcTextSize(fieldInfo.Name);
-            ImGui.GetWindowDrawList().AddLine(startPos + new Vector2(0, textSize.Y), startPos + textSize, ImGui.GetColorU32(ImGuiCol.Text));
+            ImGui.GetWindowDrawList().AddLine(
+                screenPos + textSize.YOnly(),
+                screenPos + textSize,
+                ImGui.GetColorU32(ImGuiCol.Text));
 
             if (!ImGui.IsItemHovered())
                 continue;

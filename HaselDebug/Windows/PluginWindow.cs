@@ -219,7 +219,7 @@ public partial class PluginWindow : SimpleWindow
                     var subTab = tab.SubTabs.Value[i];
 
                     using var subTabDisabled = Color.From(ImGuiCol.TextDisabled).Push(ImGuiCol.Text, !tab.IsEnabled || !subTab.IsEnabled);
-                    var pos = ImGui.GetCursorPos();
+                    var pos = ImCursor.Position;
 
                     if (ImGui.Selectable($"###Selectable_{subTab.InternalName}", _selectedTab == subTab))
                     {
@@ -243,10 +243,10 @@ public partial class PluginWindow : SimpleWindow
 
                     var linePos = ImGui.GetWindowPos() + pos
                         - new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY())
-                        + new Vector2(MathF.Round(halfLineHeight - ImGui.GetStyle().ItemSpacing.Y / 2), -MathF.Round(ImGui.GetStyle().ItemSpacing.Y / 2));
+                        + new Vector2(MathF.Round(halfLineHeight - ImStyle.ItemSpacing.Y / 2), -MathF.Round(ImStyle.ItemSpacing.Y / 2));
 
-                    ImGui.GetWindowDrawList().AddLine(linePos, linePos + new Vector2(0, i == subTabCount - 1 ? halfLineHeight : lineHeight), Color.Grey3.ToUInt());
-                    ImGui.GetWindowDrawList().AddLine(linePos + new Vector2(0, halfLineHeight), linePos + new Vector2(halfLineHeight, halfLineHeight), Color.Grey3.ToUInt());
+                    ImGui.GetWindowDrawList().AddLine(linePos, linePos + new Vector2(0, i == subTabCount - 1 ? halfLineHeight : lineHeight), Color.Text600.ToUInt());
+                    ImGui.GetWindowDrawList().AddLine(linePos + new Vector2(0, halfLineHeight), linePos + new Vector2(halfLineHeight, halfLineHeight), Color.Text600.ToUInt());
                 }
             }
         }

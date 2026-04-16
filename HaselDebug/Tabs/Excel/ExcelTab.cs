@@ -105,7 +105,7 @@ public unsafe partial class ExcelTab : DebugTab
             _nextSheetWrapper = null;
         }
 
-        var regionAvail = ImGui.GetContentRegionAvail();
+        var regionAvail = ImStyle.ContentRegionAvail;
 
         if (ImGui.Checkbox("Use Experimental Sheets", ref _useExperimentalSheets))
         {
@@ -120,8 +120,8 @@ public unsafe partial class ExcelTab : DebugTab
         }
 
         ImGui.SameLine();
-        var languageSelectorWidth = LanguageSelectorWidth * ImGuiHelpers.GlobalScale;
-        ImGui.SetCursorPosX(regionAvail.X - languageSelectorWidth);
+        var languageSelectorWidth = LanguageSelectorWidth * ImStyle.Scale;
+        ImCursor.X = regionAvail.X - languageSelectorWidth;
         ImGui.SetNextItemWidth(languageSelectorWidth);
         using (var dropdown = ImRaii.Combo("##Language", SelectedLanguage.ToString()))
         {
@@ -142,7 +142,7 @@ public unsafe partial class ExcelTab : DebugTab
         DrawGlobalSearch();
 
         DrawSheetList();
-        ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+        ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
 
         using var innerChild = ImRaii.Child("InnerHost", new Vector2(-1), false, ImGuiWindowFlags.NoSavedSettings);
         if (!innerChild) return;

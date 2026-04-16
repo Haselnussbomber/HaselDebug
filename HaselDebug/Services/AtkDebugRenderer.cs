@@ -103,7 +103,7 @@ public unsafe partial class AtkDebugRenderer
                 continue;
 
             ImGui.Text("Used by"u8);
-            ImGuiUtils.SameLineSpace();
+            ImCursor.SameLineSpace();
             _navigationService.DrawAgentLink(agentId);
 
             ImGui.SameLine();
@@ -163,9 +163,9 @@ public unsafe partial class AtkDebugRenderer
                     agentFound = true;
 
                     ImGui.Text("Callback handler is"u8);
-                    ImGuiUtils.SameLineSpace();
+                    ImCursor.SameLineSpace();
                     _navigationService.DrawAgentLink(agentId);
-                    ImGuiUtils.SameLineSpace();
+                    ImCursor.SameLineSpace();
                     ImGui.Text($"with EventKind {addonCallbackEntry.EventKind}");
 
                     break;
@@ -175,9 +175,9 @@ public unsafe partial class AtkDebugRenderer
             if (!agentFound && addonCallbackEntry.EventInterface != null)
             {
                 ImGui.Text("Callback handler at"u8);
-                ImGuiUtils.SameLineSpace();
+                ImCursor.SameLineSpace();
                 _debugRenderer.DrawAddress(addonCallbackEntry.EventInterface);
-                ImGuiUtils.SameLineSpace();
+                ImCursor.SameLineSpace();
                 ImGui.Text($"with EventKind {addonCallbackEntry.EventKind}");
             }
         }
@@ -189,7 +189,7 @@ public unsafe partial class AtkDebugRenderer
             if (host != null)
             {
                 ImGui.Text("Embedded by"u8);
-                ImGuiUtils.SameLineSpace();
+                ImCursor.SameLineSpace();
                 _navigationService.DrawAddonLink(host->Id, host->NameString);
             }
         }
@@ -325,14 +325,14 @@ public unsafe partial class AtkDebugRenderer
             if (_pluginConfig.SpacesInKTKNames)
                 name = name.SplitCamelCase();
             titleBuilder = rssb.Builder
-                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
+                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Text700)
                                .Append($"{treePrefix}[#{node->NodeId}] {name} ({(nint)node:X})")
                                .PopColor();
         }
         else
         {
             titleBuilder = rssb.Builder
-                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
+                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Text700)
                                .Append($"{treePrefix}[#{node->NodeId}] {node->Type} ({(nint)node:X})")
                                .PopColor();
         }
@@ -343,7 +343,7 @@ public unsafe partial class AtkDebugRenderer
         {
             SeStringTitle = titleBuilder.ToReadOnlySeString(),
             DrawSeStringTreeNode = true,
-            TitleColor = node->IsVisible() ? Color.Green : Color.Grey, // needed for the tree node arrow
+            TitleColor = node->IsVisible() ? Color.Green : Color.Text700, // needed for the tree node arrow
             HighlightAddress = (nint)node,
             HighlightType = typeof(AtkResNode),
             DrawContextMenu = (nodeOptions, builder) =>
@@ -409,14 +409,14 @@ public unsafe partial class AtkDebugRenderer
             if (_pluginConfig.SpacesInKTKNames)
                 name = name.SplitCamelCase();
             titleBuilder = rssb.Builder
-                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
+                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Text700)
                                .Append($"{treePrefix}[#{node->NodeId}] {name} (Node: {(nint)node:X}, Component: {(nint)component:X})")
                                .PopColor();
         }
         else
         {
             titleBuilder = rssb.Builder
-                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Grey)
+                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Text700)
                                .Append($"{treePrefix}[#{node->NodeId}] {objectInfo->ComponentType} Component Node (Node: {(nint)node:X}, Component: {(nint)component:X})")
                                .PopColor();
         }
@@ -427,7 +427,7 @@ public unsafe partial class AtkDebugRenderer
         {
             SeStringTitle = titleBuilder.ToReadOnlySeString(),
             DrawSeStringTreeNode = true,
-            TitleColor = node->IsVisible() ? Color.Green : Color.Grey, // needed for the tree node arrow
+            TitleColor = node->IsVisible() ? Color.Green : Color.Text700, // needed for the tree node arrow
             HighlightAddress = (nint)node,
             HighlightType = typeof(AtkComponentNode),
             DrawContextMenu = (nodeOptions, builder) =>

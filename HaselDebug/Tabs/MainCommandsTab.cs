@@ -50,7 +50,7 @@ public unsafe partial class MainCommandsTab : DebugTab
 
             ImGui.TableNextColumn(); // Name
             _debugRenderer.DrawIcon((uint)row.Icon);
-            ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X * 2); // idk why this bugs
+            ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X * 2); // idk why this bugs
 
             using (ImRaii.PushColor(ImGuiCol.Text, ImGui.GetColorU32(ImGuiCol.TextDisabled), !isEnabled))
             using (ImRaii.PushColor(ImGuiCol.HeaderHovered, ImGui.GetColorU32(ImGuiCol.HeaderHovered) & 0xFFFFFF | 0x30000000, !isEnabled))
@@ -75,14 +75,14 @@ public unsafe partial class MainCommandsTab : DebugTab
                 using var popuptable = ImRaii.Table("PopupTable"u8, 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
                 if (!popuptable) return;
 
-                ImGui.TableSetupColumn("Icon"u8, ImGuiTableColumnFlags.WidthFixed, 40 + ImGui.GetStyle().ItemInnerSpacing.X);
+                ImGui.TableSetupColumn("Icon"u8, ImGuiTableColumnFlags.WidthFixed, 40 + ImStyle.ItemInnerSpacing.X);
                 ImGui.TableSetupColumn("Text"u8, ImGuiTableColumnFlags.WidthFixed, 300);
 
                 ImGui.TableNextColumn(); // Icon
                 _textureProvider.DrawIcon(row.Icon, 40);
 
                 ImGui.TableNextColumn(); // Text
-                using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, ImGui.GetStyle().ItemInnerSpacing.X);
+                using var indentSpacing = ImRaii.PushStyle(ImGuiStyleVar.IndentSpacing, ImStyle.ItemInnerSpacing.X);
                 using var indent = ImRaii.PushIndent(1);
 
                 ImGui.Text(row.Name.ToString());
@@ -90,16 +90,18 @@ public unsafe partial class MainCommandsTab : DebugTab
                 var categoryName = _excelService.TryGetRow<MainCommandCategory>(row.MainCommandCategory.RowId, out var category) ? category.Name.ToString() : string.Empty;
                 if (!string.IsNullOrEmpty(categoryName))
                 {
-                    ImGuiUtils.PushCursorY(-3);
-                    using (ImRaii.PushColor(ImGuiCol.Text, Color.Grey.ToUInt()))
+                    ImCursor.Y -= 3;
+                    using (ImRaii.PushColor(ImGuiCol.Text, Color.Text700.ToUInt()))
                         ImGui.Text(categoryName);
                 }
-                ImGuiUtils.PushCursorY(1);
+                ImCursor.Y += 1;
 
                 // separator
-                var pos = ImGui.GetCursorScreenPos();
-                ImGui.GetWindowDrawList().AddLine(pos, pos + new Vector2(ImGui.GetContentRegionAvail().X, 0), ImGui.GetColorU32(ImGuiCol.Separator));
-                ImGuiUtils.PushCursorY(4);
+                ImGui.GetWindowDrawList().AddLine(
+                    ImCursor.ScreenPosition,
+                    ImCursor.ScreenPosition + ImStyle.ContentRegionAvail.XOnly(),
+                    ImGui.GetColorU32(ImGuiCol.Separator));
+                ImCursor.Y -= 4;
 
                 ImGui.TextWrapped(row.Description.ToString());
             }

@@ -174,12 +174,12 @@ public static unsafe class ImGuiUtilsEx
 
         if (TexDisplayStyle == 1)
         {
-            var pos = ImGui.GetCursorPos();
-            var screenPos = ImGui.GetCursorScreenPos();
+            var pos = ImCursor.Position;
+            var screenPos = ImCursor.ScreenPosition;
 
             ImGui.Image(new ImTextureID(tex->D3D11ShaderResourceView), size);
 
-            var posAfter = ImGui.GetCursorPos();
+            var posAfter = ImCursor.Position;
             var drawList = ImGui.GetWindowDrawList();
 
             for (var i = 0u; i < partsList->PartCount; i++)
@@ -194,9 +194,9 @@ public static unsafe class ImGuiUtilsEx
                     screenPos + partPos + partSize,
                     partSelected
                         ? Color.Gold.ToUInt()
-                        : Color.Grey4.ToUInt());
+                        : Color.Text200.ToUInt());
 
-                ImGui.SetCursorPos(pos + partPos);
+                ImCursor.Position = pos + partPos;
                 ImGui.Dummy(partSize);
                 var popupKey = $"##Asset{(nint)asset}_Part{i}";
 
@@ -257,7 +257,7 @@ public static unsafe class ImGuiUtilsEx
                 });
             }
 
-            ImGui.SetCursorPos(posAfter);
+            ImCursor.Position = posAfter;
         }
         else
         {
@@ -311,7 +311,7 @@ public static unsafe class ImGuiUtilsEx
 
                 ImGui.Text("Position:");
                 ImGui.SameLine();
-                var x = ImGui.GetCursorPosX();
+                var x = ImCursor.X;
                 ImGuiUtils.DrawCopyableText($"({part.U}, {part.V})", new CopyableTextOptions()
                 {
                     CopyText = ImGui.IsKeyDown(ImGuiKey.LeftShift)
@@ -321,7 +321,7 @@ public static unsafe class ImGuiUtilsEx
 
                 ImGui.Text("Size:    ");
                 ImGui.SameLine();
-                ImGui.SetCursorPosX(x);
+                ImCursor.X = x;
                 ImGuiUtils.DrawCopyableText($"{part.Width}x{part.Height}", new CopyableTextOptions()
                 {
                     CopyText = ImGui.IsKeyDown(ImGuiKey.LeftShift)
@@ -337,7 +337,7 @@ public static unsafe class ImGuiUtilsEx
     public static void PrintFieldValuePair(string fieldName, string value, bool copy = true)
     {
         ImGui.Text(fieldName + ":");
-        ImGuiUtils.SameLineSpace();
+        ImCursor.SameLineSpace();
         if (copy)
         {
             ImGuiUtils.DrawCopyableText(value);
@@ -392,17 +392,17 @@ public static unsafe class ImGuiUtilsEx
 
     private static void DrawAlert(string id, string text, GameIconLookup icon, Color color)
     {
-        var maxWidth = ImGui.GetContentRegionAvail().X;
-        var innerTextWidth = maxWidth - ImGui.GetStyle().FramePadding.X * 2 - ImGui.GetStyle().ItemInnerSpacing.X * 2 - ImGui.GetTextLineHeight();
+        var maxWidth = ImStyle.ContentRegionAvail.X;
+        var innerTextWidth = maxWidth - ImStyle.FramePadding.X * 2 - ImStyle.ItemInnerSpacing.X * 2 - ImStyle.TextLineHeight;
         var textSize = ImGui.CalcTextSize(text, wrapWidth: innerTextWidth);
-        var size = new Vector2(maxWidth, textSize.Y + ImGui.GetStyle().FramePadding.Y * 2 + ImGui.GetStyle().ItemInnerSpacing.Y * 2);
+        var size = new Vector2(maxWidth, textSize.Y + ImStyle.FramePadding.Y * 2 + ImStyle.ItemInnerSpacing.Y * 2);
 
         using (AlertBox(id, color, size))
         {
             if (ServiceLocator.TryGetService<ITextureProvider>(out var textureProvider))
-                textureProvider.DrawIcon(icon, ImGui.GetTextLineHeight());
+                textureProvider.DrawIcon(icon, ImStyle.TextLineHeight);
             else
-                ImGui.Dummy(new Vector2(ImGui.GetTextLineHeight()));
+                ImGui.Dummy(new Vector2(ImStyle.TextLineHeight));
             ImGui.SameLine();
             ImGui.TextWrapped(text);
         }
@@ -410,16 +410,16 @@ public static unsafe class ImGuiUtilsEx
 
     public static void DrawAlertInfo(string id, string text)
     {
-        DrawAlert(id, text, 60071, Color.FromHSL(190, 1f, 0.5f));
+        DrawAlert(id, text, 60071, Color.FromHSV(0.527f, 1, 1));
     }
 
     public static void DrawAlertWarning(string id, string text)
     {
-        DrawAlert(id, text, 60073, Color.FromHSL(50, 1f, 0.5f));
+        DrawAlert(id, text, 60073, Color.FromHSV(0.138f, 1, 1));
     }
 
     public static void DrawAlertError(string id, string text)
     {
-        DrawAlert(id, text, 60074, Color.FromHSL(0, 1f, 0.5f));
+        DrawAlert(id, text, 60074, Color.FromHSV(0, 1, 1));
     }
 }

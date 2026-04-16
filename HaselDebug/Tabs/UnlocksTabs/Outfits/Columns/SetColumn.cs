@@ -31,15 +31,15 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
         ImGui.BeginGroup();
         ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
         ImGui.SameLine(0, 0);
-        ImGuiUtils.PushCursorX(-IconSize * ImGuiHelpers.GlobalScale);
+        ImCursor.X -= IconSize * ImStyle.Scale;
         _textureProvider.DrawIcon(
             (uint)row.Set.Value.Icon,
-            new(IconSize * ImGuiHelpers.GlobalScale)
+            new(IconSize * ImStyle.Scale)
             {
                 TintColor = isSetInGlamourDresser
                     ? Color.White
                     : ImGui.IsItemHovered() || ImGui.IsPopupOpen($"###Set_{row.RowId}_Icon_ItemContextMenu")
-                        ? Color.White : Color.Grey3
+                        ? Color.White : Color.Text600
             }
         );
 
@@ -50,7 +50,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
             {
                 ImGui.Image(textureWrap.Handle, new(textureWrap.Width, textureWrap.Height));
                 ImGui.SameLine();
-                ImGuiUtils.PushCursorY(textureWrap.Height / 2f - ImGui.GetTextLineHeight() / 2f);
+                ImCursor.Y += textureWrap.Height / 2f - ImStyle.TextLineHeight / 2f;
             }
             ImGui.Text(ToName(row));
         }
@@ -59,7 +59,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
             OutfitsTable.DrawCollectedCheckmark(_textureProvider);
 
         ImGui.SameLine();
-        ImGui.Selectable($"###SetName_{row.RowId}", false, ImGuiSelectableFlags.None, new Vector2(ImGui.GetContentRegionAvail().X, IconSize * ImGuiHelpers.GlobalScale));
+        ImGui.Selectable($"###SetName_{row.RowId}", false, ImGuiSelectableFlags.None, new Vector2(ImStyle.ContentRegionAvail.X, IconSize * ImStyle.Scale));
 
         ImGui.EndGroup();
 
@@ -73,8 +73,8 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
             builder.AddOpenOnGarlandTools("item", row.Set.RowId);
         });
 
-        ImGui.SameLine(IconSize * ImGuiHelpers.GlobalScale + ImGui.GetStyle().ItemSpacing.X, 0);
-        ImGuiUtils.PushCursorY(IconSize * ImGuiHelpers.GlobalScale / 2f - ImGui.GetTextLineHeight() / 2f);
+        ImGui.SameLine(IconSize * ImStyle.Scale + ImStyle.ItemSpacing.X, 0);
+        ImCursor.Y += IconSize * ImStyle.Scale / 2f - ImStyle.TextLineHeight / 2f;
         ImGui.Text(_textService.GetItemName(row.RowId).ToString());
     }
 }
