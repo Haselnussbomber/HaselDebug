@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.FashionAccessories.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.FashionAccessories;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class FashionAccessoriesTable : Table<Ornament>
+public partial class FashionAccessoriesTable : Table<Ornament>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

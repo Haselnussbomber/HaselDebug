@@ -6,7 +6,7 @@ using HaselDebug.Interfaces;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class AddonNamesTab(AddonNameTable table) : DebugTab
+public class AddonNamesTab(AddonNameTable table) : DebugTab
 {
     public override void Draw()
     {
@@ -69,7 +69,7 @@ public partial class AddonNameTable : Table<AddonNameEntry>, IDisposable
             return row.Name;
         }
 
-        public override unsafe void DrawColumn(AddonNameEntry row)
+        public override void DrawColumn(AddonNameEntry row)
         {
             ImGuiUtils.DrawCopyableText(ToName(row));
         }

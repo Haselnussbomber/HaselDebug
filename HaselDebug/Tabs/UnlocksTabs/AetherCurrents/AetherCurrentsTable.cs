@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.AetherCurrents.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.AetherCurrents;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class AetherCurrentsTable : Table<AetherCurrentEntry>
+public partial class AetherCurrentsTable : Table<AetherCurrentEntry>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

@@ -7,7 +7,7 @@ using HaselDebug.Utils;
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class ItemsColumn : ColumnString<MirageStoreSetItem>
+public partial class ItemsColumn : ColumnString<MirageStoreSetItem>
 {
     private const float IconSize = OutfitsTable.IconSize;
 
@@ -33,7 +33,7 @@ public unsafe partial class ItemsColumn : ColumnString<MirageStoreSetItem>
         return _stringBuilder.ToString();
     }
 
-    public override unsafe void DrawColumn(MirageStoreSetItem row)
+    public override void DrawColumn(MirageStoreSetItem row)
     {
         var isSetInGlamourDresser = OutfitsTable.TryGetSetItemBitArray(row, out var bitArray);
         var isFullSetCollected = isSetInGlamourDresser && row.Items

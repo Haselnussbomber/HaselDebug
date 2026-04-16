@@ -12,7 +12,7 @@ public class CompletedColumn : ColumnYesNo<Recipe>
         LabelKey = "CompletedColumn.Label";
     }
 
-    public override unsafe bool ToBool(Recipe row)
+    public override bool ToBool(Recipe row)
         => row.RowId < 30000 && QuestManager.IsRecipeComplete(row.RowId);
 
     public override void DrawColumn(Recipe row)

@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.Fish.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.Fish;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class FishTable : Table<FishParameter>
+public partial class FishTable : Table<FishParameter>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

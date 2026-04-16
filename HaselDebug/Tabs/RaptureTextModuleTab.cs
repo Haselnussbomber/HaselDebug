@@ -129,7 +129,7 @@ public unsafe partial class RaptureTextModuleTab : DebugTab, IDisposable
         _inspectorWindow?.Language = _languageProvider.ClientLanguage;
     }
 
-    public override unsafe void Draw()
+    public override void Draw()
     {
         if (!_isInitialized)
         {

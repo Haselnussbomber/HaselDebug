@@ -15,6 +15,6 @@ public class UnlockedColumn : ColumnYesNo<Item>
         LabelKey = "UnlockedColumn.Label";
     }
 
-    public override unsafe bool ToBool(Item row)
+    public override bool ToBool(Item row)
         => _itemService.IsUnlocked(row);
 }

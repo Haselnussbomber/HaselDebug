@@ -21,7 +21,7 @@ public partial class NameColumn : ColumnString<GlassesSheet>
     public override string ToName(GlassesSheet row)
         => _textService.GetGlassesName(row.RowId);
 
-    public override unsafe void DrawColumn(GlassesSheet row)
+    public override void DrawColumn(GlassesSheet row)
     {
         _debugRenderer.DrawIcon((uint)row.Icon);
 

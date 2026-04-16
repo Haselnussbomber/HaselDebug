@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.Items.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.Items;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class ItemsTable : Table<Item>
+public partial class ItemsTable : Table<Item>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

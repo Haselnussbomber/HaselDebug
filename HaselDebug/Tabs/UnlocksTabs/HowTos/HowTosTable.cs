@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.HowTos.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.HowTos;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class HowTosTable : Table<HowTo>
+public partial class HowTosTable : Table<HowTo>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

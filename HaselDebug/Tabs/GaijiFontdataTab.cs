@@ -7,7 +7,7 @@ using static HaselCommon.Utils.GfdFile;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class GaijiFontdataTab : DebugTab
+public partial class GaijiFontdataTab : DebugTab
 {
     private readonly GaijiFontdataTable _table;
 
@@ -47,7 +47,7 @@ public partial class GaijiFontdataTable : Table<GfdEntry>, IDisposable
         return 20 + ImStyle.ItemSpacing.Y;
     }
 
-    public override unsafe void LoadRows()
+    public override void LoadRows()
     {
         Rows = _gfdService.Entries.ToArray().ToList();
     }

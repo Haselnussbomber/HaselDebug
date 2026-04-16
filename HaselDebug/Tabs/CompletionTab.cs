@@ -5,7 +5,7 @@ using HaselDebug.Interfaces;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class CompletionTab : DebugTab
+public partial class CompletionTab : DebugTab
 {
     private readonly TextService _textService;
     private readonly ExcelService _excelService;

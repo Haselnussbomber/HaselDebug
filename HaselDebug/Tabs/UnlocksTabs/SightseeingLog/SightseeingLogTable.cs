@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.SightseeingLog.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.SightseeingLog;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class SightseeingLogTable : Table<AdventureEntry>
+public partial class SightseeingLogTable : Table<AdventureEntry>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

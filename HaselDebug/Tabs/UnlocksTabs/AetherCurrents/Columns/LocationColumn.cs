@@ -30,7 +30,7 @@ public partial class LocationColumn : ColumnString<AetherCurrentEntry>
         return string.Empty;
     }
 
-    public override unsafe void DrawColumn(AetherCurrentEntry entry)
+    public override void DrawColumn(AetherCurrentEntry entry)
     {
         var clicked = ImGui.Selectable($"###AetherCurrentSelectable_{entry.Row.RowId}");
 

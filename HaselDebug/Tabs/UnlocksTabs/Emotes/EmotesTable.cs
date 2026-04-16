@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.Emotes.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.Emotes;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class EmotesTable : Table<Emote>
+public partial class EmotesTable : Table<Emote>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

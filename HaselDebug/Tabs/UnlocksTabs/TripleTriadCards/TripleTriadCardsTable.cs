@@ -5,7 +5,7 @@ using HaselDebug.Tabs.UnlocksTabs.TripleTriadCards.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.TripleTriadCards;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class TripleTriadCardsTable : Table<TripleTriadCardEntry>
+public partial class TripleTriadCardsTable : Table<TripleTriadCardEntry>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

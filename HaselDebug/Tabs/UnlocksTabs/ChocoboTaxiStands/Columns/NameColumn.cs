@@ -16,7 +16,7 @@ public partial class NameColumn : ColumnString<ChocoboTaxiStand>
     public override string ToName(ChocoboTaxiStand row)
         => row.PlaceName.ToString();
 
-    public override unsafe void DrawColumn(ChocoboTaxiStand row)
+    public override void DrawColumn(ChocoboTaxiStand row)
     {
         ImGui.Text(ToName(row));
 

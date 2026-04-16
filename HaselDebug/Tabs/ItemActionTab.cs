@@ -9,7 +9,7 @@ using HaselDebug.Utils;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class ItemActionTab : DebugTab
+public partial class ItemActionTab : DebugTab
 {
     private readonly ExcelService _excelService;
     private readonly DebugRenderer _debugRenderer;

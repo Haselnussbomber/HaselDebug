@@ -4,7 +4,7 @@ using HaselDebug.Interfaces;
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits;
 
 [RegisterSingleton<IUnlockTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class OutfitsTab(OutfitsTable table) : DebugTab, IUnlockTab
+public class OutfitsTab(OutfitsTable table) : DebugTab, IUnlockTab
 {
     public override string Title => "Outfits";
 

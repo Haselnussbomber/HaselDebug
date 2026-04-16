@@ -20,7 +20,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
     public override string ToName(MirageStoreSetItem row)
         => _textService.GetItemName(row.RowId).ToString();
 
-    public override unsafe void DrawColumn(MirageStoreSetItem row)
+    public override void DrawColumn(MirageStoreSetItem row)
     {
         var isSetInGlamourDresser = OutfitsTable.TryGetSetItemBitArray(row, out var bitArray);
         var isFullSetCollected = isSetInGlamourDresser && row.Items

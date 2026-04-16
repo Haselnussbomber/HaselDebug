@@ -35,14 +35,14 @@ public class QuestStatusColumn : ColumnFlags<QuestStatus, Quest>
                (FilterValue.HasFlag(QuestStatus.Incomplete) && value == QuestStatus.Incomplete);
     }
 
-    public override unsafe void DrawColumn(Quest row)
+    public override void DrawColumn(Quest row)
     {
         var value = ToStatus(row);
         using (ImRaii.PushColor(ImGuiCol.Text, (value == QuestStatus.Complete ? Color.Green : value == QuestStatus.Accepted ? Color.Yellow : Color.Red).ToUInt()))
             ImGui.Text(Enum.GetName(value));
     }
 
-    public override unsafe int Compare(Quest a, Quest b)
+    public override int Compare(Quest a, Quest b)
         => ToStatus(a).CompareTo(ToStatus(b));
 
     public override void SetValue(QuestStatus value, bool enable)

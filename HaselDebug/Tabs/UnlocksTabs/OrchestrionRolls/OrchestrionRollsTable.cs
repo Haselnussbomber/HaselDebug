@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.OrchestrionRolls.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.OrchestrionRolls;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class OrchestrionRollsTable : Table<OrchestrionRollEntry>
+public partial class OrchestrionRollsTable : Table<OrchestrionRollEntry>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

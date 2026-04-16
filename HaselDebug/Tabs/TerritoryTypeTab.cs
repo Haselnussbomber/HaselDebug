@@ -6,7 +6,7 @@ using HaselDebug.Utils;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class TerritoryTypeTab : DebugTab
+public partial class TerritoryTypeTab : DebugTab
 {
     private readonly DebugRenderer _debugRenderer;
     private readonly IClientState _clientState;

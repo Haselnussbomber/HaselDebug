@@ -14,7 +14,7 @@ public partial class ActionColumn : ColumnString<AozEntry>
     public override string ToName(AozEntry entry)
         => entry.Action.Name.ToString();
 
-    public override unsafe void DrawColumn(AozEntry entry)
+    public override void DrawColumn(AozEntry entry)
     {
         ImGui.BeginGroup();
         _debugRenderer.DrawIcon(entry.AozActionTransient.Icon, noTooltip: true);

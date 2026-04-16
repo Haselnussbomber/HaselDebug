@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.Minions.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.Minions;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class MinionsTable : Table<Companion>
+public partial class MinionsTable : Table<Companion>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

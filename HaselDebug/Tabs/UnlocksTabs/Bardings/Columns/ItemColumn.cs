@@ -11,7 +11,7 @@ public partial class ItemColumn : ColumnString<BuddyEquip>
     public override string ToName(BuddyEquip row)
         => row.Name.ToString();
 
-    public override unsafe void DrawColumn(BuddyEquip row)
+    public override void DrawColumn(BuddyEquip row)
     {
         _debugRenderer.DrawIcon(row.IconBody != 0
             ? row.IconBody

@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.ChocoboTaxiStands.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.ChocoboTaxiStands;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class ChocoboTaxiStandsTable : Table<ChocoboTaxiStand>
+public partial class ChocoboTaxiStandsTable : Table<ChocoboTaxiStand>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

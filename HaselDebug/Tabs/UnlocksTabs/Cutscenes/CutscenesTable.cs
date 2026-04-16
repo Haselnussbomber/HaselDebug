@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.Cutscenes.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.Cutscenes;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class CutscenesTable : Table<CutsceneEntry>
+public partial class CutscenesTable : Table<CutsceneEntry>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

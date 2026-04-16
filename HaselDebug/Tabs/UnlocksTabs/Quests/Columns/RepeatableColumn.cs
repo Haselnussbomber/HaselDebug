@@ -10,9 +10,9 @@ public class RepeatableColumn : ColumnYesNo<Quest>
         SetFixedWidth(75);
     }
 
-    public override unsafe bool ToBool(Quest row)
+    public override bool ToBool(Quest row)
         => row.IsRepeatable;
 
-    public override unsafe void DrawColumn(Quest row)
+    public override void DrawColumn(Quest row)
         => ImGui.Text(Names[ToBool(row) ? 1 : 0]);
 }

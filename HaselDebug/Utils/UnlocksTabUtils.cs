@@ -433,7 +433,7 @@ public unsafe partial class UnlocksTabUtils
         BottomRight = 2
     }
 
-    private unsafe bool TryGetFacePaintIconId(ushort dataId, out uint iconId)
+    private bool TryGetFacePaintIconId(ushort dataId, out uint iconId)
     {
         if (_facePaintIconCache.TryGetValue(dataId, out iconId))
             return true;

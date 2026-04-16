@@ -5,7 +5,7 @@ using HaselDebug.Tabs.UnlocksTabs.Mounts.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.Mounts;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class MountsTable : Table<Mount>
+public partial class MountsTable : Table<Mount>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

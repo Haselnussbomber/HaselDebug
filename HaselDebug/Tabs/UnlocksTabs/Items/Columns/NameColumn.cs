@@ -20,7 +20,7 @@ public partial class ItemColumn : ColumnString<Item>
     public override string ToName(Item row)
         => _textService.GetItemName(row.RowId).ToString();
 
-    public override unsafe void DrawColumn(Item row)
+    public override void DrawColumn(Item row)
     {
         _debugRenderer.DrawIcon(row.Icon);
 

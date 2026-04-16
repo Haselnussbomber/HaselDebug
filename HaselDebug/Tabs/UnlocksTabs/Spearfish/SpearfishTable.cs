@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.Spearfish.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.Spearfish;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class SpearfishTable : Table<SpearfishingItem>
+public partial class SpearfishTable : Table<SpearfishingItem>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;

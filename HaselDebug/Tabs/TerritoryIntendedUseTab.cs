@@ -10,7 +10,7 @@ using TerritoryIntendedUseEnum = FFXIVClientStructs.FFXIV.Client.Enums.Territory
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class TerritoryIntendedUseTab : DebugTab
+public partial class TerritoryIntendedUseTab : DebugTab
 {
     private readonly ExcelService _excelService;
     private readonly TextService _textService;

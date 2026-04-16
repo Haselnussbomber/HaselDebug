@@ -15,7 +15,7 @@ public class CaughtColumn : ColumnYesNo<FishParameter>
     public override unsafe bool ToBool(FishParameter row)
         => row.IsInLog && PlayerState.Instance()->IsFishCaught(row.RowId);
 
-    public override unsafe void DrawColumn(FishParameter row)
+    public override void DrawColumn(FishParameter row)
     {
         if (row.IsInLog)
             base.DrawColumn(row);

@@ -7,7 +7,7 @@ using HaselDebug.Tabs.UnlocksTabs;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class SpecialShopsTab : DebugTab
+public partial class SpecialShopsTab : DebugTab
 {
     private readonly SpecialShopsTable _specialShopsTable;
     public override bool DrawInChild => false;

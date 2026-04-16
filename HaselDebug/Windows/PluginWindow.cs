@@ -276,7 +276,7 @@ public partial class PluginWindow : SimpleWindow
         _pluginConfig.Save();
     }
 
-    private unsafe void DrawTab()
+    private void DrawTab()
     {
         if (_selectedTab == null)
         {

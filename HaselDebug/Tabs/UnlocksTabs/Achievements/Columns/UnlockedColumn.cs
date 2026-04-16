@@ -11,6 +11,6 @@ public class UnlockedColumn : ColumnYesNo<AchievementEntry>
         LabelKey = "UnlockedColumn.Label";
     }
 
-    public override unsafe bool ToBool(AchievementEntry entry)
+    public override bool ToBool(AchievementEntry entry)
         => entry.IsComplete;
 }

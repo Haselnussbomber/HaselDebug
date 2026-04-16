@@ -4,7 +4,7 @@ using HaselDebug.Tabs.UnlocksTabs.AozActions.Columns;
 namespace HaselDebug.Tabs.UnlocksTabs.AozActions;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class AozActionsTable : Table<AozEntry>
+public partial class AozActionsTable : Table<AozEntry>
 {
     private readonly ExcelService _excelService;
     private readonly NumberColumn _numberColumn;

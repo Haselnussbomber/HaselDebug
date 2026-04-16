@@ -4,7 +4,7 @@ using HaselDebug.Interfaces;
 namespace HaselDebug.Tabs.UnlocksTabs.Items;
 
 [RegisterSingleton<IUnlockTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class ItemsTab(ItemsTable table, ItemService itemService) : DebugTab, IUnlockTab
+public class ItemsTab(ItemsTable table, ItemService itemService) : DebugTab, IUnlockTab
 {
     public override string Title => "Items";
     public override bool DrawInChild => false;

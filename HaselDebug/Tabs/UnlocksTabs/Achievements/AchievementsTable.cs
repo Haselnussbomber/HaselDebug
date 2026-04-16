@@ -5,7 +5,7 @@ using AchievementSheet = Lumina.Excel.Sheets.Achievement;
 namespace HaselDebug.Tabs.UnlocksTabs.Achievements;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class AchievementsTable : Table<AchievementEntry>
+public partial class AchievementsTable : Table<AchievementEntry>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
