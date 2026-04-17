@@ -42,7 +42,8 @@ public unsafe class RaptureLogModuleTab : DebugTab
         {
             using var sender = new Utf8String("me");
             using var message = new Utf8String(_input);
-            raptureLogModule->PrintMessage(27, &sender, &message, (int)DateTimeOffset.Now.ToUnixTimeMilliseconds());
+            var logInfo = new LogInfo { LogKind = 27 };
+            raptureLogModule->PrintMessage(logInfo, &sender, &message, (int)DateTimeOffset.Now.ToUnixTimeMilliseconds());
         }
 
         var index = 0;

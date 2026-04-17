@@ -272,7 +272,7 @@ public unsafe partial class ConfigTab : DebugTab
             if (dict.ContainsKey(i))
                 continue;
 
-            var name = configEntry->Name != null
+            var name = configEntry->Name.HasValue
                 ? configEntry->Name.ToString()
                 : string.Empty;
 

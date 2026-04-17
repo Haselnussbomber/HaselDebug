@@ -29,7 +29,7 @@ public unsafe partial class AddonConfigTab : DebugTab
 
         foreach (ref var addon in HudLayoutAddon.GetSpan())
         {
-            AddName(addon.AddonName);
+            AddName(addon.AddonName.ToString());
         }
 
         foreach (var addonName in RaptureAtkModule.Instance()->AddonNames)

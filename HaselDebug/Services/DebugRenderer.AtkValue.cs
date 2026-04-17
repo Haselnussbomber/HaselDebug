@@ -23,7 +23,7 @@ public unsafe partial class DebugRenderer
 
         var value = (AtkValue*)address;
         ImGui.Text(value->Type.ToString());
-        if (value->Type is ValueType.Undefined or ValueType.Null)
+        if (value->Type is AtkValueType.Undefined or AtkValueType.Null)
             return;
 
         ImGui.SameLine(0, 0);
@@ -31,40 +31,40 @@ public unsafe partial class DebugRenderer
         ImGui.SameLine();
         switch (value->Type)
         {
-            case ValueType.Bool:
+            case AtkValueType.Bool:
                 ImGuiUtils.DrawCopyableText($"{value->Byte == 0x01}");
                 break;
-            case ValueType.Int:
+            case AtkValueType.Int:
                 DrawNumeric((nint)(&value->Int), typeof(int), nodeOptions);
                 break;
-            case ValueType.Int64:
+            case AtkValueType.Int64:
                 DrawNumeric((nint)(&value->Int64), typeof(long), nodeOptions);
                 break;
-            case ValueType.UInt:
+            case AtkValueType.UInt:
                 DrawNumeric((nint)(&value->UInt), typeof(uint), nodeOptions);
                 break;
-            case ValueType.UInt64:
+            case AtkValueType.UInt64:
                 DrawNumeric((nint)(&value->UInt64), typeof(ulong), nodeOptions);
                 break;
-            case ValueType.Float:
+            case AtkValueType.Float:
                 DrawNumeric((nint)(&value->Float), typeof(float), nodeOptions);
                 break;
-            case ValueType.WideString:
+            case AtkValueType.WideString:
                 ImGui.Text(value->ToString());
                 break;
-            case ValueType.String:
-            case ValueType.String8:
-            case ValueType.ManagedString:
+            case AtkValueType.String:
+            case AtkValueType.String8:
+            case AtkValueType.ManagedString:
                 DrawSeString(value->String, nodeOptions);
                 break;
-            case ValueType.Vector:
-            case ValueType.ManagedVector:
+            case AtkValueType.Vector:
+            case AtkValueType.ManagedVector:
                 DrawStdVector((nint)value->Vector, typeof(AtkValue), nodeOptions);
                 break;
-            case ValueType.Pointer:
+            case AtkValueType.Pointer:
                 DrawNumeric((nint)(&value->Pointer), typeof(nint), nodeOptions);
                 break;
-            case ValueType.AtkValues:
+            case AtkValueType.AtkValues:
                 ImGui.Text(value->ToString());
                 break;
             default:
@@ -116,11 +116,11 @@ public unsafe partial class DebugRenderer
         for (var i = 0; i < elementCount; i++)
         {
             var value = span.GetPointer(i);
-            using var disabled = ImRaii.Disabled(value->Type is ValueType.Undefined or ValueType.Null);
+            using var disabled = ImRaii.Disabled(value->Type is AtkValueType.Undefined or AtkValueType.Null);
 
-            if (value->Type == ValueType.Int && i < elementCount - 1 && span.GetPointer(i + 1)->Type == ValueType.AtkValues)
+            if (value->Type == AtkValueType.Int && i < elementCount - 1 && span.GetPointer(i + 1)->Type == AtkValueType.AtkValues)
                 valueCount = value->Int;
-            else if (value->Type != ValueType.AtkValues)
+            else if (value->Type != AtkValueType.AtkValues)
                 valueCount = 0;
 
             ImGui.TableNextRow();
@@ -133,7 +133,7 @@ public unsafe partial class DebugRenderer
 
             ImGui.TableNextColumn(); // Value
 
-            if (value->Type == ValueType.AtkValues && valueCount > 0)
+            if (value->Type == AtkValueType.AtkValues && valueCount > 0)
             {
                 DrawAtkValues(value->AtkValues, (ushort)valueCount, nodeOptions);
             }

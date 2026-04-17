@@ -36,14 +36,14 @@ public unsafe record AtkValuesCopy : IDisposable
             var value = values.GetPointer(i);
             var valueCopy = valuesCopy.GetPointer(i);
 
-            if (value->Type == ValueType.Int && i < values.Length - 1 && values.GetPointer(i + 1)->Type == ValueType.AtkValues)
+            if (value->Type == AtkValueType.Int && i < values.Length - 1 && values.GetPointer(i + 1)->Type == AtkValueType.AtkValues)
                 valueCountCopy = value->Int;
-            else if (value->Type != ValueType.AtkValues)
+            else if (value->Type != AtkValueType.AtkValues)
                 valueCountCopy = 0;
 
-            valueCopy->Ctor();
+            valueCopy->CtorCopy(value);
 
-            if (value->Type == ValueType.String)
+            if (value->Type == AtkValueType.String)
             {
                 var str = new ReadOnlySeStringSpan(value->String.Value);
                 var strPtr = (byte*)IMemorySpace.GetDefaultSpace()->Malloc((ulong)str.ByteLength + 1, 0x8);
@@ -51,9 +51,9 @@ public unsafe record AtkValuesCopy : IDisposable
                 strPtr[str.ByteLength] = 0;
                 valueCopy->SetString(strPtr);
             }
-            else if (value->Type == ValueType.AtkValues && valueCountCopy > 0)
+            else if (value->Type == AtkValueType.AtkValues && valueCountCopy > 0)
             {
-                valueCopy->ChangeType(ValueType.AtkValues);
+                valueCopy->ChangeType(AtkValueType.AtkValues);
                 valueCopy->AtkValues = CopyAtkValues(new Span<AtkValue>(value->AtkValues, valueCountCopy));
             }
             else
@@ -76,18 +76,18 @@ public unsafe record AtkValuesCopy : IDisposable
         {
             var value = values.GetPointer(i);
 
-            if (value->Type == ValueType.Int && i < values.Length - 1 && values[i + 1].Type == ValueType.AtkValues)
+            if (value->Type == AtkValueType.Int && i < values.Length - 1 && values[i + 1].Type == AtkValueType.AtkValues)
                 valueCountCopy = value->Int;
-            else if (value->Type != ValueType.AtkValues)
+            else if (value->Type != AtkValueType.AtkValues)
                 valueCountCopy = 0;
 
-            if (value->Type == ValueType.String)
+            if (value->Type == AtkValueType.String)
             {
                 IMemorySpace.Free(value->String, (ulong)new ReadOnlySeStringSpan(value->String.Value).ByteLength + 1);
-                value->ChangeType(ValueType.Undefined);
+                value->ChangeType(AtkValueType.Undefined);
                 value->String = null;
             }
-            else if (value->Type == ValueType.AtkValues && valueCountCopy > 0)
+            else if (value->Type == AtkValueType.AtkValues && valueCountCopy > 0)
             {
                 FreeAtkValues(new Span<AtkValue>(value->AtkValues, valueCountCopy));
             }

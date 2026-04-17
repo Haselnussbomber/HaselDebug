@@ -264,7 +264,7 @@ public unsafe partial class SoundManagerTab : DebugTab, IDisposable
             ImGui.Text(entry.IsActive.ToString());
 
             ImGui.TableNextColumn(); // FileName
-            ImGuiUtils.DrawCopyableText(entry.GetFileName());
+            ImGuiUtils.DrawCopyableText(entry.GetFileName().ToString());
 
             ImGui.TableNextColumn(); // ElapsedTime
             ImGuiUtils.DrawCopyableText($"{entry.GetElapsedTime():0.00}");

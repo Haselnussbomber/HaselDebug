@@ -196,12 +196,12 @@ public unsafe partial class AtkDebugRenderer
 
         ImGuiUtilsEx.PaddedSeparator();
 
-        short width;
-        short height;
+        ushort width;
+        ushort height;
         unitBase->GetSize(&width, &height, false);
 
-        short scaledWidth;
-        short scaledHeight;
+        ushort scaledWidth;
+        ushort scaledHeight;
         unitBase->GetSize(&scaledWidth, &scaledHeight, true);
 
         ImGuiUtilsEx.PrintFieldValuePairs(

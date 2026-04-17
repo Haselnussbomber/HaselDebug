@@ -329,7 +329,7 @@ public unsafe partial class AtkArrayDataTab : DebugTab
             ImGui.TableNextColumn(); // Managed
             if (!isNull)
             {
-                ImGui.Text(((nint)array->StringArray[i].Value != 0 && array->ManagedStringArray[i] == array->StringArray[i]).ToString());
+                ImGui.Text(((nint)array->StringArray[i].Value != 0 && array->ManagedStringArray[i].AsSpan().SequenceEqual(array->StringArray[i].AsSpan())).ToString());
             }
 
             ImGui.TableNextColumn(); // Text

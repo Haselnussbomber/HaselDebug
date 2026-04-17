@@ -116,7 +116,7 @@ public unsafe partial class LuaDebugTab : DebugTab
                         while (L->lua_next(-2) != 0)
                         {
                             var typeKey = L->lua_type(-2);
-                            if (typeKey == LuaType.String && L->lua_tostring(-2) == "className")
+                            if (typeKey == LuaType.String && L->lua_tostring(-2).ToString() == "className")
                             {
                                 className = L->lua_tostring(-1).ToString();
                                 L->lua_pop(1);
@@ -222,7 +222,7 @@ public unsafe partial class LuaDebugTab : DebugTab
             case LuaType.String:
                 ImGuiUtils.DrawCopyableText(key, new() { TextColor = DebugRenderer.ColorFieldName });
                 ImGui.SameLine();
-                ImGuiUtils.DrawCopyableText(L->lua_tostring(idx));
+                ImGuiUtils.DrawCopyableText(L->lua_tostring(idx).ToString());
                 break;
             case LuaType.Function:
                 ImGuiUtils.DrawCopyableText(key, new() { TextColor = DebugRenderer.ColorFieldName });
@@ -309,7 +309,7 @@ public unsafe partial class LuaDebugTab : DebugTab
             if (string.IsNullOrEmpty(strKey))
                 strKey = "INVALID_KEY";
             var typeValue = L->lua_type(-1);
-            var strValue = L->lua_tostring(-1);
+            var strValue = L->lua_tostring(-1).ToString();
 
             list.Add(new LuaGlobal(strKey, strValue, typeValue));
 
