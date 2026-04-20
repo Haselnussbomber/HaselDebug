@@ -95,7 +95,8 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
                     var agent = AgentModule.Instance()->GetAgentByInternalId(AgentId.Housing);
                     var returnValue = stackalloc AtkValue[1];
                     var values = stackalloc AtkValue[1];
-                    values->SetInt(4);
+                    values[0].Type = AtkValueType.Int;
+                    values[0].Int = 4;
                     agent->ReceiveEvent(returnValue, values, 1, 1);
                 }
             }

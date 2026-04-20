@@ -16,9 +16,9 @@ public unsafe partial class PartyFinderListingLogTab : PacketLogTab<CrossRealmLi
         Clear();
     }
 
-    private void ReceiveListingDetour(InfoProxyCrossRealm* thisPtr, nint packet)
+    private void ReceiveListingDetour(InfoProxyCrossRealm* thisPtr, ServerIpcSegment<CrossRealmListingSegmentPacket>* packet)
     {
-        AddRecord(*(CrossRealmListingSegmentPacket*)packet);
+        AddRecord(packet->Payload);
         _hook!.Original(thisPtr, packet);
     }
 
