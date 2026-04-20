@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** Event Play and Event Yield Log tab to inspect data from those packets.
+- **Updated:** The type of AtkValues is now shown.
+- **Updated:** ClientStructs now at [fa8345a1](https://github.com/aers/FFXIVClientStructs/tree/fa8345a1) ([compare](https://github.com/aers/FFXIVClientStructs/compare/9c7551ac..fa8345a1)).
+
 ## [1.54.0] (2026-04-07)
 
 - **Added:** Zone Init Log tab to inspect ZoneInit packets.
