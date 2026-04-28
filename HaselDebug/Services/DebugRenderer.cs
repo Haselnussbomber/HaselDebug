@@ -316,6 +316,11 @@ public unsafe partial class DebugRenderer
                     DrawLineToGamePos((Vector3)(*pos));
             }
         }
+        else if (Inherits<FFXIVClientStructs.FFXIV.Client.Graphics.Scene.Object>(type))
+        {
+            var obj = (FFXIVClientStructs.FFXIV.Client.Graphics.Scene.Object*)address;
+            DrawLineToGamePos(obj->Position);
+        }
         else if (Inherits<AtkUnitBase>(type))
         {
             var unitBase = (AtkUnitBase*)address;
