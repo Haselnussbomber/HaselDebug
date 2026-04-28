@@ -161,17 +161,14 @@ public unsafe partial class AtkArrayDataTab : DebugTab
             if (ImGui.IsItemHovered())
             {
                 using var tooltip = ImRaii.Tooltip();
-                if (tooltip)
+                var raptureAtkUnitManager = RaptureAtkUnitManager.Instance();
+
+                for (var j = 0; j < array->SubscribedAddonsCount; j++)
                 {
-                    var raptureAtkUnitManager = RaptureAtkUnitManager.Instance();
+                    if (array->SubscribedAddons[j] == 0)
+                        continue;
 
-                    for (var j = 0; j < array->SubscribedAddonsCount; j++)
-                    {
-                        if (array->SubscribedAddons[j] == 0)
-                            continue;
-
-                        ImGui.Text(raptureAtkUnitManager->GetAddonById(array->SubscribedAddons[j])->NameString);
-                    }
+                    ImGui.Text(raptureAtkUnitManager->GetAddonById(array->SubscribedAddons[j])->NameString);
                 }
             }
         }

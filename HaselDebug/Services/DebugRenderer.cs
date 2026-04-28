@@ -238,7 +238,7 @@ public unsafe partial class DebugRenderer
         ImGui.Text("Unsupported Type"u8);
     }
 
-    public ImRaii.IEndObject DrawTreeNode(NodeOptions nodeOptions)
+    public ImRaii.TreeNodeDisposable DrawTreeNode(NodeOptions nodeOptions)
     {
         using var titleColor = ImRaii.PushColor(ImGuiCol.Text, (nodeOptions.TitleColor ?? ColorTreeNode).ToUInt());
         var previewText = string.Empty;

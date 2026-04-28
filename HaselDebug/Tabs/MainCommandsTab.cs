@@ -69,7 +69,6 @@ public unsafe partial class MainCommandsTab : DebugTab
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
 
                 using var tooltip = ImRaii.Tooltip();
-                if (!tooltip) return;
 
                 using var disabled = ImRaii.Disabled(!isEnabled);
                 using var popuptable = ImRaii.Table("PopupTable"u8, 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);

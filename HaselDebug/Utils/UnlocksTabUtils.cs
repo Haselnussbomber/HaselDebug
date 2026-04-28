@@ -90,7 +90,6 @@ public unsafe partial class UnlocksTabUtils
     public void DrawTooltip(IDalamudTextureWrap icon, DrawInfo drawInfo, ReadOnlySeString title, ReadOnlySeString category = default, ReadOnlySeString description = default)
     {
         using var tooltip = ImRaii.Tooltip();
-        if (!tooltip) return;
 
         using var popuptable = ImRaii.Table("PopupTable"u8, 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
         if (!popuptable) return;
@@ -152,7 +151,6 @@ public unsafe partial class UnlocksTabUtils
         using var id = ImRaii.PushId($"ItemTooltip{item.ItemId}");
 
         using var tooltip = ImRaii.Tooltip();
-        if (!tooltip) return;
 
         using var popuptable = ImRaii.Table("PopupTable"u8, 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
         if (!popuptable) return;
@@ -469,7 +467,6 @@ public unsafe partial class UnlocksTabUtils
         using var id = ImRaii.PushId($"ItemTooltip{item.RowId}");
 
         using var tooltip = ImRaii.Tooltip();
-        if (!tooltip) return;
 
         using var popuptable = ImRaii.Table("PopupTable"u8, 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
         if (!popuptable) return;
@@ -518,7 +515,6 @@ public unsafe partial class UnlocksTabUtils
         using var id = ImRaii.PushId($"QuestTooltip{quest.RowId}");
 
         using var tooltip = ImRaii.Tooltip();
-        if (!tooltip) return;
 
         using var popuptable = ImRaii.Table("PopupTable"u8, 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
         if (!popuptable) return;
@@ -599,7 +595,6 @@ public unsafe partial class UnlocksTabUtils
         using var id = ImRaii.PushId($"AdventureTooltip{adventure.RowId}");
 
         using var tooltip = ImRaii.Tooltip();
-        if (!tooltip) return;
 
         using var outerpopuptable = ImRaii.Table("OuterPopupTable"u8, 1, ImGuiTableFlags.NoPadOuterX | ImGuiTableFlags.NoPadInnerX | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.NoKeepColumnsVisible);
         if (!outerpopuptable) return;
@@ -661,7 +656,6 @@ public unsafe partial class UnlocksTabUtils
         using var id = ImRaii.PushId($"HowToTooltip{howTo.RowId}");
 
         using var tooltip = ImRaii.Tooltip();
-        if (!tooltip) return;
 
         var itemInnerSpacing = ImStyle.ItemInnerSpacing * ImStyle.Scale;
         const float MaxImageWidth = 200f;

@@ -218,8 +218,9 @@ public unsafe partial class DebugRenderer
 
         nodeOptions = nodeOptions.WithAddress(rosss.GetHashCode());
 
-        using var node = asTreeNode ? DrawTreeNode(nodeOptions.WithSeStringTitle(rosss)) : null;
-        if (asTreeNode && !node!) return;
+        using var node = asTreeNode ? DrawTreeNode(nodeOptions.WithSeStringTitle(rosss)) : default;
+        if (asTreeNode && !node)
+            return;
 
         if (!asTreeNode && nodeOptions.RenderSeString)
         {

@@ -284,9 +284,7 @@ public partial class PluginWindow : SimpleWindow
             return;
         }
 
-        using var child = _selectedTab.DrawInChild
-            ? ImRaii.Child($"###{_selectedTab.InternalName}_Child", new Vector2(-1), true)
-            : null;
+        using var child = ImRaii.Child($"###{_selectedTab.InternalName}_Child", new Vector2(-1), _selectedTab.DrawInChild);
 
         try
         {
