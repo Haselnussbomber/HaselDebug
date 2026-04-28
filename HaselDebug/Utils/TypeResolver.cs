@@ -6,6 +6,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine.Group;
+using FFXIVClientStructs.FFXIV.Client.LayoutEngine.Layer;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
@@ -24,8 +25,32 @@ public static unsafe class TypeResolver
         {
             switch (((ILayoutInstance*)address)->Id.Type)
             {
+                case InstanceType.BgPart:
+                    type = typeof(BgPartsLayoutInstance);
+                    break;
+
                 case InstanceType.SharedGroup:
                     type = typeof(SharedGroupLayoutInstance);
+                    break;
+
+                case InstanceType.Sound:
+                    type = typeof(SoundLayoutInstance);
+                    break;
+
+                case InstanceType.MapRange:
+                    type = typeof(MapRangeLayoutInstance);
+                    break;
+
+                case InstanceType.Timeline:
+                    type = typeof(TimeLineLayoutInstance);
+                    break;
+
+                case InstanceType.CollisionBox:
+                    type = typeof(CollisionBoxLayoutInstance);
+                    break;
+
+                case InstanceType.DoorRange:
+                    type = typeof(DoorRangeLayoutInstance);
                     break;
             }
         }
@@ -66,10 +91,18 @@ public static unsafe class TypeResolver
                     break;
             }
         }
-        else if (Inherits<DrawObject>(type))
+        else if (Inherits<FFXIVClientStructs.FFXIV.Client.Graphics.Scene.Object>(type))
         {
             switch (((DrawObject*)address)->GetObjectType())
             {
+                case ObjectType.Terrain:
+                    type = typeof(Terrain);
+                    break;
+
+                case ObjectType.BgObject:
+                    type = typeof(BgObject);
+                    break;
+
                 case ObjectType.CharacterBase:
                     type = typeof(CharacterBase);
                     switch (((CharacterBase*)address)->GetModelType())
@@ -87,6 +120,32 @@ public static unsafe class TypeResolver
                             type = typeof(Weapon);
                             break;
                     }
+                    break;
+
+                case ObjectType.VfxObject:
+                    type = typeof(VfxObject);
+                    break;
+
+                case ObjectType.Light:
+                    type = typeof(Light);
+                    break;
+
+                // UnkType6
+
+                case ObjectType.EnvSpace:
+                    type = typeof(EnvSpace);
+                    break;
+
+                case ObjectType.EnvLocation:
+                    type = typeof(EnvLocation);
+                    break;
+
+                case ObjectType.Decal:
+                    type = typeof(Decal);
+                    break;
+
+                case ObjectType.UnkType10:
+                    type = typeof(DrawObject);
                     break;
             }
         }
