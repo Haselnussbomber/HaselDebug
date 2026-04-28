@@ -42,7 +42,7 @@ public unsafe partial class LgbInspectorTab : DebugTab
 
         foreach (var (type, instances) in activeLayout->InstancesByType)
         {
-            using var treeNode = ImRaii.TreeNode(type.ToString(), ImGuiTreeNodeFlags.SpanAvailWidth);
+            using var treeNode = ImRaii.TreeNode($"{type} ({instances.Value->Count})###" + type.ToString(), ImGuiTreeNodeFlags.SpanAvailWidth);
             if (!treeNode)
                 continue;
 
