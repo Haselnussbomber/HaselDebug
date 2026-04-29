@@ -219,6 +219,11 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
             "UIState.ContentsNote.CompletionFlags",
             UIState.Instance()->ContentsNote.CompletionFlagsBitArray,
             _excelService.GetRowCount<ContentsNoteSheet>()));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "UIState.TitleList.TitlesUnlockBitmask",
+            UIState.Instance()->TitleList.TitlesUnlockBitmaskBitArray,
+            _excelService.GetRowCount<Title>()));
         /*
         _bitArrays.Add(new BitArrayRecord(
             "QuestManager.CompletedQuests",
