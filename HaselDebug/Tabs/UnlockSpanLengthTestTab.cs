@@ -222,7 +222,7 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
 
         _bitArrays.Add(new BitArrayRecord(
             "UIState.TitleList.TitlesUnlockBitmask",
-            UIState.Instance()->TitleList.TitlesUnlockBitmaskBitArray,
+            UIState.Instance()->TitleList.UnlockedTitlesBitArray,
             _excelService.GetRowCount<Title>()));
         /*
         _bitArrays.Add(new BitArrayRecord(
