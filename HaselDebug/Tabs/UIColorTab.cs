@@ -27,8 +27,8 @@ public unsafe partial class UIColorTab : DebugTab
         ImGui.TableSetupColumn(_textService.GetAddonText(4235)); // Clear Blue
         ImGui.TableSetupColumn(_textService.GetAddonText(4236)); // Clear White
         ImGui.TableSetupColumn(_textService.GetAddonText(4237)); // Clear Green
-        ImGui.TableSetupColumn("Unknown2"u8);
-        ImGui.TableSetupColumn("Unknown3"u8);
+        ImGui.TableSetupColumn(_textService.GetAddonText(4238)); // Clear Grey
+        ImGui.TableSetupColumn(_textService.GetAddonText(4239)); // Clear Pink
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
@@ -72,12 +72,12 @@ public unsafe partial class UIColorTab : DebugTab
             ImGui.TableNextColumn();
             color = (Vector4)Color.FromABGR(row.Unknown2);
             ImGui.SetNextItemWidth(-1);
-            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown2", ref color, ImGuiColorEditFlags.DisplayHex);
+            ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearGrey", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
             color = (Vector4)Color.FromABGR(row.Unknown3);
             ImGui.SetNextItemWidth(-1);
-            ImGui.ColorEdit4($"##UIColor_{row.RowId}_Unknown3", ref color, ImGuiColorEditFlags.DisplayHex);
+            ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearPink", ref color, ImGuiColorEditFlags.DisplayHex);
         }
     }
 }
