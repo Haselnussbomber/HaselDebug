@@ -1,10 +1,17 @@
 # Changelog
 
-## [Unreleased]
+## [1.55.0] (2026-04-07)
 
 - **Added:** Event Play and Event Yield Log tab to inspect data from those packets.
+- **Added:** A new Lgb Inspector tab to display information of the active layout.
+- **Updated:** Scene.Objects are now highlighted when hovering over them.
+- **Updated:** The following Scene.Object sub-classes are now resolved based on the type: Terrain, BgObject, VfxObject, Light, EnvSpace, EnvLocation and Decal.
+- **Updated:** The following ILayoutInstance-implementing classes are now resolved based on the type: BgPart, Sound, MapRange, Timeline, CollisionBox and DoorRange.
 - **Updated:** The type of AtkValues is now shown.
-- **Updated:** ClientStructs now at [fa8345a1](https://github.com/aers/FFXIVClientStructs/tree/fa8345a1) ([compare](https://github.com/aers/FFXIVClientStructs/compare/9c7551ac..fa8345a1)).
+- **Updated:** The Unlock Span Length Test now also lists `UIState.TitleList.UnlockedTitles`, which is a BitArray now.
+- **Fixed:** Names in Atk Handler Calls tab tab were updated (their index shifted by 1 this patch).
+- **Fixed:** Clicking on BitField addresses while holding shift copied an incorrect address.
+- **Updated:** ClientStructs now at [d95cb0d6](https://github.com/aers/FFXIVClientStructs/tree/d95cb0d6) ([compare](https://github.com/aers/FFXIVClientStructs/compare/9c7551ac..d95cb0d6)).
 
 ## [1.54.0] (2026-04-07)
 
@@ -856,7 +863,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.54.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.55.0...main
+[1.55.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.54.0...v1.55.0
 [1.54.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.53.0...v1.54.0
 [1.53.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.52.0...v1.53.0
 [1.52.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.51.1...v1.52.0
