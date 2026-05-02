@@ -1,21 +1,43 @@
+using System.Text;
+using Dalamud.Utility;
+using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.System.Input;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
+using HaselDebug.Services;
 
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class InputTab : DebugTab
 {
+    private readonly IGameInteropProvider _gameInteropProvider;
+    private readonly DebugRenderer _debugRenderer;
     private readonly ExcelService _excelService;
     private readonly Dictionary<InputId, ConfigKey> _inputKey2ConfigKey = [];
     private bool _initialized;
 
     public override bool DrawInChild => true;
 
+    [Signature("4C 8D 15 ?? ?? ?? ?? 45 33 C9 ?? ?? ?? ?? ?? ?? 4D 85 C0", ScanType = ScanType.StaticAddress)]
+    private nint InputIdNamesPtr { get; set; }
+
+    [Signature("41 81 F9 ?? ?? ?? ?? 7C ?? B8", Offset = 3)]
+    private int InputIdNamesCount { get; set; }
+
+    private string GetInputIdName(int index)
+    {
+        var name = new CStringPointer(*(byte**)(InputIdNamesPtr + index * 8)).ToString();
+        if (!string.IsNullOrEmpty(name) && char.IsDigit(name[0]))
+            name = "NUM_" + name;
+        return name;
+    }
+
     private void Initialize()
     {
+        _gameInteropProvider.InitializeFromAttributes(this);
+
         foreach (var inputId in Enum.GetValues<InputId>())
         {
             if (_excelService.TryFindRow<ConfigKey>(row => row.Label.ToString() == Enum.GetName(inputId)?.ToString(), out var configKeyRow))
@@ -47,11 +69,40 @@ public unsafe partial class InputTab : DebugTab
         using var tab = ImRaii.TabItem("Inputs");
         if (!tab) return;
 
-        using var table = ImRaii.Table("InputsTable"u8, 11, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Hideable | ImGuiTableFlags.Reorderable);
+        if (ImGui.Button("Copy InputId enum"))
+        {
+            var sb = new StringBuilder();
+
+            var lastEmpty = false;
+            for (var i = 0; i < InputIdNamesCount; i++)
+            {
+                var name = GetInputIdName(i);
+                if (name.IsNullOrEmpty()){
+                    if (!lastEmpty)
+                    {
+                        lastEmpty = true;
+                        sb.AppendLine();
+                    }
+                    continue;
+                }
+
+                lastEmpty = false;
+
+                if (name.StartsWith("NUM_"))
+                    sb.AppendLine("/// <remarks>NUM_ prefix was added for C# enum compatibility</remarks>");
+
+                sb.AppendLine($"{name} = {i},");
+            }
+
+            ImGui.SetClipboardText(sb.ToString());
+        }
+
+        using var table = ImRaii.Table("InputsTable"u8, 12, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Hideable | ImGuiTableFlags.Reorderable);
         if (!table) return;
 
         ImGui.TableSetupColumn("Index"u8, ImGuiTableColumnFlags.WidthFixed, 30);
-        ImGui.TableSetupColumn("InputId"u8, ImGuiTableColumnFlags.WidthFixed, 300);
+        ImGui.TableSetupColumn("InputId Game"u8, ImGuiTableColumnFlags.WidthFixed, 300);
+        ImGui.TableSetupColumn("InputId CS"u8, ImGuiTableColumnFlags.WidthFixed, 300);
         ImGui.TableSetupColumn("Display Name"u8, ImGuiTableColumnFlags.WidthFixed, 300);
         ImGui.TableSetupColumn("Binding 1"u8, ImGuiTableColumnFlags.WidthFixed, 120);
         ImGui.TableSetupColumn("Binding 2"u8, ImGuiTableColumnFlags.WidthFixed, 120);
@@ -80,7 +131,16 @@ public unsafe partial class InputTab : DebugTab
             ImGuiUtils.DrawCopyableText($"{i}");
 
             ImGui.TableNextColumn();
-            ImGuiUtils.DrawCopyableText($"{(InputId)i}");
+            var gameName = GetInputIdName(i);
+            ImGuiUtils.DrawCopyableText(gameName);
+
+            ImGui.TableNextColumn();
+            if (Enum.IsDefined((InputId)i))
+            {
+                using (Color.Red.Push(ImGuiCol.Text, gameName != $"{(InputId)i}"))
+                using (Color.Green.Push(ImGuiCol.Text, gameName == $"{(InputId)i}"))
+                    ImGuiUtils.DrawCopyableText($"{(InputId)i}");
+            }
 
             ImGui.TableNextColumn();
             if (_inputKey2ConfigKey.TryGetValue((InputId)i, out var configKeyRow))
