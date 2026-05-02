@@ -1,6 +1,13 @@
 # Changelog
 
-## [1.55.0] (2026-04-07)
+## [1.56.0] (2026-05-03)
+
+- **Added:** The Input tab now has a button to copy the values for the InputId enum.
+- **Added:** The Input tab now compares game values vs. InputId enum and will highlight if they match or not.
+- **Fixed:** The UIColor tab was updated to use new names in the experimental UIColor Lumina sheet.
+- **Updated:** ClientStructs now at [fcb5a932](https://github.com/aers/FFXIVClientStructs/tree/fcb5a932) ([compare](https://github.com/aers/FFXIVClientStructs/compare/d95cb0d6..fcb5a932)).
+
+## [1.55.0] (2026-04-30)
 
 - **Added:** Event Play and Event Yield Log tab to inspect data from those packets.
 - **Added:** A new Lgb Inspector tab to display information of the active layout.
@@ -863,7 +870,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.55.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.56.0...main
+[1.56.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.55.0...v1.56.0
 [1.55.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.54.0...v1.55.0
 [1.54.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.53.0...v1.54.0
 [1.53.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.52.0...v1.53.0
