@@ -70,12 +70,12 @@ public unsafe partial class UIColorTab : DebugTab
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearGreen", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)Color.FromABGR(row.Unknown2);
+            color = (Vector4)Color.FromABGR(row.ClearGrey);
             ImGui.SetNextItemWidth(-1);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearGrey", ref color, ImGuiColorEditFlags.DisplayHex);
 
             ImGui.TableNextColumn();
-            color = (Vector4)Color.FromABGR(row.Unknown3);
+            color = (Vector4)Color.FromABGR(row.ClearPink);
             ImGui.SetNextItemWidth(-1);
             ImGui.ColorEdit4($"##UIColor_{row.RowId}_ClearPink", ref color, ImGuiColorEditFlags.DisplayHex);
         }
