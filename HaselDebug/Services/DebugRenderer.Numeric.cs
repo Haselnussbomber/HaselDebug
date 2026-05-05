@@ -5,7 +5,7 @@ namespace HaselDebug.Services;
 
 public unsafe partial class DebugRenderer
 {
-    public object? DrawNumeric(nint address, Type type, NodeOptions nodeOptions)
+    public object? DrawPointerNumber(nint address, Type type, NodeOptions nodeOptions)
     {
         if (address == 0)
         {
@@ -74,12 +74,15 @@ public unsafe partial class DebugRenderer
                 return value;
         }
 
-        DrawNumeric(value, type, nodeOptions);
+        DrawNumber(value, type, nodeOptions);
 
         return value;
     }
 
-    public void DrawNumeric(object value, Type type, NodeOptions nodeOptions)
+    public void DrawNumber<T>(T obj, NodeOptions nodeOptions) where T : notnull
+        => DrawNumber(obj, typeof(T), nodeOptions);
+
+    public void DrawNumber(object value, Type type, NodeOptions nodeOptions)
     {
         if (type == typeof(nint))
         {

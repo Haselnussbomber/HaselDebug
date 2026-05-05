@@ -167,30 +167,30 @@ public unsafe partial class ConfigTab : DebugTab
 
                 case 2: // UInt
                     ImGui.TableNextColumn(); // Value
-                    _debugRenderer.DrawNumeric((nint)(&option->Value.UInt), typeof(uint), default);
+                    _debugRenderer.DrawNumber(option->Value.UInt, default);
 
                     ImGui.TableNextColumn(); // Default
-                    _debugRenderer.DrawNumeric((nint)(&option->Properties.UInt.DefaultValue), typeof(uint), default);
+                    _debugRenderer.DrawNumber(option->Properties.UInt.DefaultValue, default);
 
                     ImGui.TableNextColumn(); // Min
-                    _debugRenderer.DrawNumeric((nint)(&option->Properties.UInt.MinValue), typeof(uint), default);
+                    _debugRenderer.DrawNumber(option->Properties.UInt.MinValue, default);
 
                     ImGui.TableNextColumn(); // Max
-                    _debugRenderer.DrawNumeric((nint)(&option->Properties.UInt.MaxValue), typeof(uint), default);
+                    _debugRenderer.DrawNumber(option->Properties.UInt.MaxValue, default);
                     break;
 
                 case 3: // Float
                     ImGui.TableNextColumn(); // Value
-                    _debugRenderer.DrawNumeric((nint)(&option->Value.Float), typeof(float), default);
+                    _debugRenderer.DrawNumber(option->Value.Float, default);
 
                     ImGui.TableNextColumn(); // Default
-                    _debugRenderer.DrawNumeric((nint)(&option->Properties.Float.DefaultValue), typeof(float), default);
+                    _debugRenderer.DrawNumber(option->Properties.Float.DefaultValue, default);
 
                     ImGui.TableNextColumn(); // Min
-                    _debugRenderer.DrawNumeric((nint)(&option->Properties.Float.MinValue), typeof(float), default);
+                    _debugRenderer.DrawNumber(option->Properties.Float.MinValue, default);
 
                     ImGui.TableNextColumn(); // Max
-                    _debugRenderer.DrawNumeric((nint)(&option->Properties.Float.MaxValue), typeof(float), default);
+                    _debugRenderer.DrawNumber(option->Properties.Float.MaxValue, default);
                     break;
 
                 case 4: // String

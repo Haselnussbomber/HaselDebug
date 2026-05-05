@@ -282,7 +282,7 @@ public unsafe partial class DebugRenderer
                 var color = *(ByteColor*)fieldAddress;
 
                 DrawFieldName(fieldInfo);
-                DrawNumeric(fieldAddress, fieldType, fieldNodeOptions);
+                DrawPointerNumber(fieldAddress, fieldType, fieldNodeOptions);
 
                 ImGui.SameLine();
                 ImGuiUtils.DrawCopyableText($"#{color.RGBA:X8}");
@@ -310,7 +310,7 @@ public unsafe partial class DebugRenderer
             if (Inherits<ResourceHandle>(type) && fieldType == typeof(uint) && fieldInfo.Name == nameof(ResourceHandle.FileType))
             {
                 DrawFieldName(fieldInfo);
-                DrawNumeric(fieldAddress, fieldType, fieldNodeOptions);
+                DrawPointerNumber(fieldAddress, fieldType, fieldNodeOptions);
                 ImGui.SameLine();
                 var chars = MemoryHelper.ReadString(fieldAddress, 4).ToCharArray();
                 Array.Reverse(chars);
@@ -322,7 +322,7 @@ public unsafe partial class DebugRenderer
             if (Inherits<InventoryItem>(type) && fieldType == typeof(ulong) && fieldInfo.Name == nameof(InventoryItem.CrafterContentId))
             {
                 DrawFieldName(fieldInfo);
-                DrawNumeric(fieldAddress, fieldType, fieldNodeOptions);
+                DrawPointerNumber(fieldAddress, fieldType, fieldNodeOptions);
                 ImGui.SameLine();
                 ImGuiUtils.DrawCopyableText(NameCache.Instance()->GetNameByContentId(*(ulong*)fieldAddress).ToString());
                 continue;

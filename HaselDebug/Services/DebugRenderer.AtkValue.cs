@@ -35,19 +35,19 @@ public unsafe partial class DebugRenderer
                 ImGuiUtils.DrawCopyableText($"{value->Byte == 0x01}");
                 break;
             case AtkValueType.Int:
-                DrawNumeric((nint)(&value->Int), typeof(int), nodeOptions);
+                DrawNumber(value->Int, nodeOptions);
                 break;
             case AtkValueType.Int64:
-                DrawNumeric((nint)(&value->Int64), typeof(long), nodeOptions);
+                DrawNumber(value->Int64, nodeOptions);
                 break;
             case AtkValueType.UInt:
-                DrawNumeric((nint)(&value->UInt), typeof(uint), nodeOptions);
+                DrawNumber(value->UInt, nodeOptions);
                 break;
             case AtkValueType.UInt64:
-                DrawNumeric((nint)(&value->UInt64), typeof(ulong), nodeOptions);
+                DrawNumber(value->UInt64, nodeOptions);
                 break;
             case AtkValueType.Float:
-                DrawNumeric((nint)(&value->Float), typeof(float), nodeOptions);
+                DrawNumber(value->Float, nodeOptions);
                 break;
             case AtkValueType.WideString:
                 ImGui.Text(value->ToString());
@@ -59,10 +59,10 @@ public unsafe partial class DebugRenderer
                 break;
             case AtkValueType.Vector:
             case AtkValueType.ManagedVector:
-                DrawStdVector((nint)value->Vector, typeof(AtkValue), nodeOptions);
+                DrawNumber((nint)value->Vector, nodeOptions);
                 break;
             case AtkValueType.Pointer:
-                DrawNumeric((nint)(&value->Pointer), typeof(nint), nodeOptions);
+                DrawNumber((nint)value->Pointer, nodeOptions);
                 break;
             case AtkValueType.AtkValues:
                 ImGui.Text(value->ToString());

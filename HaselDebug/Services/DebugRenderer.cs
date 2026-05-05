@@ -226,7 +226,7 @@ public unsafe partial class DebugRenderer
         }
         else if (type.IsNumericType())
         {
-            DrawNumeric(address, type, options);
+            DrawPointerNumber(address, type, options);
             return;
         }
         else if (type.IsStruct() || type.IsClass)

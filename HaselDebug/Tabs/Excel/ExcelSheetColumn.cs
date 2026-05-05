@@ -199,7 +199,7 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
 
         if (IsNumericType)
         {
-            _debugRenderer.DrawNumeric(value, ColumnType, new NodeOptions() { IsIconIdField = IsIconColumn, HexOnShift = true });
+            _debugRenderer.DrawNumber(value, ColumnType, new NodeOptions() { IsIconIdField = IsIconColumn, HexOnShift = true });
             return;
         }
 

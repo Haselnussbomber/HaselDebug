@@ -10,7 +10,7 @@ public partial class DebugRenderer
         nodeOptions = nodeOptions.WithAddress(address);
 
         var underlyingType = type.GetEnumUnderlyingType();
-        var value = DrawNumeric(address, underlyingType, nodeOptions);
+        var value = DrawPointerNumber(address, underlyingType, nodeOptions);
         if (value == null)
             return;
 
