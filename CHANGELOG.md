@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.57.0] (2026-05-09)
+
+- **Added:** Director Update Log tab to inspect data from that packet.
+- **Fixed:** The Outfits tab was displaying unlocked items which are part of a set incorrectly. I hope that works properly now.^^
+- **Updated:** ClientStructs now at [b23bf540](https://github.com/aers/FFXIVClientStructs/tree/b23bf540) ([compare](https://github.com/aers/FFXIVClientStructs/compare/fcb5a932..b23bf540)).
+
 ## [1.56.0] (2026-05-03)
 
 - **Added:** The Input tab now has a button to copy the values for the InputId enum.
@@ -870,7 +876,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.56.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.0...main
+[1.57.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.56.0...v1.57.0
 [1.56.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.55.0...v1.56.0
 [1.55.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.54.0...v1.55.0
 [1.54.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.53.0...v1.54.0
