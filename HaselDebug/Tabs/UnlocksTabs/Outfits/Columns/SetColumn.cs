@@ -8,6 +8,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
     private const float IconSize = OutfitsTable.IconSize;
 
     private readonly TextService _textService;
+    private readonly MirageService _mirageService;
     private readonly ITextureProvider _textureProvider;
 
     [AutoPostConstruct]
@@ -22,11 +23,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
 
     public override void DrawColumn(MirageStoreSetItem row)
     {
-        var isSetInGlamourDresser = OutfitsTable.TryGetSetItemBitArray(row, out var bitArray);
-        var isFullSetCollected = isSetInGlamourDresser && row.Items
-            .Index()
-            .Where((kv) => kv.Item.RowId != 0)
-            .All((kv) => bitArray.TryGet(kv.Index, out var slotLocked) && !slotLocked);
+        var isFullSetCollected = _mirageService.IsFullSetCollected(row.RowId);
 
         ImGui.BeginGroup();
         ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
@@ -36,7 +33,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
             (uint)row.Set.Value.Icon,
             new(IconSize * ImStyle.Scale)
             {
-                TintColor = isSetInGlamourDresser
+                TintColor = isFullSetCollected
                     ? Color.White
                     : ImGui.IsItemHovered() || ImGui.IsPopupOpen($"###Set_{row.RowId}_Icon_ItemContextMenu")
                         ? Color.White : Color.Text600

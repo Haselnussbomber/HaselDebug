@@ -12,6 +12,7 @@ public partial class ItemsColumn : ColumnString<MirageStoreSetItem>
     private const float IconSize = OutfitsTable.IconSize;
 
     private readonly ITextureProvider _textureProvider;
+    private readonly MirageService _mirageService;
     private readonly TextService _textService;
     private readonly UnlocksTabUtils _unlocksTabUtils;
 
@@ -35,11 +36,7 @@ public partial class ItemsColumn : ColumnString<MirageStoreSetItem>
 
     public override void DrawColumn(MirageStoreSetItem row)
     {
-        var isSetInGlamourDresser = OutfitsTable.TryGetSetItemBitArray(row, out var bitArray);
-        var isFullSetCollected = isSetInGlamourDresser && row.Items
-            .Index()
-            .Where((kv) => kv.Item.RowId != 0)
-            .All((kv) => bitArray.TryGet(kv.Index, out var slotLocked) && !slotLocked);
+        var isFullSetCollected = _mirageService.IsFullSetCollected(row.RowId);
 
         for (var slotIndex = 0; slotIndex < row.Items.Count; slotIndex++)
         {
@@ -48,8 +45,8 @@ public partial class ItemsColumn : ColumnString<MirageStoreSetItem>
                 continue;
 
             var isItemInInventory = OutfitsTable.IsItemInInventory(item);
-            var isItemInDresser = OutfitsTable.IsItemInDresser(item);
-            var isItemCollectedInPartialSet = bitArray.TryGet(slotIndex, out var slotLocked) && !slotLocked;
+            var isItemInDresser = _mirageService.IsItemCollected(item);
+            var isItemCollectedInPartialSet = _mirageService.IsSetSlotCollected(row.RowId, slotIndex);
             var isItemCollected = isFullSetCollected || isItemCollectedInPartialSet;
 
             ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
