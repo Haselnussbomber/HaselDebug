@@ -28,9 +28,9 @@
       },
       "Injectio": {
         "type": "Direct",
-        "requested": "[5.2.1, )",
-        "resolved": "5.2.1",
-        "contentHash": "9UHeJbhgaQ8u47sREd2xXE2QYMVp+Ik6rEbk7nTyWJsMdLbBF/grOammSBw2Z/YXbnrn3RFduN0bOHHmCkktMQ==",
+        "requested": "[5.2.2, )",
+        "resolved": "5.2.2",
+        "contentHash": "lFltjzgTQ8ftxUIWOCzfxlFazA+/ByTN5D7EXIIb/ukr+2gwbstX/ITJpskL11vzzy9LadSJchisfYlGBFEAFQ==",
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection": "10.0.7"
         }
@@ -48,9 +48,9 @@
       },
       "YamlDotNet": {
         "type": "Direct",
-        "requested": "[17.0.1, )",
-        "resolved": "17.0.1",
-        "contentHash": "qVir5fehR/W5nTJyoJUibypETXaW4iRAF9cQa0FQIC9TJ3VC0qDOwm4o/RxANewj8KzPF8WMF2abBfUgi6LC4w=="
+        "requested": "[17.1.0, )",
+        "resolved": "17.1.0",
+        "contentHash": "AhsNXgeAs3Ugt653t8LC44xXDuldFfwBpWbWX9pN3e4Yg8U5Bk8jLn8eXtGv5HV2V2nHu7F46fqsPC+tpcTGAA=="
       },
       "Microsoft.Extensions.Configuration": {
         "type": "Transitive",
