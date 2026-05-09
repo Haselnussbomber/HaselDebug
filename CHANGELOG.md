@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.57.1] (2026-05-09)
+
+- **Fixed:** The Outfits tab was even more wrong. It's fixed now and now also supports sets storable in the Armoire.
+
 ## [1.57.0] (2026-05-09)
 
 - **Added:** Director Update Log tab to inspect data from that packet.
@@ -876,7 +880,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.1...main
+[1.57.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.0...v1.57.1
 [1.57.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.56.0...v1.57.0
 [1.56.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.55.0...v1.56.0
 [1.55.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.54.0...v1.55.0
