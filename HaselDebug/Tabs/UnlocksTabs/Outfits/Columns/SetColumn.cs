@@ -9,6 +9,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
 
     private readonly TextService _textService;
     private readonly MirageService _mirageService;
+    private readonly CabinetService _cabinetService;
     private readonly ITextureProvider _textureProvider;
 
     [AutoPostConstruct]
@@ -25,6 +26,16 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
     {
         var isFullSetCollected = _mirageService.IsFullSetCollected(row.RowId);
 
+        var isFullCabinetSet = row.Items
+            .Where(item => item.RowId != 0 && item.IsValid)
+            .All(item => _cabinetService.TryGetCabinetId(item, out _));
+
+        var isFullCabinetSetCollected = isFullCabinetSet && row.Items
+            .Where(item => item.RowId != 0 && item.IsValid)
+            .All(item => _cabinetService.IsItemCollected(item));
+
+        var isSetCollected = isFullSetCollected || isFullCabinetSetCollected;
+
         ImGui.BeginGroup();
         ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
         ImGui.SameLine(0, 0);
@@ -33,7 +44,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
             (uint)row.Set.Value.Icon,
             new(IconSize * ImStyle.Scale)
             {
-                TintColor = isFullSetCollected
+                TintColor = isSetCollected
                     ? Color.White
                     : ImGui.IsItemHovered() || ImGui.IsPopupOpen($"###Set_{row.RowId}_Icon_ItemContextMenu")
                         ? Color.White : Color.Text600
@@ -52,7 +63,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
             ImGui.Text(ToName(row));
         }
 
-        if (isFullSetCollected)
+        if (isSetCollected)
             OutfitsTable.DrawCollectedCheckmark(_textureProvider);
 
         ImGui.SameLine();
