@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Fixed:** Inherited fields of classes with multiple inheritance were displayed at incorrect offsets, because only the first vtable was taken into account.
+
 ## [1.57.1] (2026-05-09)
 
 - **Fixed:** The Outfits tab was even more wrong. It's fixed now and now also supports sets storable in the Armoire.
