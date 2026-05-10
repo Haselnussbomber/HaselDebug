@@ -1,8 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [1.57.2] (2026-05-10)
 
 - **Fixed:** Inherited fields of classes with multiple inheritance were displayed at incorrect offsets, because only the first vtable was taken into account.
+- **Updated:** ClientStructs now at [a4901d90](https://github.com/aers/FFXIVClientStructs/tree/a4901d90) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b23bf540..a4901d90)).
 
 ## [1.57.1] (2026-05-09)
 
@@ -884,7 +885,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.2...main
+[1.57.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.1...v1.57.2
 [1.57.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.0...v1.57.1
 [1.57.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.56.0...v1.57.0
 [1.56.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.55.0...v1.56.0
