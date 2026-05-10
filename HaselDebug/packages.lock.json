@@ -28,12 +28,9 @@
       },
       "Injectio": {
         "type": "Direct",
-        "requested": "[5.2.2, )",
-        "resolved": "5.2.2",
-        "contentHash": "lFltjzgTQ8ftxUIWOCzfxlFazA+/ByTN5D7EXIIb/ukr+2gwbstX/ITJpskL11vzzy9LadSJchisfYlGBFEAFQ==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection": "10.0.7"
-        }
+        "requested": "[6.0.0, )",
+        "resolved": "6.0.0",
+        "contentHash": "2hktHHGw0vZIkHZ04ElsPXaPiEe50otpLGe0UdrOfCdSTWLTb3zMjbU0t+PmeSJZV3LFwi652X7VlTbo+/XIsg=="
       },
       "Microsoft.Windows.CsWin32": {
         "type": "Direct",
