@@ -63,7 +63,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
         var tribeId = isLoggedIn ? playerState->Tribe : 1;
         var sexId = isLoggedIn ? playerState->Sex : 1;
 
-        for (var i = 0u; i < UIState.Instance()->UnlockLinksBitArray.BitCount; i++)
+        for (var i = 1u; i < UIState.Instance()->UnlockLinksBitArray.BitCount; i++)
         {
             dict.TryAdd(i, []);
         }
