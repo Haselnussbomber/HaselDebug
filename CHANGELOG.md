@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** The Outfits table now has a toggle to only display sets with items storable in the Armoire.
+- **Updated:** The contrast between collected and non-collected items in the Outfits table was improved.
+- **Fixed:** The amount of collected sets didn't take sets stored in the Armoire into account.
+- **Updated:** ClientStructs now at [6e03f96a](https://github.com/aers/FFXIVClientStructs/tree/6e03f96a) ([compare](https://github.com/aers/FFXIVClientStructs/compare/a4901d90..6e03f96a)).
+
 ## [1.57.2] (2026-05-10)
 
 - **Fixed:** Inherited fields of classes with multiple inheritance were displayed at incorrect offsets, because only the first vtable was taken into account.

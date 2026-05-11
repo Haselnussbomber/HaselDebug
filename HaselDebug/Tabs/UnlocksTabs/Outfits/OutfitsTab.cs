@@ -29,7 +29,7 @@ public partial class OutfitsTab : DebugTab, IUnlockTab
 
         ImGui.Text($"{numCollectedSets} sets collected. {_table.Rows.Count} of {_excelService.GetRowCount<MirageStoreSetItem>()} rows shown");
 
-        if (ImGui.Checkbox("Show only sets that have items which can be stored in the Armoire"u8, ref _table.ArmoireOnly))
+        if (ImGui.Checkbox("Only show sets that have items which can be stored in the Armoire"u8, ref _table.ArmoireOnly))
         {
             _table.LoadRows();
             _table.IsFilterDirty = true;
