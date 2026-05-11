@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.57.3] (2026-05-12)
 
 - **Updated:** The Outfits table now has a toggle to only display sets with items storable in the Armoire.
 - **Updated:** The contrast between collected and non-collected items in the Outfits table was improved.
@@ -892,7 +892,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.3...main
+[1.57.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.2...v1.57.3
 [1.57.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.1...v1.57.2
 [1.57.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.0...v1.57.1
 [1.57.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.56.0...v1.57.0
