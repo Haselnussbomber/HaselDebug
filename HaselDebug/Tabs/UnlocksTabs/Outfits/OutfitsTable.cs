@@ -1,6 +1,5 @@
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
@@ -18,6 +17,8 @@ public partial class OutfitsTable : Table<MirageStoreSetItem>, IDisposable
     private readonly ItemsColumn _itemsColumn;
     private readonly IClientState _clientState;
     private readonly ItemService _itemService;
+    private readonly CabinetService _cabinetService;
+    public bool ArmoireOnly;
 
     [AutoPostConstruct]
     public void Initialize()
@@ -53,6 +54,8 @@ public partial class OutfitsTable : Table<MirageStoreSetItem>, IDisposable
 
     public override void LoadRows()
     {
+        Rows.Clear();
+
         foreach (var row in _excelService.GetSheet<MirageStoreSetItem>())
         {
             // is valid set item
@@ -65,6 +68,10 @@ public partial class OutfitsTable : Table<MirageStoreSetItem>, IDisposable
 
             // does not only consist of items that can't be worn
             if (row.Items.Where(i => i.RowId != 0).All(i => !_itemService.CanTryOn(i.Value.RowId)))
+                continue;
+
+            // apply Cabinet filter, if ticked
+            if (ArmoireOnly && !row.Items.Any(item => _cabinetService.TryGetCabinetId(item, out _)))
                 continue;
 
             Rows.Add(row);

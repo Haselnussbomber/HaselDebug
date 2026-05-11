@@ -26,7 +26,15 @@ public partial class OutfitsTab : DebugTab, IUnlockTab
     public override void Draw()
     {
         var numCollectedSets = _table.Rows.Count(row => OutfitsTable.IsItemInDresser(row.Set));
+
         ImGui.Text($"{numCollectedSets} sets collected. {_table.Rows.Count} of {_excelService.GetRowCount<MirageStoreSetItem>()} rows shown");
+
+        if (ImGui.Checkbox("Show only sets that have items which can be stored in the Armoire"u8, ref _table.ArmoireOnly))
+        {
+            _table.LoadRows();
+            _table.IsFilterDirty = true;
+        }
+
         _table.Draw();
     }
 }
