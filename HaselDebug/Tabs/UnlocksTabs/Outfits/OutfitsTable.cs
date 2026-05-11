@@ -51,10 +51,8 @@ public partial class OutfitsTable : Table<MirageStoreSetItem>, IDisposable
         return IconSize * ImStyle.Scale + ImStyle.ItemSpacing.Y; // I honestly don't know why using ItemSpacing here works
     }
 
-    public override unsafe void LoadRows()
+    public override void LoadRows()
     {
-        var agent = AgentTryon.Instance();
-        var cabinetSheet = _excelService.GetSheet<Cabinet>().Select(row => row.Item.RowId).ToArray();
         foreach (var row in _excelService.GetSheet<MirageStoreSetItem>())
         {
             // is valid set item
