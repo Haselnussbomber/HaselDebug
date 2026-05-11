@@ -12,6 +12,8 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
     private readonly CabinetService _cabinetService;
     private readonly ITextureProvider _textureProvider;
 
+    public OutfitsTable Table;
+
     [AutoPostConstruct]
     public void Initialize()
     {
@@ -24,17 +26,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
 
     public override void DrawColumn(MirageStoreSetItem row)
     {
-        var isFullSetCollected = _mirageService.IsFullSetCollected(row.RowId);
-
-        var isFullCabinetSet = row.Items
-            .Where(item => item.RowId != 0 && item.IsValid)
-            .All(item => _cabinetService.TryGetCabinetId(item, out _));
-
-        var isFullCabinetSetCollected = isFullCabinetSet && row.Items
-            .Where(item => item.RowId != 0 && item.IsValid)
-            .All(item => _cabinetService.IsItemCollected(item));
-
-        var isSetCollected = isFullSetCollected || isFullCabinetSetCollected;
+        var isSetCollected = Table.IsSetCollected(row);
 
         ImGui.BeginGroup();
         ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
@@ -47,7 +39,7 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
                 TintColor = isSetCollected
                     ? Color.White
                     : ImGui.IsItemHovered() || ImGui.IsPopupOpen($"###Set_{row.RowId}_Icon_ItemContextMenu")
-                        ? Color.White : Color.Text600
+                        ? Color.White : (Color.White with { A = 0.333f })
             }
         );
 

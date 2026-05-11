@@ -19,13 +19,13 @@ public partial class OutfitsTab : DebugTab, IUnlockTab
         return new UnlockProgress()
         {
             TotalUnlocks = _table.Rows.Count,
-            NumUnlocked = _table.Rows.Count(row => OutfitsTable.IsItemInDresser(row.Set)),
+            NumUnlocked = _table.Rows.Count(_table.IsSetCollected),
         };
     }
 
     public override void Draw()
     {
-        var numCollectedSets = _table.Rows.Count(row => OutfitsTable.IsItemInDresser(row.Set));
+        var numCollectedSets = _table.Rows.Count(_table.IsSetCollected);
 
         ImGui.Text($"{numCollectedSets} sets collected. {_table.Rows.Count} of {_excelService.GetRowCount<MirageStoreSetItem>()} rows shown");
 
