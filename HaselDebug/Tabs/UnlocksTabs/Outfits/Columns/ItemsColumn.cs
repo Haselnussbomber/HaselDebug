@@ -54,7 +54,7 @@ public partial class ItemsColumn : ColumnString<MirageStoreSetItem>
             var isCabinetSupported = _cabinetService.TryGetCabinetId(item, out _);
             var isItemInCabinet = isCabinetSupported && _cabinetService.IsItemCollected(item);
 
-            var isItemCollected = isFullSetCollected || isItemCollectedInPartialSet | isItemInCabinet;
+            var isItemCollected = isFullSetCollected || isItemCollectedInPartialSet || isItemInCabinet || isItemInDresser || isItemInInventory;
 
             ImGui.Dummy(ImGuiHelpers.ScaledVector2(IconSize));
             var afterIconPos = ImCursor.Position;
@@ -64,10 +64,10 @@ public partial class ItemsColumn : ColumnString<MirageStoreSetItem>
                 (uint)item.Value.Icon,
                 new(IconSize * ImStyle.Scale)
                 {
-                    TintColor = isItemCollected || isItemInDresser || isItemInInventory
+                    TintColor = isItemCollected
                         ? Color.White
                         : ImGui.IsItemHovered() || ImGui.IsPopupOpen($"###SetItem_{row.RowId}_{item.RowId}_ItemContextMenu")
-                            ? Color.White : Color.Text600
+                            ? Color.White : (Color.White with { A = 0.333f })
                 }
             );
 
@@ -101,7 +101,7 @@ public partial class ItemsColumn : ColumnString<MirageStoreSetItem>
                 builder.AddOpenOnGarlandTools("item", item.RowId);
             });
 
-            if (!isFullSetCollected && (isItemCollected || isItemInDresser || isItemInInventory))
+            if (!isFullSetCollected && isItemCollected)
             {
                 ImGui.SameLine(0, 0);
                 var dotSize = IconSize / 5f * ImStyle.Scale;
