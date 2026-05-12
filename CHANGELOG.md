@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+- **Fixed:** FixedSizeArray strings were reading until null terminator. This has been limited to the arrays length.
+- **Updated:** ClientStructs now at [1b90a454](https://github.com/aers/FFXIVClientStructs/tree/1b90a454) ([compare](https://github.com/aers/FFXIVClientStructs/compare/6e03f96a..1b90a454)).
+
 ## [1.57.3] (2026-05-12)
 
 - **Updated:** The Outfits table now has a toggle to only display sets with items storable in the Armoire.
