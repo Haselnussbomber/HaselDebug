@@ -24,9 +24,15 @@ public unsafe partial class DebugRenderer
         if (isString)
         {
             if (fieldType == typeof(char))
-                ImGui.Text(new string((char*)address));
+            {
+                var span = new ReadOnlySpan<char>((void*)address, elementCount);
+                ImGui.Text(new string(span));
+            }
             else
-                DrawSeString((byte*)address, nodeOptions);
+            {
+                var span = new ReadOnlySpan<byte>((void*)address, elementCount);
+                DrawSeString((ReadOnlySeStringSpan)span, nodeOptions);
+            }
 
             return;
         }
