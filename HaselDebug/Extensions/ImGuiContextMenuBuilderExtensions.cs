@@ -66,10 +66,16 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
                 if (!AgentMiragePrismPrismBox.Instance()->IsAgentActive())
                     return false;
 
+                if (TryGetAddon<AtkUnitBase>("MiragePrismPrismSetConvert", out _))
+                    return false;
+
                 if (!TryGetAddon<AtkUnitBase>("MiragePrismPrismBoxCrystallize", out _))
                     return false;
 
-                if (!ServiceLocator.TryGetService<ExcelModule>(out var excelModule) || !excelModule.GetSheet<Lumina.Excel.Sheets.MirageStoreSetItemLookup>().HasRow(item))
+                if (!TryGetAddon<AtkUnitBase>("MiragePrismPrismBox", out var _))
+                    return false;
+
+                if (!ServiceLocator.TryGetService<ExcelService>(out var excelService) || !excelService.GetSheet<MirageStoreSetItemLookup>().HasRow(item.ItemId))
                     return false;
 
                 return GetInventoryItem() != null;
@@ -87,7 +93,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
         {
             // TODO: this sucks, lol
 
-            if (ImGui.MenuItem(Label, Enabled))
+            if (ImGui.MenuItem(Label, false, Enabled))
             {
                 ClickCallback?.Invoke();
 
@@ -104,10 +110,16 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
             if (slot == null)
                 return;
 
-            if (!TryGetAddon<AtkUnitBase>("MiragePrismPrismBoxCrystallize", out var openerAddon))
+            if (TryGetAddon<AtkUnitBase>("MiragePrismPrismSetConvert", out _))
                 return;
 
-            AgentMiragePrismPrismSetConvert.Instance()->Open(item, slot->GetInventoryType(), slot->GetSlot(), openerAddon->Id, true);
+            if (!TryGetAddon<AtkUnitBase>("MiragePrismPrismBoxCrystallize", out var crystallizeAddon))
+                return;
+
+            if (!TryGetAddon<AtkUnitBase>("MiragePrismPrismBox", out var prismPrismBox))
+                return;
+
+            AgentMiragePrismPrismSetConvert.Instance()->Open(item, slot->GetInventoryType(), slot->GetSlot(), crystallizeAddon->Id, prismPrismBox->Id, true);
         }
 
         private InventoryItem* GetInventoryItem()
@@ -124,7 +136,7 @@ public static unsafe class ImGuiContextMenuBuilderExtensions
                     if (slot == null || slot->IsEmpty())
                         continue;
 
-                    if (slot->GetItemId() == item)
+                    if (slot->GetItemId() == item.ItemId)
                         return slot;
                 }
             }
