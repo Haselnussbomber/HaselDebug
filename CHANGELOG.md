@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.58.0] (2026-05-19)
 
 - **Added:** A new unlocks tab Gathering Items.
 - **Fixed:** FixedSizeArray strings were reading until null terminator. This has been limited to the arrays length.
@@ -899,7 +899,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.3...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.58.0...main
+[1.58.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.3...v1.58.0
 [1.57.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.2...v1.57.3
 [1.57.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.1...v1.57.2
 [1.57.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.0...v1.57.1
