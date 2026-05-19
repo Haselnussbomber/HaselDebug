@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** Gathering Items tab now shows collectible icon on names and has a new Type column (except for Key Items, because I don't care).
+- **Updated:** ClientStructs now at [4909a842](https://github.com/aers/FFXIVClientStructs/tree/4909a842) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b60db3d9..4909a842)).
+
 ## [1.58.0] (2026-05-19)
 
 - **Added:** A new unlocks tab Gathering Items.
