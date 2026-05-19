@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.58.2] (2026-05-19)
+
+- **Updated:** Clicking on the set name in the Outfits tab now previews the full set.
+- **Updated:** ClientStructs now at [1c23f405](https://github.com/aers/FFXIVClientStructs/tree/1c23f405) ([compare](https://github.com/aers/FFXIVClientStructs/compare/4909a842..1c23f405)).
+
 ## [1.58.1] (2026-05-19)
 
 - **Updated:** Gathering Items tab now shows collectible icon on names and has a new Type column (except for Key Items, because I don't care).
@@ -904,7 +909,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.58.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.58.2...main
+[1.58.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.58.1...v1.58.2
 [1.58.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.58.0...v1.58.1
 [1.58.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.3...v1.58.0
 [1.57.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.2...v1.57.3
