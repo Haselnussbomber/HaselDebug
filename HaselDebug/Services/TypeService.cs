@@ -37,7 +37,7 @@ public partial class TypeService : IHostedService
         LoadInstances(csAssembly);
 
         CustomNodeTypes = _pluginInterface
-            .GetOrCreateData("KamiToolKitAllocatedNodes", () => new ConcurrentDictionary<nint, Type>());
+            .GetOrCreateData("TypeMappedCustomNodes", () => new ConcurrentDictionary<nint, Type>());
 
         _loadedTcs.SetResult();
         return Task.CompletedTask;
@@ -45,7 +45,7 @@ public partial class TypeService : IHostedService
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _pluginInterface.RelinquishData("KamiToolKitAllocatedNodes");
+        _pluginInterface.RelinquishData("TypeMappedCustomNodes");
         return Task.CompletedTask;
     }
 
