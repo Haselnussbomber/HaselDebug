@@ -147,6 +147,10 @@
     "en": "Caught",
     "de": "Gefangen"
   },
+  "GatheredColumn.Label": {
+    "en": "Gathered",
+    "de": "Gesammelt"
+  },
   "ItemColumn.Label": {
     "en": "Item",
     "de": "Gegenstand"
