@@ -491,6 +491,7 @@ public unsafe partial class UnlocksTabUtils
             var text = itemCategoy.RowId switch
             {
                 1 when item.Quest.IsValid && !item.Quest.Value.Name.IsEmpty => _seStringEvaluator.Evaluate(itemCategoy.Unknown0, [_textService.GetQuestName(item.Quest.RowId)]),
+                1 => default,
                 _ => itemCategoy.Unknown0
             };
 

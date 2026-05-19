@@ -9,6 +9,7 @@ public partial class GatheringItemsTable : Table<GatheringItem>
     private readonly IServiceProvider _serviceProvider;
     private readonly ExcelService _excelService;
     private readonly GatheredColumn _gatheredColumn;
+    private readonly TypeColumn _typeColumn;
     private readonly NameColumn _nameColumn;
 
     [AutoPostConstruct]
@@ -17,6 +18,7 @@ public partial class GatheringItemsTable : Table<GatheringItem>
         Columns = [
             RowIdColumn<GatheringItem>.Create(_serviceProvider),
             _gatheredColumn,
+            _typeColumn,
             _nameColumn,
         ];
     }

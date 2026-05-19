@@ -1,3 +1,4 @@
+using Dalamud.Game.Text;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Services;
@@ -19,7 +20,14 @@ public partial class NameColumn : ColumnString<GatheringItem>
     }
 
     public override string ToName(GatheringItem row)
-        => _textService.GetItemName(row.Item.RowId, true).ToString();
+    {
+        var itemName = _textService.GetItemName(row.Item.RowId).ToString();
+
+        if (row.Item.Is<EventItem>())
+            itemName += " " + SeIconChar.Collectible.ToIconString();
+
+        return itemName;
+    }
 
     public override unsafe void DrawColumn(GatheringItem row)
     {

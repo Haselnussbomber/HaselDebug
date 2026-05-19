@@ -151,6 +151,10 @@
     "en": "Gathered",
     "de": "Gesammelt"
   },
+  "TypeColumn.Label": {
+    "en": "Type",
+    "de": "Typ"
+  },
   "ItemColumn.Label": {
     "en": "Item",
     "de": "Gegenstand"
@@ -253,6 +257,34 @@
   },
   "HaselDebug.Tabs.UnlocksTabs.Items.Columns.TypeColumn.Label": {
     "en": "Type"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.GatheringItems.Columns.TypeColumn.All": {
+    "en": "All",
+    "de": "Alle"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.GatheringItems.Columns.TypeColumn.Mining": {
+    "en": "Mining",
+    "de": "Minenarbeiter (Abbauen)",
+    "fr": "Extraction de minerai",
+    "jp": "\u63A1\u6398"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.GatheringItems.Columns.TypeColumn.Quarrying": {
+    "en": "Quarrying",
+    "de": "Minenarbeiter (Herausbrechen)",
+    "fr": "Extraction de pierre",
+    "jp": "\u7815\u5CA9"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.GatheringItems.Columns.TypeColumn.Logging": {
+    "en": "Logging",
+    "de": "Gärtner (Abholzen)",
+    "fr": "Coupe",
+    "jp": "\u4F10\u63A1"
+  },
+  "HaselDebug.Tabs.UnlocksTabs.GatheringItems.Columns.TypeColumn.Harvesting": {
+    "en": "Harvesting",
+    "de": "Gärtner (Abernten)",
+    "fr": "Fauche",
+    "jp": "\u8349\u5208"
   },
 
   "FurnitureCatalogTab.OpenButton.Label": {

@@ -5,7 +5,7 @@ using HaselDebug.Interfaces;
 namespace HaselDebug.Tabs.UnlocksTabs.GatheringItems;
 
 [RegisterSingleton<IUnlockTab>(Duplicate = DuplicateStrategy.Append)]
-public unsafe class GatheringItemsTab(GatheringItemsTable table) : DebugTab, IUnlockTab
+public class GatheringItemsTab(GatheringItemsTable table) : DebugTab, IUnlockTab
 {
     public override string Title => "Gathering Items";
     public override bool DrawInChild => false;

@@ -12,7 +12,7 @@ public class GatheredColumn : ColumnYesNo<GatheringItem>
         LabelKey = "GatheredColumn.Label";
     }
 
-    public override unsafe bool ToBool(GatheringItem row)
+    public override bool ToBool(GatheringItem row)
         =>  QuestManager.IsGatheringItemGathered((ushort)row.RowId);
 
     public override void DrawColumn(GatheringItem row)
