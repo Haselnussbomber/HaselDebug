@@ -2,8 +2,10 @@
 
 ## [Unreleased]
 
+- **Added:** A new unlocks tab Gathering Items.
 - **Fixed:** FixedSizeArray strings were reading until null terminator. This has been limited to the arrays length.
-- **Updated:** ClientStructs now at [cdd5def0](https://github.com/aers/FFXIVClientStructs/tree/cdd5def0) ([compare](https://github.com/aers/FFXIVClientStructs/compare/6e03f96a..cdd5def0)).
+- **Updated:** Datashare keys for custom node types. (Thanks to @MidoriKami)
+- **Updated:** ClientStructs now at [b60db3d9](https://github.com/aers/FFXIVClientStructs/tree/b60db3d9) ([compare](https://github.com/aers/FFXIVClientStructs/compare/6e03f96a..b60db3d9)).
 
 ## [1.57.3] (2026-05-12)
 
