@@ -1,9 +1,11 @@
+using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Gui.ImGuiTable;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Outfits.Columns;
 
 [RegisterSingleton, AutoConstruct]
-public partial class SetColumn : ColumnString<MirageStoreSetItem>
+public unsafe partial class SetColumn : ColumnString<MirageStoreSetItem>
 {
     private const float IconSize = OutfitsTable.IconSize;
 
@@ -59,17 +61,41 @@ public partial class SetColumn : ColumnString<MirageStoreSetItem>
             OutfitsTable.DrawCollectedCheckmark(_textureProvider);
 
         ImGui.SameLine();
-        ImGui.Selectable($"###SetName_{row.RowId}", false, ImGuiSelectableFlags.None, new Vector2(ImStyle.ContentRegionAvail.X, IconSize * ImStyle.Scale));
+        if (ImGui.Selectable($"###SetName_{row.RowId}", false, ImGuiSelectableFlags.None, new Vector2(ImStyle.ContentRegionAvail.X, IconSize * ImStyle.Scale)))
+        {
+            var agentColorant = AgentColorant.Instance();
+            if (agentColorant->IsAgentActive())
+                agentColorant->Hide();
+
+            UIModule.Instance()->GetAgentHelpers()->HideBlockingCharaViewAgents(2, AgentId.Tryon);
+
+            var agent = AgentTryon.Instance();
+
+            agent->TryOnItems.Clear();
+
+            foreach (ref var item in agent->TryOnItems)
+                item.EquipSlotCategory = 0xE;
+
+            var i = 0;
+
+            foreach (var item in row.Items) // MirageStoreSetItem extension property
+            {
+                if (item.RowId == 0 || !item.IsValid)
+                    continue;
+
+                agent->TryOnItems[i++].Id = item.RowId;
+            }
+
+            agent->TryOnItemsChanged = true;
+            if (!agent->IsAgentActive())
+                agent->Show();
+        }
 
         ImGui.EndGroup();
 
-        // TODO: preview whole set??
         ImGuiContextMenu.Draw($"###Set_{row.RowId}_ItemContextMenu", builder =>
         {
-            builder.AddTryOn(row.Set.RowId);
-            builder.AddItemFinder(row.Set.RowId);
             builder.AddCopyItemName(row.Set.RowId);
-            builder.AddItemSearch(row.Set.RowId);
             builder.AddOpenOnGarlandTools("item", row.Set.RowId);
         });
 
