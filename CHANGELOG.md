@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.58.1] (2026-05-19)
 
 - **Updated:** Gathering Items tab now shows collectible icon on names and has a new Type column (except for Key Items, because I don't care).
 - **Updated:** ClientStructs now at [4909a842](https://github.com/aers/FFXIVClientStructs/tree/4909a842) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b60db3d9..4909a842)).
@@ -904,7 +904,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.58.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.58.1...main
+[1.58.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.58.0...v1.58.1
 [1.58.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.3...v1.58.0
 [1.57.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.2...v1.57.3
 [1.57.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.57.1...v1.57.2
