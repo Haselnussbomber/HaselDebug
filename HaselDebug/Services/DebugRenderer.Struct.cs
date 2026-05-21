@@ -23,7 +23,7 @@ public unsafe partial class DebugRenderer
 
         var fields = GetAllInheritedFields(type);
 
-        using var disabled = ImRaii.Disabled(!fields.Any());
+        using var disabled = ImRaii.Disabled(fields.Length == 0);
         using var node = DrawTreeNode(nodeOptions.WithSeStringTitleIfNull(type.FullName ?? "Unknown Type Name"));
         if (!node) return;
 
@@ -406,7 +406,7 @@ public unsafe partial class DebugRenderer
         var hasDoc = HasDocumentation(fullName);
         var startPos = ImCursor.ScreenPosition;
 
-        ImGuiUtils.DrawCopyableText(name, new CopyableTextOptions() { NoTooltip = true, TextColor = ColorFieldName });
+        ImGuiUtils.DrawCopyableText(name, new CopyableTextOptions() { NoTooltip = true, TextColor = fieldInfo.IsPrivate ? ColorFieldName with { A = 0.67f } : ColorFieldName });
 
         if (hasDoc)
         {
