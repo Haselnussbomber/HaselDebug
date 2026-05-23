@@ -23,7 +23,7 @@ public unsafe partial class ConditionsTab : DebugTab
             .GetFields(BindingFlags.Instance | BindingFlags.Public)
             .Where(fieldInfo => fieldInfo.FieldType == typeof(bool) && fieldInfo.GetCustomAttribute<ObsoleteAttribute>() == null))
         {
-            var offset = fieldInfo.GetFieldOffset();
+            var offset = fieldInfo.FieldOffset;
             var value = *(bool*)((nint)conditions + offset);
             if (!value) continue;
 

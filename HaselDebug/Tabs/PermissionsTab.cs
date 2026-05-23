@@ -20,7 +20,7 @@ public unsafe partial class PermissionsTab : DebugTab
         _conditionNames = typeof(Conditions)
             .GetFields(BindingFlags.Instance | BindingFlags.Public)
             .Where(fi => fi.FieldType == typeof(bool) && !Attribute.IsDefined(fi, typeof(ObsoleteAttribute)))
-            .Select(fi => (fi.GetFieldOffset(), fi.Name))
+            .Select(fi => (fi.FieldOffset, fi.Name))
             .DistinctBy(t => t.Item1)
             .ToDictionary();
     }

@@ -73,6 +73,9 @@ public static class DebugUtils
 
             foreach (var field in fields)
             {
+                if (!Attribute.IsDefined(field, typeof(FieldOffsetAttribute)))
+                    continue;
+
                 if (field.GetCustomAttribute<FieldOffsetAttribute>() is not FieldOffsetAttribute fieldOffsetAttr)
                     continue;
 

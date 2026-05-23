@@ -14,7 +14,7 @@ public partial class DebugRenderer
         if (value == null)
             return;
 
-        if (type.GetCustomAttribute<FlagsAttribute>() != null)
+        if (Attribute.IsDefined(type, typeof(FlagsAttribute)))
         {
             ImGui.SameLine();
             ImGui.Text(" - "u8);

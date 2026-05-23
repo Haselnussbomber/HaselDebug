@@ -8,6 +8,9 @@ public unsafe partial class DebugRenderer
 {
     public void DrawFixedSizeArray(nint address, Type type, bool isString, NodeOptions nodeOptions)
     {
+        if (!Attribute.IsDefined(type, typeof(InlineArrayAttribute)))
+            return;
+
         if (type.GetCustomAttribute<InlineArrayAttribute>() is not InlineArrayAttribute inlineArrayAttribute)
             return;
 

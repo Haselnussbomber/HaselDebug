@@ -119,10 +119,15 @@ public partial class TypeService : IHostedService
     {
         foreach (var fieldInfo in type.GetFields(BindingFlags.Default | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
         {
+            if (!Attribute.IsDefined(fieldInfo, typeof(FieldOffsetAttribute)))
+                continue;
+
             if (fieldInfo.GetCustomAttribute<FieldOffsetAttribute>() is not { } fieldOffsetAttribute)
                 continue;
 
             if (fieldInfo.IsAssembly
+                && Attribute.IsDefined(fieldInfo, typeof(FixedSizeArrayAttribute))
+                && Attribute.IsDefined(fieldInfo.FieldType, typeof(InlineArrayAttribute))
                 && fieldInfo.GetCustomAttribute<FixedSizeArrayAttribute>() is FixedSizeArrayAttribute fixedSizeArrayAttribute
                 && !fixedSizeArrayAttribute.IsString
                 && !fixedSizeArrayAttribute.IsBitArray

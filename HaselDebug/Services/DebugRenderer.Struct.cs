@@ -28,11 +28,11 @@ public unsafe partial class DebugRenderer
         if (!node) return;
 
         var processedFields = fields
-            .OrderBy(fieldInfo => fieldInfo.GetFieldOffset())
+            .OrderBy(fieldInfo => fieldInfo.FieldOffset)
             .Select(fieldInfo => (
                 Info: fieldInfo,
-                Offset: fieldInfo.GetFieldOffset(),
-                Size: fieldInfo.IsFixed() ? fieldInfo.GetFixedType().SizeOf() * fieldInfo.GetFixedSize() : fieldInfo.FieldType.SizeOf()));
+                Offset: fieldInfo.FieldOffset,
+                Size: fieldInfo.IsFixed ? fieldInfo.FixedType.SizeOf() * fieldInfo.FixedSize : fieldInfo.FieldType.SizeOf()));
 
         nodeOptions = nodeOptions.ConsumeTreeNodeOptions();
 
@@ -65,7 +65,7 @@ public unsafe partial class DebugRenderer
             if ((fieldType == typeof(short) || fieldType == typeof(int) || fieldType == typeof(ushort) || fieldType == typeof(uint)) && fieldInfo.Name.Contains("WorldId"))
                 fieldNodeOptions = fieldNodeOptions with { IsWorldIdField = true };
 
-            if (fieldInfo.GetCustomAttribute<ObsoleteAttribute>() is ObsoleteAttribute obsoleteAttribute)
+            if (Attribute.IsDefined(fieldInfo, typeof(ObsoleteAttribute)) && fieldInfo.GetCustomAttribute<ObsoleteAttribute>() is ObsoleteAttribute obsoleteAttribute)
             {
                 using (ImRaii.PushColor(ImGuiCol.Text, (obsoleteAttribute.IsError ? ColorObsoleteError : ColorObsolete).ToUInt()))
                     ImGui.Text("[Obsolete]"u8);
@@ -100,6 +100,8 @@ public unsafe partial class DebugRenderer
 
             // internal FixedSizeArrays
             if (fieldInfo.IsAssembly
+                && Attribute.IsDefined(fieldInfo, typeof(FixedSizeArrayAttribute))
+                && Attribute.IsDefined(fieldType, typeof(InlineArrayAttribute))
                 && fieldInfo.GetCustomAttribute<FixedSizeArrayAttribute>() is FixedSizeArrayAttribute fixedSizeArrayAttribute
                 && fieldType.GetCustomAttribute<InlineArrayAttribute>() is InlineArrayAttribute inlineArrayAttribute)
             {

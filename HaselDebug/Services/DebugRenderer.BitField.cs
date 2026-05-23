@@ -173,7 +173,7 @@ public unsafe partial class DebugRenderer
                     var value = BitOps.GetBits(fieldValue, index, BitOps.CreateLowBitMask<ulong>(length));
                     ImGuiUtils.DrawCopyableText(value.ToString());
 
-                    if (t.GetCustomAttribute<FlagsAttribute>() != null)
+                    if (Attribute.IsDefined(t, typeof(FlagsAttribute)))
                     {
                         ImGui.SameLine();
                         ImGui.Text(" - "u8);
