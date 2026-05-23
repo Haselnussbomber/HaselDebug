@@ -8,6 +8,7 @@ using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Common.Component.Excel;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
 using HaselDebug.Utils;
@@ -275,6 +276,14 @@ public unsafe partial class DebugRenderer
             {
                 DrawFieldName(fieldInfo);
                 DrawArray(new Span<AtkTimelineKeyFrame>(*(nint**)fieldAddress, (int)((AtkTimelineManager*)address)->KeyFrameCount), fieldNodeOptions);
+                continue;
+            }
+
+            // ExcelSheet.ColumnDefinitions
+            if (type == typeof(ExcelSheet) && fieldType == typeof(ExcelSheet.ColumnInfo*) && fieldInfo.Name == nameof(ExcelSheet.ColumnDefinitions))
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(new Span<ExcelSheet.ColumnInfo>(*(nint**)fieldAddress, ((ExcelSheet*)address)->ColumnCount), fieldNodeOptions);
                 continue;
             }
 
