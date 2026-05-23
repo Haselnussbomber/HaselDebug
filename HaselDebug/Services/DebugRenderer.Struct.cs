@@ -398,6 +398,14 @@ public unsafe partial class DebugRenderer
                 continue;
             }
 
+            // Math.Size
+            if (fieldType == typeof(FFXIVClientStructs.FFXIV.Common.Math.Size))
+            {
+                DrawFieldName(fieldInfo);
+                DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with { Title = (*(FFXIVClientStructs.FFXIV.Common.Math.Size*)fieldAddress).ToString() });
+                continue;
+            }
+
             // TODO: enum values table
 
             DrawFieldName(fieldInfo);
