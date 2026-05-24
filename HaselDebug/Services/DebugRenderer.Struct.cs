@@ -287,6 +287,30 @@ public unsafe partial class DebugRenderer
                 continue;
             }
 
+            // AgentShop.ItemReceive
+            if (type == typeof(AgentShop) && fieldType == typeof(AgentShop.ShopItem*) && fieldInfo.Name == nameof(AgentShop.ItemReceive))
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(((AgentShop*)address)->ItemReceiveSpan, fieldNodeOptions);
+                continue;
+            }
+
+            // AgentShop.ItemCost
+            if (type == typeof(AgentShop) && fieldType == typeof(AgentShop.ShopItem*) && fieldInfo.Name == nameof(AgentShop.ItemCost))
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(((AgentShop*)address)->ItemCostSpan, fieldNodeOptions);
+                continue;
+            }
+
+            // AgentShop.ItemRetainerBuyback
+            if (type == typeof(AgentShop) && fieldType == typeof(AgentShop.ShopItem*) && fieldInfo.Name == nameof(AgentShop.ItemRetainerBuyback))
+            {
+                DrawFieldName(fieldInfo);
+                DrawArray(((AgentShop*)address)->ItemRetainerBuybackSpan, fieldNodeOptions);
+                continue;
+            }
+
             // ByteColor.RGBA
             if (type == typeof(ByteColor) && fieldType == typeof(uint) && fieldInfo.Name == nameof(ByteColor.RGBA))
             {
