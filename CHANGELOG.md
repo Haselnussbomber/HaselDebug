@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** An Exd Module tab for checking out sheets in ExdModule.
+- **Updated:** Private fields are now displayed with a dimmed green color.
+- **Updated:** The following types now have special handling:
+  - `ExcelSheet.ColumnDefinitions` is now drawn as array.
+  - `FileAccessPath` is now drawn as string.
+  - The TreeNode of a `Math.Size` now shows the dimensions.
+  - ILayoutInstances with type `InstanceType.EnvLocation` are now drawn resolved as `EnvLocationLayoutInstance`.
+- **Updated:** May have improved performance by using `Attribute.IsDefined` more.
+- **Fixed:** `AgentInterface` can no longer be pinned by accident.
+- **Updated:** ClientStructs now at [9f95801b](https://github.com/aers/FFXIVClientStructs/tree/9f95801b) ([compare](https://github.com/aers/FFXIVClientStructs/compare/1c23f405..9f95801b)).
+
 ## [1.58.2] (2026-05-19)
 
 - **Updated:** Clicking on the set name in the Outfits tab now previews the full set.
