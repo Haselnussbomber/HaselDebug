@@ -41,6 +41,10 @@ public static unsafe class TypeResolver
                     type = typeof(MapRangeLayoutInstance);
                     break;
 
+                case InstanceType.EnvLocation:
+                    type = typeof(EnvLocationLayoutInstance);
+                    break;
+
                 case InstanceType.Timeline:
                     type = typeof(TimeLineLayoutInstance);
                     break;
