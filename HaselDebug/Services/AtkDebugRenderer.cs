@@ -148,7 +148,10 @@ public unsafe partial class AtkDebugRenderer
 
         // Callback
         var atkModule = RaptureAtkModule.Instance();
-        if (atkModule->AddonCallbackMapping.TryGetValue(unitBase->Id, out var addonCallbackEntry, false))
+        var callbackAddonId = unitBase->ParentId;
+        if (callbackAddonId == 0)
+            callbackAddonId = unitBase->Id;
+        if (atkModule->AddonCallbackMapping.TryGetValue(callbackAddonId, out var addonCallbackEntry, false))
         {
             var agentFound = false;
 
