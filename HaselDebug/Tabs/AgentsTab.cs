@@ -121,14 +121,14 @@ public unsafe partial class AgentsTab : DebugTab
 
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = !isPinned,
+                    Visible = !isPinned && agentType != typeof(AgentInterface),
                     Label = _textService.Translate("ContextMenu.PinnedInstances.Pin"),
                     ClickCallback = () => _pinnedInstances.Add(agentType)
                 });
 
                 builder.Add(new ImGuiContextMenuEntry()
                 {
-                    Visible = isPinned,
+                    Visible = isPinned && agentType != typeof(AgentInterface),
                     Label = _textService.Translate("ContextMenu.PinnedInstances.Unpin"),
                     ClickCallback = () => _pinnedInstances.Remove(agentType)
                 });
