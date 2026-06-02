@@ -53,7 +53,7 @@ public unsafe partial class DebugRenderer
                 ImGui.Text(value->ToString());
                 break;
             case AtkValueType.String:
-            case AtkValueType.String8:
+            case AtkValueType.ConstString:
             case AtkValueType.ManagedString:
                 DrawSeString(value->String, nodeOptions);
                 break;

@@ -11,6 +11,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
 using InstanceContentType = FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.InstanceContentType;
+using DrawObjectType = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.ObjectType;
 
 namespace HaselDebug.Utils;
 
@@ -99,15 +100,15 @@ public static unsafe class TypeResolver
         {
             switch (((DrawObject*)address)->GetObjectType())
             {
-                case ObjectType.Terrain:
+                case DrawObjectType.Terrain:
                     type = typeof(Terrain);
                     break;
 
-                case ObjectType.BgObject:
+                case DrawObjectType.BgObject:
                     type = typeof(BgObject);
                     break;
 
-                case ObjectType.CharacterBase:
+                case DrawObjectType.CharacterBase:
                     type = typeof(CharacterBase);
                     switch (((CharacterBase*)address)->GetModelType())
                     {
@@ -126,29 +127,29 @@ public static unsafe class TypeResolver
                     }
                     break;
 
-                case ObjectType.VfxObject:
+                case DrawObjectType.VfxObject:
                     type = typeof(VfxObject);
                     break;
 
-                case ObjectType.Light:
+                case DrawObjectType.Light:
                     type = typeof(Light);
                     break;
 
                 // UnkType6
 
-                case ObjectType.EnvSpace:
+                case DrawObjectType.EnvSpace:
                     type = typeof(EnvSpace);
                     break;
 
-                case ObjectType.EnvLocation:
+                case DrawObjectType.EnvLocation:
                     type = typeof(EnvLocation);
                     break;
 
-                case ObjectType.Decal:
+                case DrawObjectType.Decal:
                     type = typeof(Decal);
                     break;
 
-                case ObjectType.UnkType10:
+                case DrawObjectType.UnkType10:
                     type = typeof(DrawObject);
                     break;
             }
