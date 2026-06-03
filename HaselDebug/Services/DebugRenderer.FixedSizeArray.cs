@@ -33,7 +33,10 @@ public unsafe partial class DebugRenderer
             }
             else
             {
-                var span = new ReadOnlySpan<byte>((void*)address, elementCount);
+                var rawSpan = new ReadOnlySpan<byte>((void*)address, elementCount);
+                var ntPos = rawSpan.IndexOf((byte)0);
+                var length = ntPos >= 0 ? ntPos : elementCount;
+                var span = rawSpan[..length];
                 DrawSeString((ReadOnlySeStringSpan)span, nodeOptions);
             }
 
