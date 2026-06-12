@@ -33,7 +33,8 @@ public unsafe partial class DebugRenderer
         { typeof(FFXIVClientStructs.FFXIV.Client.UI.Agent.MapMarkerBase), ["Subtext"] },
         { typeof(FFXIVClientStructs.FFXIV.Common.Component.Excel.ExcelSheet), ["SheetName"] },
         { typeof(WorldHelper.World), ["Name"] },
-        { typeof(AtkTextNode), ["OriginalTextPointer"] }
+        { typeof(AtkTextNode), ["OriginalTextPointer"] },
+        { typeof(RaptureAtkModule.NamePlateInfo), ["NameOverride"] }
     };
 
     private readonly ILogger<DebugRenderer> _logger;
