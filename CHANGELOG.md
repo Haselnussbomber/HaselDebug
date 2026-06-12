@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.59.3] (2026-06-02)
+
+Update for Patch 7.51 HotFix.
+
+- **Added:** Actor Cast Packet Log tab to inspect data from that packet.
+- **Updated:** Added `RaptureAtkModule.NamePlateInfo.NameOverride` as known string pointer.
+- **Fixed:** FixedSizeArray strings were not reading until null terminator withing the array length.
+- **Updated:** ClientStructs now at [bad8d3f2](https://github.com/aers/FFXIVClientStructs/tree/bad8d3f2) ([compare](https://github.com/aers/FFXIVClientStructs/compare/5deef083..bad8d3f2)).
+
 ## [1.59.2] (2026-06-02)
 
 Update for Patch 7.51.
