@@ -702,7 +702,7 @@ public unsafe partial class UnlocksTabUtils
                 2 when playerState->IsLoaded => playerState->GrandCompany - 1,
                 _ => 0,
             };
-            var iconOffset = new int[] { 0, 3000, 6000 }[iconOffsetType];
+            var iconOffset = iconOffsetType * 3000;
             var iconId = page.Value.Image + iconOffset;
 
             var textIndex = page.Value.TextType switch
