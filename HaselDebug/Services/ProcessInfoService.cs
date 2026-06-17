@@ -70,9 +70,11 @@ public unsafe partial class ProcessInfoService : IDisposable
     public void Dispose()
     {
         _cts.Cancel();
-
+        
         if (_workerThread.IsAlive)
-            _workerThread.Join(500);
+            _workerThread.Join();
+
+        _cts.Dispose();
     }
 
     private void WorkerLoop()
@@ -109,7 +111,7 @@ public unsafe partial class ProcessInfoService : IDisposable
                 }
             }
 
-            Thread.Sleep(1000);
+            _cts.Token.WaitHandle.WaitOne(1000);
         }
     }
 
@@ -147,7 +149,7 @@ public unsafe partial class ProcessInfoService : IDisposable
         return index < 0 ? default : Sections[index];
     }
 
-    private static int FillModules(ref ModuleInfo[] buffer)
+    private int FillModules(ref ModuleInfo[] buffer)
     {
         var snapshot = PInvoke.CreateToolhelp32Snapshot(CREATE_TOOLHELP_SNAPSHOT_FLAGS.TH32CS_SNAPMODULE | CREATE_TOOLHELP_SNAPSHOT_FLAGS.TH32CS_SNAPMODULE32, 0);
         if (snapshot.IsNull)
@@ -166,6 +168,9 @@ public unsafe partial class ProcessInfoService : IDisposable
             {
                 do
                 {
+                    if (_cts.Token.IsCancellationRequested)
+                        return 0;
+
                     if (count >= buffer.Length)
                         Array.Resize(ref buffer, buffer.Length * 2);
 
@@ -195,6 +200,9 @@ public unsafe partial class ProcessInfoService : IDisposable
 
         while (PInvoke.VirtualQuery((void*)address, out var memory) != 0)
         {
+            if (_cts.Token.IsCancellationRequested)
+                return 0;
+
             if (memory.State == VIRTUAL_ALLOCATION_TYPE.MEM_COMMIT)
             {
                 if (count >= buffer.Length)
@@ -218,7 +226,12 @@ public unsafe partial class ProcessInfoService : IDisposable
 
         var activeSections = new Span<SectionInfo>(buffer, 0, count);
         for (var i = 0; i < modCount; i++)
+        {
+            if (_cts.Token.IsCancellationRequested)
+                return 0;
+
             ParseModuleSections(modules[i], activeSections);
+        }
 
         return count;
     }
@@ -261,6 +274,9 @@ public unsafe partial class ProcessInfoService : IDisposable
 
         for (var i = 0; i < sectionCount; i++)
         {
+            if (_cts.Token.IsCancellationRequested)
+                return;
+
             var sectionAddr = module.BaseAddress + (nint)sectionHeaders[i].VirtualAddress;
             var idx = BinarySearchMemoryRegion(sections, sectionAddr);
             if (idx >= 0)
@@ -275,13 +291,16 @@ public unsafe partial class ProcessInfoService : IDisposable
         }
     }
 
-    private static int BinarySearchMemoryRegion<T>(ReadOnlySpan<T> regions, nint address) where T : IMemoryRegion
+    private int BinarySearchMemoryRegion<T>(ReadOnlySpan<T> regions, nint address) where T : IMemoryRegion
     {
         var low = 0;
         var high = regions.Length - 1;
 
         while (low <= high)
         {
+            if (_cts.Token.IsCancellationRequested)
+                return 0;
+
             var mid = low + ((high - low) >> 1);
             ref readonly var midRegion = ref regions[mid];
 
