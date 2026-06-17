@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.59.4] (2026-06-17)
+
+- **Updated:** ProcessInfoService is now disposing faster.
+- **Updated:** ClientStructs now at [04d9d3df](https://github.com/aers/FFXIVClientStructs/tree/04d9d3df) ([compare](https://github.com/aers/FFXIVClientStructs/compare/bad8d3f2..04d9d3df)).
+
 ## [1.59.3] (2026-06-02)
 
 Update for Patch 7.51 HotFix.
@@ -942,7 +947,9 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.59.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.59.4...main
+[1.59.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.59.3...v1.59.4
+[1.59.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.59.2...v1.59.3
 [1.59.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.59.1...v1.59.2
 [1.59.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.59.0...v1.59.1
 [1.59.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.58.2...v1.59.0
