@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [504a2b46](https://github.com/aers/FFXIVClientStructs/tree/504a2b46) ([compare](https://github.com/aers/FFXIVClientStructs/compare/04d9d3df..504a2b46)).
+
 ## [1.59.4] (2026-06-17)
 
 - **Updated:** ProcessInfoService is now disposing faster.
