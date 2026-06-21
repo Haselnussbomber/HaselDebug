@@ -84,15 +84,11 @@ public partial class OutfitsTable : Table<MirageStoreSetItem>, IDisposable
         Rows.Sort((a, b) => a.Set.RowId.CompareTo(b.Set.RowId));
     }
 
-    public static void DrawCollectedCheckmark(ITextureProvider textureProvider)
+    public static void DrawCollectedCheckmark(UldService uldService)
     {
         ImGui.SameLine(0, 0);
-        ImCursor.X -= IconSize * ImStyle.Scale;
-        if (textureProvider.GetFromGame("ui/uld/RecipeNoteBook_hr1.tex").TryGetWrap(out var tex, out _))
-        {
-            var pos = ImCursor.ScreenPosition + ImGuiHelpers.ScaledVector2(IconSize / 2.5f + 4);
-            ImGui.GetWindowDrawList().AddImage(tex.Handle, pos, pos + ImGuiHelpers.ScaledVector2(IconSize) / 1.5f, new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
-        }
+        ImCursor.Position += ImGuiHelpers.ScaledVector2(IconSize / 2.5f + 4) - ImGuiHelpers.ScaledVector2(IconSize).XOnly();
+        uldService.DrawPart("RecipeNoteBook", 25, 12, new DrawInfo(ImGuiHelpers.ScaledVector2(IconSize) / 1.5f) { DrawList = ImGui.GetWindowDrawList() });
     }
 
     public bool IsSetCollected(MirageStoreSetItem row)

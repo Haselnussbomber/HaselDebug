@@ -13,6 +13,7 @@ public unsafe partial class SetColumn : ColumnString<MirageStoreSetItem>
     private readonly MirageService _mirageService;
     private readonly CabinetService _cabinetService;
     private readonly ITextureProvider _textureProvider;
+    private readonly UldService _uldService;
 
     public OutfitsTable Table;
 
@@ -58,7 +59,7 @@ public unsafe partial class SetColumn : ColumnString<MirageStoreSetItem>
         }
 
         if (isSetCollected)
-            OutfitsTable.DrawCollectedCheckmark(_textureProvider);
+            OutfitsTable.DrawCollectedCheckmark(_uldService);
 
         ImGui.SameLine();
         if (ImGui.Selectable($"###SetName_{row.RowId}", false, ImGuiSelectableFlags.None, new Vector2(ImStyle.ContentRegionAvail.X, IconSize * ImStyle.Scale)))
