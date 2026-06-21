@@ -8,6 +8,8 @@
     <RepoUrl>https://github.com/Haselnussbomber/HaselDebug</RepoUrl>
     <Punchline>Various tools to debug things.</Punchline>
     <Description>For developers.</Description>
+    <LoadRequiredState>1</LoadRequiredState>
+    <CanUnloadAsync>true</CanUnloadAsync>
   </PropertyGroup>
 
   <!-- Build settings -->
