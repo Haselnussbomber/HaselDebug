@@ -16,7 +16,7 @@ public partial class PluginConfig : IPluginConfiguration
     public int LastSavedConfigHash { get; set; }
 
     [JsonIgnore]
-    public static JsonSerializerOptions? SerializerOptions { get; } = new JsonSerializerOptions()
+    public static JsonSerializerOptions? SerializerOptions { get; } = new()
     {
         IncludeFields = true,
         WriteIndented = true,
@@ -28,10 +28,10 @@ public partial class PluginConfig : IPluginConfiguration
     [JsonIgnore]
     private static IPluginLog? PluginLog;
 
-    public static PluginConfig Load(IServiceProvider serviceProvider)
+    public static PluginConfig Load(IDalamudPluginInterface pluginInterface, IPluginLog pluginLog)
     {
-        PluginInterface = serviceProvider.GetRequiredService<IDalamudPluginInterface>();
-        PluginLog = serviceProvider.GetRequiredService<IPluginLog>();
+        PluginInterface = pluginInterface;
+        PluginLog = pluginLog;
 
         var fileInfo = PluginInterface.ConfigFile;
         if (!fileInfo.Exists || fileInfo.Length < 2)
@@ -50,7 +50,7 @@ public partial class PluginConfig : IPluginConfiguration
         try
         {
             var serialized = JsonSerializer.Serialize(this, SerializerOptions);
-            var hash = serialized.GetHashCode(StringComparison.Ordinal);
+            var hash = StringComparer.Ordinal.GetHashCode(serialized);
 
             if (LastSavedConfigHash != hash)
             {
@@ -78,4 +78,12 @@ public partial class PluginConfig
     public string LastSelectedTab = "";
     public string[] PinnedInstances = [];
     public bool Excel2Tab_ShowRawSheets = false;
+}
+
+public static class PluginConfigExtension
+{
+    public static void AddConfig(this IServiceCollection services, PluginConfig pluginConfig)
+    {
+        services.AddSingleton(pluginConfig);
+    }
 }
