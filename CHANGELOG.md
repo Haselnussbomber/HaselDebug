@@ -2,7 +2,9 @@
 
 ## [Unreleased]
 
-- **Updated:** ClientStructs now at [4f91a220](https://github.com/aers/FFXIVClientStructs/tree/4f91a220) ([compare](https://github.com/aers/FFXIVClientStructs/compare/04d9d3df..4f91a220)).
+- **Updated:** ILayoutInstances with type `InstanceType.ExitRange` are now drawn resolved as `ExitRangeLayoutInstance`.
+- **Updated:** ILayoutInstances with type `InstanceType.LineVfx` are now drawn resolved as `LineVfxLayoutInstance`.
+- **Updated:** ClientStructs now at [31ad34f8](https://github.com/aers/FFXIVClientStructs/tree/31ad34f8) ([compare](https://github.com/aers/FFXIVClientStructs/compare/04d9d3df..31ad34f8)).
 
 ## [1.59.4] (2026-06-17)
 

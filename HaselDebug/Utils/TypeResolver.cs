@@ -38,6 +38,10 @@ public static unsafe class TypeResolver
                     type = typeof(SoundLayoutInstance);
                     break;
 
+                case InstanceType.ExitRange:
+                    type = typeof(ExitRangeLayoutInstance);
+                    break;
+
                 case InstanceType.MapRange:
                     type = typeof(MapRangeLayoutInstance);
                     break;
@@ -56,6 +60,10 @@ public static unsafe class TypeResolver
 
                 case InstanceType.DoorRange:
                     type = typeof(DoorRangeLayoutInstance);
+                    break;
+
+                case InstanceType.LineVfx:
+                    type = typeof(LineVfxLayoutInstance);
                     break;
             }
         }
