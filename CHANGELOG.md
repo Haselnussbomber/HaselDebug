@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.60.1] (2026-06-23)
+
+- **Updated:** ILayoutInstances with type `InstanceType.PrefetchRange` are now drawn resolved as `PrefetchRangeLayoutInstance`. I forgot.
+
 ## [1.60.0] (2026-06-23)
 
 Update for Patch 7.51 HotFix 2.
@@ -957,7 +961,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.1...main
+[1.60.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.0...v1.60.1
 [1.60.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.59.4...v1.60.0
 [1.59.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.59.3...v1.59.4
 [1.59.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.59.2...v1.59.3
