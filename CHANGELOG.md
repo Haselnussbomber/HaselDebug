@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+Update for Patch 7.51 HotFix 2.
+
 - **Updated:** ILayoutInstances with type `InstanceType.ExitRange` are now drawn resolved as `ExitRangeLayoutInstance`.
 - **Updated:** ILayoutInstances with type `InstanceType.LineVfx` are now drawn resolved as `LineVfxLayoutInstance`.
-- **Updated:** ClientStructs now at [31ad34f8](https://github.com/aers/FFXIVClientStructs/tree/31ad34f8) ([compare](https://github.com/aers/FFXIVClientStructs/compare/04d9d3df..31ad34f8)).
+- **Updated:** ClientStructs now at [bd339349](https://github.com/aers/FFXIVClientStructs/tree/bd339349) ([compare](https://github.com/aers/FFXIVClientStructs/compare/04d9d3df..bd339349)).
 
 ## [1.59.4] (2026-06-17)
 
