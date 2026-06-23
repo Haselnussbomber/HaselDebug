@@ -65,6 +65,10 @@ public static unsafe class TypeResolver
                 case InstanceType.LineVfx:
                     type = typeof(LineVfxLayoutInstance);
                     break;
+
+                case InstanceType.PrefetchRange:
+                    type = typeof(PrefetchRangeLayoutInstance);
+                    break;
             }
         }
         else if (Inherits<GameObject>(type))
