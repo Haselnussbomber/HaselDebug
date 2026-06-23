@@ -4,7 +4,8 @@
 
 Update for Patch 7.51 HotFix 2.
 
-- **Updated:** Added new known string pointer `WarpInfo.TerritoryTypeBg`.
+- **Added:** A new Prepare Zoning Log tab.
+- **Added:** A new known string pointer `WarpInfo.TerritoryTypeBg`.
 - **Updated:** ILayoutInstances with type `InstanceType.ExitRange` are now drawn resolved as `ExitRangeLayoutInstance`.
 - **Updated:** ILayoutInstances with type `InstanceType.LineVfx` are now drawn resolved as `LineVfxLayoutInstance`.
 - **Updated:** ClientStructs now at [bd339349](https://github.com/aers/FFXIVClientStructs/tree/bd339349) ([compare](https://github.com/aers/FFXIVClientStructs/compare/04d9d3df..bd339349)).
