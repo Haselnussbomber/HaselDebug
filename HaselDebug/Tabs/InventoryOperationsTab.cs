@@ -68,7 +68,7 @@ public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
     [AutoPostConstruct]
     private void Initialize()
     {
-        _typeBase = *(int*)(_sigScanner.ScanText("81 F9 ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? 8B 4B") + 2) - 7;
+        _typeBase = *(int*)(_sigScanner.ScanText("83 F9 ?? 0F 85 ?? ?? ?? ?? 8B 4B") + 2) - 7;
     }
 
     public void Dispose()
