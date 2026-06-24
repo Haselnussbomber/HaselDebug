@@ -140,7 +140,7 @@ public unsafe partial class AddressInspectorTab : DebugTab
             vtablePtr = originalAddress;
         if (_processInfoService.IsPointerValid(vtablePtr))
         {
-            foreach (var (name, cl) in _dataYml.Data.Classes)
+            foreach (var cl in _dataYml.Classes)
             {
                 if (cl == null || cl.VirtualTables == null || cl.VirtualTables.Count == 0)
                     continue;
@@ -148,15 +148,15 @@ public unsafe partial class AddressInspectorTab : DebugTab
                 if (cl.VirtualTables[0].Address != vtablePtr - _sigScanner.Module.BaseAddress)
                     continue;
 
-                _logger.LogDebug("Found struct {name} vtbl at {add:X}", name, vtablePtr);
+                _logger.LogDebug("Found struct {name} vtbl at {add:X}", cl.Name, vtablePtr);
 
-                var csType = GetCSTypeByName(name);
+                var csType = GetCSTypeByName(cl.Name);
 
                 _currentStructInfo = new OffsetInfo()
                 {
                     Address = _memoryAddress,
                     ResolvedAddress = vtablePtr,
-                    ClassName = name,
+                    ClassName = cl.Name,
                     Type = csType,
                 };
 
@@ -205,7 +205,7 @@ public unsafe partial class AddressInspectorTab : DebugTab
 
             if (!foundInFields)
             {
-                foreach (var (name, cl) in _dataYml.Data.Classes)
+                foreach (var cl in _dataYml.Classes)
                 {
                     if (cl == null || cl.VirtualTables == null || cl.VirtualTables.Count == 0)
                         continue;
@@ -213,9 +213,9 @@ public unsafe partial class AddressInspectorTab : DebugTab
                     if (cl.VirtualTables[0].Address != virtualTablePointer - _sigScanner.Module.BaseAddress)
                         continue;
 
-                    _logger.LogDebug("Found {name} vtbl at {add:X}", name, virtualTablePointer);
-                    offsetInfo.ClassName = name;
-                    offsetInfo.Type = GetCSTypeByName(name)?.MakePointerType();
+                    _logger.LogDebug("Found {name} vtbl at {add:X}", cl.Name, virtualTablePointer);
+                    offsetInfo.ClassName = cl.Name;
+                    offsetInfo.Type = GetCSTypeByName(cl.Name)?.MakePointerType();
                     foundInDataYml = true;
                     break;
                 }

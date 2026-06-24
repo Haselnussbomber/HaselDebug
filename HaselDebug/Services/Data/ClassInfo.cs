@@ -21,6 +21,7 @@ public partial class ClassInfo
     public nint Offset { get; set; }
     public ClassInfo? ParentClass { get; set; }
     public Dictionary<nint, string> Functions { get; } = [];
+    public List<XivVTable> VirtualTables { get; } = [];
     public Dictionary<int, string> VirtualFunctions { get; } = [];
     public Dictionary<nint, string> Instances { get; } = [];
 
@@ -74,6 +75,18 @@ public partial class ClassInfo
                 if (string.IsNullOrWhiteSpace(vf.Value))
                     continue;
                 VirtualFunctions[vf.Key] = vf.Value;
+            }
+        }
+        catch (NullReferenceException)
+        {
+            /* ignored, can happen with incomplete defs after patch */
+        }
+
+        try
+        {
+            if (xivClass.VirtualTables != null)
+            {
+                VirtualTables.AddRange(xivClass.VirtualTables);
             }
         }
         catch (NullReferenceException)

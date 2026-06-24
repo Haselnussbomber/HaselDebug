@@ -18,7 +18,6 @@ public partial class DataYmlService
     private readonly IFramework _framework;
     private readonly PluginAssemblyProvider _assemblyProvider;
 
-    public ClientStructsData Data { get; set; } = new();
     public List<ClassInfo> Classes { get; } = [];
     public Dictionary<nint, ClassInfo> ClassMap { get; } = [];
     public Dictionary<nint, string> FunctionNames { get; } = [];
@@ -47,9 +46,11 @@ public partial class DataYmlService
 
         _logger.LogDebug("Loading...");
 
+        ClientStructsData data;
+
         try
         {
-            Data = new DeserializerBuilder()
+            data = new DeserializerBuilder()
                 .WithNodeDeserializer(new AddressDeserializer())
                 .Build()
                 .Deserialize<ClientStructsData>(reader);
@@ -57,19 +58,20 @@ public partial class DataYmlService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while deserializing data.yml");
+            return;
         }
 
-        UpdateClasses();
-        UpdateFunctionNames();
+        UpdateClasses(data);
+        UpdateFunctionNames(data);
 
-        _logger.LogDebug("Loaded {num} classes", Data.Classes.Count);
+        _logger.LogDebug("Loaded {num} classes", data.Classes.Count);
 
         _ = _framework.RunOnFrameworkThread(() => Loaded?.Invoke());
     }
 
-    private void UpdateFunctionNames()
+    private void UpdateFunctionNames(ClientStructsData data)
     {
-        foreach (var func in Data.Functions)
+        foreach (var func in data.Functions)
         {
             FunctionNames.TryAdd(func.Key, func.Value);
         }
@@ -83,9 +85,9 @@ public partial class DataYmlService
         }
     }
 
-    private void UpdateClasses()
+    private void UpdateClasses(ClientStructsData data)
     {
-        foreach (var kv in Data.Classes)
+        foreach (var kv in data.Classes)
         {
             try
             {
@@ -93,7 +95,7 @@ public partial class DataYmlService
                 {
                     foreach (var vTable in kv.Value.VirtualTables)
                     {
-                        var vtInfo = new ClassInfo(Data, kv.Key, kv.Value, vTable);
+                        var vtInfo = new ClassInfo(data, kv.Key, kv.Value, vTable);
                         Classes.Add(vtInfo);
                         if (vtInfo.Offset != 0)
                             ClassMap[vtInfo.Offset] = vtInfo;
@@ -101,7 +103,7 @@ public partial class DataYmlService
                 }
                 else
                 {
-                    var info = new ClassInfo(Data, kv.Key, kv.Value, null);
+                    var info = new ClassInfo(data, kv.Key, kv.Value, null);
                     Classes.Add(info);
                     if (info.Offset == 0) continue;
                     ClassMap[info.Offset] = info;
