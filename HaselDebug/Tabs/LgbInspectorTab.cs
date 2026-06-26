@@ -12,26 +12,48 @@ public unsafe partial class LgbInspectorTab : DebugTab
     private readonly IGameGui _gameGui;
     private readonly DebugRenderer _debugRenderer;
 
+    [StructLayout(LayoutKind.Explicit)]
+    private struct LayoutWorldStub
+    {
+        [FieldOffset(0x28)] public LayoutManager* UnkLayout28;
+    }
+
     public override void Draw()
     {
-        var activeLayout = LayoutWorld.Instance()->ActiveLayout;
-        if (activeLayout == null)
+        using var tabBar = ImRaii.TabBar("LgbInspectorTabBar");
+        if (!tabBar) return;
+
+        var layoutWorld = LayoutWorld.Instance();
+
+        DrawTab("Active", layoutWorld->ActiveLayout);
+        DrawTab("Global", layoutWorld->GlobalLayout);
+        DrawTab("Unk28", ((LayoutWorldStub*)layoutWorld)->UnkLayout28);
+        DrawTab("Prefetch", layoutWorld->PrefetchLayout);
+    }
+
+    private void DrawTab(string label, LayoutManager* layout)
+    {
+        using var disabledTab = ImRaii.Disabled(layout == null);
+        using var tab = ImRaii.TabItem(label);
+        if (!tab) return;
+
+        if (layout == null)
         {
-            ImGui.Text("No ActiveLayout"u8);
+            ImGui.Text("null"u8);
             return;
         }
 
-        if (activeLayout->InitState != 7)
+        if (layout->InitState != 7)
         {
-            ImGui.Text($"InitState: {activeLayout->InitState}");
+            ImGui.Text($"InitState: {layout->InitState}");
             return;
         }
 
-        using (var stringsTreeNode = ImRaii.TreeNode("ResourcePaths", ImGuiTreeNodeFlags.SpanAvailWidth))
+        using (var stringsTreeNode = ImRaii.TreeNode($"ResourcePaths ({layout->ResourcePaths.Strings.Count})", ImGuiTreeNodeFlags.SpanAvailWidth))
         {
             if (stringsTreeNode)
             {
-                foreach (var str in activeLayout->ResourcePaths.Strings)
+                foreach (var str in layout->ResourcePaths.Strings)
                 {
                     ImGuiUtils.DrawCopyableText(str.Value->DataString);
                 }
@@ -40,7 +62,7 @@ public unsafe partial class LgbInspectorTab : DebugTab
 
         ImGui.Separator();
 
-        foreach (var (type, instances) in activeLayout->InstancesByType)
+        foreach (var (type, instances) in layout->InstancesByType)
         {
             using var treeNode = ImRaii.TreeNode($"{type} ({instances.Value->Count})###" + type.ToString(), ImGuiTreeNodeFlags.SpanAvailWidth);
             if (!treeNode)
@@ -48,11 +70,11 @@ public unsafe partial class LgbInspectorTab : DebugTab
 
             foreach (var (id, instance) in *instances.Value)
             {
-                using var disabled = ImRaii.Disabled(!instance.Value->IsActive);
+                var title = $"[{instance.Value->Id.Type}] InstanceKey: {instance.Value->Id.InstanceKey} | LayerKey: {instance.Value->Id.LayerKey} | u0: {instance.Value->Id.u0} | SubId: 0x{instance.Value->SubId:X}";
 
-                var title = $"[{instance.Value->Id.Type}] InstanceKey: {instance.Value->Id.InstanceKey} | LayerKey: {instance.Value->Id.LayerKey}";
-
+                using var col = Color.From(ImGuiCol.TextDisabled).Push(ImGuiCol.Text);
                 using var innerTreeNode = ImRaii.TreeNode(title, ImGuiTreeNodeFlags.SpanAvailWidth);
+                col.Dispose();
 
                 if (ImGui.IsItemHovered())
                 {
