@@ -1,11 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [1.61.0] (2026-06-26)
 
 - **Added:** Event Complete Log tab to inspect data passed to the `PacketDispatcher.SendEventCompletePacket` function.
 - **Updated:** Lgb Inspector: Reworked to show all layouts in their own tab (Global, Active, Unk28, Prefetch).
 - **Fixed:** Lgb Inspector: Non-active instances are now expandable.
 - **Fixed:** Lgb Inspector: Instances with the same InstanceKey and LayerKey are now expandable. For that u0 and SubId were added to the TreeNodes label.
+- **Updated:** ClientStructs now at [b81ab14d](https://github.com/aers/FFXIVClientStructs/tree/b81ab14d) ([compare](https://github.com/aers/FFXIVClientStructs/compare/bd339349..b81ab14d)).
 
 ## [1.60.3] (2026-06-23)
 
@@ -976,7 +977,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.3...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.61.0...main
+[1.61.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.3...v1.61.0
 [1.60.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.2...v1.60.3
 [1.60.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.1...v1.60.2
 [1.60.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.0...v1.60.1
