@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** Lgb Inspector: Reworked to show all layouts in their own tab (Global, Active, Unk28, Prefetch).
+- **Fixed:** Lgb Inspector: Non-active instances are now expandable.
+- **Fixed:** Lgb Inspector: Instances with the same InstanceKey and LayerKey are now expandable. For that u0 and SubId were added to the TreeNodes label.
+
 ## [1.60.3] (2026-06-23)
 
 - **Fixed:** The TypeBase type was incorrect now. I'm not paying enough attention.
