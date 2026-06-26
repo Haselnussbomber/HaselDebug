@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- **Added:** Event Complete Log tab to inspect data passed to the `PacketDispatcher.SendEventCompletePacket` function.
 - **Updated:** Lgb Inspector: Reworked to show all layouts in their own tab (Global, Active, Unk28, Prefetch).
 - **Fixed:** Lgb Inspector: Non-active instances are now expandable.
 - **Fixed:** Lgb Inspector: Instances with the same InstanceKey and LayerKey are now expandable. For that u0 and SubId were added to the TreeNodes label.
