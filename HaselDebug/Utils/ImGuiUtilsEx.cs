@@ -66,7 +66,7 @@ public static unsafe class ImGuiUtilsEx
         return false;
     }
 
-    private static string GetPartLabel(in AtkUldPart part)
+    private static string GetPartLabel(AtkUldPart part)
     {
         var texPath = part.UldAsset->AtkTexture.TextureType switch
         {
