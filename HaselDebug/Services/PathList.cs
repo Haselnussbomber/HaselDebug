@@ -17,12 +17,15 @@ public partial class PathList : IDisposable
     private readonly IDataManager _dataManager;
 
     private readonly HttpClient _httpClient = new();
+    private readonly Dictionary<SqHash, SqNode> _nodes = [];
+    private List<SqNode> _sortedNodes = [];
 
     public bool IsCached { get; private set; } = File.Exists(PathListCachePath);
     public PathListStatus Status { get; private set { field = value; StatusChange?.Invoke(value); } } = PathListStatus.NotLoaded;
     public double LoadProgress { get; private set; }
 
-    public Dictionary<SqHash, SqNode> Nodes { get; init; } = [];
+    public IReadOnlyDictionary<SqHash, SqNode> Nodes => _nodes;
+    public IReadOnlyList<SqNode> SortedNodes => _sortedNodes;
 
     public event Action<PathListStatus>? StatusChange;
 
@@ -33,7 +36,8 @@ public partial class PathList : IDisposable
 
     private void Clear()
     {
-        Nodes.Clear();
+        _nodes.Clear();
+        _sortedNodes.Clear();
         LoadProgress = 0;
         Status = PathListStatus.NotLoaded;
     }
@@ -98,7 +102,7 @@ public partial class PathList : IDisposable
         var totalBytes = stream.Length;
         var linesRead = 0;
 
-        Nodes.EnsureCapacity(FileUtils.CountLines(PathListCachePath));
+        _nodes.EnsureCapacity(FileUtils.CountLines(PathListCachePath));
 
         reader.ReadNextRow(); // skip header
 
@@ -124,7 +128,7 @@ public partial class PathList : IDisposable
 
             var node = new SqNode(path, hash);
 
-            Nodes.TryAdd(hash, node);
+            _nodes.TryAdd(hash, node);
 
             if (++linesRead % 10000 == 0 && totalBytes > 0)
                 LoadProgress = Math.Min((double)stream.Position / totalBytes, 100);
@@ -146,9 +150,14 @@ public partial class PathList : IDisposable
 
                 var node = new SqNode($"~{indexEntry.FolderHash:X8}/~{indexEntry.FullHash:X8}", hash);
 
-                Nodes.TryAdd(hash, node);
+                _nodes.TryAdd(hash, node);
             }
         }
+
+        _sortedNodes = _nodes.Values
+            .AsParallel()
+            .OrderBy(node => node.Path, StringComparer.Ordinal)
+            .ToList();
 
         Status = PathListStatus.Loaded;
 

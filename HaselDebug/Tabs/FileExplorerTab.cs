@@ -15,7 +15,7 @@ public partial class FileExplorerTab : DebugTab, IDisposable
     private readonly IFramework _framework;
 
     private string _filterTerm = string.Empty;
-    private List<SqNode>? _filteredNodes;
+    private IReadOnlyList<SqNode>? _filteredNodes;
     private Debouncer _filterDebouncer;
     private CancellationTokenSource? _filterCts;
     private Task? _filterTask;
@@ -142,21 +142,15 @@ public partial class FileExplorerTab : DebugTab, IDisposable
 
         if (string.IsNullOrEmpty(filterTerm))
         {
-            _filteredNodes = _pathList.Nodes.Values
-                .AsParallel()
-            .WithCancellation(_filterCts!.Token)
-                .OrderBy(n => n.Path, StringComparer.Ordinal)
-                .ToList();
-
+            _filteredNodes = _pathList.SortedNodes;
             _filterTask = null;
             return;
         }
 
-        _filteredNodes = _pathList.Nodes.Values
+        _filteredNodes = _pathList.SortedNodes
             .AsParallel()
             .WithCancellation(_filterCts!.Token)
-            .Where(n => n.Path.Contains(filterTerm, StringComparison.OrdinalIgnoreCase))
-            .OrderBy(n => n.Path, StringComparer.Ordinal)
+            .Where(node => node.Path.Contains(filterTerm, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
         _filterTask = null;
