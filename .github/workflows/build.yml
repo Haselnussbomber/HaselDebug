@@ -31,32 +31,19 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+      is_release: ${{ startsWith(github.ref, 'refs/tags/v') && github.event_name != 'pull_request' }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
-          submodules: true
-
-      - uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
-
-      - name: Extract .NET SDK version from global.json
-        id: get_dotnet_version
-        run: |
-          deno run --allow-read --quiet --unstable - <<'EOF' >> "$GITHUB_OUTPUT"
-          import { parse } from "jsr:@std/jsonc";
-          const content = await Deno.readTextFile("global.json");
-          const json = parse(content);
-          console.log(`dotnet_version=${json.sdk.version}`);
-          EOF
+          submodules: recursive
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
           cache: true
           cache-dependency-path: ${{ env.plugin_name }}/packages.lock.json
-          dotnet-version: ${{ steps.get_dotnet_version.outputs.dotnet_version }}
+          global-json-file: global.json
 
       - name: Download Dalamud
         env:
@@ -70,48 +57,35 @@ jobs:
           mkdir -p ~/.xlcore/dalamud/Hooks/dev/
           unzip latest.zip -d ~/.xlcore/dalamud/Hooks/dev/
 
-      - name: Restore dependencies
-        run: dotnet restore --locked-mode
-
       - name: Build
-        run: dotnet build --no-restore -c Release -clp:NoSummary
+        run: |
+          dotnet restore --locked-mode
+          dotnet build --no-restore -c Release -clp:NoSummary
 
       - name: Rename manifest
         if: github.event_name != 'pull_request'
         run: mv bin/${{ env.plugin_name }}/${{ env.plugin_name }}.json bin/${{ env.plugin_name }}/manifest.json
 
       - name: Upload Build Artifact
-        if: github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           path: bin/${{ env.plugin_name }}/*
 
-  release:
-    name: Release
-    needs: build
-    if: success() && startsWith(github.ref, 'refs/tags/v') && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v7
-        with:
-          path: artifact
-
       - name: Extract release notes
+        if: success() && env.is_release == 'true'
         id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v3
 
       - name: Release
-        uses: softprops/action-gh-release@v2
+        if: success() && env.is_release == 'true'
+        uses: softprops/action-gh-release@v3
         with:
           name: ${{ env.plugin_name }} ${{ github.ref_name }}
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
-          files: artifact/*
+          files: bin/${{ env.plugin_name }}/*
 
       - name: Trigger Repo Update
+        if: success() && env.is_release == 'true'
         uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.PAT }}
