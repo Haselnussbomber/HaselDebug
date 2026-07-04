@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using HaselDebug.Models.SqPack;
 using HaselDebug.Utils.SqPack;
@@ -21,7 +22,7 @@ public partial class PathList : IDisposable
     private readonly Dictionary<string, SqNode> _paths = [];
     private readonly Dictionary<SqHash, SqNode> _nodes = [];
     private readonly Dictionary<SqFolderHash, HashSet<SqNode>> _folderContents = [];
-    private readonly object _processLock = new();
+    private readonly Lock _processLock = new();
 
     public bool IsCached { get; private set; }
     public PathListStatus Status { get; private set; }
@@ -52,7 +53,7 @@ public partial class PathList : IDisposable
                 await DownloadPathList();
             }
 
-            lock (_processLock)
+            using (_processLock.EnterScope())
             {
                 Clear();
 
@@ -74,7 +75,7 @@ public partial class PathList : IDisposable
 
     public IEnumerable<SqNode> GetNodesInFolder(SqFolderHash folderHash)
     {
-        lock (_processLock)
+        using (_processLock.EnterScope())
         {
             if (!_folderContents.TryGetValue(folderHash, out var nodes))
                 return [];
