@@ -1,3 +1,4 @@
+using System.Globalization;
 using Dalamud.Interface.Textures;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Services;
@@ -421,5 +422,64 @@ public static unsafe class ImGuiUtilsEx
     public static void DrawAlertError(string id, string text)
     {
         DrawAlert(id, text, 60074, Color.FromHSV(0, 1, 1));
+    }
+
+    // https://github.com/ocornut/imgui/commit/c895e987
+    // size_arg (for each axis) < 0.0f: align to end, 0.0f: auto, > 0.0f: specified size
+    public static void ProgressBar(float fraction, Vector2 size_arg, string? overlay = null)
+    {
+        var window = ImGuiP.GetCurrentWindow();
+        if (window.SkipItems)
+            return;
+
+        var g = ImGui.GetCurrentContext();
+        var style = g.Style;
+
+        var pos = window.DC.CursorPos;
+        var size = ImGuiP.CalcItemSize(size_arg, ImGui.CalcItemWidth(), g.FontSize + style.FramePadding.Y * 2.0f);
+        ImRect bb = new(pos, pos + size);
+        ImGuiP.ItemSize(size, style.FramePadding.Y);
+        if (!ImGuiP.ItemAdd(bb, 0))
+            return;
+
+        // Fraction < 0.0f will display an indeterminate progress bar animation
+        // The value must be animated along with time, so e.g. passing '-1.0f * ImGui::GetTime()' as fraction works.
+        var is_indeterminate = fraction < 0.0f;
+        if (!is_indeterminate)
+            fraction = ImGuiP.ImSaturate(fraction);
+
+        // Out of courtesy we accept a NaN fraction without crashing
+        var fill_n0 = 0.0f;
+        var fill_n1 = !float.IsNaN(fraction) ? fraction : 0.0f;
+
+        if (is_indeterminate)
+        {
+            const float fill_width_n = 0.2f;
+            fill_n0 = -fraction % 1.0f * (1.0f + fill_width_n) - fill_width_n;
+            fill_n1 = ImGuiP.ImSaturate(fill_n0 + fill_width_n);
+            fill_n0 = ImGuiP.ImSaturate(fill_n0);
+        }
+
+        // Render
+        ImGuiP.RenderFrame(bb.Min, bb.Max, ImGui.GetColorU32(ImGuiCol.FrameBg), true, style.FrameRounding);
+        bb.Expand(new Vector2(-style.FrameBorderSize, -style.FrameBorderSize));
+        ImGuiP.RenderRectFilledRangeH(window.DrawList, bb, ImGui.GetColorU32(ImGuiCol.PlotHistogram), fill_n0, fill_n1, style.FrameRounding);
+
+        // Default displaying the fraction as percentage string, but user can override it
+        // Don't display text for indeterminate bars by default
+        if (!is_indeterminate || !string.IsNullOrEmpty(overlay))
+        {
+            if (string.IsNullOrEmpty(overlay))
+            {
+                overlay = string.Format(CultureInfo.InvariantCulture, "{0:P1}", fraction + 0.01f);
+            }
+
+            var overlay_size = ImGui.CalcTextSize(overlay);
+            if (overlay_size.X > 0.0f)
+            {
+                var text_x = is_indeterminate ? (bb.Min.X + bb.Max.X - overlay_size.X) * 0.5f : MathUtils.Lerp(bb.Min.X, bb.Max.X, fill_n1) + style.ItemSpacing.X;
+                ImGuiP.RenderTextClipped(new Vector2(Math.Clamp(text_x, bb.Min.X, bb.Max.X - overlay_size.X - style.ItemInnerSpacing.X), bb.Min.Y), bb.Max, overlay, overlay_size, new Vector2(0.0f, 0.5f), bb);
+            }
+        }
     }
 }

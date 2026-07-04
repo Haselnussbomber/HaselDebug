@@ -59,9 +59,7 @@ public partial class PathList : IDisposable
 
                 _logger.Information("Processing path list");
 
-                Status = PathListStatus.Loading;
                 LoadCachedPathList();
-                Status = PathListStatus.Loaded;
 
                 _logger.Information("Loaded path lists");
             }
@@ -131,6 +129,8 @@ public partial class PathList : IDisposable
         if (_dataManager.GameData == null)
             throw new NullReferenceException("GameData is not set");
 
+        Status = PathListStatus.Loading;
+
         using var stream = File.OpenRead(PathListCachePath);
         using var gzip = new GZipStream(stream, CompressionMode.Decompress);
         using var reader = new Utf8CsvReader(gzip);
@@ -139,6 +139,7 @@ public partial class PathList : IDisposable
         var linesRead = 0;
 
         Count = 0;
+        LoadProgress = 0.0;
         TotalCount = FileUtils.CountLines(PathListCachePath);
 
         _nodes.EnsureCapacity(TotalCount);
@@ -228,12 +229,12 @@ public partial class PathList : IDisposable
             if (++linesRead % 10000 == 0 && totalBytes > 0)
             {
                 Count = linesRead;
-                LoadProgress = (double)stream.Position / totalBytes;
+                LoadProgress = Math.Min((double)stream.Position / totalBytes, 100);
             }
         }
 
         Count = linesRead;
-        LoadProgress = 1.0;
+        Status = PathListStatus.Processing;
 
         var gamePath = _dataManager.GameData.DataPath.FullName;
         foreach (var index in GameIndexReader.LoadAllIndexData(gamePath))
@@ -289,6 +290,8 @@ public partial class PathList : IDisposable
             }
         }
 
+        Status = PathListStatus.Loaded;
+
         GC.Collect();
     }
 }
@@ -300,5 +303,6 @@ public enum PathListStatus
     Loaded,
     Downloading,
     Downloaded,
+    Processing,
     Error,
 }

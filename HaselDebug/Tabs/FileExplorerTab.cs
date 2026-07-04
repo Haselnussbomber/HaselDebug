@@ -4,6 +4,7 @@ using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Models.SqPack;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs;
 
@@ -47,7 +48,7 @@ public partial class FileExplorerTab : DebugTab
             return;
         }
 
-        if (_pathList.Status is PathListStatus.Loading or PathListStatus.Downloading)
+        if (_pathList.Status is PathListStatus.Loading or PathListStatus.Downloading or PathListStatus.Processing)
         {
             switch (_pathList.Status)
             {
@@ -56,7 +57,11 @@ public partial class FileExplorerTab : DebugTab
                     break;
                 case PathListStatus.Loading:
                     ImGui.Text("Loading..."u8);
-                    ImGui.ProgressBar((float)_pathList.LoadProgress, new Vector2(-1, 0));
+                    ImGuiUtilsEx.ProgressBar((float)_pathList.LoadProgress, new Vector2(-1, 0));
+                    break;
+                case PathListStatus.Processing:
+                    ImGui.Text("Processing unknown paths..."u8);
+                    ImGuiUtilsEx.ProgressBar((float)(-1.0 * ImGui.GetTime()), new Vector2(-1, 0));
                     break;
             }
 

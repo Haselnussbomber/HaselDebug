@@ -1,5 +1,6 @@
 using HaselDebug.Config;
 using HaselDebug.Services;
+using HaselDebug.Utils;
 
 namespace HaselDebug.Windows;
 
@@ -88,7 +89,11 @@ public partial class ConfigWindow : SimpleWindow
                 break;
             case PathListStatus.Loading:
                 ImGui.Text("Loading..."u8);
-                ImGui.ProgressBar((float)_pathList.LoadProgress, new Vector2(-1, 0));
+                ImGuiUtilsEx.ProgressBar((float)_pathList.LoadProgress, new Vector2(-1, 0));
+                break;
+            case PathListStatus.Processing:
+                ImGui.Text("Processing unknown paths..."u8);
+                ImGuiUtilsEx.ProgressBar((float)(-1.0 * ImGui.GetTime()), new Vector2(-1, 0));
                 break;
             case PathListStatus.Loaded:
                 ImGui.Text($"Loaded ({_pathList.Count:N0} paths)");
