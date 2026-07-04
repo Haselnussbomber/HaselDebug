@@ -147,7 +147,14 @@ public partial class PathList : IDisposable
         var rootNode = new SqNode("", rootHash);
         _nodes.TryAdd(rootHash, rootNode);
         _paths.TryAdd("", rootNode);
-        _folderContents[rootHash.Folder] = []; // Initialize root directory
+
+        var unkHash = new SqHash("<unknown>", true);
+        var unkNode = new SqNode("<unknown>", unkHash);
+        _nodes.TryAdd(unkHash, unkNode);
+        _paths.TryAdd("<unknown>", unkNode);
+
+        _folderContents[unkHash.Folder] = [];
+        _folderContents[rootHash.Folder] = [unkNode];
 
         reader.ReadNextRow(); // skip header
 
@@ -202,6 +209,7 @@ public partial class PathList : IDisposable
                     break;
 
                 var parentNode = new SqNode(parentPath, parentHash);
+
                 _nodes[parentHash] = parentNode;
                 _paths[parentPath] = parentNode;
 
@@ -245,10 +253,7 @@ public partial class PathList : IDisposable
                     ? $"{folderNode.Path}/~{indexEntry.FullHash:X8}"
                     : $"~{indexEntry.FolderHash:X8}/~{indexEntry.FullHash:X8}";
 
-                var node = new SqNode(path, hash)
-                {
-                    Name = $"~{indexEntry.FullHash:X8}"
-                };
+                var node = new SqNode(path, hash);
 
                 _nodes[hash] = node;
                 _paths[path] = node;
@@ -258,7 +263,12 @@ public partial class PathList : IDisposable
                     _folderContents[indexEntry.FolderHash] = children = [];
 
                     var folderPath = $"~{indexEntry.FolderHash:X8}";
-                    var unkFolderHash = new SqHash { Folder = indexEntry.FolderHash, File = 0, Full = 0 };
+                    var unkFolderHash = new SqHash
+                    {
+                        File = 0,
+                        Folder = indexEntry.FolderHash,
+                        Full = indexEntry.FolderHash
+                    };
 
                     if (!_nodes.ContainsKey(unkFolderHash))
                     {
@@ -270,7 +280,7 @@ public partial class PathList : IDisposable
                         _nodes[unkFolderHash] = unkFolderNode;
                         _paths[folderPath] = unkFolderNode;
 
-                        _folderContents[rootHash.Folder].Add(unkFolderNode);
+                        _folderContents[unkHash.Folder].Add(unkFolderNode);
                     }
                 }
 
