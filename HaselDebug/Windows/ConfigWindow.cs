@@ -96,14 +96,14 @@ public partial class ConfigWindow : SimpleWindow
                 ImGuiUtilsEx.ProgressBar((float)(-1.0 * ImGui.GetTime()), new Vector2(-1, 0));
                 break;
             case PathListStatus.Loaded:
-                ImGui.Text($"Loaded ({_pathList.Count:N0} paths)");
+                ImGui.Text($"Loaded ({_pathList.Nodes.Count:N0} paths)");
                 break;
             case PathListStatus.Error:
                 ImGui.TextColored(Color.ErrorForeground, "Error loading path list"u8);
                 break;
         }
 
-        using (var workingDisabled = ImRaii.Disabled(_pathList.Status is PathListStatus.Downloading or PathListStatus.Loading))
+        using (var workingDisabled = ImRaii.Disabled(_pathList.Status is PathListStatus.Downloading or PathListStatus.Loading or PathListStatus.Processing))
         {
             using (var disabled = ImRaii.Disabled(!_pathList.IsCached))
             {

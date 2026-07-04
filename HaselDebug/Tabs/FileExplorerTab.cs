@@ -1,4 +1,4 @@
-using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
@@ -9,40 +9,64 @@ using HaselDebug.Utils;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public partial class FileExplorerTab : DebugTab
+public partial class FileExplorerTab : DebugTab, IDisposable
 {
     private readonly PathList _pathList;
-    private readonly IDataManager _dataManager;
-    private readonly ITextureProvider _textureProvider;
+    private readonly IFramework _framework;
 
-    private readonly Dictionary<SqFolderHash, bool> _hasFilesCache = [];
+    private string _filterTerm = string.Empty;
+    private List<SqNode>? _filteredNodes;
+    private Debouncer _filterDebouncer;
+    private CancellationTokenSource? _filterCts;
+    private Task? _filterTask;
+    private bool _initialized;
 
-    private string _exportDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "HaselDebugExport");
-    private bool _thumbnailView = false;
-    private SqNode? _selectedFolderNode = null;
-    private bool _autoLoadStarted = false;
+    [AutoPostConstruct]
+    private void Initialize()
+    {
+        _filterDebouncer = _framework.CreateDebouncer(TimeSpan.FromMilliseconds(100), StartFilter);
+        _pathList.StatusChange += OnStatusChange;
+    }
+
+    public void Dispose()
+    {
+        _filterDebouncer.Dispose();
+        _pathList.StatusChange -= OnStatusChange;
+    }
+
+    private void OnStatusChange(PathListStatus status)
+    {
+        if (status == PathListStatus.Loaded)
+        {
+            StartFilter();
+        }
+
+        if (status == PathListStatus.NotLoaded)
+        {
+            CancelFilter();
+        }
+    }
 
     public override void Draw()
     {
+        if (!_initialized)
+        {
+            if (_pathList.Status == PathListStatus.NotLoaded && _pathList.IsCached)
+            {
+                Task.Run(() => _pathList.LoadPathList(!_pathList.IsCached));
+            }
+
+            _initialized = true;
+        }
+
         if (_pathList.Status == PathListStatus.NotLoaded)
         {
             ImGui.Text("The Path List is not loaded.");
-            ImGui.Text("You need to load the path list to use the File Explorer.");
+            ImGui.Text("You need to download the path list to use the File Explorer.");
 
-            if (_pathList.IsCached)
+            if (ImGui.Button("Download & Load Path List"))
             {
-                if (!_autoLoadStarted && _pathList.Status == PathListStatus.NotLoaded)
-                {
-                    _autoLoadStarted = true;
-                    Task.Run(() => _pathList.LoadPathList(!_pathList.IsCached));
-                }
-            }
-            else
-            {
-                if (ImGui.Button("Download & Load Path List"))
-                {
-                    Task.Run(() => _pathList.LoadPathList(true));
-                }
+                Task.Run(() => _pathList.LoadPathList(true));
             }
 
             return;
@@ -74,253 +98,75 @@ public partial class FileExplorerTab : DebugTab
             return;
         }
 
-        ImGui.InputText("Export Directory", ref _exportDirectory, 512);
+        ImGui.SetNextItemWidth(-1);
+        if (ImGui.InputTextWithHint("##SearchTermInput"u8, "Search..."u8, ref _filterTerm, 512, ImGuiInputTextFlags.AutoSelectAll))
+            StartFilter();
 
-        var root = _pathList.RootNode;
-        if (root == null)
+        if (_filterTask != null)
+            ImGuiUtilsEx.ProgressBar((float)(-1.0f * ImGui.GetTime()), new Vector2(-1, 1));
+        else
+            ImGui.Dummy(new Vector2(-1, 1));
+
+        using var table = ImRaii.Table("FileTable"u8, 1, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        if (!table)
             return;
 
-        ImGui.Separator();
+        ImGui.TableSetupColumn("Path"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupScrollFreeze(0, 1);
+        ImGui.TableHeadersRow();
 
-        ImGui.Columns(2, "FileExplorerColumns", true);
-
-        using (var fileTreeChild = ImRaii.Child("FileTree"u8))
-        {
-            if (fileTreeChild)
-            {
-                var rootChildren = _pathList.GetNodesInFolder(root.Hash.Folder)
-                    .Where(n => n != root && n.IsDirectory && HasFilesRecursively(n))
-                    .Sort();
-
-                foreach (var child in rootChildren)
-                {
-                    DrawNode(child);
-                }
-            }
-        }
-
-        ImGui.NextColumn();
-
-        using (var folderContentsChild = ImRaii.Child("FolderContents"u8))
-        {
-            if (folderContentsChild.Success && _selectedFolderNode != null)
-            {
-                ImGui.Checkbox("Thumbnail View", ref _thumbnailView);
-                ImGui.Separator();
-
-                if (_thumbnailView)
-                {
-                    DrawThumbnailView(_selectedFolderNode);
-                }
-                else
-                {
-                    DrawListView(_selectedFolderNode);
-                }
-            }
-        }
-
-        ImGui.Columns(1);
-    }
-
-    private bool HasFilesRecursively(SqNode folderNode)
-    {
-        if (_hasFilesCache.TryGetValue(folderNode.Hash.Folder, out var hasFiles))
-            return hasFiles;
-
-        foreach (var child in _pathList.GetNodesInFolder(folderNode.Hash.Folder).Where(n => n != folderNode))
-        {
-            if (!child.IsDirectory)
-            {
-                _hasFilesCache[folderNode.Hash.Folder] = true;
-                return true;
-            }
-
-            if (HasFilesRecursively(child))
-            {
-                _hasFilesCache[folderNode.Hash.Folder] = true;
-                return true;
-            }
-        }
-
-        _hasFilesCache[folderNode.Hash.Folder] = false;
-        return false;
-    }
-
-    private void DrawNode(SqNode node)
-    {
-        if (!node.IsDirectory || !HasFilesRecursively(node))
+        if (_filteredNodes == null)
             return;
 
-        using var id = ImRaii.PushId($"Node_{node.Hash.Folder}_{node.Hash.File}_{node.Hash.Full}");
+        using var clip = new ImRaiiListClipper(_filteredNodes.Count, ImGui.GetTextLineHeightWithSpacing());
 
-        var hasSubFolders = _pathList.GetNodesInFolder(node.Hash.Folder)
-            .Any(n => n != node && n.IsDirectory && HasFilesRecursively(n));
-
-        var flags = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick | ImGuiTreeNodeFlags.SpanAvailWidth;
-        if (_selectedFolderNode == node)
-            flags |= ImGuiTreeNodeFlags.Selected;
-        if (!hasSubFolders)
-            flags |= ImGuiTreeNodeFlags.Leaf;
-
-        using var expanded = ImRaii.TreeNode(node.Name, flags);
-
-        if (ImGui.IsItemClicked())
+        foreach (var row in clip)
         {
-            _selectedFolderNode = node;
+            ImGui.TableNextRow();
+
+            ImGui.TableNextColumn(); // Path
+            ImGui.Selectable(_filteredNodes[row].Path);
         }
+    }
 
-        DrawContextMenu(node);
+    private void StartFilter()
+    {
+        CancelFilter();
+        _filterCts ??= new();
+        _filterTask = Task.Run(FilterList, _filterCts.Token);
+    }
 
-        if (!expanded)
+    private void FilterList()
+    {
+        var filterTerm = _filterTerm;
+
+        if (string.IsNullOrEmpty(filterTerm))
+        {
+            _filteredNodes = _pathList.Nodes.Values
+                .AsParallel()
+            .WithCancellation(_filterCts!.Token)
+                .OrderBy(n => n.Path, StringComparer.Ordinal)
+                .ToList();
+
+            _filterTask = null;
             return;
-
-        var children = _pathList.GetNodesInFolder(node.Hash.Folder)
-            .Where(n => n != node && n.IsDirectory && HasFilesRecursively(n))
-            .Sort();
-
-        foreach (var child in children)
-        {
-            DrawNode(child);
         }
+
+        _filteredNodes = _pathList.Nodes.Values
+            .AsParallel()
+            .WithCancellation(_filterCts!.Token)
+            .Where(n => n.Path.Contains(filterTerm, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(n => n.Path, StringComparer.Ordinal)
+            .ToList();
+
+        _filterTask = null;
     }
 
-    private void DrawListView(SqNode folderNode)
+    private void CancelFilter()
     {
-        var children = _pathList.GetNodesInFolder(folderNode.Hash.Folder)
-            .Where(n => n != folderNode && !n.IsDirectory)
-            .Sort();
-
-        foreach (var child in children)
-        {
-            using var id = ImRaii.PushId($"Node_{child.Hash.Folder}_{child.Hash.File}_{child.Hash.Full}");
-
-            ImGui.Selectable(child.Name);
-
-            DrawContextMenu(child);
-        }
-    }
-
-    private void DrawThumbnailView(SqNode folderNode)
-    {
-        var children = _pathList.GetNodesInFolder(folderNode.Hash.Folder)
-            .Where(n => n != folderNode && !n.IsDirectory)
-            .Sort();
-
-        var itemWidth = 100f * ImGuiHelpers.GlobalScale;
-        var padding = ImGui.GetStyle().ItemSpacing.X;
-        var windowVisibleX2 = ImGui.GetWindowPos().X + ImGui.GetWindowContentRegionMax().X;
-
-        foreach (var child in children)
-        {
-            using var id = ImRaii.PushId($"Node_{child.Hash.Folder}_{child.Hash.File}_{child.Hash.Full}");
-
-            ImGui.BeginGroup();
-
-            var isTexture = child.Name.EndsWith(".tex") || child.Name.EndsWith(".atex");
-            var textureDrawn = false;
-
-            if (isTexture && _textureProvider.GetFromGame(child.Path).TryGetWrap(out var texWrap, out _))
-            {
-                var aspectRatio = (float)texWrap.Width / texWrap.Height;
-                var drawHeight = itemWidth / aspectRatio;
-                ImGui.Image(texWrap.Handle, new Vector2(itemWidth, drawHeight));
-                textureDrawn = true;
-            }
-
-            if (!textureDrawn)
-            {
-                ImGui.Dummy(new Vector2(itemWidth, itemWidth)); // Placeholder
-            }
-
-            var textWidth = ImGui.CalcTextSize(child.Name).X;
-            if (textWidth > itemWidth)
-            {
-                ImGui.TextWrapped(child.Name); // May break layout if too long
-            }
-            else
-            {
-                var textOffset = (itemWidth - textWidth) / 2;
-                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + textOffset);
-                ImGui.Text(child.Name);
-            }
-
-            ImGui.EndGroup();
-
-            DrawContextMenu(child);
-
-            var lastButtonX2 = ImGui.GetItemRectMax().X;
-            var nextButtonX2 = lastButtonX2 + padding + itemWidth;
-            if (nextButtonX2 < windowVisibleX2)
-                ImGui.SameLine();
-        }
-    }
-
-    private void DrawContextMenu(SqNode node)
-    {
-        using var popup = ImRaii.ContextPopupItem($"Context_{node.Hash.Folder}_{node.Hash.File}_{node.Hash.Full}");
-        if (!popup)
-            return;
-
-        if (node.IsDirectory && ImGui.MenuItem("Export Folder"))
-        {
-            ExportFolder(node);
-        }
-        if (!node.IsDirectory && ImGui.MenuItem("Export File"))
-        {
-            ExportFile(node);
-        }
-    }
-
-    private void ExportFile(SqNode node)
-    {
-        try
-        {
-            if (node.Path.StartsWith('~'))
-            {
-                // Can't export unknown paths simply via GetFile
-                return;
-            }
-
-            var file = _dataManager.GetFile(node.Path);
-            if (file != null)
-            {
-                var dir = Path.Combine(_exportDirectory, node.Path.Replace('/', '\\'));
-                dir = Path.GetDirectoryName(dir);
-                if (dir != null && !Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
-
-                var outPath = Path.Combine(_exportDirectory, node.Path.Replace('/', '\\'));
-                File.WriteAllBytes(outPath, file.Data);
-            }
-        }
-        catch
-        {
-            // ignore for now
-        }
-    }
-
-    private void ExportFolder(SqNode folderNode)
-    {
-        var children = _pathList.GetNodesInFolder(folderNode.Hash.Folder)
-            .Where(n => n != folderNode);
-
-        foreach (var child in children)
-        {
-            if (child.IsDirectory)
-                ExportFolder(child);
-            else
-                ExportFile(child);
-        }
-    }
-}
-
-public static class IEnumerableSqNodeExtensions
-{
-    public static IEnumerable<SqNode> Sort(this IEnumerable<SqNode> nodes)
-    {
-        return nodes
-            .OrderBy(node => !node.IsDirectory)
-            .ThenBy(node => node.Name.StartsWith('~'))
-            .ThenBy(node => node.Name, StringComparer.OrdinalIgnoreCase);
+        _filterCts?.Cancel();
+        _filterCts?.Dispose();
+        _filterCts = null;
+        _filterTask = null;
     }
 }
