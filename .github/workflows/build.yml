@@ -53,9 +53,8 @@ jobs:
               'https://goatcorp.github.io/dalamud-distrib/latest.zip'
             ) }}
         run: |
-          curl -o latest.zip ${{ env.DALAMUD_URL }}
           mkdir -p ~/.xlcore/dalamud/Hooks/dev/
-          unzip latest.zip -d ~/.xlcore/dalamud/Hooks/dev/
+          curl -fsSL ${{ env.DALAMUD_URL }} | unzip -q -d ~/.xlcore/dalamud/Hooks/dev/ - || [ $? -eq 1 ]
 
       - name: Build
         run: |
