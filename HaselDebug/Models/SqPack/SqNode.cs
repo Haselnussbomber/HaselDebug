@@ -1,4 +1,4 @@
-using Lumina.Data;
+using Lumina;
 
 namespace HaselDebug.Models.SqPack;
 
@@ -7,19 +7,32 @@ public record SqNode
     public SqNode(string path, SqHash hash)
     {
         Hash = hash;
-        IsDirectory = hash.File == 0;
-        Name = System.IO.Path.GetFileName(path);
-        if (string.IsNullOrEmpty(Name))
-        {
-            Name = path; // Root or similar
-        }
         Path = path;
+        IsUnknown = path.StartsWith('~');
     }
 
+    private bool _isMetaDataRead;
+
     public SqHash Hash { get; }
-    public string Name { get; set; }
     public string Path { get; set; }
-    public bool IsDirectory { get; }
-    public bool HasMetdata { get; set; }
-    public FileResource? FileResource { get; set; }
+    public bool IsUnknown { get; }
+    public long? Size { get; set; }
+    public string? SizeString { get; set; }
+
+    public void UpdateFileMetaData(GameData gameData)
+    {
+        if (_isMetaDataRead)
+            return;
+
+        if (gameData.GetFileMetadata(Path) is not { } fileMetaData)
+        {
+            _isMetaDataRead = true;
+            return;
+        }
+
+        Size = fileMetaData.RawFileSize;
+        SizeString = FileUtils.GetHumanReadableSize(fileMetaData.RawFileSize);
+
+        _isMetaDataRead = true;
+    }
 }

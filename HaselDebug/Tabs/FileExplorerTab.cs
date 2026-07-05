@@ -13,6 +13,7 @@ public partial class FileExplorerTab : DebugTab, IDisposable
 {
     private readonly PathList _pathList;
     private readonly IFramework _framework;
+    private readonly IDataManager _dataManager;
 
     private string _filterTerm = string.Empty;
     private IReadOnlyList<SqNode>? _filteredNodes;
@@ -107,11 +108,12 @@ public partial class FileExplorerTab : DebugTab, IDisposable
         else
             ImGui.Dummy(new Vector2(-1, 1));
 
-        using var table = ImRaii.Table("FileTable"u8, 1, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("FileTable2"u8, 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table)
             return;
 
         ImGui.TableSetupColumn("Path"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Size"u8, ImGuiTableColumnFlags.WidthFixed, 90);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
@@ -122,10 +124,23 @@ public partial class FileExplorerTab : DebugTab, IDisposable
 
         foreach (var row in clip)
         {
+            var node = _filteredNodes[row];
+
+            node.UpdateFileMetaData(_dataManager.GameData);
+
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Path
-            ImGui.Selectable(_filteredNodes[row].Path);
+            ImGui.Selectable(node.Path);
+
+            ImGui.TableNextColumn(); // Size
+            if (!node.IsUnknown && !string.IsNullOrEmpty(node.SizeString))
+            {
+                var startPos = ImCursor.Position;
+                ImCursor.X += ImStyle.ContentRegionAvail.X - ImGui.CalcTextSize(node.SizeString).X;
+                ImGui.Text(node.SizeString);
+                ImCursor.Position = startPos;
+            }
         }
     }
 

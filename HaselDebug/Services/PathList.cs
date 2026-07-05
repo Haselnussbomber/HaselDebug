@@ -95,14 +95,14 @@ public partial class PathList : IDisposable
 
         Status = PathListStatus.Loading;
 
+        _nodes.EnsureCapacity(FileUtils.CountGZippedLines(PathListCachePath));
+
         using var stream = File.OpenRead(PathListCachePath);
         using var gzip = new GZipStream(stream, CompressionMode.Decompress);
         using var reader = new Utf8CsvReader(gzip);
 
         var totalBytes = stream.Length;
         var linesRead = 0;
-
-        _nodes.EnsureCapacity(FileUtils.CountLines(PathListCachePath));
 
         reader.ReadNextRow(); // skip header
 
