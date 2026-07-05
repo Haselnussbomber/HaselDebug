@@ -117,14 +117,16 @@ public partial class FileExplorerTab : DebugTab, IDisposable
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
 
-        if (_filteredNodes == null)
+        var filteredNodes = _filteredNodes;
+
+        if (filteredNodes == null)
             return;
 
-        using var clip = new ImRaiiListClipper(_filteredNodes.Count, ImGui.GetTextLineHeightWithSpacing());
+        using var clip = new ImRaiiListClipper(filteredNodes.Count, ImGui.GetTextLineHeightWithSpacing());
 
         foreach (var row in clip)
         {
-            var node = _filteredNodes[row];
+            var node = filteredNodes[row];
 
             node.UpdateFileMetaData(_dataManager.GameData);
 
