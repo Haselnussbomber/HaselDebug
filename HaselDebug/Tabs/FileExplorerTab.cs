@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Threading;
 using System.Threading.Tasks;
 using HaselDebug.Abstracts;
@@ -15,6 +16,8 @@ public partial class FileExplorerTab : DebugTab, IDisposable
     private readonly IFramework _framework;
     private readonly IDataManager _dataManager;
 
+    private FrozenDictionary<string, string> _fileTypes;
+
     private string _filterTerm = string.Empty;
     private IReadOnlyList<SqNode>? _filteredNodes;
     private Debouncer _filterDebouncer;
@@ -25,7 +28,86 @@ public partial class FileExplorerTab : DebugTab, IDisposable
     [AutoPostConstruct]
     private void Initialize()
     {
+        _fileTypes = new Dictionary<string, string>()
+        {
+            // { ".a", "Default" },
+            { ".aet", "AnimationExchangeTable" },
+            { ".amb", "AmbientSet" },
+            { ".asik", "AutoShakeIk" },
+            { ".atch", "AttachOffset" },
+            { ".atex", "ApricotTexture" },
+            { ".avfx", "Apricot" },
+            { ".awt", "AnimationWorkTable" },
+            { ".bklb", "BonamikLoad" },
+            { ".bnmb", "Bonamik" },
+            { ".cldb", "CloudAsset" },
+            { ".cmp", "CharaMakeParameter" },
+            { ".cmt", "CameraShake" },
+            { ".ctb", "ControlPoint" },
+            { ".cur", "Cursor" },
+            { ".cutb", "CutScene" },
+            // { ".dic", "Default" },
+            { ".eanb", "EyeAnimation" },
+            { ".eid", "ElementId" },
+            { ".envb", "EnvSet" },
+            { ".eqdp", "EquipmentDeformerParameter" },
+            { ".eqp", "EquipmentParameter" },
+            { ".eslb", "ExtraSkeletonLoad" },
+            { ".essb", "SoundSet" },
+            { ".est", "ExSkeletonTable" },
+            { ".evp", "EquipmentVfxParameter" },
+            // { ".exd", "Exd" },
+            // { ".exh", "Exh" },
+            // { ".exl", "Exl" },
+            { ".fdt", "Fontdata" },
+            { ".fpeb", "FacialParameterEdit" },
+            { ".gfd", "GaijiFontdata" },
+            { ".ggd", "GrassGridData" },
+            { ".gmp", "GimmickParameter" },
+            { ".gzd", "GrassZoneData" },
+            { ".hwc", "HardwareCursor" },
+            { ".imc", "ImageChangeData" },
+            { ".kdb", "KineDriver" },
+            { ".kdlb", "KineDriverLoad" },
+            { ".laik", "LookAtIk" },
+            { ".lcb", "ClipAABB" },
+            { ".lgb", "LayerGroup" },
+            { ".lua", "Lua" },
+            { ".luab", "Luab" },
+            { ".lvb", "LevelScene" },
+            { ".mdl", "Model" },
+            { ".mlt", "MotionLineTable" },
+            // { ".msb", "Msb" },
+            { ".mtrl", "Material" },
+            { ".nvm", "NaviMesh" },
+            { ".obsb", "ObjectBehaviorSet" },
+            { ".pap", "PartialAnimationPack" },
+            { ".pbd", "PreBoneDeformer" },
+            { ".pcb", "CollisionMesh" },
+            { ".phyb", "BonePhysics" },
+            { ".plt", "PapLoadTable" },
+            { ".png", "PNG" },
+            { ".scd", "Sound" },
+            { ".sgb", "SharedGroup" },
+            { ".shcd", "ShaderCode" },
+            { ".shpk", "ShaderPackage" },
+            { ".sklb", "Skeleton" },
+            { ".skp", "SkeletonParam" },
+            // { ".spm", "Spm" },
+            { ".stm", "StainingTemplate" },
+            { ".svb", "SkyVisibility" },
+            { ".tera", "Terrain" },
+            { ".tex", "Texture" },
+            { ".tmb", "TimeLine" },
+            // { ".ugd", "Ugd" },
+            // { ".uld", "Uld" },
+            // { ".uwb", "Udw" },
+            { ".waoe", "WeaponAttachOffsetExist" },
+            { ".wtd", "WeaponTypeData" },
+        }.ToFrozenDictionary();
+
         _filterDebouncer = _framework.CreateDebouncer(TimeSpan.FromMilliseconds(100), StartFilter);
+
         _pathList.StatusChange += OnStatusChange;
     }
 
@@ -108,11 +190,12 @@ public partial class FileExplorerTab : DebugTab, IDisposable
         else
             ImGui.Dummy(new Vector2(-1, 1));
 
-        using var table = ImRaii.Table("FileTable2"u8, 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
+        using var table = ImRaii.Table("FileTable3"u8, 3, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table)
             return;
 
         ImGui.TableSetupColumn("Path"u8, ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Type"u8, ImGuiTableColumnFlags.WidthFixed, _fileTypes.Values.Max(t => ImGui.CalcTextSize(t).X));
         ImGui.TableSetupColumn("Size"u8, ImGuiTableColumnFlags.WidthFixed, 90);
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableHeadersRow();
@@ -134,6 +217,9 @@ public partial class FileExplorerTab : DebugTab, IDisposable
 
             ImGui.TableNextColumn(); // Path
             ImGui.Selectable(node.Path);
+
+            ImGui.TableNextColumn(); // Type
+            ImGui.Text(_fileTypes.TryGetValue(node.Ext, out var filetype) ? filetype : node.Ext);
 
             ImGui.TableNextColumn(); // Size
             if (!node.IsUnknown && !string.IsNullOrEmpty(node.SizeString))

@@ -8,6 +8,7 @@ public record SqNode
     {
         Hash = hash;
         Path = path;
+        Ext = System.IO.Path.GetExtension(path);
         IsUnknown = path.StartsWith('~');
     }
 
@@ -15,6 +16,7 @@ public record SqNode
 
     public SqHash Hash { get; }
     public string Path { get; set; }
+    public string Ext { get; set; }
     public bool IsUnknown { get; }
     public long? Size { get; set; }
     public string? SizeString { get; set; }
