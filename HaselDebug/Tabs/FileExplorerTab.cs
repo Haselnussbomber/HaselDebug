@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using HaselDebug.Abstracts;
@@ -24,6 +25,8 @@ public partial class FileExplorerTab : DebugTab, IDisposable
     private CancellationTokenSource? _filterCts;
     private Task? _filterTask;
     private bool _initialized;
+    private bool _enableRegex;
+    private Exception? _filterError;
 
     [AutoPostConstruct]
     private void Initialize()
@@ -181,14 +184,26 @@ public partial class FileExplorerTab : DebugTab, IDisposable
             return;
         }
 
-        ImGui.SetNextItemWidth(-1);
-        if (ImGui.InputTextWithHint("##SearchTermInput"u8, "Search..."u8, ref _filterTerm, 512, ImGuiInputTextFlags.AutoSelectAll))
+        ImGui.SetNextItemWidth(ImStyle.ContentRegionAvail.X - ImStyle.ItemSpacing.X - ImStyle.FrameHeight);
+        if (ImGui.InputTextWithHint("##SearchTermInput"u8, _enableRegex ? "Search (with regex)..."u8 : "Search..."u8, ref _filterTerm, 512, ImGuiInputTextFlags.AutoSelectAll))
             StartFilter();
+        ImGui.SameLine();
+        if (ImGui.Checkbox("##regexcheckbox"u8, ref _enableRegex))
+            StartFilter();
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip("Enables regex search"u8);
 
         if (_filterTask != null)
             ImGuiUtilsEx.ProgressBar((float)(-1.0f * ImGui.GetTime()), new Vector2(-1, 1));
         else
             ImGui.Dummy(new Vector2(-1, 1));
+
+        var filterError = _filterError;
+        if (filterError != null)
+        {
+            ImGui.TextColored(Color.ErrorForeground, filterError.Message);
+            return;
+        }
 
         using var table = ImRaii.Table("FileTable3"u8, 3, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table)
@@ -247,13 +262,30 @@ public partial class FileExplorerTab : DebugTab, IDisposable
         {
             _filteredNodes = _pathList.SortedNodes;
             _filterTask = null;
+            _filterError = null;
+            return;
+        }
+
+        Regex? regex = null;
+        try
+        {
+            if (_enableRegex)
+            {
+                regex = new Regex(_filterTerm);
+                _filterError = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            _filterError = ex;
+            _filterTask = null;
             return;
         }
 
         _filteredNodes = _pathList.SortedNodes
             .AsParallel()
             .WithCancellation(_filterCts!.Token)
-            .Where(node => node.Path.Contains(filterTerm, StringComparison.OrdinalIgnoreCase))
+            .Where(node => regex?.IsMatch(node.Path) ?? node.Path.Contains(filterTerm, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
         _filterTask = null;
@@ -265,5 +297,6 @@ public partial class FileExplorerTab : DebugTab, IDisposable
         _filterCts?.Dispose();
         _filterCts = null;
         _filterTask = null;
+        _filterError = null;
     }
 }
