@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.61.1] (2026-07-06)
+
+- **Updated:** TreeNodes for AtkComponentTreeListItem now display their first string as label for simpler identification.
+- **Updated:** ClientStructs now at [cb804dc0](https://github.com/aers/FFXIVClientStructs/tree/cb804dc0) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b81ab14d..cb804dc0)).
+
 ## [1.61.0] (2026-06-26)
 
 - **Added:** Event Complete Log tab to inspect data passed to the `PacketDispatcher.SendEventCompletePacket` function.
@@ -977,7 +982,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.61.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.61.1...main
+[1.61.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.61.0...v1.61.1
 [1.61.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.3...v1.61.0
 [1.60.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.2...v1.60.3
 [1.60.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.1...v1.60.2
