@@ -24,6 +24,17 @@ public unsafe partial class DebugRenderer
 
         var fields = GetAllInheritedFields(type);
 
+        if (type == typeof(AtkComponentTreeListItem) && nodeOptions.SeStringTitle == null && nodeOptions.Title == null)
+        {
+            var item = (AtkComponentTreeListItem*)address;
+            if (item->StringValues.Count > 0)
+            {
+                var str = HaselCommon.Extensions.CStringExtensions.AsReadOnlySeString(item->StringValues[0]);
+                if (!str.IsEmpty)
+                    nodeOptions = nodeOptions with { SeStringTitle = str };
+            }
+        }
+
         using var disabled = ImRaii.Disabled(fields.Length == 0);
         using var node = DrawTreeNode(nodeOptions.WithSeStringTitleIfNull(type.FullName ?? "Unknown Type Name"));
         if (!node) return;
