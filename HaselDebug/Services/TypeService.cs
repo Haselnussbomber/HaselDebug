@@ -91,7 +91,7 @@ public partial class TypeService : IHostedService
     private void LoadAddons(Assembly csAssembly)
     {
         AddonTypes = csAssembly.GetTypes()
-            .Where(type => Attribute.IsDefined(type, typeof(AddonAttribute)))
+            .Where(type => type.IsDefined(typeof(AddonAttribute), false) && !string.IsNullOrEmpty(type.Namespace))
             .SelectMany(type => type.GetCustomAttribute<AddonAttribute>()!.AddonIdentifiers, (type, addonName) => (type, addonName))
             .ToImmutableSortedDictionary(
                 tuple => tuple.addonName,
@@ -101,7 +101,7 @@ public partial class TypeService : IHostedService
     private void LoadAgents(Assembly csAssembly)
     {
         AgentTypes = csAssembly.GetTypes()
-            .Where(type => Attribute.IsDefined(type, typeof(AgentAttribute)))
+            .Where(type => type.IsDefined(typeof(AgentAttribute), false) && !string.IsNullOrEmpty(type.Namespace))
             .Select(type => (type, agentId: type.GetCustomAttribute<AgentAttribute>()!.Id))
             .ToImmutableSortedDictionary(
                 tuple => tuple.agentId,
@@ -119,15 +119,15 @@ public partial class TypeService : IHostedService
     {
         foreach (var fieldInfo in type.GetFields(BindingFlags.Default | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
         {
-            if (!Attribute.IsDefined(fieldInfo, typeof(FieldOffsetAttribute)))
+            if (!fieldInfo.IsDefined(typeof(FieldOffsetAttribute), false))
                 continue;
 
             if (fieldInfo.GetCustomAttribute<FieldOffsetAttribute>() is not { } fieldOffsetAttribute)
                 continue;
 
             if (fieldInfo.IsAssembly
-                && Attribute.IsDefined(fieldInfo, typeof(FixedSizeArrayAttribute))
-                && Attribute.IsDefined(fieldInfo.FieldType, typeof(InlineArrayAttribute))
+                && fieldInfo.IsDefined(typeof(FixedSizeArrayAttribute), false)
+                && fieldInfo.FieldType.IsDefined(typeof(InlineArrayAttribute), false)
                 && fieldInfo.GetCustomAttribute<FixedSizeArrayAttribute>() is FixedSizeArrayAttribute fixedSizeArrayAttribute
                 && !fixedSizeArrayAttribute.IsString
                 && !fixedSizeArrayAttribute.IsBitArray
