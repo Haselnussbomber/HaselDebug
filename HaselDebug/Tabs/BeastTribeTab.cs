@@ -14,6 +14,7 @@ public unsafe partial class BeastTribeTab : DebugTab
     private readonly TextService _textService;
     private readonly ISeStringEvaluator _seStringEvaluator;
     private readonly TeleportService _teleportService;
+    private readonly MapService _mapService;
 
     public override bool DrawInChild => false;
 
@@ -80,6 +81,14 @@ public unsafe partial class BeastTribeTab : DebugTab
                 {
                     Telepo.Instance()->Teleport(aetheryte.RowId, 0);
                 }
+                ImGuiContextMenu.Draw($"BeastTribeTeleportContextMenu_{row.RowId}", builder =>
+                {
+                    builder.Add(new ImGuiContextMenuEntry()
+                    {
+                        Label = "Open on Map",
+                        ClickCallback = () => _mapService.OpenMap(level)
+                    });
+                });
             }
             else
             {
