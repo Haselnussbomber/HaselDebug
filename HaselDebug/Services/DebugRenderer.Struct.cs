@@ -1,7 +1,6 @@
 using System.Buffers.Binary;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Dalamud.Memory;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
@@ -11,6 +10,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Common.Component.Excel;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
+using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkUldManager;
 
@@ -358,9 +358,7 @@ public unsafe partial class DebugRenderer
                 DrawFieldName(fieldInfo);
                 DrawPointerNumber(fieldAddress, fieldType, fieldNodeOptions);
                 ImGui.SameLine();
-                var chars = MemoryHelper.ReadString(fieldAddress, 4).ToCharArray();
-                Array.Reverse(chars);
-                ImGuiUtils.DrawCopyableText(new string(chars));
+                ImGuiUtils.DrawCopyableText(((ResourceHandle*)address)->FileTypeString);
                 continue;
             }
 

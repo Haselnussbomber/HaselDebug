@@ -7,11 +7,13 @@ using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine.Group;
 using FFXIVClientStructs.FFXIV.Client.LayoutEngine.Layer;
+using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using HaselDebug.Extensions;
+using DrawObjectType = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.ObjectType;
 using EventHandler = FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandler;
 using InstanceContentType = FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.InstanceContentType;
-using DrawObjectType = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.ObjectType;
 
 namespace HaselDebug.Utils;
 
@@ -22,7 +24,87 @@ public static unsafe class TypeResolver
         if (nodeOptions.ResolvedInheritedTypeAddresses.Path.Contains(address))
             return;
 
-        if (Inherits<ILayoutInstance>(type))
+        if (Inherits<ResourceHandle>(type))
+        {
+            switch (((ResourceHandle*)address)->FileTypeString)
+            {
+                case "a": type = typeof(DefaultResourceHandle); break;
+                case "aet": type = typeof(AnimationExchangeTableResourceHandle); break;
+                case "amb": type = typeof(AmbientSetResourceHandle); break;
+                case "asik": type = typeof(AutoShakeIkResourceHandle); break;
+                case "atch": type = typeof(AttachOffsetResourceHandle); break;
+                case "atex": type = typeof(ApricotTextureResourceHandle); break;
+                case "avfx": type = typeof(ApricotResourceHandle); break;
+                case "awt": type = typeof(AnimationWorkTableResourceHandle); break;
+                case "bklb": type = typeof(BonamikLoadResourceHandle); break;
+                case "bnmb": type = typeof(BonamikResourceHandle); break;
+                case "cldb": type = typeof(CloudAssetResourceHandle); break;
+                case "cmp": type = typeof(CharaMakeParameterResourceHandle); break;
+                case "cmt": type = typeof(CameraShakeResourceHandle); break;
+                case "ctb": type = typeof(ControlPointResourceHandle); break;
+                case "cur": type = typeof(CursorResourceHandle); break;
+                case "cutb": type = typeof(CutSceneResourceHandle); break;
+                case "dic": type = typeof(DefaultResourceHandle); break;
+                case "eanb": type = typeof(EyeAnimationResourceHandle); break;
+                case "eid": type = typeof(ElementIdResourceHandle); break;
+                case "envb": type = typeof(EnvSetResourceHandle); break;
+                case "eqdp": type = typeof(EquipmentDeformerParameterResourceHandle); break;
+                case "eqp": type = typeof(EquipmentParameterResourceHandle); break;
+                case "eslb": type = typeof(ExtraSkeletonLoadResourceHandle); break;
+                case "essb": type = typeof(SoundSetResourceHandle); break;
+                case "est": type = typeof(ExSkeletonTableResourceHandle); break;
+                case "evp": type = typeof(EquipmentVfxParameterResourceHandle); break;
+                case "exd": type = typeof(ExdResourceHandle); break;
+                case "exh": type = typeof(ExhResourceHandle); break;
+                case "exl": type = typeof(ExlResourceHandle); break;
+                case "fdt": type = typeof(FontdataResourceHandle); break;
+                case "fpeb": type = typeof(FacialParameterEditResourceHandle); break;
+                case "gfd": type = typeof(GaijiFontdataResourceHandle); break;
+                case "ggd": type = typeof(GrassGridDataResourceHandle); break;
+                case "gmp": type = typeof(GimmickParameterResourceHandle); break;
+                case "gzd": type = typeof(GrassZoneDataResourceHandle); break;
+                case "hwc": type = typeof(HardwareCursorResourceHandle); break;
+                case "imc": type = typeof(ImageChangeDataResourceHandle); break;
+                case "kdb": type = typeof(KineDriverResourceHandle); break;
+                case "kdlb": type = typeof(KineDriverLoadResourceHandle); break;
+                case "laik": type = typeof(LookAtIkResourceHandle); break;
+                case "lcb": type = typeof(ClipAABBResourceHandle); break;
+                case "lgb": type = typeof(LayerGroupResourceHandle); break;
+                case "lua": type = typeof(LuaResourceHandle); break;
+                case "luab": type = typeof(LuabResourceHandle); break;
+                case "lvb": type = typeof(LevelSceneResourceHandle); break;
+                case "mdl": type = typeof(ModelResourceHandle); break;
+                case "mlt": type = typeof(MotionLineTableResourceHandle); break;
+                case "msb": type = typeof(MsbResourceHandle); break;
+                case "mtrl": type = typeof(MaterialResourceHandle); break;
+                case "nvm": type = typeof(NaviMeshResourceHandle); break;
+                case "obsb": type = typeof(ObjectBehaviorSetResourceHandle); break;
+                case "pap": type = typeof(PartialAnimationPackResourceHandle); break;
+                case "pbd": type = typeof(PreBoneDeformerResourceHandle); break;
+                case "pcb": type = typeof(CollisionMeshResourceHandle); break;
+                case "phyb": type = typeof(BonePhysicsResourceHandle); break;
+                case "plt": type = typeof(PapLoadTableResourceHandle); break;
+                case "png": type = typeof(PNGResourceHandle); break;
+                case "scd": type = typeof(SoundResourceHandle); break;
+                case "sgb": type = typeof(SharedGroupResourceHandle); break;
+                case "shcd": type = typeof(ShaderCodeResourceHandle); break;
+                case "shpk": type = typeof(ShaderPackageResourceHandle); break;
+                case "sklb": type = typeof(SkeletonResourceHandle); break;
+                case "skp": type = typeof(SkeletonParamResourceHandle); break;
+                case "spm": type = typeof(SpmResourceHandle); break;
+                case "stm": type = typeof(StainingTemplateResourceHandle); break;
+                case "svb": type = typeof(SkyVisibilityResourceHandle); break;
+                case "tera": type = typeof(TerrainResourceHandle); break;
+                case "tex": type = typeof(TextureResourceHandle); break;
+                case "tmb": type = typeof(TimeLineResourceHandle); break;
+                case "ugd": type = typeof(UgdResourceHandle); break;
+                case "uld": type = typeof(UldResourceHandle); break;
+                case "uwb": type = typeof(UdwResourceHandle); break;
+                case "waoe": type = typeof(WeaponAttachOffsetExistResourceHandle); break;
+                case "wtd": type = typeof(WeaponTypeDataResourceHandle); break;
+            }
+        }
+        else if (Inherits<ILayoutInstance>(type))
         {
             switch (((ILayoutInstance*)address)->Id.Type)
             {
