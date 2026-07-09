@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.62.0] (2026-07-09)
+
+- **Added:** Add ResourceHandler type redirects based their the FileType.
+- **Added:** Toast tab to log the different toasts. (Thanks to @Jaksuhn)
+  - I have reworked the implementation to not use Dalamuds IToastGui service and instead hook the functions directly. Sorry if this is not what you wanted.
+- **Updated:** ClientStructs now at [dbe41718](https://github.com/aers/FFXIVClientStructs/tree/dbe41718) ([compare](https://github.com/aers/FFXIVClientStructs/compare/cb804dc0..dbe41718)).
+
 ## [1.61.1] (2026-07-06)
 
 - **Updated:** TreeNodes for AtkComponentTreeListItem now display their first string as label for simpler identification.
@@ -982,7 +989,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.61.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.62.0...main
+[1.62.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.61.1...v1.62.0
 [1.61.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.61.0...v1.61.1
 [1.61.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.3...v1.61.0
 [1.60.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.60.2...v1.60.3
