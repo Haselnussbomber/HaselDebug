@@ -137,33 +137,33 @@ public unsafe partial class ToastTab : DebugTab, IDisposable
     private void ShowTextDetour(UIModule* thisPtr, int position, CStringPointer text, uint iconOrCheck1, bool playSound, uint iconOrCheck2, bool alsoPlaySound)
     {
         _showTextHook!.Original(thisPtr, position, text, iconOrCheck1, playSound, iconOrCheck2, alsoPlaySound);
-        var formatted = _seStringEvaluator.Evaluate(text.AsReadOnlySeStringSpan());
-        if (!formatted.IsEmpty)
-            _toasts.Add(new NormalToast(DateTime.Now, formatted, position, iconOrCheck1, playSound, iconOrCheck2, alsoPlaySound));
+        var message = _seStringEvaluator.Evaluate(text.AsReadOnlySeStringSpan());
+        if (!message.IsEmpty)
+            _toasts.Add(new NormalToast(DateTime.Now, message, position, iconOrCheck1, playSound, iconOrCheck2, alsoPlaySound));
     }
 
     private void ShowPoisonTextDetour(UIModule* thisPtr, CStringPointer text, int layer)
     {
         _showPoisonTextHook!.Original(thisPtr, text, layer);
-        var formatted = _seStringEvaluator.Evaluate(text.AsReadOnlySeStringSpan());
-        if (!formatted.IsEmpty)
-            _toasts.Add(new PoisonToast(DateTime.Now, formatted, layer));
+        var message = _seStringEvaluator.Evaluate(text.AsReadOnlySeStringSpan());
+        if (!message.IsEmpty)
+            _toasts.Add(new PoisonToast(DateTime.Now, message, layer));
     }
 
     private void ShowErrorTextDetour(UIModule* thisPtr, CStringPointer text, bool forceVisible)
     {
         _showErrorTextHook!.Original(thisPtr, text, forceVisible);
-        var formatted = _seStringEvaluator.Evaluate(text.AsReadOnlySeStringSpan());
-        if (!formatted.IsEmpty)
-            _toasts.Add(new ErrorToast(DateTime.Now, formatted, forceVisible));
+        var message = _seStringEvaluator.Evaluate(text.AsReadOnlySeStringSpan());
+        if (!message.IsEmpty)
+            _toasts.Add(new ErrorToast(DateTime.Now, message, forceVisible));
     }
 
     private void ShowTextGimmickHintDetour(RaptureAtkModule* thisPtr, CStringPointer text, RaptureAtkModule.TextGimmickHintStyle style, int duration)
     {
         _showTextGimmickHintHook!.Original(thisPtr, text, style, duration);
-        var formatted = _seStringEvaluator.Evaluate(text.AsReadOnlySeStringSpan());
-        if (!formatted.IsEmpty)
-            _toasts.Add(new GimmickHintToast(DateTime.Now, formatted, style, duration));
+        var message = _seStringEvaluator.Evaluate(text.AsReadOnlySeStringSpan());
+        if (!message.IsEmpty)
+            _toasts.Add(new GimmickHintToast(DateTime.Now, message, style, duration));
     }
 
     private class Toast(DateTime timestamp, ReadOnlySeString text)
