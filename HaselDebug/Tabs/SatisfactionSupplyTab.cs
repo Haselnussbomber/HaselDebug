@@ -65,6 +65,7 @@ public unsafe partial class SatisfactionSupplyTab : DebugTab
                     builder.Add(new ImGuiContextMenuEntry()
                     {
                         Label = "Open on Map",
+                        Enabled = level.Map.Value.PriorityUI != 0,
                         ClickCallback = () => _mapService.OpenMap(level)
                     });
                 });

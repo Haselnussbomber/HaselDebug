@@ -86,6 +86,7 @@ public unsafe partial class BeastTribeTab : DebugTab
                     builder.Add(new ImGuiContextMenuEntry()
                     {
                         Label = "Open on Map",
+                        Enabled = level.Map.Value.PriorityUI != 0,
                         ClickCallback = () => _mapService.OpenMap(level)
                     });
                 });
