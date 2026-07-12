@@ -58,6 +58,9 @@ public unsafe partial class ConfigTab : DebugTab
         DrawConfigTab(ref commonSystemConfig.UiConfig, "UiConfig");
         DrawConfigTab(ref commonSystemConfig.UiControlConfig, "UiControl");
         DrawConfigTab(ref commonSystemConfig.UiControlGamepadConfig, "UiControlGamepad");
+
+        ref var devConfig = ref Framework.Instance()->DevConfig;
+        DrawConfigTab(ref devConfig.DevConfigBase.ConfigBase, "Dev");
     }
 
     private int GetNumSearchResults(ref ConfigBase configBase)
