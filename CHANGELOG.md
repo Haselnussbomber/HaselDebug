@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.63.0] (2026-07-15)
 
 - **Added:** The Config tab now has a tab to inspect the DevConfig.
 - **Updated:** ClientStructs now at [af24e2e9](https://github.com/aers/FFXIVClientStructs/tree/af24e2e9) ([compare](https://github.com/aers/FFXIVClientStructs/compare/dbe41718..af24e2e9)).
@@ -999,7 +999,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.62.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.63.0...main
+[1.63.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.62.1...v1.63.0
 [1.62.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.62.0...v1.62.1
 [1.62.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.61.1...v1.62.0
 [1.61.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.61.0...v1.61.1
