@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** The Config tab now has a tab to inspect the DevConfig.
+- **Updated:** ClientStructs now at [af24e2e9](https://github.com/aers/FFXIVClientStructs/tree/af24e2e9) ([compare](https://github.com/aers/FFXIVClientStructs/compare/dbe41718..af24e2e9)).
+
 ## [1.62.1] (2026-07-09)
 
 - **Added:** A context menu was added to the Beast Tribes and Custom Deliveries names to open the location on the map.
