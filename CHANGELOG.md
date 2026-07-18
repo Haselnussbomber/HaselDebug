@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [aa412b80](https://github.com/aers/FFXIVClientStructs/tree/aa412b80) ([compare](https://github.com/aers/FFXIVClientStructs/compare/af24e2e9..aa412b80)).
+
 ## [1.63.0] (2026-07-15)
 
 - **Added:** The Config tab now has a tab to inspect the DevConfig.
