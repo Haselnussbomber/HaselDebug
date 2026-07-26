@@ -72,6 +72,7 @@ public partial class PluginConfig
     public bool ShowInDevMenu = true;
     public bool AutoOpenPluginWindow = false;
     public bool EnableLuaLogger = false;
+    public bool EnableUnknownObserver = false;
     public bool ResolveAddonLifecycleVTables = true;
     public bool ResolveAgentLifecycleVTables = true;
     public bool SpacesInKTKNames = true;

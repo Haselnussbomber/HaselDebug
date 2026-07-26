@@ -45,6 +45,12 @@ public partial class ConfigWindow : SimpleWindow
         using (ImGuiUtils.ConfigIndent())
             ImGui.TextColoredWrapped(Color.Text600, _textService.Translate("Config.EnableLuaLogger.Description"));
 
+        // EnableUnknownObserver
+        configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.EnableUnknownObserver.Label")}##EnableUnknownObserver", ref _pluginConfig.EnableUnknownObserver);
+
+        using (ImGuiUtils.ConfigIndent())
+            ImGui.TextColoredWrapped(Color.Text600, _textService.Translate("Config.EnableUnknownObserver.Description"));
+
         // ResolveAddonLifecycleVTables
         configChanged |= ImGui.Checkbox($"{_textService.Translate("Config.ResolveAddonLifecycleVTables.Label")}##ResolveAddonLifecycleVTables", ref _pluginConfig.ResolveAddonLifecycleVTables);
 
@@ -68,6 +74,14 @@ public partial class ConfigWindow : SimpleWindow
                 else
                     luaLogger.Disable();
             }
+            /*
+            if (ServiceLocator.TryGetService<UnknownObserver>(out var unknownObserver))
+            {
+                if (_pluginConfig.EnableUnknownObserver)
+                    unknownObserver.Enable();
+                else
+                    unknownObserver.Disable();
+            }*/
         }
     }
 }

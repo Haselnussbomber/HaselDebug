@@ -40,6 +40,14 @@
     "en": "Writes print and panics to the Debug log.",
     "de": "Schreibt print und panics in die Debug-Log."
   },
+  "Config.EnableUnknownObserver.Label": {
+    "en": "Enable UnknownObserver",
+    "de": "UnknownObserver aktivieren"
+  },
+  "Config.EnableUnknownObserver.Description": {
+    "en": "Prints a message into chat when something unknown to CS was found!",
+    "de": "Zeigt eine Nachricht im Chat an, wenn etwas CS-unbekanntes gefunden wurde!"
+  },
   "Config.ResolveAddonLifecycleVTables.Label": {
     "en": "Resolve original Addon VTable addresses",
     "de": "Originale Addon VTable-Adressen auflösen"
