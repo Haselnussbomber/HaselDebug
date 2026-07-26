@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - **Added:** ILayoutInstances type redirect for PopRangeLayoutInstance.
+- **Added:** Support for sequencial structs like System.Numerics.Vector2/3/4.
 - **Updated:** ClientStructs now at [502941fe](https://github.com/aers/FFXIVClientStructs/tree/502941fe) ([compare](https://github.com/aers/FFXIVClientStructs/compare/af24e2e9..502941fe)).
 
 ## [1.63.0] (2026-07-15)

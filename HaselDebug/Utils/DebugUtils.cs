@@ -73,13 +73,28 @@ public static class DebugUtils
 
             foreach (var field in fields)
             {
-                if (!Attribute.IsDefined(field, typeof(FieldOffsetAttribute)))
-                    continue;
+                int fieldOffset;
 
-                if (field.GetCustomAttribute<FieldOffsetAttribute>() is not FieldOffsetAttribute fieldOffsetAttr)
-                    continue;
+                if (field.GetCustomAttribute<FieldOffsetAttribute>() is { } fieldOffsetAttr)
+                {
+                    fieldOffset = fieldOffsetAttr.Value;
+                }
+                else
+                {
+                    if (currentType.IsAutoLayout)
+                        continue;
 
-                fieldsByOffsetAndName.TryAdd((offset + fieldOffsetAttr.Value, field.Name), field);
+                    try
+                    {
+                        fieldOffset = (int)Marshal.OffsetOf(currentType, field.Name);
+                    }
+                    catch (ArgumentException)
+                    {
+                        continue;
+                    }
+                }
+
+                fieldsByOffsetAndName.TryAdd((offset + fieldOffset, field.Name), field);
             }
 
             var inheritAttrs = currentType.GetCustomAttributes()
