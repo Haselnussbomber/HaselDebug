@@ -188,11 +188,6 @@ public unsafe partial class DebugRenderer
             ImGuiUtils.DrawCopyableText(((StdString*)address)->ToString());
             return;
         }
-        else if (type == typeof(StdString))
-        {
-            ImGuiUtils.DrawCopyableText(((StdString*)address)->ToString());
-            return;
-        }
         else if (type == typeof(FileAccessPath))
         {
             ImGuiUtils.DrawCopyableText(((FileAccessPath*)address)->ToString());
