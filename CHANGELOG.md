@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-- **Updated:** ClientStructs now at [aa412b80](https://github.com/aers/FFXIVClientStructs/tree/aa412b80) ([compare](https://github.com/aers/FFXIVClientStructs/compare/af24e2e9..aa412b80)).
+- **Updated:** ClientStructs now at [e508667d](https://github.com/aers/FFXIVClientStructs/tree/e508667d) ([compare](https://github.com/aers/FFXIVClientStructs/compare/af24e2e9..e508667d)).
 
 ## [1.63.0] (2026-07-15)
 
