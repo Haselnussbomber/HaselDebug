@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.64.0] (2026-07-26)
 
 - **Added:** ILayoutInstances type redirect for PopRangeLayoutInstance.
 - **Added:** Support for sequencial structs like System.Numerics.Vector2/3/4.
@@ -1005,7 +1005,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.63.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.64.0...main
+[1.64.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.63.0...v1.64.0
 [1.63.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.62.1...v1.63.0
 [1.62.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.62.0...v1.62.1
 [1.62.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.61.1...v1.62.0
