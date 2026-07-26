@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 
-- **Updated:** ClientStructs now at [e508667d](https://github.com/aers/FFXIVClientStructs/tree/e508667d) ([compare](https://github.com/aers/FFXIVClientStructs/compare/af24e2e9..e508667d)).
+- **Added:** ILayoutInstances type redirect for PopRangeLayoutInstance.
+- **Updated:** ClientStructs now at [502941fe](https://github.com/aers/FFXIVClientStructs/tree/502941fe) ([compare](https://github.com/aers/FFXIVClientStructs/compare/af24e2e9..502941fe)).
 
 ## [1.63.0] (2026-07-15)
 

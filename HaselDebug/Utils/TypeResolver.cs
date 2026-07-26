@@ -120,6 +120,10 @@ public static unsafe class TypeResolver
                     type = typeof(SoundLayoutInstance);
                     break;
 
+                case InstanceType.PopRange:
+                    type = typeof(PopRangeLayoutInstance);
+                    break;
+
                 case InstanceType.ExitRange:
                     type = typeof(ExitRangeLayoutInstance);
                     break;
