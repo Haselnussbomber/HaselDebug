@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+Update for Patch 7.55.
+
+- **Updated:** ClientStructs now at [b2e56484](https://github.com/aers/FFXIVClientStructs/tree/b2e56484) ([compare](https://github.com/aers/FFXIVClientStructs/compare/502941fe..b2e56484)).
+
 ## [1.64.0] (2026-07-26)
 
 - **Added:** ILayoutInstances type redirect for PopRangeLayoutInstance.
