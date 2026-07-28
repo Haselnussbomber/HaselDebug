@@ -120,6 +120,10 @@ public static unsafe class TypeResolver
                     type = typeof(SoundLayoutInstance);
                     break;
 
+                case InstanceType.Treasure:
+                    type = typeof(TreasureLayoutInstance);
+                    break;
+
                 case InstanceType.PopRange:
                     type = typeof(PopRangeLayoutInstance);
                     break;
@@ -154,6 +158,14 @@ public static unsafe class TypeResolver
 
                 case InstanceType.PrefetchRange:
                     type = typeof(PrefetchRangeLayoutInstance);
+                    break;
+
+                // These don't have their own struct yet, so we use the parent class
+                case InstanceType.Aetheryte:
+                case InstanceType.Gathering:
+                case InstanceType.EventObject:
+                case InstanceType.Character:
+                    type = typeof(GameObjectLayoutInstance);
                     break;
             }
         }
