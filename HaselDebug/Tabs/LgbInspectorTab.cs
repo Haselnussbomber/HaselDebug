@@ -72,7 +72,7 @@ public unsafe partial class LgbInspectorTab : DebugTab
             {
                 var title = $"[{instance.Value->Id.Type}] InstanceKey: {instance.Value->Id.InstanceKey} | LayerKey: {instance.Value->Id.LayerKey} | u0: {instance.Value->Id.u0} | SubId: 0x{instance.Value->SubId:X}";
 
-                using var col = Color.From(ImGuiCol.TextDisabled).Push(ImGuiCol.Text);
+                using var col = Color.From(ImGuiCol.TextDisabled).Push(ImGuiCol.Text, !instance.Value->IsActive);
                 using var innerTreeNode = ImRaii.TreeNode(title, ImGuiTreeNodeFlags.SpanAvailWidth);
                 col.Dispose();
 
