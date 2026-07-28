@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.65.1] (2026-07-28)
+
+Second update for Patch 7.55.
+
+- **Fixed:** Broken sig in InventoryOperationsTab preventing the plugin from loading.
+- **Updated:** ClientStructs now at [3e2b738f](https://github.com/aers/FFXIVClientStructs/tree/3e2b738f) ([compare](https://github.com/aers/FFXIVClientStructs/compare/b2e56484..3e2b738f)).
+
 ## [1.65.0] (2026-07-28)
 
 Update for Patch 7.55.
@@ -1012,7 +1019,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.1...main
+[1.65.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.0...v1.65.1
 [1.65.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.64.0...v1.65.0
 [1.64.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.63.0...v1.64.0
 [1.63.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.62.1...v1.63.0
