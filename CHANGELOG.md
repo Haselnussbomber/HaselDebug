@@ -1,9 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [1.65.0] (2026-07-28)
 
 Update for Patch 7.55.
 
+- **Added:** Fate Reward Log tab to inspect data from that packet.
 - **Updated:** ClientStructs now at [b2e56484](https://github.com/aers/FFXIVClientStructs/tree/b2e56484) ([compare](https://github.com/aers/FFXIVClientStructs/compare/502941fe..b2e56484)).
 
 ## [1.64.0] (2026-07-26)
@@ -1011,7 +1012,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.64.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.0...main
+[1.65.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.64.0...v1.65.0
 [1.64.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.63.0...v1.64.0
 [1.63.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.62.1...v1.63.0
 [1.62.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.62.0...v1.62.1
