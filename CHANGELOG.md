@@ -1,7 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [1.66.0] (2026-07-30)
 
+- **Added:** A Chara Card Packet Log tab to inspect data from that packet.
+- **Added:** Unlock Span Length Test tab now supports PlayerState.UnlockedFramersKitsBitArray.
 - **Added:** ILayoutInstances type redirects for the following types:
   - LightLayoutInstance
   - VfxLayoutInstance
@@ -1044,7 +1046,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.66.0...main
+[1.66.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.2...v1.66.0
 [1.65.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.1...v1.65.2
 [1.65.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.0...v1.65.1
 [1.65.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.64.0...v1.65.0
