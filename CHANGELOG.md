@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+- **Added:** ILayoutInstances type redirects for the following types:
+  - LightLayoutInstance
+  - VfxLayoutInstance
+  - EventNpcLayoutInstance
+  - BattleNpcLayoutInstance
+  - CharacterLayoutInstance
+  - AetheryteLayoutInstance
+  - EnvSpaceLayoutInstance
+  - GatheringLayoutInstance
+  - WeaponLayoutInstance
+  - EventObjectLayoutInstance
+  - ChairMarkerLayoutInstance
+  - ClickableRangeLayoutInstance
+  - FateRangeLayoutInstance
 - **Updated:** ClientStructs now at [4a00dc68](https://github.com/aers/FFXIVClientStructs/tree/4a00dc68) ([compare](https://github.com/aers/FFXIVClientStructs/compare/cc474ca9..4a00dc68)).
 
 ## [1.65.2] (2026-07-28)
