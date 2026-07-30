@@ -1,5 +1,6 @@
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using HaselCommon.Game.Enums;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -170,10 +171,10 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
         //     PlayerState.Instance()->UnlockedRaidsBitArray,
         //     (int)_excelService.GetSheet<InstanceContentSheet>().Where(row => row.RowId is > 30000 and < 35000).Max(row => row.RowId - 30000))); // they reseve more space
 
-        // _bitfields.Add(new BitfieldRecord(
-        //    "PlayerState.UnlockedFramersKits",
-        //    PlayerState->UnlockedFramersKitsBitArray,
-        //    unknown));
+        _bitArrays.Add(new BitArrayRecord(
+            "PlayerState.UnlockedFramersKitsBitArray",
+            PlayerState.Instance()->UnlockedFramersKitsBitArray,
+            PlayerState.MemberFunctionPointers.IsFramersKitUnlocked != null ? * (int*)((nint)PlayerState.MemberFunctionPointers.IsFramersKitUnlocked + 1) : 0));
 
         _bitArrays.Add(new BitArrayRecord(
             "UIState.Achievement.CompletedAchievements",
@@ -224,6 +225,12 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
             "UIState.TitleList.UnlockedTitles",
             UIState.Instance()->TitleList.UnlockedTitlesBitArray,
             _excelService.GetRowCount<Title>()));
+
+        _bitArrays.Add(new BitArrayRecord(
+            "UIState.TitleList.UnlockedTitles",
+            UIState.Instance()->TitleList.UnlockedTitlesBitArray,
+            _excelService.GetRowCount<Title>()));
+
         /*
         _bitArrays.Add(new BitArrayRecord(
             "QuestManager.CompletedQuests",
