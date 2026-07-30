@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [4a00dc68](https://github.com/aers/FFXIVClientStructs/tree/4a00dc68) ([compare](https://github.com/aers/FFXIVClientStructs/compare/cc474ca9..4a00dc68)).
+
 ## [1.65.2] (2026-07-28)
 
 - **Added:** ILayoutInstances type redirect for TreasureLayoutInstance.
