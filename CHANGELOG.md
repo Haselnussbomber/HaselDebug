@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** A Resource Handle tab to load and inspect resource handles by path.
+- **Updated:** ClientStructs now at [de18d8b2](https://github.com/aers/FFXIVClientStructs/tree/de18d8b2) ([compare](https://github.com/aers/FFXIVClientStructs/compare/cc474ca9..de18d8b2)).
+
 ## [1.66.0] (2026-07-30)
 
 - **Added:** A Chara Card Packet Log tab to inspect data from that packet.
