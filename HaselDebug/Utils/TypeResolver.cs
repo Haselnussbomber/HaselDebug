@@ -573,6 +573,12 @@ public static unsafe class TypeResolver
                     case ComponentType.Portrait:
                         type = typeof(AtkComponentPortrait);
                         break;
+                    case ComponentType.XBMItem:
+                        type = typeof(AtkComponentXBMItem);
+                        break;
+                    case ComponentType.XBMContentStageEventMap:
+                        type = typeof(AtkComponentXBMContentStageEventMap);
+                        break;
                 }
             }
         }
