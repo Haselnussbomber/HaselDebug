@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [1.67.0] (2026-07-31)
+
+6-7, hehe.
 
 - **Added:** A Resource Handle tab to load and inspect resource handles by path.
 - **Updated:** ClientStructs now at [de18d8b2](https://github.com/aers/FFXIVClientStructs/tree/de18d8b2) ([compare](https://github.com/aers/FFXIVClientStructs/compare/cc474ca9..de18d8b2)).
@@ -1051,7 +1053,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.66.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.67.0...main
+[1.67.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.66.0...v1.67.0
 [1.66.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.2...v1.66.0
 [1.65.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.1...v1.65.2
 [1.65.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.0...v1.65.1
