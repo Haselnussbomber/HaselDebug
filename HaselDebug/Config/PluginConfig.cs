@@ -28,10 +28,10 @@ public partial class PluginConfig : IPluginConfiguration
     [JsonIgnore]
     private static IPluginLog? PluginLog;
 
-    public static PluginConfig Load(IDalamudPluginInterface pluginInterface, IPluginLog pluginLog)
+    public static PluginConfig Load(IDalamudPluginInterface pluginInterface)
     {
         PluginInterface = pluginInterface;
-        PluginLog = pluginLog;
+        PluginLog = pluginInterface.GetService<IPluginLog>();
 
         var fileInfo = PluginInterface.ConfigFile;
         if (!fileInfo.Exists || fileInfo.Length < 2)
@@ -42,7 +42,7 @@ public partial class PluginConfig : IPluginConfiguration
         if (node == null)
             return new();
 
-        return JsonSerializer.Deserialize<PluginConfig>(node, SerializerOptions) ?? new();
+        return node.Deserialize<PluginConfig>(SerializerOptions) ?? new();
     }
 
     public void Save()
