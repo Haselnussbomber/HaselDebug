@@ -5,7 +5,7 @@ using HaselDebug.Services;
 namespace HaselDebug.Abstracts;
 
 [AutoConstruct]
-public partial class PacketLogTab<T> : DebugTab, IPacketLogTab where T : unmanaged
+public unsafe partial class PacketLogTab<T> : DebugTab, IPacketLogTab, IDisposable where T : unmanaged
 {
     protected readonly DebugRenderer _debugRenderer;
     protected readonly IGameInteropProvider _gameInteropProvider;
@@ -23,6 +23,8 @@ public partial class PacketLogTab<T> : DebugTab, IPacketLogTab where T : unmanag
 
     public virtual void Clear()
     {
+        foreach (var record in _records)
+            IMemorySpace.Free(record.Payload, 0);
         _records.Clear();
     }
 
@@ -61,7 +63,7 @@ public partial class PacketLogTab<T> : DebugTab, IPacketLogTab where T : unmanag
         }
     }
 
-    public virtual unsafe void AddRecord(T payload)
+    public virtual void AddRecord(T payload)
     {
         var copy = IMemorySpace.GetDefaultSpace()->Malloc<T>();
         *copy = payload;
@@ -70,5 +72,10 @@ public partial class PacketLogTab<T> : DebugTab, IPacketLogTab where T : unmanag
             Time = DateTime.Now,
             Payload = copy
         });
+    }
+
+    public virtual void Dispose()
+    {
+        Clear();
     }
 }

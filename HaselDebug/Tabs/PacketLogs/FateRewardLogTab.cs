@@ -10,10 +10,10 @@ public unsafe partial class FateRewardLogTab : PacketLogTab<FateRewardPacket>, I
 {
     private Hook<FateManager.Delegates.HandleFateRewardPacket>? _hook;
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void HandleFateRewardPacketDetour(FateManager* thisPtr, FateRewardPacket* packet)

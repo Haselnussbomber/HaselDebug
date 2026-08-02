@@ -21,10 +21,10 @@ public unsafe partial class EventCompleteLogTab : PacketLogTab<EventCompleteReco
 {
     private Hook<PacketDispatcher.Delegates.SendEventCompletePacket>? _hook;
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void SendEventCompletePacketDetour(EventId eventId, short scene, byte a3, uint* payload, byte payloadSize, void* a6)

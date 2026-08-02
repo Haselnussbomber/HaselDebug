@@ -10,10 +10,10 @@ public unsafe partial class PrepareZoningLogTab : PacketLogTab<PrepareZoningPack
 {
     private Hook<PacketDispatcher.Delegates.HandlePrepareZoningPacket>? _hook;
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void HandlePrepareZoningPacketDetour(PrepareZoningPacket* packet, byte a2)

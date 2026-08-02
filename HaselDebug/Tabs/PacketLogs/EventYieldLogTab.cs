@@ -21,10 +21,10 @@ public unsafe partial class EventYieldLogTab : PacketLogTab<EventYieldRecord>, I
 {
     private Hook<PacketDispatcher.Delegates.HandleEventYieldPacket>? _hook;
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void HandleEventYieldPacketDetour(EventId eventId, short scene, byte yieldId, int* intData, byte intDataCount)

@@ -24,10 +24,10 @@ public unsafe partial class EventPlayLogTab : PacketLogTab<EventPlayRecord>, IDi
 {
     private Hook<PacketDispatcher.Delegates.HandleEventPlayPacket>? _hook;
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void HandleEventPlayPacketDetour(GameObjectId objectId, EventId eventId, short scene, ulong sceneFlags, uint* sceneData, byte sceneDataCount)

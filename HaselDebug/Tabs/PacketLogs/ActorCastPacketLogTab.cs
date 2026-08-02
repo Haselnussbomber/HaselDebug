@@ -10,10 +10,10 @@ public unsafe partial class ActorCastPacketLogTab : PacketLogTab<ActorCastPacket
 {
     private Hook<PacketDispatcher.Delegates.HandleActorCastPacket>? _hook;
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void HandleActorCastPacketDetour(uint entityId, ActorCastPacket* packet)

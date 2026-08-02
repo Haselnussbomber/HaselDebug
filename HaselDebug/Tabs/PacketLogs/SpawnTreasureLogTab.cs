@@ -10,10 +10,10 @@ public unsafe partial class SpawnTreasureLogTab : PacketLogTab<SpawnTreasurePack
 {
     private Hook<PacketDispatcher.Delegates.HandleSpawnTreasurePacket>? _hook;
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void HandleSpawnTreasurePacketDetour(uint targetId, SpawnTreasurePacket* packet)

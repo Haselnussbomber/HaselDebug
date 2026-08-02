@@ -10,10 +10,10 @@ public unsafe partial class CharaCardPacketLogTab : PacketLogTab<CharaCardPacket
 {
     private Hook<CharaCard.Delegates.HandleCurrentCharaCardDataPacket>? _hook;
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void HandleCurrentCharaCardDataPacketDetour(CharaCard* thisPtr, CharaCardPacket* packet)

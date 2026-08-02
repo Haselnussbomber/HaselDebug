@@ -25,10 +25,10 @@ public unsafe partial class DirectorUpdateLogTab : PacketLogTab<DirectorUpdateEn
         public uint Arg6;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void ProcessDirectorUpdateDetour(EventFramework* thisPtr, EventId eventId, uint category, uint arg1, uint arg2, uint arg3, uint arg4, uint arg5, uint arg6)

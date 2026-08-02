@@ -10,10 +10,10 @@ public unsafe partial class PartyFinderListingLogTab : PacketLogTab<CrossRealmLi
 {
     private Hook<InfoProxyCrossRealm.Delegates.ReceiveListing>? _hook;
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void ReceiveListingDetour(InfoProxyCrossRealm* thisPtr, ServerIpcSegment<CrossRealmListingSegmentPacket>* packet)

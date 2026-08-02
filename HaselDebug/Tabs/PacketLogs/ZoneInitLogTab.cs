@@ -10,10 +10,10 @@ public unsafe partial class ZoneInitLogTab : PacketLogTab<ZoneInitPacket>, IDisp
 {
     private Hook<PacketDispatcher.Delegates.HandleZoneInitPacket>? _hook;
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void HandleZoneInitPacketDetour(uint targetId, ZoneInitPacket* packet, byte a3)

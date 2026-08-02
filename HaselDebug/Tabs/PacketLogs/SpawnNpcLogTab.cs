@@ -29,10 +29,10 @@ public unsafe partial class SpawnNpcLogTab : PacketLogTab<SpawnNpcEntry>, IDispo
         public uint EntityId;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void HandleSpawnNpcPacketDetour(uint entityId, SpawnNpcPacket* packet)

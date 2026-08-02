@@ -12,10 +12,10 @@ public unsafe partial class SpawnObjectLogTab : PacketLogTab<SpawnObjectPacket>,
 {
     private Hook<PacketDispatcher.Delegates.HandleSpawnObjectPacket>? _hook;
 
-    public void Dispose()
+    public override void Dispose()
     {
         _hook?.Dispose();
-        Clear();
+        base.Dispose();
     }
 
     private void HandleSpawnObjectPacketDetour(uint targetId, SpawnObjectPacket* packet)
