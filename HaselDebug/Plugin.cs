@@ -28,6 +28,7 @@ public partial class Plugin : IAsyncDalamudPlugin
 
     public Task LoadAsync(CancellationToken cancellationToken)
     {
+        _pluginInterface.InitializeCustomClientStructs();
         return _host.StartOnFrameworkThread(_framework, cancellationToken);
     }
 
