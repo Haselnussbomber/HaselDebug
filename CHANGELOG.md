@@ -2,11 +2,13 @@
 
 ## [Unreleased]
 
+Update for Patch 7.55hf1.
+
 - **Added:** Type redirects for Atk components XBMItem and XBMContentStageEventMap.
 - **Added:** A MKDRelicGrowth tab to test QuestCustomTodoManager, and to be an example of how it works. This requires to be on the quest "Aether, Aether, Everywhere".
 - **Added:** A Server Request Callback Log tab to log server responses for those requests. Due to how it's coded, it's not under the Packet Logs category and only shows the payload as hex, sorry.
 - **Fixed:** Packet Log tabs did not free the allocated memory for packet copies when clearing records or on unloading the plugin.
-- **Updated:** ClientStructs now at [b827bdb8](https://github.com/aers/FFXIVClientStructs/tree/b827bdb8) ([compare](https://github.com/aers/FFXIVClientStructs/compare/de18d8b2..b827bdb8)).
+- **Updated:** ClientStructs now at [8121cbbc](https://github.com/aers/FFXIVClientStructs/tree/8121cbbc) ([compare](https://github.com/aers/FFXIVClientStructs/compare/de18d8b2..8121cbbc)).
 
 ## [1.67.0] (2026-07-31)
 
