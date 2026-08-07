@@ -1,4 +1,5 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
@@ -152,6 +153,8 @@ public unsafe partial class EventFrameworkTab : DebugTab, IDisposable
             _debugRenderer.DrawAddress(task);
             ImGui.SameLine();
             ImGui.Text($"Type: {task->Type}, Flags: {task->Flags}");
+            ImGui.SameLine();
+            _debugRenderer.DrawPointerType(task);
         }
 
         ImGui.Separator();

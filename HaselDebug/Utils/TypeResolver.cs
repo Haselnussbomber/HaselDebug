@@ -460,6 +460,18 @@ public static unsafe class TypeResolver
                 };
             }
         }
+        else if (Inherits<EventSceneTaskInterface>(type))
+        {
+            switch (((EventSceneTaskInterface*)address)->Type)
+            {
+                case EventSceneTaskType.PlayCutScene:
+                    type = typeof(PlayCutSceneTask);
+                    break;
+                case EventSceneTaskType.PlayStaffRoll:
+                    type = typeof(PlayStaffRollTask);
+                    break;
+            }
+        }
         else if (Inherits<AtkResNode>(type))
         {
             switch (((AtkResNode*)address)->GetNodeType())
