@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.68.1] (2026-08-08)
 
 - **Fixed:** The TypeBase in the Inventory Operations tab was incorrect since it grew out of byte range.
 
@@ -1070,7 +1070,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.68.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.68.1...main
+[1.68.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.68.0...v1.68.1
 [1.68.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.67.0...v1.68.0
 [1.67.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.66.0...v1.67.0
 [1.66.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.65.2...v1.66.0
