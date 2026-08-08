@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Fixed:** The TypeBase in the Inventory Operations tab was incorrect since it grew out of byte range.
+
 ## [1.68.0] (2026-08-07)
 
 Update for Patch 7.55hf1.
@@ -353,7 +357,6 @@ Happy new year!
 - **Changed:** Addons starting with `KTK_Overlay` are now sorted to the bottom of the node picker list.
 - **Updated:** The node list search in the Addon Inspector was slightly improved, so that you can specify more precisely what to search.  
   Supported tags are:
-
   - Node ids with `id:15` or just `#15`
   - Node types with `type:res`
   - Node addresses with `addr:0x28EFEDA19F0`, `addr:2813184317936`
@@ -364,6 +367,7 @@ Happy new year!
 
   It's possible to exclude these tags by prefixing them with a `-`.  
   Naturally these are mixable with each other and still work without prefix.
+
 - **Updated:** Holding shift while the node picker is active will now display nodes inside components.
 - **Updated:** The struct displayed in the Atk Event tab is now automatically changed for further events:
   - `AtkEventType.ChildAddonAttached` uses `AtkEventData.AtkAddonControlData`
@@ -434,7 +438,6 @@ Update for 7.4. You're welcome.
 - **Updated:** Support for AddonLifecycle vtable replacements in Dalamud v14. The original vtable is now resolved.
 - **Fixed:** The addons listed in the Addon Names tab no longer open when clicked. This was leftover testing code. It now only copies the name when clicking on them. Sorry about that.
 - **Updated:** ClientStructs now at [82de587a](https://github.com/aers/FFXIVClientStructs/tree/82de587a) ([compare](https://github.com/aers/FFXIVClientStructs/compare/6f339d8f..82de587a)).
-
 
 ## [1.41.0] (2025-12-06)
 
@@ -674,6 +677,7 @@ Update for 7.3.
   - Added a search bar to the top-level (=addon) Node List, which can find nodes by address (hex only), NodeId, NodeType, ComponentType
 
   It's still work in progress. Animations and Parts will be added later.
+
 - **Updated:** ClientStructs now at [7028ecae](https://github.com/aers/FFXIVClientStructs/tree/7028ecae) ([compare](https://github.com/aers/FFXIVClientStructs/compare/3d53c797..7028ecae)).
 
 ## [1.24.2] (2025-06-04)
@@ -716,6 +720,7 @@ Update for 7.3.
   - and the newly reversed Stand Object Manager, displaying nameless, "lively" EventNpcs and EventObjects.
 
   These now reuse the same table code and I've added the EntityId and ObjectId columns. It's now possible to hide columns, though settings are not saved for these tables.
+
 - **Changed:** Previously, fields with "IconId" in their name showed the icon next to the value, now it's for all fields containing just "Icon".
 - **Updated:** I updated my TerritoryIntendedUse enum in HaselCommon, so 60 is now called CosmicExploration.
 - **Updated:** ClientStructs now at [377ddb3](https://github.com/aers/FFXIVClientStructs/tree/377ddb3) ([compare](https://github.com/aers/FFXIVClientStructs/compare/09d40c6a..377ddb3)).
@@ -901,7 +906,7 @@ There is probably some change that I forgot to list. :)
 - **Added:** ILayoutInstance type redirect to SharedGroupLayoutInstance, when the type matches.
 - **Updated:** Instance Content Director tab now uses the correct struct type based on InstanceContentType or PublicContentDirectorType.
 - **Fixed:** A line to 3D positions is now also drawn for structs that inherit ILayoutInstance.
-- **Fixed:** Incorrect usage of Std* struct types.
+- **Fixed:** Incorrect usage of Std\* struct types.
 - **Updated:** ClientStructs now at [f26035a](https://github.com/aers/FFXIVClientStructs/tree/f26035a) ([compare](https://github.com/aers/FFXIVClientStructs/compare/cc98a564..f26035a)).
 
 ## [1.10.1] (2024-12-22)
@@ -1040,11 +1045,11 @@ Update for 7.1.
 - **Added:** Early version of the Addon Inspector 2 tab.
 - **Added:** Unlocks -> Store Items tab.
 - **Added:** uint fields named IconId will show their icon in front of their id.
-- **Added:** Known byte* strings will now be displayed as string, instead of just a single byte.  
+- **Added:** Known byte\* strings will now be displayed as string, instead of just a single byte.  
   This has to be maintained by hand. Currently handled fields are:
-    - MapMarkerBase.Subtext
-    - ExcelSheet.SheetName
-- **Changed:** Extend Arrays are now displayed as MapMarkerBase*.
+  - MapMarkerBase.Subtext
+  - ExcelSheet.SheetName
+- **Changed:** Extend Arrays are now displayed as MapMarkerBase\*.
 - **Changed:** String Arrays strings are now rendered as SeString, so payloads can be inspected.
 - **Changed:** FixedSizeArray strings are now rendered as SeString, so payloads can be inspected.
 - **Changed:** Interactable Selectables in the Unlocks tab now show a hand cursor.
