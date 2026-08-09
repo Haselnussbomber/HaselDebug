@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.69.0] (2026-08-09)
+
+Got some *nice* updates for ya! :)
+
+- **Added:** Excel columns that contain a collection are now clickable and open the collection in a new window!
+- **Fixed:** Nested structs in excel sheets like Quest and SpecialShop are now properly drawn in the TreeNode view, instead of just drawing their full type name.
+- **Fixed:** Pinned instances are now sorted by their displayed title.
+- **Updated:** ClientStructs now at [dc21e187](https://github.com/aers/FFXIVClientStructs/tree/dc21e187) ([compare](https://github.com/aers/FFXIVClientStructs/compare/8121cbbc..dc21e187)).
+
 ## [1.68.1] (2026-08-08)
 
 - **Fixed:** The TypeBase in the Inventory Operations tab was incorrect since it grew out of byte range.
@@ -1070,7 +1079,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.68.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.69.0...main
+[1.69.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.68.1...v1.69.0
 [1.68.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.68.0...v1.68.1
 [1.68.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.67.0...v1.68.0
 [1.67.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.66.0...v1.67.0
