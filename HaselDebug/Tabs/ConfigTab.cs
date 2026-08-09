@@ -115,7 +115,7 @@ public unsafe partial class ConfigTab : DebugTab
                 continue;
 
             var optionName = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(option->Name));
-            if (optionName == "LockonDefaultZoom_186")
+            if (optionName == "LockonDefaultZoom_187")
                 optionName = "LockonDefaultDistance";
             if (!optionName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
                 continue;
@@ -230,7 +230,7 @@ public unsafe partial class ConfigTab : DebugTab
                 continue;
 
             var name = configEntry->Name.ToString();
-            if (name == "LockonDefaultZoom_186")
+            if (name == "LockonDefaultZoom_187")
                 name = "LockonDefaultDistance";
 
             if (dict.ContainsValue(name))
@@ -279,7 +279,7 @@ public unsafe partial class ConfigTab : DebugTab
                 ? configEntry->Name.ToString()
                 : string.Empty;
 
-            if (name == "LockonDefaultZoom_186")
+            if (name == "LockonDefaultZoom_187")
                 name = "LockonDefaultDistance";
 
             // Dalamud doesn't support multiple options with the same name
