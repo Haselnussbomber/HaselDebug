@@ -221,7 +221,7 @@ public partial class DebugRenderer
             nodeOptions);
     }
 
-    private void DrawExcelColumn(string columnName, Type columnType, object? value, uint rowId, uint depth, NodeOptions nodeOptions)
+    public void DrawExcelColumn(string columnName, Type columnType, object? value, uint rowId, uint depth, NodeOptions nodeOptions)
     {
         if (value == null)
         {
@@ -333,7 +333,12 @@ public partial class DebugRenderer
 
                 ImGui.TableNextColumn(); // Value
                 var colValue = columnType.GetMethod("get_Item")?.Invoke(value, [i]);
-                DrawExcelColumn(columnName + $"[{i}]", collectionType, colValue, rowId, depth + 1, nodeOptions.WithAddress(i));
+                DrawExcelColumn(columnName + $"[{i}]", collectionType, colValue, rowId, depth + 1, new NodeOptions()
+                {
+                    RenderSeString = nodeOptions.RenderSeString,
+                    Language = nodeOptions.Language,
+                    AddressPath = nodeOptions.AddressPath.With(i)
+                });
             }
 
             return;
@@ -373,7 +378,12 @@ public partial class DebugRenderer
 
                 ImGui.TableNextColumn(); // Value
                 var colValue = columnType.GetMethod("get_Item")?.Invoke(value, [i]);
-                DrawExdSubrow(collectionType, rowId, i, depth + 1, nodeOptions.WithAddress(i));
+                DrawExdSubrow(collectionType, rowId, i, depth + 1, new NodeOptions()
+                {
+                    RenderSeString = nodeOptions.RenderSeString,
+                    Language = nodeOptions.Language,
+                    AddressPath = nodeOptions.AddressPath.With(i)
+                });
             }
 
             return;
@@ -419,7 +429,12 @@ public partial class DebugRenderer
                     propInfo.GetValue(value),
                     rowId,
                     depth,
-                    nodeOptions.WithAddress(StringComparer.Ordinal.GetHashCode(propInfo.Name)));
+                    new NodeOptions()
+                    {
+                        RenderSeString = nodeOptions.RenderSeString,
+                        Language = nodeOptions.Language,
+                        AddressPath = nodeOptions.AddressPath.With(StringComparer.Ordinal.GetHashCode(propInfo.Name))
+                    });
             }
 
             return;

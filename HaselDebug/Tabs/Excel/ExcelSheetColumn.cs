@@ -3,6 +3,8 @@ using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Extensions;
 using HaselDebug.Services;
 using HaselDebug.Utils;
+using HaselDebug.Windows;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace HaselDebug.Tabs.Excel;
 
@@ -192,8 +194,16 @@ public partial class ExcelSheetColumn<T> : ColumnString<T> where T : struct
         if (ColumnType.IsGenericType && ColumnType.GetGenericTypeDefinition() == typeof(Collection<>))
         {
             var count = (int)ColumnType.GetProperty("Count")?.GetValue(value)!;
-            using (Color.Text700.Push(ImGuiCol.Text))
-                ImGui.Text($"{count} value{(count != 1 ? "s" : "")}"); // TODO: click to open
+
+            using var color = DebugRenderer.ColorTreeNode.Push(ImGuiCol.Text);
+
+            if (ImGui.Selectable($"{count} value{(count != 1 ? "s" : "")}"))
+            {
+                var name = $"{RowType.Name}#{rowId}{(subrowId != null ? $".{subrowId}" : "")}.{ColumnType.GetGenericArguments()[0].Name}";
+                _serviceProvider
+                    .GetRequiredService<WindowManager>()
+                    .CreateOrOpen(name, () => ActivatorUtilities.CreateInstance<ExcelCollectionWindow>(_serviceProvider, ColumnType, value, rowId, name));
+            }
             return;
         }
 
