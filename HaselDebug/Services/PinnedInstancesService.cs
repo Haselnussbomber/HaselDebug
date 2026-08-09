@@ -43,7 +43,7 @@ public partial class PinnedInstancesService : IReadOnlyCollection<PinnedInstance
 
     private void Sort()
     {
-        _tabs.Sort((a, b) => a.InternalName.CompareTo(b.InternalName));
+        _tabs.Sort((a, b) => a.Title.CompareTo(b.Title));
     }
 
     public void Add(Type type)
