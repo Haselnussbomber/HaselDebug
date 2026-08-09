@@ -390,6 +390,78 @@ public partial class DebugRenderer
             return;
         }
 
+        if (columnType.IsValueType && !columnType.IsPrimitive && !columnType.IsEnum)
+        {
+            ImGuiUtils.DrawCopyableText(FormatStructInline(columnType, value));
+            return;
+        }
+
         ImGuiUtils.DrawCopyableText(value.ToString() ?? string.Empty);
+    }
+
+    private static string FormatStructInline(Type type, object value, int depth = 0)
+    {
+        if (depth > 3)
+            return type.Name;
+
+        var members = new List<string>();
+
+        foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy(p => p.MetadataToken))
+        {
+            if (prop.GetIndexParameters().Length > 0)
+                continue; // skip indexers
+
+            object? memberValue;
+            try
+            {
+                memberValue = prop.GetValue(value);
+            }
+            catch
+            {
+                continue;
+            }
+
+            members.Add($"{prop.Name} = {FormatMemberValue(prop.PropertyType, memberValue, depth)}");
+        }
+
+        foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.Instance).OrderBy(p => p.MetadataToken))
+        {
+            object? memberValue;
+            try
+            {
+                memberValue = field.GetValue(value);
+            }
+            catch
+            {
+                continue;
+            }
+
+            members.Add($"{field.Name} = {FormatMemberValue(field.FieldType, memberValue, depth)}");
+        }
+
+        return $"{type.Name} {{ {string.Join(", ", members)} }}";
+    }
+
+    private static string FormatMemberValue(Type memberType, object? memberValue, int depth)
+    {
+        if (memberValue is null)
+            return "null";
+
+        if (memberType == typeof(string))
+            return $"\"{memberValue}\"";
+
+        if (memberType == typeof(ReadOnlySeString))
+            return $"\"{((ReadOnlySeString)memberValue).ToMacroString()}\"";
+
+        if (memberType.IsEnum)
+            return memberValue.ToString()!;
+
+        if (memberType.IsPrimitive || memberValue is decimal)
+            return memberValue.ToString()!;
+
+        if (memberType.IsValueType)
+            return FormatStructInline(memberType, memberValue, depth + 1);
+
+        return memberValue.ToString() ?? "null";
     }
 }
