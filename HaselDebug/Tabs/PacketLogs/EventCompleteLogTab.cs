@@ -6,14 +6,15 @@ using EventId = FFXIVClientStructs.FFXIV.Client.Game.Event.EventId;
 namespace HaselDebug.Tabs.PacketLogs;
 
 [GenerateInterop]
-[StructLayout(LayoutKind.Explicit, Size = 0x404)]
-public partial struct EventCompleteRecord
+[StructLayout(LayoutKind.Explicit, Size = 0x40C)]
+public unsafe partial struct EventCompleteRecord
 {
     [FieldOffset(0x00)] public EventId EventId;
     [FieldOffset(0x04)] public short Scene;
-    [FieldOffset(0x06)] public byte a3;
+    [FieldOffset(0x06)] public byte LuaStatus;
     [FieldOffset(0x07)] public byte PayloadSize;
-    [FieldOffset(0x08), FixedSizeArray] internal FixedSizeArray255<uint> _payload;
+    [FieldOffset(0x08)] public void* a6;
+    [FieldOffset(0x10), FixedSizeArray] internal FixedSizeArray255<uint> _payload;
 }
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
@@ -27,21 +28,22 @@ public unsafe partial class EventCompleteLogTab : PacketLogTab<EventCompleteReco
         base.Dispose();
     }
 
-    private void SendEventCompletePacketDetour(EventId eventId, short scene, byte a3, uint* payload, byte payloadSize, void* a6)
+    private void SendEventCompletePacketDetour(EventId eventId, short scene, byte luaStatus, uint* payload, byte payloadSize, void* a6)
     {
         var record = new EventCompleteRecord()
         {
             EventId = eventId,
             Scene = scene,
-            a3 = a3,
+            LuaStatus = luaStatus,
             PayloadSize = payloadSize,
+            a6 = a6,
         };
 
         new ReadOnlySpan<uint>(payload, payloadSize).CopyTo(record.Payload);
 
         AddRecord(record);
 
-        _hook!.Original(eventId, scene, a3, payload, payloadSize, a6);
+        _hook!.Original(eventId, scene, luaStatus, payload, payloadSize, a6);
     }
 
     public override void Draw()

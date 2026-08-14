@@ -15,6 +15,7 @@
   - EventEffectRangeLayoutInstance
   - CullingBoxLayoutInstance
   - VolumetricCloudLayoutInstance
+- **Updated:** The a3 field in the Event Complete Log tab was renamed to LuaState and a6 was added.
 
 ## [1.69.0] (2026-08-09)
 
