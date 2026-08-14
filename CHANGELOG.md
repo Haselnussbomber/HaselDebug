@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [1.70.0] (2026-08-14)
+
+Update for Patch 7.55hf2.
 
 - **Added:** ILayoutInstances type redirects for the following types:
   - PositionMarkerLayoutInstance
@@ -16,6 +18,7 @@
   - CullingBoxLayoutInstance
   - VolumetricCloudLayoutInstance
 - **Updated:** The a3 field in the Event Complete Log tab was renamed to LuaState and a6 was added.
+- **Updated:** ClientStructs now at [50e46a84](https://github.com/aers/FFXIVClientStructs/tree/50e46a84) ([compare](https://github.com/aers/FFXIVClientStructs/compare/dc21e187..50e46a84)).
 
 ## [1.69.0] (2026-08-09)
 
@@ -1096,7 +1099,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.69.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.70.0...main
+[1.70.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.69.0...v1.70.0
 [1.69.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.68.1...v1.69.0
 [1.68.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.68.0...v1.68.1
 [1.68.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.67.0...v1.68.0
