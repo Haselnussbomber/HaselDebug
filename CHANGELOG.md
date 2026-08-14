@@ -1,5 +1,21 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** ILayoutInstances type redirects for the following types:
+  - PositionMarkerLayoutInstance
+  - QuestMarkerLayoutInstance
+  - ClientPathLayoutInstance
+  - ServerPathLayoutInstance
+  - TargetMarkerLayoutInstance
+  - SphereCastRangeLayoutInstance
+  - WaterRangeLayoutInstance
+  - ShowHideRangeLayoutInstance
+  - GameContentsRangeLayoutInstance
+  - EventEffectRangeLayoutInstance
+  - CullingBoxLayoutInstance
+  - VolumetricCloudLayoutInstance
+
 ## [1.69.0] (2026-08-09)
 
 Got some *nice* updates for ya! :)

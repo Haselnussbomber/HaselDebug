@@ -124,6 +124,7 @@ public static unsafe class TypeResolver
                     break;
 
                 case InstanceType.PositionMarker:
+                    type = typeof(PositionMarkerLayoutInstance);
                     break;
 
                 case InstanceType.SharedGroup:
@@ -208,7 +209,10 @@ public static unsafe class TypeResolver
                 case InstanceType.ControlPoint:
                 case InstanceType.EventRange:
                 case InstanceType.RestBonusRange:
+                    break;
+
                 case InstanceType.QuestMarker:
+                    type = typeof(QuestMarkerLayoutInstance);
                     break;
 
                 case InstanceType.Timeline:
@@ -238,10 +242,21 @@ public static unsafe class TypeResolver
                 case InstanceType.CharaScene:
                 case InstanceType.CutAction:
                 case InstanceType.EquipPreset:
+                    break;
+
                 case InstanceType.ClientPath:
+                    type = typeof(ClientPathLayoutInstance);
+                    break;
+
                 case InstanceType.ServerPath:
+                    type = typeof(ServerPathLayoutInstance);
+                    break;
+
                 case InstanceType.GimmickRange:
+                    break;
+
                 case InstanceType.TargetMarker:
+                    type = typeof(TargetMarkerLayoutInstance);
                     break;
 
                 case InstanceType.ChairMarker:
@@ -262,11 +277,41 @@ public static unsafe class TypeResolver
 
                 case InstanceType.PartyMember:
                 case InstanceType.KeepRange:
+                    break;
+
                 case InstanceType.SphereCastRange:
+                    type = typeof(SphereCastRangeLayoutInstance);
+                    break;
+
                 case InstanceType.IndoorObject:
                 case InstanceType.OutdoorObject:
                 case InstanceType.EditGroup:
                 case InstanceType.StableChocobo:
+                case InstanceType.Decal:
+                    break;
+
+                case InstanceType.WaterRange:
+                    type = typeof(WaterRangeLayoutInstance);
+                    break;
+
+                case InstanceType.ShowHideRange:
+                    type = typeof(ShowHideRangeLayoutInstance);
+                    break;
+
+                case InstanceType.GameContentsRange:
+                    type = typeof(GameContentsRangeLayoutInstance);
+                    break;
+
+                case InstanceType.EventEffectRange:
+                    type = typeof(EventEffectRangeLayoutInstance);
+                    break;
+
+                case InstanceType.CullingBox:
+                    type = typeof(CullingBoxLayoutInstance);
+                    break;
+
+                case InstanceType.VolumetricCloud:
+                    type = typeof(VolumetricCloudLayoutInstance);
                     break;
             }
         }
@@ -375,6 +420,10 @@ public static unsafe class TypeResolver
                 case EventHandlerContent.Quest:
                     type = typeof(QuestEventHandler);
                     additionalName = ServiceLocator.GetService<TextService>()?.GetQuestName(eventId.Id);
+                    break;
+
+                case EventHandlerContent.Warp:
+                    type = typeof(WarpEventHandler);
                     break;
 
                 case EventHandlerContent.GatheringPoint:
