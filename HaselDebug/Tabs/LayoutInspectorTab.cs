@@ -7,7 +7,7 @@ using HaselDebug.Utils;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class LgbInspectorTab : DebugTab
+public unsafe partial class LayoutInspectorTab : DebugTab
 {
     private readonly IGameGui _gameGui;
     private readonly DebugRenderer _debugRenderer;

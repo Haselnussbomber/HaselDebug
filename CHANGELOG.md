@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Changed:** Renamed Lgb Inspector to Layout Inspector.
+
 ## [1.70.0] (2026-08-14)
 
 Update for Patch 7.55hf2.
