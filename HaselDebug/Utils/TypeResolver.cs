@@ -452,6 +452,10 @@ public static unsafe class TypeResolver
                     type = typeof(FishingEventHandler);
                     break;
 
+                case EventHandlerContent.RetainerBuyback:
+                    type = typeof(RetainerBuybackEventHandler);
+                    break;
+
                 case EventHandlerContent.FateDirector:
                     type = typeof(FateDirector);
                     break;
