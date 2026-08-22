@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - **Changed:** Renamed Lgb Inspector to Layout Inspector.
+- **Updated:** ClientStructs now at [7ef0af2c](https://github.com/aers/FFXIVClientStructs/tree/7ef0af2c) ([compare](https://github.com/aers/FFXIVClientStructs/compare/50e46a84..7ef0af2c)).
 
 ## [1.70.0] (2026-08-14)
 
