@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- **Added:** A Reaction Event Object Manager tab for, well, objects from the ReactionEventObjectManager.
 - **Added:** Type redirect for RetainerBuybackEventHandler.
 - **Changed:** Renamed Lgb Inspector to Layout Inspector.
 - **Updated:** ClientStructs now at [7ef0af2c](https://github.com/aers/FFXIVClientStructs/tree/7ef0af2c) ([compare](https://github.com/aers/FFXIVClientStructs/compare/50e46a84..7ef0af2c)).
