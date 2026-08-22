@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.71.0] (2026-08-22)
 
 - **Added:** A Reaction Event Object Manager tab for, well, objects from the ReactionEventObjectManager.
 - **Added:** Type redirect for RetainerBuybackEventHandler.
@@ -1106,7 +1106,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.70.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.71.0...main
+[1.71.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.70.0...v1.71.0
 [1.70.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.69.0...v1.70.0
 [1.69.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.68.1...v1.69.0
 [1.68.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.68.0...v1.68.1
