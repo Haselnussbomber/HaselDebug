@@ -200,7 +200,7 @@ public unsafe partial class SoundManagerTab : DebugTab, IDisposable
                 ImGui.DragFloat3("Position"u8, ref _position);
                 ImGui.DragFloat("Speed"u8, ref _speed, 0.01f, 0, 2);
                 ImGui.InputInt("a9"u8, ref _a9);
-                ImGui.InputUInt("Track Index"u8, ref _soundNumber, 1);
+                ImGui.InputUInt("SoundNumber"u8, ref _soundNumber, 1);
                 ImGui.Checkbox("AutoRelease"u8, ref _autoRelease);
                 ImGuiUtilsEx.EnumCombo("VolumeCategory", ref _volumeCategory);
                 ImGui.Checkbox("a13"u8, ref _a13);
