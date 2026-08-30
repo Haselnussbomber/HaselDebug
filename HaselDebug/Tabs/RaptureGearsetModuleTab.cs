@@ -41,7 +41,7 @@ public unsafe partial class RaptureGearsetModuleTab : DebugTab
             DrawGearsetContextMenu(raptureGearsetModule, i, gearset);
 
             ImGui.SameLine(ImStyle.FramePadding.X * 3f + ImGui.GetFontSize(), 0);
-            ImGui.Text($"Gearset {i}");
+            ImGui.Text($"Gearset {i} - ");
             ImGui.SameLine(0, ImStyle.FramePadding.X);
             ImGui.Text(gearset->NameString);
             ImGui.SameLine(0, ImStyle.FramePadding.X * 3);
