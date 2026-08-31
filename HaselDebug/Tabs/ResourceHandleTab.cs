@@ -5,18 +5,6 @@ using HaselDebug.Services;
 
 namespace HaselDebug.Tabs;
 
-#pragma warning disable RCS1047
-
-[GenerateInterop]
-public unsafe partial struct ResourceHandleHelper
-{
-    [MemberFunction("E8 ?? ?? ?? ?? 4D 8B B5"), GenerateStringOverloads]
-    public static partial ResourceHandle* GetResourceAsync(CStringPointer path, nint unknown = 0, nint unkDebugPtr = 0, uint unkDebugInt = 0);
-
-    [MemberFunction("E8 ?? ?? ?? ?? 48 89 43 ?? 4D 85 F6"), GenerateStringOverloads]
-    public static partial ResourceHandle* GetResourceSync(CStringPointer path, nint unknown = 0, nint unkDebugPtr = 0, uint unkDebugInt = 0);
-}
-
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
 public unsafe partial class ResourceHandleTab : DebugTab, IDisposable
 {
@@ -69,13 +57,13 @@ public unsafe partial class ResourceHandleTab : DebugTab, IDisposable
     private void LoadAsync()
     {
         Unload();
-        _handle = ResourceHandleHelper.GetResourceAsync(_path);
+        _handle = ResourceHandle.GetAsync(_path);
     }
 
     private void LoadSync()
     {
         Unload();
-        _handle = ResourceHandleHelper.GetResourceSync(_path);
+        _handle = ResourceHandle.GetSync(_path);
     }
 
     public void Dispose()
