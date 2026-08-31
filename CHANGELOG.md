@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [f7c66c58](https://github.com/aers/FFXIVClientStructs/tree/f7c66c58) ([compare](https://github.com/aers/FFXIVClientStructs/compare/7ef0af2c..f7c66c58)).
+
 ## [1.71.0] (2026-08-22)
 
 - **Added:** A Reaction Event Object Manager tab for, well, objects from the ReactionEventObjectManager.
