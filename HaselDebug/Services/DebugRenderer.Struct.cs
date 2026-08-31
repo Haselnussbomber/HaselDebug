@@ -323,6 +323,14 @@ public unsafe partial class DebugRenderer
             return;
         }
 
+        // AddonListIcon.ItemData
+        if (parentType == typeof(AddonListIcon) && fieldType == typeof(AddonListIcon.ItemData*) && fieldInfo.Name == nameof(AddonListIcon.ListData))
+        {
+            DrawFieldName(fieldInfo);
+            DrawArray(new Span<AddonListIcon.ItemData>(((AddonListIcon*)address)->ListData, ((AddonListIcon*)address)->TotalItemCount), fieldNodeOptions);
+            return;
+        }
+
         // ByteColor.RGBA
         if (parentType == typeof(ByteColor) && fieldType == typeof(uint) && fieldInfo.Name == nameof(ByteColor.RGBA))
         {
