@@ -16,7 +16,6 @@ public unsafe partial class RaptureGearsetModuleTab : DebugTab
     private readonly TextService _textService;
     private readonly ItemService _itemService;
     private readonly ExcelService _excelService;
-    private readonly ITextureProvider _textureProvider;
 
     private int? _renamingGearsetId;
     private string _renameInput = string.Empty;
@@ -38,7 +37,7 @@ public unsafe partial class RaptureGearsetModuleTab : DebugTab
 
     private void DrawGearsetEntriesTable(RaptureGearsetModule* module)
     {
-        using var scroll = ImRaii.Child("RaptureGearsetModuleEntriesScroll"u8, new Vector2(0, ImGui.GetContentRegionAvail().Y), false, ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.NoSavedSettings);
+        using var scroll = ImRaii.Child("RaptureGearsetModuleEntriesScroll"u8, new Vector2(-1), false, ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.NoSavedSettings);
         if (!scroll)
             return;
 
@@ -58,12 +57,19 @@ public unsafe partial class RaptureGearsetModuleTab : DebugTab
             RaptureGearsetModule.GearsetEntry* expandedGearset = null;
             var expandedGearsetId = -1;
 
-            using (var table = ImRaii.Table($"RaptureGearsetModuleEntriesChunk{chunkIndex}", 9, GearsetEntryTableFlags))
+            using (var table = ImRaii.Table($"RaptureGearsetModuleEntriesChunk{chunkIndex}", 8, GearsetEntryTableFlags))
             {
                 if (!table)
                     return;
 
-                SetupGearsetEntryColumns();
+                ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 30);
+                ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("ClassJob"u8, ImGuiTableColumnFlags.WidthFixed, 140);
+                ImGui.TableSetupColumn("GlamourSetLink"u8, ImGuiTableColumnFlags.WidthFixed, 110);
+                ImGui.TableSetupColumn("ItemLevel"u8, ImGuiTableColumnFlags.WidthFixed, 70);
+                ImGui.TableSetupColumn("BannerIndex"u8, ImGuiTableColumnFlags.WidthFixed, 90);
+                ImGui.TableSetupColumn("Flags"u8, ImGuiTableColumnFlags.WidthFixed, 120);
+                ImGui.TableSetupColumn("Items"u8, ImGuiTableColumnFlags.WidthFixed, 360);
 
                 if (drawHeader)
                 {
@@ -99,32 +105,30 @@ public unsafe partial class RaptureGearsetModuleTab : DebugTab
         }
     }
 
-    private static void SetupGearsetEntryColumns()
-    {
-        ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 30);
-        ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthFixed, 140);
-        ImGui.TableSetupColumn("ClassJob"u8, ImGuiTableColumnFlags.WidthFixed, 120);
-        ImGui.TableSetupColumn("GlamourSetLink"u8, ImGuiTableColumnFlags.WidthFixed, 110);
-        ImGui.TableSetupColumn("ItemLevel"u8, ImGuiTableColumnFlags.WidthFixed, 70);
-        ImGui.TableSetupColumn("BannerIndex"u8, ImGuiTableColumnFlags.WidthFixed, 90);
-        ImGui.TableSetupColumn("Flags"u8, ImGuiTableColumnFlags.WidthFixed, 120);
-        ImGui.TableSetupColumn("Items"u8, ImGuiTableColumnFlags.WidthFixed, 300);
-        ImGui.TableSetupColumn("GlassesIds"u8, ImGuiTableColumnFlags.WidthFixed, 90);
-    }
-
     private bool DrawGearsetEntryRow(RaptureGearsetModule* module, int i, RaptureGearsetModule.GearsetEntry* gearset)
     {
+        ClassJob classJob = default;
+        var hasClassJob = gearset->ClassJob != 0 && _excelService.TryGetRow<ClassJob>(gearset->ClassJob, out classJob);
+
         ImGui.TableNextColumn(); // Id
         ImGui.Text(gearset->Id.ToString());
 
         ImGui.TableNextColumn(); // Name
-        ImGui.Text(gearset->NameString);
+        if (hasClassJob)
+        {
+            _debugRenderer.DrawIcon(62000 + classJob.RowId);
+        }
+
+        if (ImGui.Selectable(gearset->NameString, module->CurrentGearsetIndex == i))
+        {
+            module->EquipGearset(i);
+        }
         DrawGearsetContextMenu(module, i, gearset);
 
         ImGui.TableNextColumn(); // ClassJob
-        if (_excelService.TryGetRow<ClassJob>(gearset->ClassJob, out var classJob))
+        if (hasClassJob)
         {
-            ImGui.Text($"{gearset->ClassJob} ({classJob.Name})");
+            ImGui.Text($"{classJob.Name} ({gearset->ClassJob})");
         }
         else
         {
@@ -141,7 +145,7 @@ public unsafe partial class RaptureGearsetModuleTab : DebugTab
         ImGui.Text(gearset->BannerIndex.ToString());
 
         ImGui.TableNextColumn(); // Flags
-        TextWithTooltip(gearset->Flags.ToString(), $"##FlagsTooltip{i}");
+        ImGuiUtils.DrawCopyableText(gearset->Flags.ToString());
 
         var itemsExpanded = false;
         ImGui.TableNextColumn(); // Items
@@ -150,9 +154,6 @@ public unsafe partial class RaptureGearsetModuleTab : DebugTab
             itemsExpanded = itemsNode;
             DrawGearsetItemIcons(gearset);
         }
-
-        ImGui.TableNextColumn(); // GlassesIds
-        ImGui.Text($"{gearset->GlassesIds[0]}, {gearset->GlassesIds[1]}");
 
         return itemsExpanded;
     }
@@ -165,16 +166,16 @@ public unsafe partial class RaptureGearsetModuleTab : DebugTab
 
         ImGui.TableSetupColumn("Slot"u8, ImGuiTableColumnFlags.WidthFixed, 40);
         ImGui.TableSetupColumn("Armoury"u8, ImGuiTableColumnFlags.WidthFixed, 100);
-        ImGui.TableSetupColumn("ItemId"u8, ImGuiTableColumnFlags.WidthFixed, 100);
+        ImGui.TableSetupColumn("Id"u8, ImGuiTableColumnFlags.WidthFixed, 100);
         ImGui.TableSetupColumn("Name"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(4, 1);
         ImGui.TableHeadersRow();
 
         foreach (var slot in Enum.GetValues<RaptureGearsetModule.GearsetItemIndex>())
         {
-            var item = gearset->Items[(int)slot];
+            var item = gearset->Items.GetPointer((int)slot);
 
-            using var disabled = ImRaii.Disabled(item.ItemId == 0);
+            using var disabled = ImRaii.Disabled(item->ItemId == 0);
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn(); // Slot
@@ -183,22 +184,49 @@ public unsafe partial class RaptureGearsetModuleTab : DebugTab
             ImGui.TableNextColumn(); // Armoury
             ImGui.Text(slot.ToString());
 
-            ImGui.TableNextColumn(); // ItemId
-            ImGui.Text(item.ItemId.ToString());
+            ImGui.TableNextColumn(); // Id
+            ImGuiUtils.DrawCopyableText(item->ItemId.ToString());
 
             ImGui.TableNextColumn(); // Name
-            if (item.ItemId != 0)
+            if (item->ItemId != 0)
             {
-                _debugRenderer.DrawIcon(_itemService.GetItemIcon(item.ItemId), ItemUtil.IsHighQuality(item.ItemId));
-
-                fixed (RaptureGearsetModule.GearsetItem* itemsPtr = gearset->Items)
+                _debugRenderer.DrawIcon(_itemService.GetItemIcon(item->ItemId), ItemUtil.IsHighQuality(item->ItemId));
+                _debugRenderer.DrawPointerType(item, new NodeOptions()
                 {
-                    _debugRenderer.DrawPointerType(itemsPtr + (int)slot, new NodeOptions()
-                    {
-                        AddressPath = new AddressPath([gearsetId, (nint)slot]),
-                        Title = _textService.GetItemName(item.ItemId).ToString(),
-                    });
-                }
+                    AddressPath = new AddressPath([gearsetId, (nint)slot]),
+                    Title = _textService.GetItemName(item->ItemId).ToString(),
+                });
+            }
+        }
+
+        var glassesIndex = -1;
+        foreach (var glassesId in gearset->GlassesIds)
+        {
+            glassesIndex++;
+
+            if (!_excelService.TryGetRow<Glasses>(glassesId, out var row))
+                continue;
+
+            using var disabled = ImRaii.Disabled(glassesId == 0);
+
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn(); // Slot
+            ImGui.Text(glassesIndex.ToString());
+
+            ImGui.TableNextColumn(); // Armoury
+            ImGui.Text("Glasses"u8);
+
+            ImGui.TableNextColumn(); // Id
+            ImGuiUtils.DrawCopyableText(glassesId.ToString());
+
+            ImGui.TableNextColumn(); // Name
+            if (glassesId != 0)
+            {
+                _debugRenderer.DrawIcon((uint)row.Icon);
+                _debugRenderer.DrawExdRow(typeof(Glasses), row.RowId, 0, new()
+                {
+                    Title = row.Name.ToString()
+                });
             }
         }
     }
@@ -209,7 +237,17 @@ public unsafe partial class RaptureGearsetModuleTab : DebugTab
 
         foreach (var slot in Enum.GetValues<RaptureGearsetModule.GearsetItemIndex>())
         {
-            DrawGearsetItemIcon(gearset->Items[(int)slot]);
+            var (baseId, kind) = ItemUtil.GetBaseId(gearset->GetItem(slot).ItemId);
+            _debugRenderer.DrawIcon(_itemService.GetItemIcon(baseId), kind == Dalamud.Utility.ItemKind.Hq, false, canCopy: false, noTooltip: true);
+            ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
+        }
+
+        foreach (var glassesId in gearset->GlassesIds)
+        {
+            if (glassesId == 0 || !_excelService.TryGetRow<Glasses>(glassesId, out var row))
+                continue;
+
+            _debugRenderer.DrawIcon((uint)row.Icon, false, false, canCopy: false, noTooltip: true);
             ImGui.SameLine(0, ImStyle.ItemInnerSpacing.X);
         }
     }
@@ -293,37 +331,5 @@ public unsafe partial class RaptureGearsetModuleTab : DebugTab
         _renamingGearsetId = null;
         _renameInput = string.Empty;
         ImGui.CloseCurrentPopup();
-    }
-
-    private static void TextWithTooltip(string text, string id)
-    {
-        var maxWidth = ImGui.GetContentRegionAvail().X;
-        var pos = ImGui.GetCursorScreenPos();
-        var size = new Vector2(maxWidth, ImGui.GetTextLineHeightWithSpacing());
-        var clipRect = new Vector4(pos.X, pos.Y, pos.X + size.X, pos.Y + size.Y);
-
-        ImGui.GetWindowDrawList().AddTextClippedEx(pos, pos + size, text, null, Vector2.Zero, clipRect);
-
-        ImGui.SetCursorScreenPos(pos);
-        ImGui.InvisibleButton(id, size);
-
-        if (ImGui.IsItemHovered() && ImGui.CalcTextSize(text).X > maxWidth)
-        {
-            using var tooltip = ImRaii.Tooltip();
-            ImGui.Text(text);
-        }
-    }
-
-    private void DrawGearsetItemIcon(RaptureGearsetModule.GearsetItem item)
-    {
-        var iconId = item.ItemId != 0 ? _itemService.GetItemIcon(item.ItemId) : 0u;
-        if (iconId != 0 && _textureProvider.TryGetFromGameIcon(iconId, out var tex) && tex.TryGetWrap(out var texture, out _))
-        {
-            ImGui.Image(texture.Handle, new Vector2(ImStyle.TextLineHeight));
-        }
-        else
-        {
-            ImGui.Dummy(new Vector2(ImStyle.TextLineHeight));
-        }
     }
 }
