@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.72.0] (2026-08-31)
 
 - **Added:** Rapture Gearset Module tab to display gearsets in a nice table. (Thanks to @Jaksuhn)
 - **Updated:** ClientStructs now at [a2b1eace](https://github.com/aers/FFXIVClientStructs/tree/a2b1eace) ([compare](https://github.com/aers/FFXIVClientStructs/compare/7ef0af2c..a2b1eace)).
@@ -1111,7 +1111,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.71.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.72.0...main
+[1.72.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.71.0...v1.72.0
 [1.71.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.70.0...v1.71.0
 [1.70.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.69.0...v1.70.0
 [1.69.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.68.1...v1.69.0
