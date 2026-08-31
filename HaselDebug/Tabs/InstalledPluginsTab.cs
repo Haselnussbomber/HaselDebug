@@ -1,3 +1,4 @@
+using System.Text;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
@@ -14,7 +15,28 @@ public partial class InstalledPluginsTab : DebugTab
     public override void Draw()
     {
         _table.LoadRows();
+        DrawHeader();
+        ImGui.Separator();
         _table.Draw();
+        _table.UpdateRows();
+    }
+
+    private void DrawHeader()
+    {
+        if (ImGui.Button("Copy to clipboard"))
+            ImGui.SetClipboardText(_table.GetExport());
+
+        ImGui.SameLine();
+
+        var stats = _table.GetStats();
+        if (stats.Visible == stats.Total)
+        {
+            ImGui.Text($"{stats.Total} installed - {stats.Loaded} loaded - {stats.ThirdParty} third-party - {stats.Bad} bad");
+        }
+        else
+        {
+            ImGui.Text($"{stats.Visible} shown of {stats.Total} installed - {stats.Loaded} loaded - {stats.ThirdParty} third-party - {stats.Bad} bad");
+        }
     }
 }
 
@@ -62,6 +84,59 @@ public partial class InstalledPluginsTable : Table<IExposedPlugin>
     public override float CalculateLineHeight() => ImGui.GetFrameHeightWithSpacing(); // because of the buttons
 
     public override void LoadRows() => Rows = [.. _pluginInterface.InstalledPlugins];
+
+    private List<IExposedPlugin> _displayRows = [];
+
+    public void UpdateRows()
+        => _displayRows = FilteredRows?.ToList() ?? [.. GetVisibleRows()];
+
+    public IEnumerable<IExposedPlugin> GetVisibleRows()
+        => Rows.Where(row => Columns.All(column => column.ShouldShow(row)));
+
+    public InstalledPluginsStats GetStats()
+    {
+        var visible = GetVisibleRows().ToList();
+
+        return new InstalledPluginsStats(
+            Total: Rows.Count,
+            Visible: visible.Count,
+            Loaded: visible.Count(plugin => plugin.IsLoaded),
+            ThirdParty: visible.Count(plugin => plugin.IsThirdParty),
+            Bad: visible.Count(plugin => GetBadFlags(plugin) != BadPluginFlags.None));
+    }
+
+    public string GetExport()
+    {
+        var rows = _displayRows.Count > 0 ? _displayRows : [.. GetVisibleRows().OrderBy(plugin => plugin.InternalName)];
+
+        var sb = new StringBuilder();
+        sb.AppendLine("InternalName,Name,IsLoaded,IsDev,IsThirdParty,IsBad,Version,HasMainUi,HasConfigUi,Source");
+
+        foreach (var row in rows)
+        {
+            sb.Append(row.InternalName);
+            sb.Append(',');
+            sb.Append(row.Name);
+            sb.Append(',');
+            sb.Append(row.IsLoaded ? "Yes" : "No");
+            sb.Append(',');
+            sb.Append(row.IsDev ? "Yes" : "No");
+            sb.Append(',');
+            sb.Append(row.IsThirdParty ? "Yes" : "No");
+            sb.Append(',');
+            sb.Append(ToBadFlagsString(row));
+            sb.Append(',');
+            sb.Append(row.Version.ToString());
+            sb.Append(',');
+            sb.Append(row.HasMainUi ? "Yes" : "No");
+            sb.Append(',');
+            sb.Append(row.HasConfigUi ? "Yes" : "No");
+            sb.Append(',');
+            sb.AppendLine(row.Manifest.InstalledFromUrl ?? string.Empty);
+        }
+
+        return sb.ToString();
+    }
 
     public static BadPluginFlags GetBadFlags(IExposedPlugin plugin)
     {
@@ -322,3 +397,5 @@ public partial class InstalledPluginsTable : Table<IExposedPlugin>
         }
     }
 }
+
+public readonly record struct InstalledPluginsStats(int Total, int Visible, int Loaded, int ThirdParty, int Bad);
