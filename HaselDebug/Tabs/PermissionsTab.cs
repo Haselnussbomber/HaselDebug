@@ -21,7 +21,7 @@ public unsafe partial class PermissionsTab : DebugTab
             .GetFields(BindingFlags.Instance | BindingFlags.Public)
             .Where(fi => fi.FieldType == typeof(bool) && !Attribute.IsDefined(fi, typeof(ObsoleteAttribute)))
             .Select(fi => (fi.FieldOffset, fi.Name))
-            .DistinctBy(t => t.Item1)
+            .DistinctBy(t => t.FieldOffset)
             .ToDictionary();
     }
 
