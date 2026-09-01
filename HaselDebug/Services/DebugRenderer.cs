@@ -372,7 +372,7 @@ public unsafe partial class DebugRenderer
         var width = node->Width * scale;
         var height = node->Height * scale;
 
-        // Definite the original rectangle that we will then transform below
+        // Define the original rectangle that we will then transform below
         Span<Vector2> localCorners =
         [
             new(0, 0),
