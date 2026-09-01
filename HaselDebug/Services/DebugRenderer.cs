@@ -367,9 +367,36 @@ public unsafe partial class DebugRenderer
         if (_processInfoService.IsPointerValid(addon))
             scale *= addon->Scale;
 
-        var pos = ImGui.GetMainViewport().Pos + new Vector2(node->ScreenX, node->ScreenY);
-        var size = node->Size * scale;
-        ImGui.GetForegroundDrawList().AddRect(pos, pos + size, Color.Gold.ToUInt());
+        var origin = ImGui.GetMainViewport().Pos + new Vector2(node->ScreenX, node->ScreenY);
+
+        var width = node->Width * scale;
+        var height = node->Height * scale;
+
+        // Define the original rectangle that we will then transform below
+        Span<Vector2> localCorners =
+        [
+            new(0, 0),
+            new(width, 0),
+            new(width, height),
+            new(0, height),
+        ];
+
+        var transform = node->Transform;
+        Span<Vector2> screenCorners = stackalloc Vector2[4];
+
+        // Calculate transform using #math
+        for (var i = 0; i < 4; i++)
+        {
+            var local = localCorners[i];
+            var transformedX = (local.X * transform.M11) - (local.Y * transform.M12);
+            var transformedY = - (local.X * transform.M21) + (local.Y * transform.M22);
+
+            screenCorners[i] = origin + new Vector2(transformedX, transformedY);
+        }
+
+        // Draw transformed bounds via Polyline
+        var drawList = ImGui.GetForegroundDrawList();
+        drawList.AddPolyline(ref screenCorners[0], 4, Color.Gold.ToUInt(), ImDrawFlags.Closed, 1.5f);
     }
 
     private void DrawLineToGamePos(Vector3 pos)
