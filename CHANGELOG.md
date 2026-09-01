@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** The AtkResNode highlight now supports transformations. (Thanks to @MidoriKami)
+
 ## [1.72.0] (2026-08-31)
 
 - **Added:** Rapture Gearset Module tab to display gearsets in a nice table. (Thanks to @Jaksuhn)
