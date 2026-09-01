@@ -315,9 +315,25 @@ public unsafe partial class DebugRenderer
             var gameObjectExists = GameObjectManager.Instance()->Objects.IndexSorted.Contains(gameObject);
             if (gameObjectExists && gameObject->VirtualTable != null)
             {
-                var pos = gameObject->GetPosition();
-                if (pos != null)
-                    DrawLineToGamePos((Vector3)(*pos));
+                var drawObject = gameObject->GetDrawObject();
+                if (drawObject != null)
+                {
+                    var bounds = new FFXIVClientStructs.FFXIV.Common.Math.OrientedBounds();
+                    drawObject->ComputeOrientedBounds(&bounds);
+                    DrawOrientedBounds(bounds);
+                }
+                else if (gameObject->SharedGroupLayoutInstance != null)
+                {
+                    var bounds = new FFXIVClientStructs.FFXIV.Common.Math.OrientedBounds();
+                    gameObject->SharedGroupLayoutInstance->GetOrientedBoundsImpl(&bounds);
+                    DrawOrientedBounds(bounds);
+                }
+                else
+                {
+                    var pos = gameObject->GetPosition();
+                    if (pos != null)
+                        DrawLineToGamePos((Vector3)(*pos));
+                }
             }
         }
         else if (Inherits<FFXIVClientStructs.FFXIV.Client.Graphics.Scene.Object>(type))
@@ -388,8 +404,8 @@ public unsafe partial class DebugRenderer
         for (var i = 0; i < 4; i++)
         {
             var local = localCorners[i];
-            var transformedX = (local.X * transform.M11) - (local.Y * transform.M12);
-            var transformedY = - (local.X * transform.M21) + (local.Y * transform.M22);
+            var transformedX = local.X * transform.M11 - local.Y * transform.M12;
+            var transformedY = -local.X * transform.M21 + local.Y * transform.M22;
 
             screenCorners[i] = origin + new Vector2(transformedX, transformedY);
         }
@@ -401,11 +417,129 @@ public unsafe partial class DebugRenderer
 
     private void DrawLineToGamePos(Vector3 pos)
     {
+        var drawList = ImGui.GetForegroundDrawList();
+        var color = Color.Orange.ToUInt();
+        var mousePos = ImGui.GetMousePos();
+
+        // On-screen: Draw line to position with the center dot
         if (_gameGui.WorldToScreen(pos, out var screenPos))
         {
-            var drawList = ImGui.GetForegroundDrawList();
-            drawList.AddLine(ImGui.GetMousePos(), screenPos, Color.Orange.ToUInt());
-            drawList.AddCircleFilled(screenPos, 3f, Color.Orange.ToUInt());
+            drawList.AddLine(mousePos, screenPos, color);
+            drawList.AddCircleFilled(screenPos, 3f, color);
+            return;
         }
+
+        // Off-screen: Project line to the screen edge (no dot)
+        var displaySize = ImGui.GetIO().DisplaySize;
+        var screenCenter = displaySize * 0.5f;
+
+        // Calculate direction from screen center toward projected target
+        var dir = Vector2.Normalize(screenPos - screenCenter);
+        if (dir == Vector2.Zero || float.IsNaN(dir.X))
+        {
+            dir = new Vector2(0, 1); // Fallback
+        }
+
+        var scaleX = (dir.X > 0 ? (displaySize.X - screenCenter.X) : screenCenter.X) / dir.X;
+        var scaleY = (dir.Y > 0 ? (displaySize.Y - screenCenter.Y) : screenCenter.Y) / dir.Y;
+        var scale = MathF.Min(MathF.Abs(scaleX), MathF.Abs(scaleY));
+
+        var edgePos = screenCenter + dir * scale;
+        drawList.AddLine(mousePos, edgePos, color);
+    }
+
+    private void DrawOrientedBounds(FFXIVClientStructs.FFXIV.Common.Math.OrientedBounds bounds)
+    {
+        var extents = bounds.HalfExtents;
+
+        Vector3[] localCorners = [
+            new(-extents.X, -extents.Y, -extents.Z), // 0: Bottom-left-back
+            new( extents.X, -extents.Y, -extents.Z), // 1: Bottom-right-back
+            new( extents.X, -extents.Y,  extents.Z), // 2: Bottom-right-front
+            new(-extents.X, -extents.Y,  extents.Z), // 3: Bottom-left-front
+            new(-extents.X,  extents.Y, -extents.Z), // 4: Top-left-back
+            new( extents.X,  extents.Y, -extents.Z), // 5: Top-right-back
+            new( extents.X,  extents.Y,  extents.Z), // 6: Top-right-front
+            new(-extents.X,  extents.Y,  extents.Z), // 7: Top-left-front
+        ];
+
+        // Transform local corners into world space
+        var worldCorners = new Vector3[8];
+        for (var i = 0; i < 8; i++)
+        {
+            worldCorners[i] = Vector3.Transform(localCorners[i], bounds.Transform);
+        }
+
+        // Draw line to center
+        Vector3 worldCenter = bounds.Transform.Translation;
+        DrawLineToGamePos(worldCenter);
+
+        // Render clipped 3D edges
+        var drawList = ImGui.GetForegroundDrawList();
+        var color = Color.Orange.ToUInt();
+        const float thickness = 1.0f;
+
+        void DrawClippedLine(Vector3 p1, Vector3 p2)
+        {
+            var p1Valid = _gameGui.WorldToScreen(p1, out var s1);
+            var p2Valid = _gameGui.WorldToScreen(p2, out var s2);
+
+            if (p1Valid && p2Valid)
+            {
+                drawList.AddLine(s1, s2, color, thickness);
+                return;
+            }
+
+            if (!p1Valid && !p2Valid) return;
+
+            var validPoint = p1Valid ? p1 : p2;
+            var invalidPoint = p1Valid ? p2 : p1;
+
+            float low = 0.0f, high = 1.0f;
+            Vector2 clippedScreen = default;
+
+            for (var i = 0; i < 10; i++)
+            {
+                var mid = (low + high) * 0.5f;
+                var testPoint = Vector3.Lerp(validPoint, invalidPoint, mid);
+
+                if (_gameGui.WorldToScreen(testPoint, out var testScreen))
+                {
+                    clippedScreen = testScreen;
+                    low = mid;
+                }
+                else
+                {
+                    high = mid;
+                }
+            }
+
+            if (p1Valid)
+            {
+                drawList.AddLine(s1, clippedScreen, color, thickness);
+            }
+            else
+            {
+                drawList.AddLine(clippedScreen, s2, color, thickness);
+            }
+        }
+
+        // Bottom face
+        DrawClippedLine(worldCorners[0], worldCorners[1]);
+        DrawClippedLine(worldCorners[1], worldCorners[2]);
+        DrawClippedLine(worldCorners[2], worldCorners[3]);
+        DrawClippedLine(worldCorners[3], worldCorners[0]);
+
+        // Top face
+        DrawClippedLine(worldCorners[4], worldCorners[5]);
+        DrawClippedLine(worldCorners[5], worldCorners[6]);
+        DrawClippedLine(worldCorners[6], worldCorners[7]);
+        DrawClippedLine(worldCorners[7], worldCorners[4]);
+
+        // Vertical pillars
+        DrawClippedLine(worldCorners[0], worldCorners[4]);
+        DrawClippedLine(worldCorners[1], worldCorners[5]);
+        DrawClippedLine(worldCorners[2], worldCorners[6]);
+        DrawClippedLine(worldCorners[3], worldCorners[7]);
     }
 }

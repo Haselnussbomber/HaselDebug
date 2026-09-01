@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 - **Updated:** The AtkResNode highlight now supports transformations. (Thanks to @MidoriKami)
+- **Updated:** The GameObject highlight now draws a line even if the object is out of field of view.
+- **Updated:** The GameObject highlight now draws an oriented bounding box, if available.
+- **Updated:** ClientStructs now at [9e293913](https://github.com/aers/FFXIVClientStructs/tree/9e293913) ([compare](https://github.com/aers/FFXIVClientStructs/compare/a2b1eace..9e293913)).
 
 ## [1.72.0] (2026-08-31)
 
