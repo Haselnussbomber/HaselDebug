@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.73.0] (2026-09-02)
 
 - **Updated:** The AtkResNode highlight now supports transformations. (Thanks to @MidoriKami)
 - **Updated:** The GameObject highlight now draws a line even if the object is out of field of view.
@@ -1118,7 +1118,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.72.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.73.0...main
+[1.73.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.72.0...v1.73.0
 [1.72.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.71.0...v1.72.0
 [1.71.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.70.0...v1.71.0
 [1.70.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.69.0...v1.70.0
