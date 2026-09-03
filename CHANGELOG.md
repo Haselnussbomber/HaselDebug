@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** The GameWindow tab was removed because a special case for the Arguments pointer was added to draw them as array.
+
 ## [1.73.0] (2026-09-02)
 
 - **Updated:** The AtkResNode highlight now supports transformations. (Thanks to @MidoriKami)

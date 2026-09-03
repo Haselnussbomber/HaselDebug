@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -328,6 +329,14 @@ public unsafe partial class DebugRenderer
         {
             DrawFieldName(fieldInfo);
             DrawArray(new Span<AddonListIcon.ItemData>(((AddonListIcon*)address)->ListData, ((AddonListIcon*)address)->TotalItemCount), fieldNodeOptions);
+            return;
+        }
+
+        // GameWindow.Arguments
+        if (parentType == typeof(GameWindow) && fieldType == typeof(CStringPointer*) && fieldInfo.Name == nameof(GameWindow.Arguments))
+        {
+            DrawFieldName(fieldInfo);
+            DrawArray(((GameWindow*)address)->ArgumentsSpan, fieldNodeOptions);
             return;
         }
 
