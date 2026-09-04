@@ -2,7 +2,10 @@
 
 ## [Unreleased]
 
+- **Added:** Type redirect for GuildleveAssignmentEventHandler.
+- **Updated:** The plugin now disposes asynchronously, concurrently and on the Framework thread.
 - **Updated:** The GameWindow tab was removed because a special case for the Arguments pointer was added to draw them as array.
+- **Updated:** ClientStructs now at [d8633414](https://github.com/aers/FFXIVClientStructs/tree/d8633414) ([compare](https://github.com/aers/FFXIVClientStructs/compare/5af9ff4c..d8633414)).
 
 ## [1.73.0] (2026-09-02)
 
