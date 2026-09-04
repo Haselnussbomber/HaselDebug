@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
@@ -7,11 +8,14 @@ using HaselDebug.Utils;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
+public unsafe partial class AtkHandlerCallsTab : DebugTab, IAsyncDisposable
 {
     private readonly DebugRenderer _debugRenderer;
     private readonly IGameInteropProvider _gameInteropProvider;
+    private readonly IFramework _framework;
+
     private readonly List<AtkValuesCopy> _calls = [];
+
     private Hook<AtkExternalInterface.Delegates.CallHandler>? _callHandlerDetour;
     private bool _enabled = false;
     private bool _isInitialized;
@@ -23,14 +27,14 @@ public unsafe partial class AtkHandlerCallsTab : DebugTab, IDisposable
             CallHandlerDetour);
     }
 
-    public void Dispose()
+    public ValueTask DisposeAsync()
     {
-        _callHandlerDetour?.Dispose();
-
         foreach (var entry in _calls)
             entry.Dispose();
 
         _calls.Clear();
+
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _callHandlerDetour)));
     }
 
     private AtkValue* CallHandlerDetour(AtkExternalInterface* thisPtr, AtkValue* returnValue, uint handlerIndex, uint valueCount, AtkValue* values)

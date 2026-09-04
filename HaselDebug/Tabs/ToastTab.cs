@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
@@ -7,28 +8,32 @@ using HaselDebug.Utils;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class ToastTab : DebugTab, IDisposable
+public unsafe partial class ToastTab : DebugTab, IAsyncDisposable
 {
     private readonly DebugRenderer _debugRenderer;
     private readonly IGameInteropProvider _gameInteropProvider;
     private readonly ISeStringEvaluator _seStringEvaluator;
+    private readonly IFramework _framework;
 
     private bool _enabled;
-    private Hook<UIModule.Delegates.ShowWideText> _showWideTextHook;
-    private Hook<UIModule.Delegates.ShowText> _showTextHook;
-    private Hook<UIModule.Delegates.ShowPoisonText> _showPoisonTextHook;
-    private Hook<UIModule.Delegates.ShowErrorText> _showErrorTextHook;
+    private Hook<UIModule.Delegates.ShowWideText>? _showWideTextHook;
+    private Hook<UIModule.Delegates.ShowText>? _showTextHook;
+    private Hook<UIModule.Delegates.ShowPoisonText>? _showPoisonTextHook;
+    private Hook<UIModule.Delegates.ShowErrorText>? _showErrorTextHook;
     private Hook<RaptureAtkModule.Delegates.ShowTextGimmickHint>? _showTextGimmickHintHook;
 
     private readonly List<Toast> _toasts = [];
 
-    public void Dispose()
+    public ValueTask DisposeAsync()
     {
-        _showWideTextHook?.Dispose();
-        _showTextHook?.Dispose();
-        _showPoisonTextHook?.Dispose();
-        _showErrorTextHook?.Dispose();
-        _showTextGimmickHintHook?.Dispose();
+        return new ValueTask(_framework.Run(() =>
+        {
+            DisposeAndNull(ref _showWideTextHook);
+            DisposeAndNull(ref _showTextHook);
+            DisposeAndNull(ref _showPoisonTextHook);
+            DisposeAndNull(ref _showErrorTextHook);
+            DisposeAndNull(ref _showTextGimmickHintHook);
+        }));
     }
 
     public override void Draw()

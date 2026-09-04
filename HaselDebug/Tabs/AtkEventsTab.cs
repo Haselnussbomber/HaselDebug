@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselDebug.Abstracts;
 using HaselDebug.Extensions;
@@ -8,18 +9,21 @@ using HaselDebug.Utils;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class AtkEventsTab : DebugTab, IDisposable
+public unsafe partial class AtkEventsTab : DebugTab, IAsyncDisposable
 {
     private readonly DebugRenderer _debugRenderer;
     private readonly IGameInteropProvider _gameInteropProvider;
+    private readonly IFramework _framework;
+
     private readonly List<(DateTime, nint)> _events = [];
+
     private Hook<AtkEventDispatcher.Delegates.DispatchEvent>? _dispatchEventHook;
     private bool _enabled = false;
 
-    public void Dispose()
+    public ValueTask DisposeAsync()
     {
-        _dispatchEventHook?.Dispose();
         Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _dispatchEventHook)));
     }
 
     private void Clear()

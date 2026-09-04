@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using HaselDebug.Abstracts;
@@ -7,20 +8,21 @@ using HaselDebug.Services;
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class ServerRequestCallbackLogTab : DebugTab, IPacketLogTab, IDisposable
+public unsafe partial class ServerRequestCallbackLogTab : DebugTab, IPacketLogTab, IAsyncDisposable
 {
     protected readonly DebugRenderer _debugRenderer;
     protected readonly IGameInteropProvider _gameInteropProvider;
+    protected readonly IFramework _framework;
 
     private Hook<ServerRequestCallbackManager.Delegates.ProcessPacket>? _hook;
     private readonly List<ServerRequestCallbackEntry> _records = [];
 
     public bool IsPacketLogEnabled { get; private set; }
 
-    public void Dispose()
+    public ValueTask DisposeAsync()
     {
-        _hook?.Dispose();
         Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _hook)));
     }
 
     private void ProcessPacketDetour(ServerRequestCallbackManager* thisPtr, int callbackIndex, int commandId, void* payload, nuint payloadSize)

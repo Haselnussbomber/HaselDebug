@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Network;
@@ -8,14 +9,14 @@ using HaselDebug.Utils;
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class SpawnObjectLogTab : PacketLogTab<SpawnObjectPacket>, IDisposable
+public unsafe partial class SpawnObjectLogTab : PacketLogTab<SpawnObjectPacket>
 {
     private Hook<PacketDispatcher.Delegates.HandleSpawnObjectPacket>? _hook;
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
-        _hook?.Dispose();
-        base.Dispose();
+        Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _hook)));
     }
 
     private void HandleSpawnObjectPacketDetour(uint targetId, SpawnObjectPacket* packet)

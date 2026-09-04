@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Network;
@@ -20,14 +21,14 @@ public partial struct EventPlayRecord
 }
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class EventPlayLogTab : PacketLogTab<EventPlayRecord>, IDisposable
+public unsafe partial class EventPlayLogTab : PacketLogTab<EventPlayRecord>
 {
     private Hook<PacketDispatcher.Delegates.HandleEventPlayPacket>? _hook;
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
-        _hook?.Dispose();
-        base.Dispose();
+        Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _hook)));
     }
 
     private void HandleEventPlayPacketDetour(GameObjectId objectId, EventId eventId, short scene, ulong sceneFlags, uint* sceneData, byte sceneDataCount)

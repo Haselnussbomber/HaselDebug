@@ -6,38 +6,40 @@ using HaselDebug.Config;
 namespace HaselDebug.Services;
 
 [RegisterSingleton, RegisterSingleton<IHostedService>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class LuaLogger : IHostedService, IDisposable
+public unsafe partial class LuaLogger : IHostedService
 {
     private const int LUA_GLOBALSINDEX = -10002; // _G
 
     private readonly ILogger<LuaLogger> _logger;
     private readonly PluginConfig _pluginConfig;
     private readonly IGameInteropProvider _gameInteropProvider;
+    private readonly IFramework _framework;
 
     private Hook<LuaFuncDelegate>? _luaPanicHook;
     private Hook<LuaFuncDelegate>? _luaPrintHook;
 
     private delegate ulong LuaFuncDelegate(lua_State* thisPtr);
 
-    [AutoPostConstruct]
-    private void Initialize()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         _luaPanicHook = _gameInteropProvider.HookFromSignature<LuaFuncDelegate>("48 83 EC ?? 45 33 C0 41 8D 50 ?? E8 ?? ?? ?? ?? 33 C0", LuaPanicDetour);
         _luaPrintHook = _gameInteropProvider.HookFromSignature<LuaFuncDelegate>("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 48 8B F9 E8", LuaPrintDetour);
 
         if (_pluginConfig.EnableLuaLogger)
-            Enable();
+            return _framework.Run(Enable, cancellationToken);
+
+        return Task.CompletedTask;
     }
 
-    public void Dispose()
+    public Task StopAsync(CancellationToken cancellationToken)
     {
-        Disable();
-        _luaPanicHook?.Dispose();
-        _luaPrintHook?.Dispose();
+        return _framework.Run(() =>
+        {
+            DisposeAndNull(ref _luaPanicHook);
+            DisposeAndNull(ref _luaPrintHook);
+            _logger.LogInformation("Disposed");
+        }, cancellationToken);
     }
-
-    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     public void Enable()
     {

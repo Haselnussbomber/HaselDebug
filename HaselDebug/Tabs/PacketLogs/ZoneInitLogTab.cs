@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using HaselDebug.Abstracts;
@@ -6,14 +7,14 @@ using HaselDebug.Interfaces;
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class ZoneInitLogTab : PacketLogTab<ZoneInitPacket>, IDisposable
+public unsafe partial class ZoneInitLogTab : PacketLogTab<ZoneInitPacket>
 {
     private Hook<PacketDispatcher.Delegates.HandleZoneInitPacket>? _hook;
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
-        _hook?.Dispose();
-        base.Dispose();
+        Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _hook)));
     }
 
     private void HandleZoneInitPacketDetour(uint targetId, ZoneInitPacket* packet, byte a3)

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Network;
@@ -12,7 +13,7 @@ using DObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class SpawnNpcLogTab : PacketLogTab<SpawnNpcEntry>, IDisposable
+public unsafe partial class SpawnNpcLogTab : PacketLogTab<SpawnNpcEntry>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly TextService _textService;
@@ -29,10 +30,10 @@ public unsafe partial class SpawnNpcLogTab : PacketLogTab<SpawnNpcEntry>, IDispo
         public uint EntityId;
     }
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
-        _hook?.Dispose();
-        base.Dispose();
+        Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _hook)));
     }
 
     private void HandleSpawnNpcPacketDetour(uint entityId, SpawnNpcPacket* packet)

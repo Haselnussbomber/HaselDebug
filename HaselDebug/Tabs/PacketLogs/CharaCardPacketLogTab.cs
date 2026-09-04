@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselDebug.Abstracts;
@@ -6,14 +7,14 @@ using HaselDebug.Interfaces;
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class CharaCardPacketLogTab : PacketLogTab<CharaCardPacket>, IDisposable
+public unsafe partial class CharaCardPacketLogTab : PacketLogTab<CharaCardPacket>
 {
     private Hook<CharaCard.Delegates.HandleCurrentCharaCardDataPacket>? _hook;
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
-        _hook?.Dispose();
-        base.Dispose();
+        Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _hook)));
     }
 
     private void HandleCurrentCharaCardDataPacketDetour(CharaCard* thisPtr, CharaCardPacket* packet)

@@ -1,5 +1,6 @@
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.System.Diagnostics.Debug;
@@ -10,13 +11,13 @@ using Windows.Win32.System.SystemServices;
 namespace HaselDebug.Service;
 
 [RegisterSingleton, AutoConstruct]
-public unsafe partial class ProcessInfoService : IDisposable
+public partial class ProcessInfoService : IAsyncDisposable
 {
     private readonly CancellationTokenSource _cts = new();
     private readonly Lock _swapLock = new();
 
     private HANDLE _processHandle;
-    private Thread _workerThread;
+    private Task? _workerTask;
 
     private ModuleInfo[] _modulesBufferA = new ModuleInfo[512];
     private ModuleInfo[] _modulesBufferB = new ModuleInfo[512];
@@ -57,27 +58,26 @@ public unsafe partial class ProcessInfoService : IDisposable
         _activeModules = _modulesBufferA;
         _activeSections = _sectionsBufferA;
 
-        _workerThread = new Thread(WorkerLoop)
-        {
-            IsBackground = true,
-            Name = "ProcessInfoServiceWorker",
-            Priority = ThreadPriority.BelowNormal
-        };
-
-        _workerThread.Start();
+        _workerTask = Task.Factory.StartNew(
+            WorkerLoopAsync,
+            _cts.Token,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default).Unwrap();
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         _cts.Cancel();
-        
-        if (_workerThread.IsAlive)
-            _workerThread.Join();
+
+        if (_workerTask != null)
+        {
+            await _workerTask.ConfigureAwait(false);
+        }
 
         _cts.Dispose();
     }
 
-    private void WorkerLoop()
+    private async Task WorkerLoopAsync()
     {
         while (!_cts.Token.IsCancellationRequested)
         {
@@ -111,13 +111,20 @@ public unsafe partial class ProcessInfoService : IDisposable
                 }
             }
 
-            _cts.Token.WaitHandle.WaitOne(1000);
+            try
+            {
+                await Task.Delay(1000, _cts.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
         }
     }
 
-    public bool IsPointerValid(nint ptr) => IsPointerValid((void*)ptr);
+    public unsafe bool IsPointerValid(nint ptr) => IsPointerValid((void*)ptr);
 
-    public bool IsPointerValid(void* ptr)
+    public unsafe bool IsPointerValid(void* ptr)
     {
         return ptr != null && GetSectionToPointer((nint)ptr) != default;
     }
@@ -149,7 +156,7 @@ public unsafe partial class ProcessInfoService : IDisposable
         return index < 0 ? default : Sections[index];
     }
 
-    private int FillModules(ref ModuleInfo[] buffer)
+    private unsafe int FillModules(ref ModuleInfo[] buffer)
     {
         var snapshot = PInvoke.CreateToolhelp32Snapshot(CREATE_TOOLHELP_SNAPSHOT_FLAGS.TH32CS_SNAPMODULE | CREATE_TOOLHELP_SNAPSHOT_FLAGS.TH32CS_SNAPMODULE32, 0);
         if (snapshot.IsNull)
@@ -193,7 +200,7 @@ public unsafe partial class ProcessInfoService : IDisposable
         return count;
     }
 
-    private int FillSections(ref SectionInfo[] buffer, ModuleInfo[] modules, int modCount)
+    private unsafe int FillSections(ref SectionInfo[] buffer, ModuleInfo[] modules, int modCount)
     {
         var count = 0;
         nuint address = 0;
@@ -236,7 +243,7 @@ public unsafe partial class ProcessInfoService : IDisposable
         return count;
     }
 
-    private void ParseModuleSections(ModuleInfo module, Span<SectionInfo> sections)
+    private unsafe void ParseModuleSections(ModuleInfo module, Span<SectionInfo> sections)
     {
         if (module.BaseAddress == 0)
             return;

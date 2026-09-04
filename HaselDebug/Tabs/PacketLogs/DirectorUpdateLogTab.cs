@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
@@ -8,7 +9,7 @@ using EventId = FFXIVClientStructs.FFXIV.Client.Game.Event.EventId;
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class DirectorUpdateLogTab : PacketLogTab<DirectorUpdateEntry>, IDisposable
+public unsafe partial class DirectorUpdateLogTab : PacketLogTab<DirectorUpdateEntry>
 {
     private Hook<EventFramework.Delegates.ProcessDirectorUpdate>? _hook;
 
@@ -25,10 +26,10 @@ public unsafe partial class DirectorUpdateLogTab : PacketLogTab<DirectorUpdateEn
         public uint Arg6;
     }
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
-        _hook?.Dispose();
-        base.Dispose();
+        Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _hook)));
     }
 
     private void ProcessDirectorUpdateDetour(EventFramework* thisPtr, EventId eventId, uint category, uint arg1, uint arg2, uint arg3, uint arg4, uint arg5, uint arg6)

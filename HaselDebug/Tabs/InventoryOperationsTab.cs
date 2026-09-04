@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using FFXIVClientStructs.FFXIV.Client.Network;
@@ -12,9 +13,10 @@ namespace HaselDebug.Tabs;
 // Yes, this does not list ALL inventory operations. It's a complicated system with many packets.
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
+public unsafe partial class InventoryOperationsTab : DebugTab, IAsyncDisposable
 {
     private readonly IGameInteropProvider _gameInteropProvider;
+    private readonly IFramework _framework;
     private readonly ISigScanner _sigScanner;
     private readonly DebugRenderer _debugRenderer;
     private readonly ItemService _itemService;
@@ -71,18 +73,21 @@ public unsafe partial class InventoryOperationsTab : DebugTab, IDisposable
         _typeBase = *(int*)(_sigScanner.ScanText("81 F9 ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? 8B 4B") + 2) - 7;
     }
 
-    public void Dispose()
+    public ValueTask DisposeAsync()
     {
-        _removeOperationByIdHook?.Dispose();
-        _handleInventoryItemPacketHook?.Dispose();
-        _handleInventoryItemUpdatePacketHook?.Dispose();
-        _handleSetInventoryItemCurrencyPacketHook?.Dispose();
-        _handleSetInventoryItemSymbolicPacketHook?.Dispose();
+        return new ValueTask(_framework.Run(() =>
+        {
+            DisposeAndNull(ref _removeOperationByIdHook);
+            DisposeAndNull(ref _handleInventoryItemPacketHook);
+            DisposeAndNull(ref _handleInventoryItemUpdatePacketHook);
+            DisposeAndNull(ref _handleSetInventoryItemCurrencyPacketHook);
+            DisposeAndNull(ref _handleSetInventoryItemSymbolicPacketHook);
 
-        foreach (var action in _actions)
-            action.Dispose();
+            foreach (var action in _actions)
+                action.Dispose();
 
-        _actions.Clear();
+            _actions.Clear();
+        }));
     }
 
     private void RemoveOperationByIdDetour(InventoryManager* thisPtr, uint contextId)

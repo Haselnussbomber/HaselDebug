@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
@@ -18,14 +19,14 @@ public unsafe partial struct EventCompleteRecord
 }
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class EventCompleteLogTab : PacketLogTab<EventCompleteRecord>, IDisposable
+public unsafe partial class EventCompleteLogTab : PacketLogTab<EventCompleteRecord>
 {
     private Hook<PacketDispatcher.Delegates.SendEventCompletePacket>? _hook;
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
-        _hook?.Dispose();
-        base.Dispose();
+        Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _hook)));
     }
 
     private void SendEventCompletePacketDetour(EventId eventId, short scene, byte luaStatus, uint* payload, byte payloadSize, void* a6)

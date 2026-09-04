@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
@@ -17,14 +18,14 @@ public partial struct EventYieldRecord
 }
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class EventYieldLogTab : PacketLogTab<EventYieldRecord>, IDisposable
+public unsafe partial class EventYieldLogTab : PacketLogTab<EventYieldRecord>
 {
     private Hook<PacketDispatcher.Delegates.HandleEventYieldPacket>? _hook;
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
-        _hook?.Dispose();
-        base.Dispose();
+        Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _hook)));
     }
 
     private void HandleEventYieldPacketDetour(EventId eventId, short scene, byte yieldId, int* intData, byte intDataCount)

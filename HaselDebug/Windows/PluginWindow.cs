@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using HaselDebug.Config;
 using HaselDebug.Interfaces;
 using HaselDebug.Service;
@@ -8,7 +9,7 @@ using HaselDebug.Utils;
 namespace HaselDebug.Windows;
 
 [RegisterSingleton, AutoConstruct]
-public partial class PluginWindow : SimpleWindow
+public partial class PluginWindow : SimpleWindow, IAsyncDisposable
 {
     private const uint SidebarWidth = 250;
 
@@ -61,10 +62,30 @@ public partial class PluginWindow : SimpleWindow
         _pinnedInstances.Loaded += OnPinnedInstancesLoaded;
     }
 
-    public override void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        foreach (var tab in _tabs.OfType<IDisposable>())
-            tab.Dispose();
+        var cleanupTasks = _tabs.Select(async tab =>
+        {
+            try
+            {
+                if (tab is IAsyncDisposable asyncDisposable)
+                {
+                    _logger.LogDebug("Disposing {name}", tab.GetType().Name);
+                    await asyncDisposable.DisposeAsync();
+                }
+                else if (tab is IDisposable disposable)
+                {
+                    _logger.LogDebug("Disposing {name}", tab.GetType().Name);
+                    disposable.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while disposing {name}", tab.GetType().Name);
+            }
+        });
+
+        await Task.WhenAll(cleanupTasks);
 
         _processInfoService.Enabled = false;
 

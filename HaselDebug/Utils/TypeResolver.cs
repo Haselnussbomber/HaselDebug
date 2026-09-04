@@ -439,6 +439,10 @@ public static unsafe class TypeResolver
                     type = typeof(AetheryteEventHandler);
                     break;
 
+                case EventHandlerContent.GuildLeveAssignment:
+                    type = typeof(GuildleveAssignmentEventHandler);
+                    break;
+
                 case EventHandlerContent.Craft:
                     type = typeof(CraftEventHandler);
                     break;

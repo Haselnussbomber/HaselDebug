@@ -1,5 +1,7 @@
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Sound;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
@@ -9,10 +11,11 @@ using HaselDebug.Utils;
 namespace HaselDebug.Tabs;
 
 [RegisterSingleton<IDebugTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class SoundManagerTab : DebugTab, IDisposable
+public unsafe partial class SoundManagerTab : DebugTab, IAsyncDisposable
 {
     private readonly ILogger<SoundManagerTab> _logger;
     private readonly IGameInteropProvider _gameInteropProvider;
+    private readonly IFramework _framework;
     private readonly DebugRenderer _debugRenderer;
 
     private bool _initialized;
@@ -57,17 +60,20 @@ public unsafe partial class SoundManagerTab : DebugTab, IDisposable
         _hook9 = _gameInteropProvider.HookFromAddress<SoundManager.Delegates.PlayCutsceneVoSound>(SoundManager.MemberFunctionPointers.PlayCutsceneVoSound, PlayCutsceneVoSoundDetour);
     }
 
-    public void Dispose()
+    public ValueTask DisposeAsync()
     {
-        _hook1?.Dispose();
-        _hook2?.Dispose();
-        _hook3?.Dispose();
-        _hook4?.Dispose();
-        _hook5?.Dispose();
-        _hook6?.Dispose();
-        _hook7?.Dispose();
-        _hook8?.Dispose();
-        _hook9?.Dispose();
+        return new ValueTask(_framework.Run(() =>
+        {
+            DisposeAndNull(ref _hook1);
+            DisposeAndNull(ref _hook2);
+            DisposeAndNull(ref _hook3);
+            DisposeAndNull(ref _hook4);
+            DisposeAndNull(ref _hook5);
+            DisposeAndNull(ref _hook6);
+            DisposeAndNull(ref _hook7);
+            DisposeAndNull(ref _hook8);
+            DisposeAndNull(ref _hook9);
+        }));
     }
 
     private SoundData* PlaySoundDetour(SoundManager* thisPtr, CStringPointer path, float volume, uint fadeInDuration, float posX, float posY, float posZ, float speed, int a9, uint soundNumber, bool autoRelease, SoundVolumeCategory volumeCategory, bool a13, int note, bool a15, bool a16, bool a17, bool a18)

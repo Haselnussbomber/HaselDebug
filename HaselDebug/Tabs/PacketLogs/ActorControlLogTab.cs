@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using HaselDebug.Abstracts;
@@ -8,7 +9,7 @@ using static HaselDebug.Tabs.PacketLogs.ActorControlLogTab;
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class ActorControlLogTab : PacketLogTab<ActorControlEntry>, IDisposable
+public unsafe partial class ActorControlLogTab : PacketLogTab<ActorControlEntry>
 {
     private Hook<PacketDispatcher.Delegates.HandleActorControlPacket>? _hook;
 
@@ -23,10 +24,10 @@ public unsafe partial class ActorControlLogTab : PacketLogTab<ActorControlEntry>
         public uint Arg4;
     }
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
-        _hook?.Dispose();
-        base.Dispose();
+        Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _hook)));
     }
 
     private void HandleActorControlPacketDetour(uint entityId, uint category, uint arg1, uint arg2, uint arg3, uint arg4, uint arg5, uint arg6, uint arg7, uint arg8, GameObjectId targetId, bool isRecorded)

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Game.Fate;
 using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using HaselDebug.Abstracts;
@@ -6,14 +7,14 @@ using HaselDebug.Interfaces;
 namespace HaselDebug.Tabs.PacketLogs;
 
 [RegisterSingleton<IPacketLogTab>(Duplicate = DuplicateStrategy.Append), AutoConstruct]
-public unsafe partial class FateRewardLogTab : PacketLogTab<FateRewardPacket>, IDisposable
+public unsafe partial class FateRewardLogTab : PacketLogTab<FateRewardPacket>
 {
     private Hook<FateManager.Delegates.HandleFateRewardPacket>? _hook;
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
-        _hook?.Dispose();
-        base.Dispose();
+        Clear();
+        return new ValueTask(_framework.Run(() => DisposeAndNull(ref _hook)));
     }
 
     private void HandleFateRewardPacketDetour(FateManager* thisPtr, FateRewardPacket* packet)
