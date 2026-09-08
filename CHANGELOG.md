@@ -6,7 +6,7 @@
 - **Added:** The Outfits unlock tab now has a Online Store column, displaying whether the set can be bought.
 - **Updated:** The plugin now disposes asynchronously, concurrently and on the Framework thread.
 - **Updated:** The GameWindow tab was removed because a special case for the Arguments pointer was added to draw them as array.
-- **Updated:** ClientStructs now at [d8633414](https://github.com/aers/FFXIVClientStructs/tree/d8633414) ([compare](https://github.com/aers/FFXIVClientStructs/compare/5af9ff4c..d8633414)).
+- **Updated:** ClientStructs now at [1f10edb6](https://github.com/aers/FFXIVClientStructs/tree/1f10edb6) ([compare](https://github.com/aers/FFXIVClientStructs/compare/5af9ff4c..1f10edb6)).
 
 ## [1.73.0] (2026-09-02)
 
