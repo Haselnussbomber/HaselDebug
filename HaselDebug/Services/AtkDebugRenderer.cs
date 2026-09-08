@@ -1079,8 +1079,7 @@ public unsafe partial class AtkDebugRenderer
                 var textNode = (AtkTextNode*)node;
                 StartRow("Text");
                 var str = new ReadOnlySeString(textNode->NodeText.AsSpan());
-                var macroCode = str.ToString();
-                if (ImGui.Selectable(str.ToString() + $"##TextNodeText{(nint)node:X}"))
+                if (ImGui.Selectable(str.ToMacroString() + $"##TextNodeText{(nint)node:X}"))
                 {
                     var windowTitle = $"Text Node #{node->NodeId} (0x{(nint)node:X})";
                     _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _serviceProvider)
@@ -1148,8 +1147,7 @@ public unsafe partial class AtkDebugRenderer
                 var counterNode = (AtkCounterNode*)node;
                 StartRow("Text");
                 str = new ReadOnlySeString(counterNode->NodeText.AsSpan());
-                macroCode = str.ToString();
-                if (ImGui.Selectable(str.ToString() + $"##CounterNodeText{(nint)node:X}"))
+                if (ImGui.Selectable(str.ToMacroString() + $"##CounterNodeText{(nint)node:X}"))
                 {
                     var windowTitle = $"Counter Node #{node->NodeId} (0x{(nint)node:X})";
                     _windowManager.CreateOrOpen(windowTitle, () => new SeStringInspectorWindow(_windowManager, _textService, _serviceProvider)
