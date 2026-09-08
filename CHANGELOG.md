@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [1.74.0] (2026-09-08)
+
+Update for Patch 7.56.
 
 - **Added:** Type redirect for GuildleveAssignmentEventHandler.
 - **Added:** The Outfits unlock tab now has a Online Store column, displaying whether the set can be bought.
@@ -1126,7 +1128,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.73.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.74.0...main
+[1.74.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.73.0...v1.74.0
 [1.73.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.72.0...v1.73.0
 [1.72.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.71.0...v1.72.0
 [1.71.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.70.0...v1.71.0
