@@ -28,7 +28,7 @@ public partial class StoreItemColumn : Column<MirageStoreSetItem>
         {
             _textureProvider.DrawIcon(61831, OutfitsTable.IconSize);
 
-            var url = Table.GetStoreUrl(row.Items.First(item => item.RowId != 0 && item.IsValid));
+            var url = Table.GetStoreUrl(row.Items.First(item => item.RowId != 0 && item.IsValid).RowId);
             var hasUrl = !string.IsNullOrEmpty(url);
 
             if (ImGui.IsItemHovered())

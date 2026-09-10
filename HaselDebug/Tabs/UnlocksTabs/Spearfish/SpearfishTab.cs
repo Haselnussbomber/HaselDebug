@@ -17,8 +17,8 @@ public unsafe class SpearfishTab(SpearfishTable table) : DebugTab, IUnlockTab
 
         return new UnlockProgress()
         {
-            TotalUnlocks = table.Rows.Count(row => row.IsVisible),
-            NumUnlocked = table.Rows.Count(row => row.IsVisible && PlayerState.Instance()->IsSpearfishCaught(row.RowId)),
+            TotalUnlocks = table.Rows.Count(row => row.IsInLog),
+            NumUnlocked = table.Rows.Count(row => row.IsInLog && PlayerState.Instance()->IsSpearfishCaught(row.RowId)),
         };
     }
 

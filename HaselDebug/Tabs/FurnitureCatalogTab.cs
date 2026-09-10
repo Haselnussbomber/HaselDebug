@@ -152,7 +152,7 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
         {
             SheetType = typeof(HousingYardObject);
             RowId = row.RowId;
-            Item = row.Item;
+            Item = row.Item.RowId;
             ModelKey = row.ModelKey;
             HousingItemCategory = row.HousingItemCategory;
 

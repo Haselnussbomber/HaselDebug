@@ -58,7 +58,7 @@ public unsafe partial class ExcelTab : DebugTab
     private void LoadSheetTypes()
     {
         var sheetsType = _useExperimentalSheets
-            ? typeof(Lumina.Excel.Sheets.Experimental.Achievement)
+            ? typeof(HaselDebug.Excel.Sheets.Achievement)
             : typeof(Lumina.Excel.Sheets.Achievement);
 
         _sheetTypes = sheetsType.Assembly

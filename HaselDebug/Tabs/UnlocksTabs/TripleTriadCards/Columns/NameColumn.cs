@@ -88,7 +88,7 @@ public partial class NameColumn : ColumnString<TripleTriadCardEntry>
             }
 
             if (entry.Item.HasValue && ImGui.IsItemHovered())
-                _unlocksTabUtils.DrawItemTooltip(entry.Item.Value);
+                _unlocksTabUtils.DrawItemTooltip(entry.Item.Value.RowId);
         }
         else
         {

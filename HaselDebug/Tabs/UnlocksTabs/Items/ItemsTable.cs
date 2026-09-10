@@ -26,6 +26,6 @@ public partial class ItemsTable : Table<Item>
 
     public override void LoadRows()
     {
-        Rows = [.. _excelService.FindRows<Item>(row => _itemService.IsUnlockable(row))];
+        Rows = [.. _excelService.FindRows<Item>(row => _itemService.IsUnlockable(row.RowId))];
     }
 }

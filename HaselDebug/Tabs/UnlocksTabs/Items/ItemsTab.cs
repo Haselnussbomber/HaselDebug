@@ -16,8 +16,8 @@ public class ItemsTab(ItemsTable table, ItemService itemService) : DebugTab, IUn
 
         return new UnlockProgress()
         {
-            TotalUnlocks = table.Rows.Count(row => itemService.IsUnlockable(row)),
-            NumUnlocked = table.Rows.Count(row => itemService.IsUnlocked(row)),
+            TotalUnlocks = table.Rows.Count(row => itemService.IsUnlockable(row.RowId)),
+            NumUnlocked = table.Rows.Count(row => itemService.IsUnlocked(row.RowId)),
         };
     }
 

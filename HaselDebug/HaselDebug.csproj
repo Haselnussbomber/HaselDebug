@@ -53,7 +53,12 @@
     <PackageReference Include="LuminaSupplemental.Excel" Version="5.1.4" />
   </ItemGroup>
 
-  <!-- FFXIVClientStructs -->
+  <!-- HaselCommon -->
+  <ItemGroup>
+    <ProjectReference Include="..\HaselCommon\HaselCommon\HaselCommon.csproj" />
+  </ItemGroup>
+
+  <!-- Custom FFXIVClientStructs -->
   <PropertyGroup>
     <InteropGenerator_InteropNamespace>$(AssemblyName)</InteropGenerator_InteropNamespace>
   </PropertyGroup>
@@ -65,8 +70,22 @@
     <ProjectReference Include="..\FFXIVClientStructs\InteropGenerator.Runtime\InteropGenerator.Runtime.csproj" Private="True" />
   </ItemGroup>
 
-  <!-- HaselCommon -->
+  <!-- Custom Lumina Excel -->
+  <PropertyGroup>
+    <SchemaPath>$(MSBuildProjectDirectory)\..\Lumina.Excel\deps\EXDSchema-experimental</SchemaPath>
+    <GeneratedNamespace>HaselDebug.Excel.Sheets</GeneratedNamespace>
+    <UseUsings>true</UseUsings>
+    <UseFileScopedNamespace>true</UseFileScopedNamespace>
+    <UseSchemaAttribute>false</UseSchemaAttribute>
+  </PropertyGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\HaselCommon\HaselCommon\HaselCommon.csproj" />
+    <CompilerVisibleProperty Include="SchemaPath" />
+    <CompilerVisibleProperty Include="ExperimentalSchemaPath" />
+    <CompilerVisibleProperty Include="GeneratedNamespace" />
+    <CompilerVisibleProperty Include="UseUsings" />
+    <CompilerVisibleProperty Include="UseFileScopedNamespace" />
+    <CompilerVisibleProperty Include="UseSchemaAttribute" />
+    <ProjectReference Include="..\Lumina.Excel\src\Lumina.Excel.Generator\Lumina.Excel.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" IncludeAssets="all" />
   </ItemGroup>
 </Project>

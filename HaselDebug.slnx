@@ -14,4 +14,5 @@
   <Project Path="HaselDebug/HaselDebug.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="Lumina.Excel/src/Lumina.Excel.Generator/Lumina.Excel.Generator.csproj" />
 </Solution>

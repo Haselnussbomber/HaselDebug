@@ -86,7 +86,7 @@ public partial class OutfitsTable : Table<MirageStoreSetItem>, IDisposable
                 continue;
 
             // apply Cabinet filter, if ticked
-            if (ArmoireOnly && !row.Items.Any(item => _cabinetService.TryGetCabinetId(item, out _)))
+            if (ArmoireOnly && !row.Items.Any(item => _cabinetService.TryGetCabinetId(item.RowId, out _)))
                 continue;
 
             Rows.Add(row);
@@ -111,11 +111,11 @@ public partial class OutfitsTable : Table<MirageStoreSetItem>, IDisposable
 
         var isFullCabinetSet = row.Items
             .Where(item => item.RowId != 0 && item.IsValid)
-            .All(item => _cabinetService.TryGetCabinetId(item, out _));
+            .All(item => _cabinetService.TryGetCabinetId(item.RowId, out _));
 
         var isFullCabinetSetCollected = isFullCabinetSet && row.Items
             .Where(item => item.RowId != 0 && item.IsValid)
-            .All(item => _cabinetService.IsItemCollected(item));
+            .All(item => _cabinetService.IsItemCollected(item.RowId));
 
         return isFullSetCollected || isFullCabinetSetCollected;
     }

@@ -48,11 +48,11 @@ public partial class ItemsColumn : ColumnString<MirageStoreSetItem>
             if (item.RowId == 0)
                 continue;
 
-            var isItemInInventory = OutfitsTable.IsItemInInventory(item);
-            var isItemInDresser = _mirageService.IsItemCollected(item);
+            var isItemInInventory = OutfitsTable.IsItemInInventory(item.RowId);
+            var isItemInDresser = _mirageService.IsItemCollected(item.RowId);
             var isItemCollectedInPartialSet = _mirageService.IsSetSlotCollected(row.RowId, slotIndex);
-            var isCabinetSupported = _cabinetService.TryGetCabinetId(item, out _);
-            var isItemInCabinet = isCabinetSupported && _cabinetService.IsItemCollected(item);
+            var isCabinetSupported = _cabinetService.TryGetCabinetId(item.RowId, out _);
+            var isItemInCabinet = isCabinetSupported && _cabinetService.IsItemCollected(item.RowId);
 
             var isItemCollected = isFullSetCollected || isItemCollectedInPartialSet || isItemInCabinet || isItemInDresser || isItemInInventory;
 
@@ -98,18 +98,18 @@ public partial class ItemsColumn : ColumnString<MirageStoreSetItem>
                 if (isItemInInventory)
                     _stringBuilder.AppendLine("In Inventory");
 
-                _unlocksTabUtils.DrawItemTooltip(item.Value, description: _stringBuilder.ToString());
+                _unlocksTabUtils.DrawItemTooltip(item.RowId, description: _stringBuilder.ToString());
             }
 
             ImGuiContextMenu.Draw($"###SetItem_{row.RowId}_{item.RowId}_ItemContextMenu", builder =>
             {
-                builder.AddRestoreItem(item);
-                builder.AddViewOutfitGlamourReadyItems(item);
-                builder.AddTryOn(item);
-                builder.AddItemFinder(item);
-                builder.AddCopyItemName(item);
-                builder.AddItemSearch(item);
-                builder.AddSearchCraftingMethod(item);
+                builder.AddRestoreItem(item.RowId);
+                builder.AddViewOutfitGlamourReadyItems(item.RowId);
+                builder.AddTryOn(item.RowId);
+                builder.AddItemFinder(item.RowId);
+                builder.AddCopyItemName(item.RowId);
+                builder.AddItemSearch(item.RowId);
+                builder.AddSearchCraftingMethod(item.RowId);
                 builder.AddOpenOnGarlandTools("item", item.RowId);
             });
 

@@ -34,7 +34,7 @@ public partial class NameColumn : ColumnString<AdventureEntry>
                 ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
 
             if (clicked)
-                _mapService.OpenMap(entry.Row.Level.Value);
+                _mapService.OpenMap(entry.Row.Level.Value.ToLumina());
         }
         else
         {

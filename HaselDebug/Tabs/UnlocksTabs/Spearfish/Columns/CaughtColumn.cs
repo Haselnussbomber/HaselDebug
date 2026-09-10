@@ -13,11 +13,11 @@ public class CaughtColumn : ColumnYesNo<SpearfishingItem>
     }
 
     public override unsafe bool ToBool(SpearfishingItem row)
-        => row.IsVisible && PlayerState.Instance()->IsSpearfishCaught(row.RowId);
+        => row.IsInLog && PlayerState.Instance()->IsSpearfishCaught(row.RowId);
 
     public override void DrawColumn(SpearfishingItem row)
     {
-        if (row.IsVisible)
+        if (row.IsInLog)
             base.DrawColumn(row);
     }
 }

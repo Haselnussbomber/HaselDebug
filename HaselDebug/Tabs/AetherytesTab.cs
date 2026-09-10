@@ -10,6 +10,7 @@ namespace HaselDebug.Tabs;
 public partial class AetherytesTab : DebugTab
 {
     private readonly IAetheryteList _aetheryteList;
+    private readonly ExcelService _excelService;
     private readonly TextService _textService;
     private readonly UldService _uldService;
 
@@ -81,7 +82,7 @@ public partial class AetherytesTab : DebugTab
 
     // "48 83 EC 28 0F B7 4A 08"
     // int GetRegion(Client::UI::Agent::AgentTeleport* thisPtr, Client::Game::UI::TeleportInfo* teleportInfo)
-    private static AetheryteRegion GetRegion(TerritoryType territoryType)
+    private static AetheryteRegion GetRegion(Lumina.Excel.Sheets.TerritoryType territoryType)
     {
         if (territoryType.TerritoryIntendedUse.RowId == (uint)TerritoryIntendedUseEnum.HousingOutdoor)
             return AetheryteRegion.HousingArea;

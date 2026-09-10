@@ -27,7 +27,7 @@ public partial class ItemColumn : ColumnString<Item>
         ImGui.Selectable(ToName(row));
 
         if (ImGui.IsItemHovered())
-            _unlocksTabUtils.DrawItemTooltip(row);
+            _unlocksTabUtils.DrawItemTooltip(row.RowId);
 
         ImGuiContextMenu.Draw($"###Item_{row.RowId}_ItemContextMenu", builder =>
         {

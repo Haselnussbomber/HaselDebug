@@ -31,7 +31,7 @@ public partial class NameColumn : ColumnString<SpearfishingItem>
             AgentFishGuide.Instance()->OpenForItemId(row.Item.RowId, true);
 
         if (ImGui.IsItemHovered())
-            _unlocksTabUtils.DrawItemTooltip(item);
+            _unlocksTabUtils.DrawItemTooltip(item.RowId);
 
         ImGuiContextMenu.Draw($"###SpearfishItem_{row.RowId}_ItemContextMenu", builder =>
         {

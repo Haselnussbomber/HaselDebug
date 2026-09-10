@@ -138,7 +138,7 @@ public unsafe partial class UnlocksTabUtils
     public void DrawItemTooltip(RowRef rowRef)
     {
         if (rowRef.TryGetValue<Item>(out var item))
-            DrawItemTooltip(item);
+            DrawItemTooltip(item.RowId);
         else if (rowRef.TryGetValue<EventItem>(out var eventItem))
             DrawEventItemTooltip(eventItem);
     }
@@ -486,13 +486,13 @@ public unsafe partial class UnlocksTabUtils
 
         ImGui.Text(title);
 
-        if (item.Category.RowId != 0 && _excelService.TryGetRow<EventItemCategory>(item.Category.RowId, out var itemCategoy) && !itemCategoy.Unknown0.IsEmpty)
+        if (item.Category.RowId != 0 && _excelService.TryGetRow<EventItemCategory>(item.Category.RowId, out var itemCategoy) && !itemCategoy.Text.IsEmpty)
         {
             var text = itemCategoy.RowId switch
             {
-                1 when item.Quest.IsValid && !item.Quest.Value.Name.IsEmpty => _seStringEvaluator.Evaluate(itemCategoy.Unknown0, [_textService.GetQuestName(item.Quest.RowId)]),
+                1 when item.Quest.IsValid && !item.Quest.Value.Name.IsEmpty => _seStringEvaluator.Evaluate(itemCategoy.Text, [_textService.GetQuestName(item.Quest.RowId)]),
                 1 => default,
-                _ => itemCategoy.Unknown0
+                _ => itemCategoy.Text
             };
 
             if (!text.IsEmpty)

@@ -4,3 +4,6 @@
 [submodule "FFXIVClientStructs"]
 	path = FFXIVClientStructs
 	url = https://github.com/aers/FFXIVClientStructs.git
+[submodule "Lumina.Excel"]
+	path = Lumina.Excel
+	url = https://github.com/NotAdam/Lumina.Excel.git

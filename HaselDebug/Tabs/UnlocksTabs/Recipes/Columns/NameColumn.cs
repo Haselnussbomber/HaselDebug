@@ -21,7 +21,7 @@ public partial class NameColumn : ColumnString<Recipe>
 
     public override unsafe void DrawColumn(Recipe row)
     {
-        var clicked = _unlocksTabUtils.DrawSelectableItem(row.ItemResult.Value!, $"Recipe{row.RowId}");
+        var clicked = _unlocksTabUtils.DrawSelectableItem(row.ItemResult.Value.RowId, $"Recipe{row.RowId}");
 
         if (ImGui.IsItemHovered())
             ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);

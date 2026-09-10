@@ -26,7 +26,7 @@ public partial class ItemActionTab : DebugTab
             .GroupBy(row => row.Action.RowId)
             .ToDictionary(
                 g => g.Key,
-                g => _excelService.FindRows<Item>(item => g.Any(itemAction => itemAction.RowId == item.ItemAction.RowId)).Select(row => (ItemHandle)row).ToArray()
+                g => _excelService.FindRows<Item>(item => g.Any(itemAction => itemAction.RowId == item.ItemAction.RowId)).Select(row => (ItemHandle)row.RowId).ToArray()
             )
             .ToImmutableSortedDictionary();
     }

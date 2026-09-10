@@ -237,7 +237,7 @@ public unsafe partial class AddonConfigTab : DebugTab
             ImGui.TableNextColumn(); // HudRowId
 
             if (_excelService.TryGetRow<Hud>(entry.HudRowId, out var hudRow))
-                ImGuiUtils.DrawCopyableText($"[Hud#{entry.HudRowId}] {hudRow.Unknown0}");
+                ImGuiUtils.DrawCopyableText($"[Hud#{entry.HudRowId}] {hudRow.DisplayName}");
             else
                 ImGuiUtils.DrawCopyableText($"[Hud#{entry.HudRowId}]");
 

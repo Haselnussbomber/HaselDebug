@@ -16,5 +16,5 @@ public class UnlockedColumn : ColumnYesNo<Item>
     }
 
     public override bool ToBool(Item row)
-        => _itemService.IsUnlocked(row);
+        => _itemService.IsUnlocked(row.RowId);
 }

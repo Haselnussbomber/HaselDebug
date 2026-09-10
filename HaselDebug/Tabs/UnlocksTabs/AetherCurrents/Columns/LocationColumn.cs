@@ -161,7 +161,7 @@ public partial class LocationColumn : ColumnString<AetherCurrentEntry>
 
     private string GetHumanReadableCoords(Level level)
     {
-        var coords = MapService.GetCoords(level);
+        var coords = MapService.GetCoords(level.ToLumina());
         var x = coords.X.ToString("0.0", CultureInfo.InvariantCulture);
         var y = coords.Y.ToString("0.0", CultureInfo.InvariantCulture);
         return string.Format("X: {0}, Y: {1}", x, y);

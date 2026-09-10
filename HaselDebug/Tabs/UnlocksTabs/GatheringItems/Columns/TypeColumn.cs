@@ -22,7 +22,7 @@ public partial class TypeColumn : Column<GatheringItem>
 
     public virtual GatheringTypeFlag ToType(GatheringItem row)
     {
-        if (row.RowId < 10000 && row.Item.TryGetValue<Item>(out var item) && _itemService.GetGatheringPoints(item).TryGetFirst(out var point))
+        if (row.RowId < 10000 && row.Item.TryGetValue<Item>(out var item) && _itemService.GetGatheringPoints(item.RowId).TryGetFirst(out var point))
             return (GatheringTypeFlag)point.GatheringPointBase.Value.GatheringType.RowId;
 
         return GatheringTypeFlag.All;
@@ -36,7 +36,7 @@ public partial class TypeColumn : Column<GatheringItem>
 
     public override void DrawColumn(GatheringItem row)
     {
-        if (row.Item.TryGetValue<Item>(out var item) && _itemService.GetGatheringPoints(item).TryGetFirst(out var point))
+        if (row.Item.TryGetValue<Item>(out var item) && _itemService.GetGatheringPoints(item.RowId).TryGetFirst(out var point))
         {
             var gatheringType = point.GatheringPointBase.Value.GatheringType.Value;
             var rare = !UIGlobals.IsExportedGatheringPointTimed(point.Type);
