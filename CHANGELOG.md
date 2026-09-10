@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- **Added:** HaselDebug now ships with custom Lumina.Excel. It uses the latest branch from EXDSchema (currently at [f3cacf3b](https://github.com/xivdev/EXDSchema/tree/f3cacf3b)) for the Excel tab when the Experimental Sheets checkbox is selected.
 - **Updated:** ClientStructs now at [f0741b76](https://github.com/aers/FFXIVClientStructs/tree/f0741b76) ([compare](https://github.com/aers/FFXIVClientStructs/compare/1f10edb6..f0741b76)).
 
 ## [1.74.0] (2026-09-08)
