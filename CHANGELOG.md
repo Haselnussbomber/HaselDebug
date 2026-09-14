@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - **Added:** HaselDebug now ships with custom Lumina.Excel. It uses the latest branch from EXDSchema (currently at [f3cacf3b](https://github.com/xivdev/EXDSchema/tree/f3cacf3b)) for the Excel tab when the Experimental Sheets checkbox is selected.
+- **Fixed:** TextNodes weren't displaying the text as macro string anymore since the change in Lumina.
 - **Updated:** ClientStructs now at [5ff8edea](https://github.com/aers/FFXIVClientStructs/tree/5ff8edea) ([compare](https://github.com/aers/FFXIVClientStructs/compare/1f10edb6..5ff8edea)).
 
 ## [1.74.0] (2026-09-08)
@@ -1133,7 +1134,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.74.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.74.1...main
+[1.74.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.74.0...v1.74.1
 [1.74.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.73.0...v1.74.0
 [1.73.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.72.0...v1.73.0
 [1.72.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.71.0...v1.72.0
