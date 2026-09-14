@@ -5,6 +5,7 @@ global using System.Numerics;
 global using System.Runtime.InteropServices;
 global using AutoCtor;
 global using Dalamud.Bindings.ImGui;
+global using Dalamud.Common;
 global using Dalamud.Game;
 global using Dalamud.Hooking;
 global using Dalamud.Interface;

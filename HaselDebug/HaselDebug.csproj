@@ -44,6 +44,7 @@
 
   <!-- NuGet dependencies -->
   <ItemGroup>
+    <Reference Include="Dalamud.Common" Private="false" />
     <PackageReference Include="AutoCtor" Version="3.1.1" PrivateAssets="all" ExcludeAssets="compile;runtime" />
     <PackageReference Include="Iced" Version="1.21.0" />
     <PackageReference Include="Injectio" Version="6.2.0" PrivateAssets="all" />
