@@ -1,4 +1,4 @@
-using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;

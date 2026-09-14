@@ -1,6 +1,6 @@
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using UIColor = Lumina.Excel.Sheets.Experimental.UIColor;
+using UIColor = Dalamud.Excel.Sheets.UIColor;
 
 #pragma warning disable PendingExcelSchema
 

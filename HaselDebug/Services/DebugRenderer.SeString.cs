@@ -1,6 +1,6 @@
 using System.Text;
+using Dalamud.Game.Text;
 using Dalamud.Game.Text.Noun.Enums;
-using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -71,8 +71,6 @@ public unsafe partial class DebugRenderer
         { MacroCode.LevelPos, ["LevelId"] },
     };
 
-    private const LinkMacroPayloadType DalamudLinkType = (LinkMacroPayloadType)Payload.EmbeddedInfoType.DalamudLink - 1;
-
     private readonly Dictionary<LinkMacroPayloadType, string[]> _linkExpressionNames = new()
     {
         { LinkMacroPayloadType.Character, ["Flags", "WorldId"] },
@@ -88,7 +86,7 @@ public unsafe partial class DebugRenderer
         { LinkMacroPayloadType.Description, ["RowId"] },
         { LinkMacroPayloadType.WKSPioneeringTrail, ["RowId", "SubrowId"] },
         { LinkMacroPayloadType.MKDLore, ["RowId"] },
-        { DalamudLinkType, ["CommandId", "Extra1", "Extra2", "ExtraString"] },
+        { DalamudLinkPayload.LinkType, ["CommandId", "Extra1", "Extra2", "ExtraString"] },
     };
 
     private readonly Dictionary<uint, string[]> _fixedExpressionNames = new()
@@ -325,7 +323,7 @@ public unsafe partial class DebugRenderer
 
             if (macroCode == MacroCode.Link && idx == 0)
             {
-                var name = subType != null && (LinkMacroPayloadType)subType == DalamudLinkType
+                var name = subType != null && (LinkMacroPayloadType)subType == DalamudLinkPayload.LinkType
                     ? "Dalamud"
                     : Enum.GetName((LinkMacroPayloadType)u32);
 

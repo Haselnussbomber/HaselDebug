@@ -4,8 +4,8 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselCommon.Game.Enums;
 using HaselDebug.Services;
 using HaselDebug.Sheets;
-using Companion = Lumina.Excel.Sheets.Companion;
-using Ornament = Lumina.Excel.Sheets.Ornament;
+using Companion = Dalamud.Excel.Sheets.Companion;
+using Ornament = Dalamud.Excel.Sheets.Ornament;
 
 namespace HaselDebug.Utils;
 
