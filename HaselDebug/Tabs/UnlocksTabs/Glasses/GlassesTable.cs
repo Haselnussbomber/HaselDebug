@@ -1,6 +1,6 @@
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Tabs.UnlocksTabs.Glasses.Columns;
-using GlassesSheet = Lumina.Excel.Sheets.Glasses;
+using GlassesSheet = Dalamud.Excel.Sheets.Glasses;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Glasses;
 

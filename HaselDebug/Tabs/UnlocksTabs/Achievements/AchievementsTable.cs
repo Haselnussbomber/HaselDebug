@@ -1,6 +1,6 @@
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Tabs.UnlocksTabs.Achievements.Columns;
-using AchievementSheet = Lumina.Excel.Sheets.Achievement;
+using AchievementSheet = Dalamud.Excel.Sheets.Achievement;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Achievements;
 

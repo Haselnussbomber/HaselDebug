@@ -24,6 +24,7 @@
   <PropertyGroup>
     <Use_Dalamud_Newtonsoft_Json>false</Use_Dalamud_Newtonsoft_Json>
     <Use_Dalamud_FFXIVClientStructs>false</Use_Dalamud_FFXIVClientStructs>
+    <Use_Dalamud_Lumina_Excel>false</Use_Dalamud_Lumina_Excel>
   </PropertyGroup>
 
   <!-- Translations -->
@@ -44,6 +45,7 @@
 
   <!-- NuGet dependencies -->
   <ItemGroup>
+    <Reference Include="Dalamud.Common" Private="false" />
     <PackageReference Include="AutoCtor" Version="3.1.1" PrivateAssets="all" ExcludeAssets="compile;runtime" />
     <PackageReference Include="Iced" Version="1.21.0" />
     <PackageReference Include="Injectio" Version="6.2.0" PrivateAssets="all" />

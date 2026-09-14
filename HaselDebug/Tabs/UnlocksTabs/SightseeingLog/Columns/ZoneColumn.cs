@@ -24,7 +24,7 @@ public partial class ZoneColumn : ColumnString<AdventureEntry>
         base.DrawColumn(entry);
 
         var level = entry.Row.Level.Value;
-        if (_clientState.TerritoryType == level.Territory.RowId)
+        if (_clientState.TerritoryType.RowId == level.Territory.RowId)
         {
             var distance = _mapService.GetDistanceFromPlayer(level);
             if (distance is > 1f and < float.MaxValue)

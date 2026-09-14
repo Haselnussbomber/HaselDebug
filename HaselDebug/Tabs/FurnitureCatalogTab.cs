@@ -6,10 +6,9 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Abstracts;
-using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Utils;
-using HousingFurniture = Lumina.Excel.Sheets.HousingFurniture;
+using HousingFurniture = Dalamud.Excel.Sheets.HousingFurniture;
 
 namespace HaselDebug.Tabs;
 
