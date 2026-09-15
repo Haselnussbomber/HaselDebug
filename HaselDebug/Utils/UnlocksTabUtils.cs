@@ -211,7 +211,7 @@ public unsafe partial class UnlocksTabUtils
             ImGui.TextWrapped(description);
         }
 
-        if (!isItem || !itemRow.ItemAction.TryGetRow(out var itemAction))
+        if (!isItem || !itemRow.ItemAction.TryGetValue(out var itemAction))
             return;
 
         switch ((ItemActionType)itemAction.Action.RowId)
