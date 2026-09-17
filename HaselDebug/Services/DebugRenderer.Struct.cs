@@ -457,6 +457,21 @@ public unsafe partial class DebugRenderer
             return;
         }
 
+        if (fieldType == typeof(Guid))
+        {
+            var guidString = (*(Guid*)fieldAddress).ToString();
+            DrawFieldName(fieldInfo);
+            DrawPointerType(fieldAddress, fieldType, fieldNodeOptions with
+            {
+                Title = guidString,
+                DrawContextMenu = (nodeOptions, builder) =>
+                {
+                    builder.AddCopyValueString(guidString);
+                }
+            });
+            return;
+        }
+
         // TODO: enum values table
 
         DrawFieldName(fieldInfo);
