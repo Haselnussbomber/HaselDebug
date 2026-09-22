@@ -59,7 +59,7 @@ public unsafe partial class ExcelTab : DebugTab
     {
         var sheetsType = _useExperimentalSheets
             ? typeof(HaselDebug.Excel.Sheets.Achievement)
-            : typeof(Dalamud.Excel.Sheets.Achievement);
+            : typeof(Lumina.Excel.Sheets.Achievement);
 
         _sheetTypes = sheetsType.Assembly
             .GetExportedTypes()

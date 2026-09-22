@@ -91,7 +91,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
         AddLabel(372, "Adventurer Squadrons");
         AddLabel(466, "Mogpendium");
 
-        foreach (var row in _excelService.GetSheet<Dalamud.Excel.Sheets.Action>())
+        foreach (var row in _excelService.GetSheet<Lumina.Excel.Sheets.Action>())
         {
             if (row.UnlockLink.RowId is > 0 and < 65536)
             {
@@ -100,7 +100,7 @@ public unsafe partial class UnlockLinksTable : Table<UnlockLinkEntry>, IDisposab
 
                 names.Add(new UnlockEntry()
                 {
-                    ExcelRowIdentifier = new(typeof(Dalamud.Excel.Sheets.Action), row.RowId),
+                    ExcelRowIdentifier = new(typeof(Lumina.Excel.Sheets.Action), row.RowId),
                     IconId = row.Icon,
                     Label = row.Name.ToString(),
                     Category = _excelService.TryFindRow<AozAction>(aozRow => aozRow.Action.RowId == row.RowId, out var aozAction) ? $"Blue Mage Action {aozAction.RowId}" : "Action"

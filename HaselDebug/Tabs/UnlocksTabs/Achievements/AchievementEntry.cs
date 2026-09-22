@@ -1,5 +1,5 @@
 using Achievement = FFXIVClientStructs.FFXIV.Client.Game.UI.Achievement;
-using AchievementSheet = Dalamud.Excel.Sheets.Achievement;
+using AchievementSheet = Lumina.Excel.Sheets.Achievement;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Achievements;
 

@@ -24,7 +24,6 @@
   <PropertyGroup>
     <Use_Dalamud_Newtonsoft_Json>false</Use_Dalamud_Newtonsoft_Json>
     <Use_Dalamud_FFXIVClientStructs>false</Use_Dalamud_FFXIVClientStructs>
-    <Use_Dalamud_Lumina_Excel>false</Use_Dalamud_Lumina_Excel>
   </PropertyGroup>
 
   <!-- Translations -->
