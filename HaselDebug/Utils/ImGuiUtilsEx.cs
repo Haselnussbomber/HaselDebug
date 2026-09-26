@@ -283,6 +283,11 @@ public static unsafe class ImGuiUtilsEx
             {
                 ref var part = ref partsList->Parts[i];
                 var selected = i == partId;
+                var partPath = string.Empty;
+                if (part.UldAsset != null && part.UldAsset->AtkTexture.TextureType == TextureType.Resource)
+                {
+                    partPath = part.UldAsset->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString();
+                }
 
                 ImGui.TableNextRow();
 
@@ -309,9 +314,19 @@ public static unsafe class ImGuiUtilsEx
                 ImGui.TableNextColumn(); // Info
                 if (selected) ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, (Color.Gold with { A = 0.5f }).ToUInt());
 
-                ImGui.Text("Position:");
+                ImGui.Text("Path:\t\t\t");
                 ImGui.SameLine();
                 var x = ImCursor.X;
+                ImGuiUtils.DrawCopyableText(partPath, new CopyableTextOptions()
+                {
+                    CopyText = ImGui.IsKeyDown(ImGuiKey.LeftShift)
+                                   ? partPath
+                                   : null
+                });
+
+                ImGui.Text("Position:");
+                ImGui.SameLine();
+                ImCursor.X = x;
                 ImGuiUtils.DrawCopyableText($"({part.U}, {part.V})", new CopyableTextOptions()
                 {
                     CopyText = ImGui.IsKeyDown(ImGuiKey.LeftShift)
