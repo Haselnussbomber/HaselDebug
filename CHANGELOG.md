@@ -1,7 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [1.75.1] (2026-09-26)
 
+- **Updated:** Image node property inputs were added for WrapMode and Flags.
+- **Updated:** Image node assets now draw paths per part. (Thanks @MidoriKami)
+- **Fixed:** In the Chocobo Taxi Stands tab, TimeRequired and Fare were swapped due to updated sheets.
 - **Updated:** ClientStructs now at [29c7c22e](https://github.com/aers/FFXIVClientStructs/tree/29c7c22e) ([compare](https://github.com/aers/FFXIVClientStructs/compare/f64a80e8..29c7c22e)).
 
 ## [1.75.0] (2026-09-17)
@@ -1139,7 +1142,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.0...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.1...main
+[1.75.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.0...v1.75.1
 [1.75.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.74.0...v1.75.0
 [1.74.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.73.0...v1.74.0
 [1.73.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.72.0...v1.73.0
