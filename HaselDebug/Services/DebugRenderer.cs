@@ -11,7 +11,6 @@ using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.STD;
 using HaselDebug.Config;
-using HaselDebug.Extensions;
 using HaselDebug.Service;
 using HaselDebug.Services.Data;
 using HaselDebug.Utils;

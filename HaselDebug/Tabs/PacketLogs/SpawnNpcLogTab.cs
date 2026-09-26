@@ -3,7 +3,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Network;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using HaselDebug.Abstracts;
-using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Utils;
 using HaselDebug.Windows;

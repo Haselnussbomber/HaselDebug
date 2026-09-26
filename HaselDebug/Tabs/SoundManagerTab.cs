@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Sound;
-using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;

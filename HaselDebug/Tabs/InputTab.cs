@@ -77,7 +77,8 @@ public unsafe partial class InputTab : DebugTab
             for (var i = 0; i < InputIdNamesCount; i++)
             {
                 var name = GetInputIdName(i);
-                if (name.IsNullOrEmpty()){
+                if (name.IsNullOrEmpty())
+                {
                     if (!lastEmpty)
                     {
                         lastEmpty = true;

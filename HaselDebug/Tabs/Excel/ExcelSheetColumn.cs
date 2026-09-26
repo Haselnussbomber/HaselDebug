@@ -1,10 +1,8 @@
 using System.Reflection;
 using HaselCommon.Gui.ImGuiTable;
-using HaselDebug.Extensions;
 using HaselDebug.Services;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace HaselDebug.Tabs.Excel;
 

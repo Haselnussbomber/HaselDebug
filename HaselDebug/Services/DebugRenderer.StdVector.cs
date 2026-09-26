@@ -1,5 +1,4 @@
 using FFXIVClientStructs.STD;
-using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 

@@ -32,7 +32,7 @@ public unsafe partial class ChatTab : DebugTab
         var count = raptureLogModule->LogMessageCount - start;
 
         ImGui.Text($"{count} Message");
-        
+
         using var table = ImRaii.Table("ChatTabTable"u8, 5, ImGuiTableFlags.Resizable | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.NoSavedSettings);
         if (!table)
             return;
@@ -44,14 +44,14 @@ public unsafe partial class ChatTab : DebugTab
         ImGui.TableSetupColumn("Formatted Message"u8, ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableSetupScrollFreeze(5, 1);
         ImGui.TableHeadersRow();
-        
+
         using var clipper = new ImRaiiListClipper(count, ImGui.GetTextLineHeightWithSpacing());
 
         foreach (var i in clipper)
         {
             if (!raptureLogModule->GetLogMessageDetail(i + start, out var sender, out var message, out var logKind, out EntityRelationKind casterKind, out var targetKind, out var time))
                 continue;
-            
+
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn(); // Timestamp

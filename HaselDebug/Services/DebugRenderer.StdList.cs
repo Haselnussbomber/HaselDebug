@@ -1,6 +1,5 @@
 using FFXIVClientStructs.STD;
 using FFXIVClientStructs.STD.ContainerInterface;
-using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 

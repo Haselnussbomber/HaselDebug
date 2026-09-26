@@ -1,5 +1,4 @@
 using HaselCommon.Gui.ImGuiTable;
-using HaselDebug.Extensions;
 
 namespace HaselDebug.Tabs.UnlocksTabs.UnlockLinks.Columns;
 

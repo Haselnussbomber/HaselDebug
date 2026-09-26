@@ -6,7 +6,6 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Abstracts;
-using HaselDebug.Extensions;
 using HaselDebug.Interfaces;
 using HaselDebug.Utils;
 using HousingFurniture = Lumina.Excel.Sheets.HousingFurniture;
@@ -80,7 +79,7 @@ public unsafe partial class FurnitureCatalogTab : DebugTab
                 + (showButton // line 2: button
                     ? (style.ItemSpacing.Y + ImGuiHelpers.GetButtonSize(buttonText).Y) // spacing between text and button + button
                     : 0);
-            
+
             using (ImGuiUtilsEx.AlertBox("InfoBox", Color.FromHSV(0.527f, 1, 1), outerSize))
             {
                 if (ServiceLocator.TryGetService<ITextureProvider>(out var textureProvider))

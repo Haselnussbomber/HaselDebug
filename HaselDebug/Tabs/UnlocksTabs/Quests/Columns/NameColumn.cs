@@ -1,7 +1,6 @@
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselCommon.Gui.ImGuiTable;
-using HaselDebug.Extensions;
 using HaselDebug.Utils;
 
 namespace HaselDebug.Tabs.UnlocksTabs.Quests.Columns;

@@ -13,7 +13,7 @@ public class GatheredColumn : ColumnYesNo<GatheringItem>
     }
 
     public override bool ToBool(GatheringItem row)
-        =>  QuestManager.IsGatheringItemGathered((ushort)row.RowId);
+        => QuestManager.IsGatheringItemGathered((ushort)row.RowId);
 
     public override void DrawColumn(GatheringItem row)
     {

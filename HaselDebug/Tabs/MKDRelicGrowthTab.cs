@@ -64,7 +64,7 @@ public unsafe partial class MKDRelicGrowthTab : DebugTab
 
 public static unsafe class QuestCustomTodoExtensions
 {
-    extension (QuestCustomTodo row)
+    extension(QuestCustomTodo row)
     {
         public Collection<EntryStruct> Entries => new(row.ExcelPage, row.RowOffset, row.RowOffset, &EntryCtor, 7);
     }

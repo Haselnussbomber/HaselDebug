@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using HaselDebug.Extensions;
 using HaselDebug.Utils;
 using HaselDebug.Windows;
 
