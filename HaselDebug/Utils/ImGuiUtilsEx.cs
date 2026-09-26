@@ -101,14 +101,6 @@ public static unsafe class ImGuiUtilsEx
             return changed;
         }
 
-        var path = string.Empty;
-        var version = 1;
-        if (asset->AtkTexture.TextureType == TextureType.Resource)
-        {
-            path = asset->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString();
-            version = asset->AtkTexture.Resource->Version;
-        }
-
         var kernelTexture = asset->AtkTexture.GetKernelTexture();
         if (kernelTexture == null)
         {
@@ -124,35 +116,8 @@ public static unsafe class ImGuiUtilsEx
         {
             AddressPath = new AddressPath((nint)asset),
             DefaultOpen = true,
-            DrawContextMenu = (nodeOptions, builder) =>
-            {
-                builder.Add(new ImGuiContextMenuEntry()
-                {
-                    Visible = !string.IsNullOrEmpty(path),
-                    Label = "Copy Path",
-                    ClickCallback = () => ImGui.SetClipboardText(path)
-                });
-
-                builder.Add(new ImGuiContextMenuEntry()
-                {
-                    Label = "Copy Size",
-                    ClickCallback = () => ImGui.SetClipboardText(ImGui.IsKeyDown(ImGuiKey.LeftShift)
-                        ? $"new Vector2({tex->ActualWidth}, {tex->ActualHeight})"
-                        : $"{tex->ActualWidth}x{tex->ActualHeight}")
-                });
-
-                builder.Add(new ImGuiContextMenuEntry()
-                {
-                    Label = "Copy Format",
-                    ClickCallback = () => ImGui.SetClipboardText($"{tex->TextureFormat}")
-                });
-            }
+            Title = "Preview"
         };
-
-        var texInfo = $"{tex->ActualWidth}x{tex->ActualHeight}, {tex->TextureFormat}";
-        nodeOptions.Title = string.IsNullOrEmpty(path)
-            ? texInfo
-            : $"{path} ({texInfo})";
 
         using var node = debugRenderer.DrawTreeNode(nodeOptions);
         if (!node)
@@ -171,6 +136,10 @@ public static unsafe class ImGuiUtilsEx
         }
 
         var size = new Vector2(tex->ActualWidth, tex->ActualHeight);
+
+        var version = 1;
+        if (asset->AtkTexture.TextureType == TextureType.Resource)
+            version = asset->AtkTexture.Resource->Version;
 
         if (TexDisplayStyle == 1)
         {

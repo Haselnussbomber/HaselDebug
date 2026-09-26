@@ -1066,6 +1066,21 @@ public unsafe partial class AtkDebugRenderer
         {
             case NodeType.Image:
                 var imageNode = (AtkImageNode*)node;
+
+                StartRow("WrapMode");
+                var wrapMode = imageNode->WrapMode;
+                if (ImGui.InputByte("##WrapMode", ref wrapMode, 1))
+                {
+                    imageNode->WrapMode = wrapMode;
+                }
+
+                StartRow("Flags");
+                var imageFlags = imageNode->Flags;
+                if (ImGuiUtilsEx.EnumCombo("##Flags", ref imageFlags, true))
+                {
+                    imageNode->Flags = imageFlags;
+                }
+
                 StartRow("Asset");
                 partId = imageNode->PartId;
                 if (ImGuiUtilsEx.PartListSelector(_serviceProvider, imageNode->PartsList, ref partId))
