@@ -29,8 +29,7 @@ public partial class NameColumn : ColumnString<ChocoboTaxiStand>
                 if (!location.IsValid || !location.Value.Location.IsValid)
                     continue;
 
-                // TODO: TimeRequired and Fare columns are swapped. See https://github.com/xivdev/EXDSchema/pull/103
-                ImGui.Text($"→ {_seStringEvaluator.EvaluateFromAddon(102383, [location.Value.Location.RowId, (int)location.Value.TimeRequired, (int)location.Value.Fare])}");
+                ImGui.Text($"→ {_seStringEvaluator.EvaluateFromAddon(102383, [location.Value.Location.RowId, (int)location.Value.Fare, (int)location.Value.TimeRequired])}");
             }
         }
     }
