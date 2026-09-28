@@ -7,6 +7,7 @@ using Dalamud.Utility;
 
 namespace HaselDebug.Config;
 
+[RegisterSingleton(Factory = nameof(ServiceFactory))]
 public partial class PluginConfig : IPluginConfiguration
 {
     [JsonIgnore]
@@ -28,10 +29,10 @@ public partial class PluginConfig : IPluginConfiguration
     [JsonIgnore]
     private static IPluginLog? PluginLog;
 
-    public static PluginConfig Load(IDalamudPluginInterface pluginInterface)
+    public static PluginConfig ServiceFactory(IServiceProvider serviceProvider)
     {
-        PluginInterface = pluginInterface;
-        PluginLog = pluginInterface.GetService<IPluginLog>();
+        PluginInterface = serviceProvider.GetRequiredService<IDalamudPluginInterface>();
+        PluginLog = serviceProvider.GetRequiredService<IPluginLog>();
 
         var fileInfo = PluginInterface.ConfigFile;
         if (!fileInfo.Exists || fileInfo.Length < 2)
@@ -78,12 +79,4 @@ public partial class PluginConfig
     public string LastSelectedTab = "";
     public string[] PinnedInstances = [];
     public bool Excel2Tab_ShowRawSheets = false;
-}
-
-public static class PluginConfigExtension
-{
-    public static void AddConfig(this IServiceCollection services, PluginConfig pluginConfig)
-    {
-        services.AddSingleton(pluginConfig);
-    }
 }

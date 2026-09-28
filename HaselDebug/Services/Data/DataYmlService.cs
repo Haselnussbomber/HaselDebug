@@ -16,7 +16,7 @@ public partial class DataYmlService
 
     private readonly ILogger<DataYmlService> _logger;
     private readonly IFramework _framework;
-    private readonly PluginAssemblyProvider _assemblyProvider;
+    private readonly PluginAssembly _pluginAssembly;
 
     public List<ClassInfo> Classes { get; } = [];
     public Dictionary<nint, ClassInfo> ClassMap { get; } = [];
@@ -35,7 +35,7 @@ public partial class DataYmlService
         Classes.Clear();
         ClassMap.Clear();
 
-        using var stream = _assemblyProvider.Assembly.GetManifestResourceStream("HaselDebug.data.yml");
+        using var stream = _pluginAssembly.Assembly.GetManifestResourceStream("HaselDebug.data.yml");
         if (stream == null)
         {
             _logger.LogWarning("Could not find data.yml");
