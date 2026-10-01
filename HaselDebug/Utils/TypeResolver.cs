@@ -480,6 +480,7 @@ public static unsafe class TypeResolver
                     {
                         InstanceContentType.DeepDungeon => typeof(InstanceContentDeepDungeon),
                         InstanceContentType.OceanFishing => typeof(InstanceContentOceanFishing),
+                        InstanceContentType.CrucibleOfTheUnbroken => typeof(InstanceContentCrucibleOfTheUnbroken),
                         _ => typeof(InstanceContentDirector)
                     };
                     additionalName = ((InstanceContentDirector*)address)->InstanceContentType.ToString();

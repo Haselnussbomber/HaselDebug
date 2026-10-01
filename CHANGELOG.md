@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** Type redirect for InstanceContentCrucibleOfTheUnbroken.
+- **Updated:** ClientStructs now at [fb265050](https://github.com/aers/FFXIVClientStructs/tree/fb265050) ([compare](https://github.com/aers/FFXIVClientStructs/compare/29c7c22e..fb265050)).
+
 ## [1.75.1] (2026-09-26)
 
 - **Updated:** Image node property inputs were added for WrapMode and Flags.
