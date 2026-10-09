@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.75.2] (2026-10-09)
 
 - **Added:** Type redirect for InstanceContentCrucibleOfTheUnbroken.
 - **Updated:** ClientStructs now at [97a7fc48](https://github.com/aers/FFXIVClientStructs/tree/97a7fc48) ([compare](https://github.com/aers/FFXIVClientStructs/compare/29c7c22e..97a7fc48)).
@@ -1147,7 +1147,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.1...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.2...main
+[1.75.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.1...v1.75.2
 [1.75.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.0...v1.75.1
 [1.75.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.74.0...v1.75.0
 [1.74.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.73.0...v1.74.0
