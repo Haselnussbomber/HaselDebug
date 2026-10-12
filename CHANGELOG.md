@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Updated:** ClientStructs now at [a80aa7f7](https://github.com/aers/FFXIVClientStructs/tree/a80aa7f7) ([compare](https://github.com/aers/FFXIVClientStructs/compare/97a7fc48..a80aa7f7)).
+
 ## [1.75.2] (2026-10-09)
 
 - **Added:** Type redirect for InstanceContentCrucibleOfTheUnbroken.
