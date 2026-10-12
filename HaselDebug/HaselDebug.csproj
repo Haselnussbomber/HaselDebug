@@ -10,6 +10,8 @@
     <Description>For developers.</Description>
     <LoadRequiredState>1</LoadRequiredState>
     <CanUnloadAsync>true</CanUnloadAsync>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
 
   <!-- Build settings -->
