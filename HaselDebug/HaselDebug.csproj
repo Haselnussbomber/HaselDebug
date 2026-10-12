@@ -35,13 +35,13 @@
 
   <!-- NuGet dependencies -->
   <ItemGroup>
-    <PackageReference Include="AutoCtor" Version="3.1.1" PrivateAssets="all" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="AutoCtor" Version="4.0.1" PrivateAssets="all" ExcludeAssets="compile;runtime" />
     <PackageReference Include="Iced" Version="1.21.0" />
     <PackageReference Include="Injectio" Version="6.2.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.330" PrivateAssets="All" />
-    <PackageReference Include="Roslynator.Analyzers" Version="5.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.360" PrivateAssets="All" />
+    <PackageReference Include="Roslynator.Analyzers" Version="5.0.1" PrivateAssets="all" />
     <PackageReference Include="YamlDotNet" Version="18.1.0" />
-    <PackageReference Include="LuminaSupplemental.Excel" Version="5.1.4" />
+    <PackageReference Include="LuminaSupplemental.Excel" Version="5.1.5" />
   </ItemGroup>
 
   <!-- HaselCommon -->
