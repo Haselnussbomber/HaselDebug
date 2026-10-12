@@ -26,20 +26,11 @@
     <Use_Dalamud_FFXIVClientStructs>false</Use_Dalamud_FFXIVClientStructs>
   </PropertyGroup>
 
-  <!-- Translations -->
-  <ItemGroup Condition="Exists('Translations.json')">
-    <EmbeddedResource Include="Translations.json" />
-  </ItemGroup>
-
-  <!-- Licenses -->
-  <ItemGroup Condition="Exists('LICENSES.md')">
-    <EmbeddedResource Include="LICENSES.md" />
-    <None Include="LICENSES.md" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <!-- data.yml -->
-  <ItemGroup Condition="Exists('..\FFXIVClientStructs\ida\data.yml')">
-    <EmbeddedResource Include="..\FFXIVClientStructs\ida\data.yml" />
+  <!-- Assets -->
+  <ItemGroup>
+    <None Include="..\FFXIVClientStructs\ida\data.yml" Link="data.yml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Translations.json" Link="$(AssemblyName).Translations.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="LICENSES.md" Link="LICENSES.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!-- NuGet dependencies -->
@@ -88,4 +79,8 @@
     <CompilerVisibleProperty Include="UseSchemaAttribute" />
     <ProjectReference Include="..\Lumina.Excel\src\Lumina.Excel.Generator\Lumina.Excel.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" IncludeAssets="all" />
   </ItemGroup>
+
+  <Target Name="DeleteLuminaExcelDocs" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' and Exists('$(TargetDir)Lumina.Excel.xml')">
+    <Delete Files="$(TargetDir)Lumina.Excel.xml" />
+  </Target>
 </Project>
