@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.75.3] (2026-10-13)
 
 Update for Patch 7.57.
 
@@ -1153,7 +1153,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.2...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.3...main
+[1.75.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.2...v1.75.3
 [1.75.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.1...v1.75.2
 [1.75.1]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.0...v1.75.1
 [1.75.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.74.0...v1.75.0
