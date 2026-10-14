@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- **Added:** Type redirect for DrawObjectType CullingBox.
+
 ## [1.75.3] (2026-10-13)
 
 Update for Patch 7.57.
