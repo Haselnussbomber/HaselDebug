@@ -273,25 +273,25 @@
     "en": "Mining",
     "de": "Minenarbeiter (Abbauen)",
     "fr": "Extraction de minerai",
-    "jp": "\u63A1\u6398"
+    "ja": "\u63A1\u6398"
   },
   "HaselDebug.Tabs.UnlocksTabs.GatheringItems.Columns.TypeColumn.Quarrying": {
     "en": "Quarrying",
     "de": "Minenarbeiter (Herausbrechen)",
     "fr": "Extraction de pierre",
-    "jp": "\u7815\u5CA9"
+    "ja": "\u7815\u5CA9"
   },
   "HaselDebug.Tabs.UnlocksTabs.GatheringItems.Columns.TypeColumn.Logging": {
     "en": "Logging",
     "de": "Gärtner (Abholzen)",
     "fr": "Coupe",
-    "jp": "\u4F10\u63A1"
+    "ja": "\u4F10\u63A1"
   },
   "HaselDebug.Tabs.UnlocksTabs.GatheringItems.Columns.TypeColumn.Harvesting": {
     "en": "Harvesting",
     "de": "Gärtner (Abernten)",
     "fr": "Fauche",
-    "jp": "\u8349\u5208"
+    "ja": "\u8349\u5208"
   },
 
   "FurnitureCatalogTab.OpenButton.Label": {
