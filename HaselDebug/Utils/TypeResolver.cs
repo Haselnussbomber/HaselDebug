@@ -404,8 +404,8 @@ public static unsafe class TypeResolver
                     type = typeof(Decal);
                     break;
 
-                case DrawObjectType.UnkType10:
-                    type = typeof(DrawObject);
+                case DrawObjectType.CullingBox:
+                    type = typeof(CullingBox);
                     break;
             }
         }
