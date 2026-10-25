@@ -3,8 +3,8 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Services;
-using ContentsNoteSheet = Dalamud.Excel.Sheets.ContentsNote;
-using InstanceContentSheet = Dalamud.Excel.Sheets.InstanceContent;
+using ContentsNoteSheet = Lumina.Excel.Sheets.ContentsNote;
+using InstanceContentSheet = Lumina.Excel.Sheets.InstanceContent;
 
 namespace HaselDebug.Tabs;
 
@@ -178,7 +178,7 @@ public unsafe partial class UnlockSpanLengthTestTab : DebugTab
         _bitArrays.Add(new BitArrayRecord(
             "UIState.Achievement.CompletedAchievements",
             UIState.Instance()->Achievement.CompletedAchievementsBitArray,
-            _excelService.GetRowCount<Dalamud.Excel.Sheets.Achievement>()));
+            _excelService.GetRowCount<Lumina.Excel.Sheets.Achievement>()));
 
         _bitArrays.Add(new BitArrayRecord(
             "UIState.UnlockedAetherytes",
