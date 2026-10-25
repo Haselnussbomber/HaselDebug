@@ -8,7 +8,7 @@ using HaselCommon.Gui.ImGuiTable;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
 using HaselDebug.Utils;
-using HousingFurniture = Lumina.Excel.Sheets.HousingFurniture;
+using HousingFurniture = Dalamud.Excel.Sheets.HousingFurniture;
 
 namespace HaselDebug.Tabs;
 

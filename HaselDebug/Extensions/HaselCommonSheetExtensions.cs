@@ -4,7 +4,7 @@ public static unsafe class HaselCommonSheetExtensions
 {
     extension(Level row)
     {
-        public Lumina.Excel.Sheets.Level ToDalamud() => new(row.ExcelPage, row.RowOffset, row.RowId);
+        public Dalamud.Excel.Sheets.Level ToDalamud() => new(row.ExcelPage, row.RowOffset, row.RowId);
     }
 
     extension(MirageStoreSetItem row)
@@ -19,7 +19,7 @@ public static unsafe class HaselCommonSheetExtensions
             => new(row.ExcelPage, row.RowOffset, row.RowOffset, &PermissionConditionCtor, row.ExcelPage.Sheet.Columns.Count);
     }
 
-    extension(Lumina.Excel.Sheets.Aetheryte row)
+    extension(Dalamud.Excel.Sheets.Aetheryte row)
     {
         public Aetheryte ToCustom() => new(row.ExcelPage, row.RowOffset, row.RowId);
     }

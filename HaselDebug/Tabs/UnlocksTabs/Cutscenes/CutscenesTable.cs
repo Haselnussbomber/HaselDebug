@@ -62,7 +62,7 @@ public partial class CutscenesTable : Table<CutsceneEntry>
             }
         }
 
-        foreach (var row in _excelService.GetSheet<Lumina.Excel.Sheets.InstanceContent>())
+        foreach (var row in _excelService.GetSheet<Dalamud.Excel.Sheets.InstanceContent>())
         {
             if (row.Cutscene.RowId == 0)
                 continue;
@@ -71,7 +71,7 @@ public partial class CutscenesTable : Table<CutsceneEntry>
                 continue;
 
             if (_cutscenes.TryGetValue(row.Cutscene.RowId, out var cEntry))
-                cEntry.Uses.Add((typeof(Lumina.Excel.Sheets.InstanceContent), row.RowId, cfc.Name.ToString()));
+                cEntry.Uses.Add((typeof(Dalamud.Excel.Sheets.InstanceContent), row.RowId, cfc.Name.ToString()));
         }
 
         foreach (var row in _excelService.GetSheet<PartyContentCutscene>())
