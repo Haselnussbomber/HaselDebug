@@ -57,15 +57,13 @@ public unsafe partial class UnlocksTabUtils
             builder.AddOpenOnGarlandTools("item", item.ItemId);
         });
 
-        if (_itemService.IsUnlocked(item))
+        if (_itemService.IsUnlocked(item) && _textureProvider.GetFromGame("ui/uld/RecipeNoteBook_hr1.tex").TryGetWrap(out var tex, out _))
         {
             ImGui.SameLine(1, 0);
-
-            if (_textureProvider.GetFromGame("ui/uld/RecipeNoteBook_hr1.tex").TryGetWrap(out var tex, out _))
-            {
-                var pos = ImCursor.ScreenPosition + new Vector2((float)iconSize / 2f);
-                ImGui.GetWindowDrawList().AddImage(tex.Handle, pos, pos + new Vector2((float)iconSize / 1.5f), new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
-            }
+            var pos = ImCursor.ScreenPosition + new Vector2((float)iconSize / 2f);
+            var size = new Vector2((float)iconSize / 1.5f);
+            ImGui.GetWindowDrawList().AddImage(tex.Handle, pos, pos + size, new Vector2(0.6818182f, 0.21538462f), new Vector2(1, 0.4f));
+            ImGui.Dummy(size);
         }
 
         return clicked;
