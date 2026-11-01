@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 - **Added:** Type redirect for DrawObjectType CullingBox.
-- **Updated:** ClientStructs now at [b72bc1f7](https://github.com/aers/FFXIVClientStructs/tree/b72bc1f7) ([compare](https://github.com/aers/FFXIVClientStructs/compare/78975d83..b72bc1f7)).
+- **Updated:** ClientStructs now at [6dcdd7e3](https://github.com/aers/FFXIVClientStructs/tree/6dcdd7e3) ([compare](https://github.com/aers/FFXIVClientStructs/compare/78975d83..6dcdd7e3)).
 
 ## [1.75.3] (2026-10-13)
 
