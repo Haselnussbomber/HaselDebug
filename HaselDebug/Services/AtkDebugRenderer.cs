@@ -303,10 +303,10 @@ public unsafe partial class AtkDebugRenderer
         if (nodePath != null)
             ImGui.SetNextItemOpen(nodePath.Contains(node), ImGuiCond.Always);
 
-        if ((int)node->Type < 1000)
-            PrintSimpleNode(node, treePrefix, nodePath, nodeOptions);
-        else
+        if (node->GetNodeType() == NodeType.Component)
             PrintComponentNode(node, treePrefix, nodePath, nodeOptions);
+        else
+            PrintSimpleNode(node, treePrefix, nodePath, nodeOptions);
 
         if (printSiblings)
         {
@@ -320,32 +320,32 @@ public unsafe partial class AtkDebugRenderer
     {
         using var rssb = new RentedSeStringBuilder();
 
-        SeStringBuilder titleBuilder;
+        var color = node->IsVisible() ? Color.Green : Color.Text700;
+
+        rssb.PushColorRgba(color);
+        rssb.Builder.Append($"{treePrefix}[#{node->NodeId}] ");
+
         if (_typeService.CustomNodeTypes?.TryGetValue((nint)node, out var type) ?? false)
         {
-            var name = type.ReadableTypeName();
-            if (_pluginConfig.SpacesInKTKNames)
-                name = name.SplitCamelCase();
-            titleBuilder = rssb.Builder
-                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Text700)
-                               .Append($"{treePrefix}[#{node->NodeId}] {name} ({(nint)node:X})")
-                               .PopColor();
+            rssb.Append(_pluginConfig.SpacesInKTKNames
+                ? type.ReadableTypeName().SplitCamelCase()
+                : type.ReadableTypeName());
         }
         else
         {
-            titleBuilder = rssb.Builder
-                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Text700)
-                               .Append($"{treePrefix}[#{node->NodeId}] {node->Type} ({(nint)node:X})")
-                               .PopColor();
+            rssb.Append(node->Type.ToString());
         }
 
-        AddNodeFieldSuffix(titleBuilder, node, nodeOptions);
+        rssb.Builder.Append($" ({(nint)node:X})");
+        rssb.PopColor();
+
+        AddNodeFieldSuffix(rssb, node, nodeOptions);
 
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
-            SeStringTitle = titleBuilder.ToReadOnlySeString(),
+            SeStringTitle = rssb.ToReadOnlySeString(),
             DrawSeStringTreeNode = true,
-            TitleColor = node->IsVisible() ? Color.Green : Color.Text700, // needed for the tree node arrow
+            TitleColor = color, // needed for the tree node arrow
             HighlightAddress = (nint)node,
             HighlightType = typeof(AtkResNode),
             DrawContextMenu = (nodeOptions, builder) =>
@@ -404,32 +404,32 @@ public unsafe partial class AtkDebugRenderer
 
         using var rssb = new RentedSeStringBuilder();
 
-        SeStringBuilder titleBuilder;
+        var color = node->IsVisible() ? Color.Green : Color.Text700;
+
+        rssb.PushColorRgba(color);
+        rssb.Builder.Append($"{treePrefix}[#{node->NodeId}] ");
+
         if (_typeService.CustomNodeTypes?.TryGetValue((nint)node, out var type) ?? false)
         {
-            var name = type.ReadableTypeName();
-            if (_pluginConfig.SpacesInKTKNames)
-                name = name.SplitCamelCase();
-            titleBuilder = rssb.Builder
-                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Text700)
-                               .Append($"{treePrefix}[#{node->NodeId}] {name} (Node: {(nint)node:X}, Component: {(nint)component:X})")
-                               .PopColor();
+            rssb.Append(_pluginConfig.SpacesInKTKNames
+                ? type.ReadableTypeName().SplitCamelCase()
+                : type.ReadableTypeName());
         }
         else
         {
-            titleBuilder = rssb.Builder
-                               .PushColorRgba(node->IsVisible() ? Color.Green : Color.Text700)
-                               .Append($"{treePrefix}[#{node->NodeId}] {objectInfo->ComponentType} Component Node (Node: {(nint)node:X}, Component: {(nint)component:X})")
-                               .PopColor();
+            rssb.Builder.Append($"{objectInfo->ComponentType} Component Node");
         }
 
-        AddNodeFieldSuffix(titleBuilder, (AtkResNode*)node, nodeOptions);
+        rssb.Builder.Append($" (Node: {(nint)node:X}, Component: {(nint)component:X})");
+        rssb.PopColor();
+
+        AddNodeFieldSuffix(rssb, (AtkResNode*)node, nodeOptions);
 
         using var treeNode = _debugRenderer.DrawTreeNode(nodeOptions with
         {
-            SeStringTitle = titleBuilder.ToReadOnlySeString(),
+            SeStringTitle = rssb.ToReadOnlySeString(),
             DrawSeStringTreeNode = true,
-            TitleColor = node->IsVisible() ? Color.Green : Color.Text700, // needed for the tree node arrow
+            TitleColor = color, // needed for the tree node arrow
             HighlightAddress = (nint)node,
             HighlightType = typeof(AtkComponentNode),
             DrawContextMenu = (nodeOptions, builder) =>
@@ -496,7 +496,7 @@ public unsafe partial class AtkDebugRenderer
         }
     }
 
-    private void AddNodeFieldSuffix(SeStringBuilder titleBuilder, AtkResNode* node, NodeOptions nodeOptions)
+    private void AddNodeFieldSuffix(RentedSeStringBuilder titleBuilder, AtkResNode* node, NodeOptions nodeOptions)
     {
         if (!nodeOptions.UnitBase.HasValue)
             return;
