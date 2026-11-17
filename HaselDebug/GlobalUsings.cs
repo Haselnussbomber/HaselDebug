@@ -13,6 +13,7 @@ global using Dalamud.Interface.Utility.Raii;
 global using Dalamud.Plugin;
 global using Dalamud.Plugin.Services;
 global using FFXIVClientStructs.Interop;
+global using HaselCommon;
 global using HaselCommon.Extensions;
 global using HaselCommon.Gui;
 global using HaselCommon.Hosting;
