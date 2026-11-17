@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.76.0] (2026-11-17)
+
+- **Added:** Execute Command Log tab to inspect parameters from ExecuteCommand calls.
+- **Added:** Execute Location Command Log tab to inspect parameters from ExecuteLocationCommandLogTab calls.
+- **Changed:** Expanded nodes in the Addon Inspector will now stay expanded throughout closing and reopening an addon.
+  - How it works: Instead of relaying on the address of either a AtkUnitBase or AtkResNode, it generates a hash from the addons name and uses the nodes id for the ImGui TreeNode id.
+
 ## [1.75.4] (2026-11-10)
 
 Update for Patch 7.58.
@@ -1162,7 +1169,8 @@ Updated CS for 7.05hf1
 
 First release! 🥳
 
-[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.4...main
+[unreleased]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.76.0...main
+[1.76.0]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.4...v1.76.0
 [1.75.4]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.3...v1.75.4
 [1.75.3]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.2...v1.75.3
 [1.75.2]: https://github.com/Haselnussbomber/HaselDebug/compare/v1.75.1...v1.75.2
