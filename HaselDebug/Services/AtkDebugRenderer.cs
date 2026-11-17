@@ -62,7 +62,7 @@ public unsafe partial class AtkDebugRenderer
 
         var nodeOptions = new NodeOptions()
         {
-            AddressPath = new((nint)unitBase),
+            AddressPath = new(unitBase->Name.UntilNullTerminator().GetSpanHashCode()),
             DefaultOpen = true,
             UnitBase = unitBase,
         };
@@ -298,7 +298,7 @@ public unsafe partial class AtkDebugRenderer
         if (node == null)
             return;
 
-        nodeOptions = nodeOptions.WithAddress((nint)node);
+        nodeOptions = nodeOptions.WithAddress((nint)node->NodeId);
 
         if (nodePath != null)
             ImGui.SetNextItemOpen(nodePath.Contains(node), ImGuiCond.Always);
