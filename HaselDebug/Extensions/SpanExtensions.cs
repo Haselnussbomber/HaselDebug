@@ -1,6 +1,6 @@
 namespace HaselDebug.Extensions;
 
-public static class SpanHashExtensions
+public static class SpanExtensions
 {
     extension(ReadOnlySpan<byte> span)
     {
