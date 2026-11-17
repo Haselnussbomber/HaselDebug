@@ -1,8 +1,6 @@
 using System.Threading.Tasks;
 using HaselDebug.Config;
 using HaselDebug.Interfaces;
-using HaselDebug.Service;
-using HaselDebug.Services;
 using HaselDebug.Tabs;
 using HaselDebug.Utils;
 

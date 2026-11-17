@@ -1,7 +1,6 @@
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using HaselDebug.Service;
 
 namespace HaselDebug.Tabs;
 

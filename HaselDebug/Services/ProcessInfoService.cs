@@ -8,7 +8,7 @@ using Windows.Win32.System.Diagnostics.ToolHelp;
 using Windows.Win32.System.Memory;
 using Windows.Win32.System.SystemServices;
 
-namespace HaselDebug.Service;
+namespace HaselDebug.Services;
 
 [RegisterSingleton, AutoConstruct]
 public partial class ProcessInfoService : IAsyncDisposable

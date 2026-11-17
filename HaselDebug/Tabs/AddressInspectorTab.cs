@@ -1,8 +1,6 @@
 using System.Globalization;
 using HaselDebug.Abstracts;
 using HaselDebug.Interfaces;
-using HaselDebug.Service;
-using HaselDebug.Services;
 using HaselDebug.Services.Data;
 using HaselDebug.Utils;
 using Iced.Intel;

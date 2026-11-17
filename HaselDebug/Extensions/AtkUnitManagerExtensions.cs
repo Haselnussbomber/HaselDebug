@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using HaselDebug.Service;
 
 namespace HaselDebug.Extensions;
 

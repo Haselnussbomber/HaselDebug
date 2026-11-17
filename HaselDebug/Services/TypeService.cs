@@ -12,7 +12,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 namespace HaselDebug.Services;
 
 [AutoConstruct]
-[RegisterSingleton(Duplicate = DuplicateStrategy.Append, Registration = RegistrationStrategy.SelfWithProxyFactory)]
+[RegisterSingleton, RegisterSingleton<IHostedService>(Duplicate = DuplicateStrategy.Append)]
 public partial class TypeService : IHostedService
 {
     private readonly ILogger<TypeService> _logger;

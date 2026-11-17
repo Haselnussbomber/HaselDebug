@@ -15,6 +15,7 @@ public partial class Plugin : IAsyncDalamudPlugin
         _host = new HostBuilder()
             .ConfigureServices(services =>
             {
+                services.AddFallbackProvider(_pluginInterface);
                 services.AddSingleton(_pluginInterface);
                 services.AddHaselCommon();
                 services.AddHaselDebug();

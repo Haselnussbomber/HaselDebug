@@ -4,9 +4,9 @@
     "net10.0-windows7.0": {
       "AutoCtor": {
         "type": "Direct",
-        "requested": "[4.0.1, )",
-        "resolved": "4.0.1",
-        "contentHash": "okT3WzFOTagMp028hELJHY8gUpIuVtp/uRWozgE9z33m1RUjSy58dXFjO9VAU6oxWO2yBGMZr/mcxs4GT4K/Pg=="
+        "requested": "[4.0.2, )",
+        "resolved": "4.0.2",
+        "contentHash": "afKSH54bEHzo+ZAmIJsDgKRwAjzuZ9rszJ2csD/HceskRtwP8oeqkEJgv3Dom5h23Op3KyClMoNXGBj6yOx90g=="
       },
       "DalamudPackager": {
         "type": "Direct",
@@ -22,21 +22,15 @@
       },
       "Iced": {
         "type": "Direct",
-        "requested": "[1.21.0, )",
-        "resolved": "1.21.0",
-        "contentHash": "dv5+81Q1TBQvVMSOOOmRcjJmvWcX3BZPZsIq31+RLc5cNft0IHAyNlkdb7ZarOWG913PyBoFDsDXoCIlKmLclg=="
-      },
-      "Injectio": {
-        "type": "Direct",
-        "requested": "[6.2.0, )",
-        "resolved": "6.2.0",
-        "contentHash": "MgtjdaL1LJojuOTG5Wak9/zrQWnk1o2NYFZZlOLX1AMqcvZj7DCIot31N/e7e9e81iEsQRyEV0ClKIdkozqkqA=="
+        "requested": "[1.22.0, )",
+        "resolved": "1.22.0",
+        "contentHash": "CeaiTnTfk+Ur9K4ulE6ugMRs/qL1FyhntJuBR0myBxYAUtptNjoMR1kZgMsSgfsWTXEPjUG7b2CJyGXMyuba4Q=="
       },
       "LuminaSupplemental.Excel": {
         "type": "Direct",
-        "requested": "[5.1.5, )",
-        "resolved": "5.1.5",
-        "contentHash": "32kzvAN80hfbMXrYBbS1cApUz20glevUSO6z6IdGcP1AIY/pxD0V1n8Oq7c2YWJ9UCYYyqqTj7WnHpyvfFpOlA==",
+        "requested": "[7.0.1, )",
+        "resolved": "7.0.1",
+        "contentHash": "QRtkqiwRM2Z30mLhaqJ89+fUTKYBGdk0al/DsBzQOYpm0oqkgh+h8i0FmvuDM33FOuyIPtD5HYkVTOM0k9oCGg==",
         "dependencies": {
           "CSVFile": "3.2.1",
           "CsvHelper": "30.0.1",

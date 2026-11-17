@@ -8,6 +8,7 @@ using HaselDebug.Utils;
 using HaselDebug.Windows;
 using Lumina.Data;
 using Lumina.Text.Expressions;
+using Language = Lumina.Data.Language;
 
 namespace HaselDebug.Services;
 
