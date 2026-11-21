@@ -297,7 +297,9 @@ public unsafe partial class AtkDebugRenderer
         if (node == null)
             return;
 
-        nodeOptions = nodeOptions.WithAddress((nint)node->NodeId);
+        var customNodeTypeName = _typeService.CustomNodeTypes?.GetValueOrDefault((nint)node)?.FullName;
+
+        nodeOptions = nodeOptions.WithAddress((nint)node->NodeId + customNodeTypeName?.GetHashCode() ?? 0);
 
         if (nodePath != null)
             ImGui.SetNextItemOpen(nodePath.Contains(node), ImGuiCond.Always);
